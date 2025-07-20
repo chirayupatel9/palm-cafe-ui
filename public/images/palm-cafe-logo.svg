@@ -1,0 +1,21 @@
+<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background circle -->
+  <circle cx="100" cy="100" r="95" fill="#153059" stroke="#f4e1ba" stroke-width="2"/>
+  
+  <!-- Palm tree trunk -->
+  <path d="M85 140 L85 100 Q85 90 95 90 Q105 90 105 100 L105 140 Z" fill="#f4e1ba"/>
+  
+  <!-- Palm tree fronds -->
+  <path d="M95 90 Q85 80 80 70 Q75 60 85 50 Q95 40 105 50 Q115 60 110 70 Q105 80 95 90" fill="#f4e1ba"/>
+  <path d="M95 90 Q85 85 75 75 Q65 65 70 55 Q75 45 85 55 Q95 65 95 90" fill="#f4e1ba"/>
+  <path d="M95 90 Q105 85 115 75 Q125 65 120 55 Q115 45 105 55 Q95 65 95 90" fill="#f4e1ba"/>
+  
+  <!-- Stylized base/roots -->
+  <path d="M75 140 Q85 150 95 150 Q105 150 115 140 Q110 145 105 145 Q95 145 90 145 Q85 145 80 140 Z" fill="#f4e1ba"/>
+  
+  <!-- Text: THE PALM -->
+  <text x="100" y="170" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#f4e1ba">THE PALM</text>
+  
+  <!-- Text: CAFE -->
+  <text x="100" y="185" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="normal" fill="#f4e1ba" letter-spacing="2">CAFE</text>
+</svg> 
