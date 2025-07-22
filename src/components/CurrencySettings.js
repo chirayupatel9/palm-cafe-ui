@@ -205,7 +205,7 @@ const CurrencySettings = () => {
                   value={formData.currency_code}
                   onChange={handleInputChange}
                   className="input-field"
-                  placeholder="e.g., USD"
+                  placeholder="e.g., INR"
                   maxLength="3"
                   required
                 />
@@ -237,7 +237,7 @@ const CurrencySettings = () => {
                   value={formData.currency_name}
                   onChange={handleInputChange}
                   className="input-field"
-                  placeholder="e.g., US Dollar"
+                  placeholder="e.g., Indian Rupee"
                   required
                 />
               </div>
@@ -272,7 +272,7 @@ const CurrencySettings = () => {
                 <h4 className="text-sm font-semibold text-secondary-700 dark:text-secondary-300 uppercase tracking-wide">Currency Code</h4>
               </div>
               <p className="text-xl font-bold text-secondary-800 dark:text-secondary-200">
-                {currentSettings?.currency_code || 'USD'}
+                {currentSettings?.currency_code || 'INR'}
               </p>
             </div>
             <div className="bg-gradient-to-br from-warm-50 to-warm-100 dark:from-warm-900/30 dark:to-warm-800/20 p-6 rounded-xl border border-warm-200 dark:border-warm-700 shadow-sm hover:shadow-md transition-all duration-200">
@@ -294,7 +294,7 @@ const CurrencySettings = () => {
                 <h4 className="text-sm font-semibold text-secondary-700 dark:text-secondary-300 uppercase tracking-wide">Currency Name</h4>
               </div>
               <p className="text-xl font-bold text-secondary-800 dark:text-secondary-200">
-                {currentSettings?.currency_name || 'US Dollar'}
+                {currentSettings?.currency_name || 'Indian Rupee'}
               </p>
             </div>
           </div>

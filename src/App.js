@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
-import { Receipt, Settings, Plus, Calculator, FolderOpen, Menu, X, DollarSign, LogOut, User } from 'lucide-react';
+import { Receipt, Settings, Plus, Calculator, FolderOpen, Menu, X, DollarSign, LogOut, User, Package } from 'lucide-react';
 import axios from 'axios';
 import { CurrencyProvider } from './contexts/CurrencyContext';
 import { DarkModeProvider } from './contexts/DarkModeContext';
@@ -12,13 +12,14 @@ import CategoryManagement from './components/CategoryManagement';
 import InvoiceHistory from './components/InvoiceHistory';
 import TaxSettings from './components/TaxSettings';
 import CurrencySettings from './components/CurrencySettings';
+import InventoryManagement from './components/InventoryManagement';
 import DarkModeToggle from './components/DarkModeToggle';
 import Login from './components/Login';
 import Register from './components/Register';
 import ProtectedRoute from './components/ProtectedRoute';
 
 // Configure axios base URL - use environment variable or fallback to localhost
-const API_BASE_URL = "https://palm-cafe-api.onrender.com"//process.env.REACT_APP_API_BASE_URL;
+const API_BASE_URL = "http://localhost:5000"//"https://palm-cafe-api.onrender.com"//process.env.REACT_APP_API_BASE_URL;
 axios.defaults.baseURL = `${API_BASE_URL}/api`;
 
 function MainApp() {
@@ -100,6 +101,8 @@ function MainApp() {
         return <TaxSettings />;
       case 'currency':
         return <CurrencySettings />;
+      case 'inventory':
+        return <InventoryManagement />;
       default:
         return <OrderPage menuItems={menuItems} />;
     }
@@ -109,6 +112,7 @@ function MainApp() {
     { id: 'order', label: 'New Order', icon: Plus },
     { id: 'categories', label: 'Categories', icon: FolderOpen },
     { id: 'menu', label: 'Menu Management', icon: Settings },
+    { id: 'inventory', label: 'Inventory', icon: Package },
     { id: 'history', label: 'Invoice History', icon: Receipt },
     { id: 'tax', label: 'Tax Settings', icon: Calculator },
     { id: 'currency', label: 'Currency Settings', icon: DollarSign },

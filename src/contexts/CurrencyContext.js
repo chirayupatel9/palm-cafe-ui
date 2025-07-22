@@ -13,9 +13,9 @@ export const useCurrency = () => {
 
 export const CurrencyProvider = ({ children }) => {
   const [currencySettings, setCurrencySettings] = useState({
-    currency_code: 'USD',
-    currency_symbol: '$',
-    currency_name: 'US Dollar'
+    currency_code: 'INR',
+    currency_symbol: '₹',
+    currency_name: 'Indian Rupee'
   });
   const [loading, setLoading] = useState(true);
 
@@ -31,9 +31,9 @@ export const CurrencyProvider = ({ children }) => {
       console.error('Error fetching currency settings:', error);
       // Use default settings if API fails
       setCurrencySettings({
-        currency_code: 'USD',
-        currency_symbol: '$',
-        currency_name: 'US Dollar'
+        currency_code: 'INR',
+        currency_symbol: '₹',
+        currency_name: 'Indian Rupee'
       });
     } finally {
       setLoading(false);
@@ -42,7 +42,14 @@ export const CurrencyProvider = ({ children }) => {
 
   const formatCurrency = (amount) => {
     const { currency_symbol } = currencySettings;
-    return `${currency_symbol}${parseFloat(amount).toFixed(2)}`;
+    if (!amount || isNaN(amount) || amount === null || amount === undefined) {
+      return `${currency_symbol}0.00`;
+    }
+    const parsedAmount = parseFloat(amount);
+    if (isNaN(parsedAmount)) {
+      return `${currency_symbol}0.00`;
+    }
+    return `${currency_symbol}${parsedAmount.toFixed(2)}`;
   };
 
   const updateCurrencySettings = (newSettings) => {

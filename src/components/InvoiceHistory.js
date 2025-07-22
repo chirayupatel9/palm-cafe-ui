@@ -73,13 +73,19 @@ const InvoiceHistory = () => {
   };
 
   const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
+    if (!dateString) return 'N/A';
+    try {
+      return new Date(dateString).toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+    } catch (error) {
+      console.error('Error formatting date:', dateString, error);
+      return 'Invalid Date';
+    }
   };
 
   // Helper function to get invoice number from different possible property names
@@ -175,11 +181,11 @@ const InvoiceHistory = () => {
                           <User className="h-4 w-4 text-secondary-400 mr-2" />
                           <div>
                             <div className="text-sm font-medium text-secondary-700 dark:text-secondary-300">
-                              {invoice.customerName}
+                              {invoice.customer_name}
                             </div>
-                            {invoice.customerPhone && (
+                            {invoice.customer_phone && (
                               <div className="text-sm text-gray-500 dark:text-gray-400">
-                                {invoice.customerPhone}
+                                {invoice.customer_phone}
                               </div>
                             )}
                           </div>
@@ -189,7 +195,7 @@ const InvoiceHistory = () => {
                         <div className="flex items-center">
                           <Calendar className="h-4 w-4 text-secondary-400 mr-2" />
                           <div className="text-sm text-secondary-700 dark:text-secondary-300">
-                            {formatDate(invoice.date)}
+                            {formatDate(invoice.invoice_date)}
                           </div>
                         </div>
                       </td>
@@ -214,9 +220,9 @@ const InvoiceHistory = () => {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center">
-                          <div className="text-sm font-semibold text-secondary-600">
-                            {formatCurrency(invoice.total)}
-                          </div>
+                                                  <div className="text-sm font-semibold text-secondary-600">
+                          {formatCurrency(invoice.total_amount)}
+                        </div>
                         </div>
                         {/* Show tax and tip breakdown */}
                         <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
@@ -252,7 +258,7 @@ const InvoiceHistory = () => {
                       <Calendar className="h-5 w-5 text-secondary-500 mr-2" />
                       <div>
                         <h4 className="font-medium text-secondary-700 dark:text-secondary-300">#{getInvoiceNumber(invoice)}</h4>
-                        <p className="text-sm text-gray-600 dark:text-gray-400">{formatDate(invoice.date)}</p>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">{formatDate(invoice.invoice_date)}</p>
                       </div>
                     </div>
                     <button
@@ -268,9 +274,9 @@ const InvoiceHistory = () => {
                     <div className="flex items-center">
                       <User className="h-4 w-4 text-secondary-400 mr-2" />
                       <div>
-                        <p className="text-sm font-medium text-secondary-700 dark:text-secondary-300">{invoice.customerName}</p>
-                        {invoice.customerPhone && (
-                          <p className="text-xs text-gray-500 dark:text-gray-400">{invoice.customerPhone}</p>
+                        <p className="text-sm font-medium text-secondary-700 dark:text-secondary-300">{invoice.customer_name}</p>
+                        {invoice.customer_phone && (
+                          <p className="text-xs text-gray-500 dark:text-gray-400">{invoice.customer_phone}</p>
                         )}
                         <div className="mt-1">
                           <span className="text-xs text-gray-500 dark:text-gray-400">
@@ -295,9 +301,9 @@ const InvoiceHistory = () => {
                     
                                           <div className="flex justify-between items-center pt-2 border-t border-accent-100">
                         <div className="flex items-center">
-                          <span className="text-sm font-semibold text-secondary-600">
-                            {formatCurrency(invoice.total)}
-                          </span>
+                                                  <span className="text-sm font-semibold text-secondary-600">
+                          {formatCurrency(invoice.total_amount)}
+                        </span>
                         </div>
                         <div className="text-xs text-gray-500 dark:text-gray-400">
                           {invoice.tax_amount > 0 && (
