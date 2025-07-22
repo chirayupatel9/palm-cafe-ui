@@ -359,6 +359,48 @@ const OrderPage = ({ menuItems }) => {
                 </div>
               </div>
 
+              {/* UPI QR Code Display */}
+              {paymentMethod === 'upi' && (
+                <div className="mb-4 p-4 bg-white border border-accent-200 rounded-lg">
+                  <div className="text-center">
+                    <div className="bg-purple-600 text-white p-3 rounded-t-lg -mt-4 -mx-4 mb-4 flex items-center">
+                      <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center mr-2">
+                        <span className="text-purple-600 font-bold text-sm">पे</span>
+                      </div>
+                      <span className="font-semibold">PhonePe</span>
+                    </div>
+                    
+                    <p className="text-sm text-gray-600 mb-4">Scan & Pay with any UPI App</p>
+                    
+                    <img 
+                      src="/images/upi-qr-code.png" 
+                      alt="UPI QR Code" 
+                      className="w-40 h-40 mx-auto mb-4"
+                    />
+                    
+                    <div className="text-sm text-gray-600 mb-2">UPI ID: Q966641592@ybl</div>
+                    
+                    <div className="flex justify-center items-center space-x-4 mb-3">
+                      <div className="text-center">
+                        <div className="text-base font-bold text-gray-700">BHIM</div>
+                        <div className="text-xs text-gray-500">BHARAT INTERFACE</div>
+                        <div className="text-xs text-gray-500">FOR MONEY</div>
+                      </div>
+                      <div className="w-px h-6 bg-gray-300"></div>
+                      <div className="text-center">
+                        <div className="text-base font-bold text-gray-700">UPI</div>
+                        <div className="text-xs text-gray-500">UNIFIED PAYMENTS</div>
+                        <div className="text-xs text-gray-500">INTERFACE</div>
+                      </div>
+                    </div>
+                    
+                    <div className="text-sm font-medium text-gray-700">The Palm Cafe</div>
+                    
+                    <div className="bg-purple-600 h-2 -mx-4 -mb-4 rounded-b-lg"></div>
+                  </div>
+                </div>
+              )}
+
               {/* Cart Items */}
               {cart.length === 0 ? (
                 <div className="text-center py-8 text-gray-500">
@@ -551,6 +593,48 @@ const OrderPage = ({ menuItems }) => {
                 ))}
               </div>
             </div>
+
+            {/* UPI QR Code Display */}
+            {paymentMethod === 'upi' && (
+              <div className="mb-4 p-4 bg-white border border-accent-200 rounded-lg">
+                <div className="text-center">
+                  <div className="bg-purple-600 text-white p-3 rounded-t-lg -mt-4 -mx-4 mb-4 flex items-center">
+                    <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center mr-2">
+                      <span className="text-purple-600 font-bold text-sm">पे</span>
+                    </div>
+                    <span className="font-semibold">PhonePe</span>
+                  </div>
+                  
+                  <p className="text-sm text-gray-600 mb-4">Scan & Pay with any UPI App</p>
+                  
+                  <img 
+                    src="/images/upi-qr-code.png" 
+                    alt="UPI QR Code" 
+                    className="w-48 h-48 mx-auto mb-4"
+                  />
+                  
+                  <div className="text-sm text-gray-600 mb-2">UPI ID: Q966641592@ybl</div>
+                  
+                  <div className="flex justify-center items-center space-x-4 mb-3">
+                    <div className="text-center">
+                      <div className="text-lg font-bold text-gray-700">BHIM</div>
+                      <div className="text-xs text-gray-500">BHARAT INTERFACE</div>
+                      <div className="text-xs text-gray-500">FOR MONEY</div>
+                    </div>
+                    <div className="w-px h-8 bg-gray-300"></div>
+                    <div className="text-center">
+                      <div className="text-lg font-bold text-gray-700">UPI</div>
+                      <div className="text-xs text-gray-500">UNIFIED PAYMENTS</div>
+                      <div className="text-xs text-gray-500">INTERFACE</div>
+                    </div>
+                  </div>
+                  
+                  <div className="text-sm font-medium text-gray-700">The Palm Cafe</div>
+                  
+                  <div className="bg-purple-600 h-2 -mx-4 -mb-4 rounded-b-lg"></div>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Cart Items */}
