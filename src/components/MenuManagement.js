@@ -106,7 +106,9 @@ const MenuManagement = ({ menuItems, onUpdate, onAdd, onDelete }) => {
         sort_order: ''
       });
     } catch (error) {
-      toast.error('Failed to save menu item');
+      console.error('Error saving menu item:', error);
+      const errorMessage = error.response?.data?.error || 'Failed to save menu item';
+      toast.error(errorMessage);
     }
   };
 
