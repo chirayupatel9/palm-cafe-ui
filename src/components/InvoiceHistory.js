@@ -10,10 +10,6 @@ const InvoiceHistory = () => {
   const [statistics, setStatistics] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Debug logging
-  console.log('InvoiceHistory - Currency Settings:', currencySettings);
-  console.log('InvoiceHistory - formatCurrency function:', formatCurrency);
-
   useEffect(() => {
     fetchInvoices();
     fetchStatistics();
@@ -22,7 +18,6 @@ const InvoiceHistory = () => {
   const fetchInvoices = async () => {
     try {
       const response = await axios.get('/invoices');
-      console.log('Fetched invoices:', response.data);
       setInvoices(response.data);
     } catch (error) {
       console.error('Error fetching invoices:', error);
@@ -49,7 +44,6 @@ const InvoiceHistory = () => {
     }
     
     try {
-      console.log('Opening invoice:', invoiceNumber);
       const response = await axios.get(`/invoices/${invoiceNumber}/download`);
       
       // Create blob and open PDF in new tab

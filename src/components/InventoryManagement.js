@@ -7,7 +7,7 @@ import { useAuth } from '../contexts/AuthContext';
 
 const InventoryManagement = () => {
   const { formatCurrency } = useCurrency();
-  const { isAuthenticated, user, loading: authLoading, token } = useAuth();
+  const { isAuthenticated, user, loading: authLoading } = useAuth();
   const [inventory, setInventory] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showAddForm, setShowAddForm] = useState(false);
@@ -51,21 +51,10 @@ const InventoryManagement = () => {
 
   const fetchCategories = async () => {
     try {
-      console.log('🔍 Fetching inventory categories...');
-      console.log('🔑 Auth token:', token ? 'Present' : 'Missing');
-      console.log('👤 User authenticated:', isAuthenticated);
-      
       const response = await axios.get('/inventory/categories');
-      console.log('✅ Categories response:', response.data);
       setCategories(response.data);
     } catch (error) {
-      console.error('❌ Error fetching inventory categories:', error);
-      console.error('📊 Error details:', {
-        status: error.response?.status,
-        statusText: error.response?.statusText,
-        data: error.response?.data,
-        headers: error.response?.headers
-      });
+      console.error('Error fetching inventory categories:', error);
       // If no inventory categories exist yet, start with empty array
       setCategories([]);
     }
