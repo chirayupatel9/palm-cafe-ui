@@ -1,0 +1,504 @@
+import React, { useState, useEffect } from 'react';
+import { Clock, CheckCircle, XCircle, Printer, RefreshCw, AlertTriangle, Coffee, Utensils, Plus } from 'lucide-react';
+import axios from 'axios';
+import toast from 'react-hot-toast';
+import { useAuth } from '../contexts/AuthContext';
+
+const KitchenOrders = () => {
+  const { isAuthenticated, user, loading: authLoading } = useAuth();
+  const [orders, setOrders] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [selectedOrder, setSelectedOrder] = useState(null);
+  const [showPrintModal, setShowPrintModal] = useState(false);
+  const [autoRefresh, setAutoRefresh] = useState(true);
+  const [autoPrint, setAutoPrint] = useState(true);
+  const [filterStatus, setFilterStatus] = useState('all');
+
+  useEffect(() => {
+    if (isAuthenticated && !authLoading) {
+      fetchOrders();
+      if (autoRefresh) {
+        const interval = setInterval(fetchOrders, 30000); // Refresh every 30 seconds
+        return () => clearInterval(interval);
+      }
+    }
+  }, [isAuthenticated, authLoading, autoRefresh]);
+
+  const fetchOrders = async () => {
+    try {
+      console.log('🔍 Frontend: Fetching orders...');
+      const response = await axios.get('/orders');
+      console.log('✅ Frontend: Orders received:', response.data);
+      
+      // Debug: Check items in orders
+      response.data.forEach((order, index) => {
+        console.log(`📋 Order ${index + 1} (${order.order_number}):`, {
+          id: order.id,
+          items_count: order.items ? order.items.length : 0,
+          items: order.items
+        });
+      });
+      
+      // Check for new pending orders and auto-print them
+      const newOrders = response.data.filter(newOrder => 
+        newOrder.status === 'pending' && 
+        !orders.some(oldOrder => oldOrder.id === newOrder.id)
+      );
+      
+      if (autoPrint && newOrders.length > 0) {
+        console.log('🆕 New orders detected:', newOrders.length);
+        // Auto-print the first new order
+        try {
+          await printOrder(newOrders[0]);
+          toast.success(`New order #${newOrders[0].order_number} printed automatically!`);
+        } catch (printError) {
+          console.error('Auto-print failed for new order:', printError);
+        }
+      }
+      
+      setOrders(response.data);
+    } catch (error) {
+      console.error('❌ Frontend: Error fetching orders:', error);
+      console.error('📊 Error details:', {
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data
+      });
+      toast.error('Failed to load orders');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const updateOrderStatus = async (orderId, status) => {
+    try {
+      await axios.patch(`/orders/${orderId}/status`, { status });
+      toast.success(`Order ${status} successfully`);
+      
+      // Auto-print when order status changes to 'preparing' or 'ready'
+      if (autoPrint && (status === 'preparing' || status === 'ready')) {
+        try {
+          const order = orders.find(o => o.id === orderId);
+          if (order) {
+            await printOrder(order);
+          }
+        } catch (printError) {
+          console.error('Auto-print failed:', printError);
+          // Don't show error toast for auto-print failures
+        }
+      }
+      
+      fetchOrders();
+    } catch (error) {
+      console.error('Error updating order status:', error);
+      toast.error('Failed to update order status');
+    }
+  };
+
+  const printOrder = async (order) => {
+    try {
+      const response = await axios.post(`/orders/${order.id}/print`, {}, {
+        responseType: 'blob'
+      });
+      
+      // Create blob and download
+      const blob = new Blob([response.data], { type: 'text/plain' });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `order-${order.order_number}.txt`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+      
+      toast.success('Order printed successfully');
+    } catch (error) {
+      console.error('Error printing order:', error);
+      toast.error('Failed to print order');
+    }
+  };
+
+  const getStatusIcon = (status) => {
+    switch (status) {
+      case 'pending':
+        return <Clock className="h-5 w-5 text-yellow-500" />;
+      case 'preparing':
+        return <Utensils className="h-5 w-5 text-blue-500" />;
+      case 'ready':
+        return <CheckCircle className="h-5 w-5 text-green-500" />;
+      case 'completed':
+        return <CheckCircle className="h-5 w-5 text-green-600" />;
+      case 'cancelled':
+        return <XCircle className="h-5 w-5 text-red-500" />;
+      default:
+        return <AlertTriangle className="h-5 w-5 text-gray-500" />;
+    }
+  };
+
+  const getStatusColor = (status) => {
+    switch (status) {
+      case 'pending':
+        return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+      case 'preparing':
+        return 'bg-blue-100 text-blue-800 border-blue-200';
+      case 'ready':
+        return 'bg-green-100 text-green-800 border-green-200';
+      case 'completed':
+        return 'bg-green-200 text-green-900 border-green-300';
+      case 'cancelled':
+        return 'bg-red-100 text-red-800 border-red-200';
+      default:
+        return 'bg-gray-100 text-gray-800 border-gray-200';
+    }
+  };
+
+  const getNextStatus = (currentStatus) => {
+    switch (currentStatus) {
+      case 'pending':
+        return 'preparing';
+      case 'preparing':
+        return 'ready';
+      case 'ready':
+        return 'completed';
+      default:
+        return null;
+    }
+  };
+
+  const formatTime = (timestamp) => {
+    return new Date(timestamp).toLocaleTimeString('en-US', {
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: true
+    });
+  };
+
+  const formatDate = (timestamp) => {
+    return new Date(timestamp).toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: true
+    });
+  };
+
+  const filteredOrders = orders.filter(order => {
+    if (filterStatus === 'all') return true;
+    return order.status === filterStatus;
+  });
+
+  const pendingOrders = orders.filter(order => 
+    ['pending', 'preparing'].includes(order.status)
+  );
+
+  if (authLoading) {
+    return (
+      <div className="flex flex-col items-center justify-center py-12">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600 mb-4"></div>
+        <p className="text-gray-600 dark:text-gray-400">Loading kitchen orders...</p>
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return (
+      <div className="flex flex-col items-center justify-center py-12">
+        <img 
+          src="/images/palm-cafe-logo.png" 
+          alt="Palm Cafe Logo" 
+          className="h-16 w-16 mb-4 opacity-50"
+        />
+        <h2 className="text-xl font-semibold text-secondary-700 dark:text-secondary-300 mb-2">Authentication Required</h2>
+        <p className="text-gray-600 dark:text-gray-400 text-center mb-4">
+          You need to be logged in to access the kitchen orders.
+        </p>
+        <button
+          onClick={() => window.location.href = '/login'}
+          className="btn-primary"
+        >
+          Go to Login
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center">
+          <img 
+            src="/images/palm-cafe-logo.png" 
+            alt="Palm Cafe Logo" 
+            className="h-12 w-12 mr-4"
+          />
+          <div>
+            <h1 className="text-2xl font-bold text-secondary-700 dark:text-secondary-300">Kitchen Orders</h1>
+            <p className="text-gray-600 dark:text-gray-400">Manage and track order preparation</p>
+          </div>
+        </div>
+        <div className="flex items-center space-x-2">
+          <button
+            onClick={fetchOrders}
+            className="btn-secondary flex items-center"
+            title="Refresh Orders"
+          >
+            <RefreshCw className="h-4 w-4 mr-2" />
+            Refresh
+          </button>
+          <button
+            onClick={async () => {
+              try {
+                await axios.post('/orders/test');
+                toast.success('Test order created!');
+                fetchOrders();
+              } catch (error) {
+                console.error('Error creating test order:', error);
+                toast.error('Failed to create test order');
+              }
+            }}
+            className="btn-primary flex items-center"
+            title="Create Test Order"
+          >
+            <Plus className="h-4 w-4 mr-2" />
+            Test Order
+          </button>
+          <label className="flex items-center space-x-2 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={autoRefresh}
+              onChange={(e) => setAutoRefresh(e.target.checked)}
+              className="rounded"
+            />
+            <span className="text-sm text-gray-600 dark:text-gray-400">Auto-refresh</span>
+          </label>
+          <label className="flex items-center space-x-2 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={autoPrint}
+              onChange={(e) => setAutoPrint(e.target.checked)}
+              className="rounded"
+            />
+            <span className="text-sm text-gray-600 dark:text-gray-400">Auto-print</span>
+          </label>
+        </div>
+      </div>
+
+      {/* Statistics */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="card">
+          <div className="flex items-center">
+            <div className="p-2 bg-yellow-100 rounded-lg">
+              <Clock className="h-6 w-6 text-yellow-600" />
+            </div>
+            <div className="ml-4">
+              <p className="text-sm font-medium text-gray-600">Pending</p>
+              <p className="text-2xl font-bold text-yellow-600">
+                {orders.filter(o => o.status === 'pending').length}
+              </p>
+            </div>
+          </div>
+        </div>
+        <div className="card">
+          <div className="flex items-center">
+            <div className="p-2 bg-blue-100 rounded-lg">
+              <Utensils className="h-6 w-6 text-blue-600" />
+            </div>
+            <div className="ml-4">
+              <p className="text-sm font-medium text-gray-600">Preparing</p>
+              <p className="text-2xl font-bold text-blue-600">
+                {orders.filter(o => o.status === 'preparing').length}
+              </p>
+            </div>
+          </div>
+        </div>
+        <div className="card">
+          <div className="flex items-center">
+            <div className="p-2 bg-green-100 rounded-lg">
+              <CheckCircle className="h-6 w-6 text-green-600" />
+            </div>
+            <div className="ml-4">
+              <p className="text-sm font-medium text-gray-600">Ready</p>
+              <p className="text-2xl font-bold text-green-600">
+                {orders.filter(o => o.status === 'ready').length}
+              </p>
+            </div>
+          </div>
+        </div>
+        <div className="card">
+          <div className="flex items-center">
+            <div className="p-2 bg-gray-100 rounded-lg">
+              <Coffee className="h-6 w-6 text-gray-600" />
+            </div>
+            <div className="ml-4">
+              <p className="text-sm font-medium text-gray-600">Total Active</p>
+              <p className="text-2xl font-bold text-gray-600">
+                {pendingOrders.length}
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Filters */}
+      <div className="flex items-center space-x-4">
+        <select
+          value={filterStatus}
+          onChange={(e) => setFilterStatus(e.target.value)}
+          className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
+        >
+          <option value="all">All Orders</option>
+          <option value="pending">Pending</option>
+          <option value="preparing">Preparing</option>
+          <option value="ready">Ready</option>
+          <option value="completed">Completed</option>
+          <option value="cancelled">Cancelled</option>
+        </select>
+      </div>
+
+      {/* Orders List */}
+      {loading ? (
+        <div className="flex justify-center py-8">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
+        </div>
+      ) : filteredOrders.length === 0 ? (
+        <div className="text-center py-8">
+          <Coffee className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+          <p className="text-gray-500">No orders found</p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+          {filteredOrders.map((order) => (
+            <div
+              key={order.id}
+              className={`card border-l-4 ${
+                order.status === 'pending' ? 'border-l-yellow-500' :
+                order.status === 'preparing' ? 'border-l-blue-500' :
+                order.status === 'ready' ? 'border-l-green-500' :
+                order.status === 'completed' ? 'border-l-green-600' :
+                'border-l-red-500'
+              }`}
+            >
+              {/* Order Header */}
+              <div className="flex items-center justify-between mb-4">
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                    Order #{order.order_number}
+                  </h3>
+                  <p className="text-sm text-gray-500">
+                    {formatDate(order.created_at)}
+                  </p>
+                </div>
+                <div className="flex items-center space-x-2">
+                  {getStatusIcon(order.status)}
+                  <span className={`px-2 py-1 text-xs font-medium rounded-full border ${getStatusColor(order.status)}`}>
+                    {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
+                  </span>
+                </div>
+              </div>
+
+              {/* Customer Info */}
+              <div className="mb-4 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                <p className="font-medium text-gray-900 dark:text-gray-100">
+                  {order.customer_name || 'Walk-in Customer'}
+                </p>
+                {order.customer_phone && order.customer_phone.trim() !== '' && (
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                    📞 {order.customer_phone}
+                  </p>
+                )}
+                {order.payment_method && (
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                    💳 {order.payment_method.toUpperCase()}
+                  </p>
+                )}
+              </div>
+
+              {/* Order Items */}
+              <div className="mb-4">
+                <h4 className="font-medium text-gray-900 dark:text-gray-100 mb-2">Items:</h4>
+                {order.items && order.items.length > 0 ? (
+                  <div className="space-y-2">
+                    {order.items.map((item, index) => (
+                      <div key={index} className="flex justify-between items-center">
+                        <div className="flex items-center space-x-2">
+                          <span className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                            {item.quantity}x
+                          </span>
+                          <span className="text-sm text-gray-700 dark:text-gray-300">
+                            {item.name || 'Unknown Item'}
+                          </span>
+                        </div>
+                        <span className="text-sm text-gray-600 dark:text-gray-400">
+                          ₹{item.price || 0}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-sm text-gray-500 dark:text-gray-400 italic">
+                    No items found
+                  </p>
+                )}
+              </div>
+
+              {/* Order Total */}
+              <div className="border-t pt-3 mb-4">
+                <div className="flex justify-between items-center">
+                  <span className="font-medium text-gray-900 dark:text-gray-100">Total:</span>
+                  <span className="font-bold text-lg text-gray-900 dark:text-gray-100">
+                    ₹{order.final_amount}
+                  </span>
+                </div>
+              </div>
+
+              {/* Notes */}
+              {order.notes && (
+                <div className="mb-4 p-3 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
+                  <p className="text-sm text-yellow-800 dark:text-yellow-200">
+                    <strong>Notes:</strong> {order.notes}
+                  </p>
+                </div>
+              )}
+
+              {/* Actions */}
+              <div className="flex items-center justify-between pt-3 border-t">
+                <div className="flex space-x-2">
+                  {getNextStatus(order.status) && (
+                    <button
+                      onClick={() => updateOrderStatus(order.id, getNextStatus(order.status))}
+                      className="btn-primary text-sm px-3 py-1"
+                    >
+                      {getNextStatus(order.status) === 'preparing' ? 'Start Preparing' :
+                       getNextStatus(order.status) === 'ready' ? 'Mark Ready' :
+                       getNextStatus(order.status) === 'completed' ? 'Complete' : 'Update'}
+                    </button>
+                  )}
+                  {order.status === 'pending' && (
+                    <button
+                      onClick={() => updateOrderStatus(order.id, 'cancelled')}
+                      className="btn-secondary text-sm px-3 py-1 text-red-600 border-red-300 hover:bg-red-50"
+                    >
+                      Cancel
+                    </button>
+                  )}
+                </div>
+                <button
+                  onClick={() => printOrder(order)}
+                  className="btn-secondary text-sm px-3 py-1"
+                  title="Print Order"
+                >
+                  <Printer className="h-4 w-4" />
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default KitchenOrders; 

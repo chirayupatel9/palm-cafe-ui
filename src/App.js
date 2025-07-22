@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
-import { Receipt, Settings, Plus, Calculator, FolderOpen, Menu, X, DollarSign, LogOut, User, Package } from 'lucide-react';
+import { Receipt, Settings, Plus, Calculator, FolderOpen, Menu, X, DollarSign, LogOut, User, Package, Utensils } from 'lucide-react';
 import axios from 'axios';
 import { CurrencyProvider } from './contexts/CurrencyContext';
 import { DarkModeProvider } from './contexts/DarkModeContext';
@@ -13,13 +13,14 @@ import InvoiceHistory from './components/InvoiceHistory';
 import TaxSettings from './components/TaxSettings';
 import CurrencySettings from './components/CurrencySettings';
 import InventoryManagement from './components/InventoryManagement';
+import KitchenOrders from './components/KitchenOrders';
 import DarkModeToggle from './components/DarkModeToggle';
 import Login from './components/Login';
 import Register from './components/Register';
 import ProtectedRoute from './components/ProtectedRoute';
 
 // Configure axios base URL - use environment variable or fallback to localhost
-const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || "http://localhost:5000";
 axios.defaults.baseURL = `${API_BASE_URL}/api`;
 
 function MainApp() {
@@ -103,6 +104,8 @@ function MainApp() {
         return <CurrencySettings />;
       case 'inventory':
         return <InventoryManagement />;
+      case 'kitchen':
+        return <KitchenOrders />;
       default:
         return <OrderPage menuItems={menuItems} />;
     }
@@ -110,6 +113,7 @@ function MainApp() {
 
   const navigationItems = [
     { id: 'order', label: 'New Order', icon: Plus },
+    { id: 'kitchen', label: 'Kitchen Orders', icon: Utensils },
     { id: 'categories', label: 'Categories', icon: FolderOpen },
     { id: 'menu', label: 'Menu Management', icon: Settings },
     { id: 'inventory', label: 'Inventory', icon: Package },

@@ -176,7 +176,11 @@ const OrderPage = ({ menuItems }) => {
       setTipAmount(0);
       setTipPercentage(0);
       
-      toast.success('Invoice generated and opened!');
+      const orderNumber = response.data.orderNumber;
+      const successMessage = orderNumber 
+        ? `Invoice generated and opened! Order #${orderNumber}`
+        : 'Invoice generated and opened!';
+      toast.success(successMessage);
     } catch (error) {
       console.error('Error generating invoice:', error);
       toast.error('Failed to generate invoice');

@@ -143,6 +143,9 @@ const InvoiceHistory = () => {
                       Invoice #
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-secondary-600 uppercase tracking-wider">
+                      Order #
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-secondary-600 uppercase tracking-wider">
                       Customer
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-secondary-600 uppercase tracking-wider">
@@ -168,6 +171,11 @@ const InvoiceHistory = () => {
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="text-sm font-medium text-secondary-700 dark:text-secondary-300">
                           #{getInvoiceNumber(invoice)}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm text-secondary-600 dark:text-secondary-400">
+                          {invoice.order_number ? `#${invoice.order_number}` : 'N/A'}
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
@@ -252,6 +260,9 @@ const InvoiceHistory = () => {
                       <Calendar className="h-5 w-5 text-secondary-500 mr-2" />
                       <div>
                         <h4 className="font-medium text-secondary-700 dark:text-secondary-300">#{getInvoiceNumber(invoice)}</h4>
+                        {invoice.order_number && (
+                          <p className="text-xs text-gray-500 dark:text-gray-400">Order #{invoice.order_number}</p>
+                        )}
                         <p className="text-sm text-gray-600 dark:text-gray-400">{formatDate(invoice.invoice_date)}</p>
                       </div>
                     </div>
