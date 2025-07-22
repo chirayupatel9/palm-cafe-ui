@@ -18,7 +18,7 @@ import Register from './components/Register';
 import ProtectedRoute from './components/ProtectedRoute';
 
 // Configure axios base URL - use environment variable or fallback to localhost
-const API_BASE_URL = "https://palm-cafe-api.onrender.com"//process.env.REACT_APP_API_BASE_URL;
+const API_BASE_URL = "http://localhost:5000"//"https://palm-cafe-api.onrender.com"//process.env.REACT_APP_API_BASE_URL;
 axios.defaults.baseURL = `${API_BASE_URL}/api`;
 
 function MainApp() {

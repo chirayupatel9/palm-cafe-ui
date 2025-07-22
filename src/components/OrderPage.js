@@ -10,6 +10,7 @@ const OrderPage = ({ menuItems }) => {
   const [cart, setCart] = useState([]);
   const [customerName, setCustomerName] = useState('');
   const [customerPhone, setCustomerPhone] = useState('');
+  const [paymentMethod, setPaymentMethod] = useState('cash');
   const [taxInfo, setTaxInfo] = useState({ taxRate: 0, taxName: 'Tax', taxAmount: 0 });
   const [tipAmount, setTipAmount] = useState(0);
   const [tipPercentage, setTipPercentage] = useState(0);
@@ -140,6 +141,7 @@ const OrderPage = ({ menuItems }) => {
       const orderData = {
         customerName: customerName.trim(),
         customerPhone: customerPhone.trim(),
+        paymentMethod: paymentMethod,
         items: cart.map(item => ({
           id: item.id,
           name: item.name,
@@ -170,6 +172,7 @@ const OrderPage = ({ menuItems }) => {
       setCart([]);
       setCustomerName('');
       setCustomerPhone('');
+      setPaymentMethod('cash');
       setTipAmount(0);
       setTipPercentage(0);
       
@@ -186,6 +189,7 @@ const OrderPage = ({ menuItems }) => {
     setCart([]);
     setCustomerName('');
     setCustomerPhone('');
+    setPaymentMethod('cash');
     setTipAmount(0);
     setTipPercentage(0);
     toast.success('Cart cleared');
@@ -322,8 +326,37 @@ const OrderPage = ({ menuItems }) => {
                   placeholder="Phone Number (optional)"
                   value={customerPhone}
                   onChange={(e) => setCustomerPhone(e.target.value)}
-                  className="input-field"
+                  className="input-field mb-2"
                 />
+                
+                {/* Payment Method */}
+                <div className="mb-2">
+                  <label className="block text-sm font-medium text-secondary-700 dark:text-secondary-300 mb-2">
+                    Payment Method
+                  </label>
+                  <div className="grid grid-cols-2 gap-2">
+                    {[
+                      { value: 'cash', label: 'Cash', icon: '💵' },
+                      { value: 'card', label: 'Card', icon: '💳' },
+                      { value: 'upi', label: 'UPI', icon: '📱' },
+                      { value: 'online', label: 'Online', icon: '🌐' }
+                    ].map((method) => (
+                      <button
+                        key={method.value}
+                        type="button"
+                        onClick={() => setPaymentMethod(method.value)}
+                        className={`flex items-center justify-center p-3 rounded-lg border transition-colors ${
+                          paymentMethod === method.value
+                            ? 'bg-secondary-500 text-white border-secondary-500'
+                            : 'bg-white text-secondary-700 border-accent-300 hover:bg-accent-50'
+                        }`}
+                      >
+                        <span className="mr-2">{method.icon}</span>
+                        <span className="text-sm font-medium">{method.label}</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
               </div>
 
               {/* Cart Items */}
@@ -487,8 +520,37 @@ const OrderPage = ({ menuItems }) => {
               placeholder="Phone Number (optional)"
               value={customerPhone}
               onChange={(e) => setCustomerPhone(e.target.value)}
-              className="input-field"
+              className="input-field mb-2"
             />
+            
+            {/* Payment Method */}
+            <div className="mb-2">
+              <label className="block text-sm font-medium text-secondary-700 dark:text-secondary-300 mb-2">
+                Payment Method
+              </label>
+              <div className="grid grid-cols-2 gap-2">
+                {[
+                  { value: 'cash', label: 'Cash', icon: '💵' },
+                  { value: 'card', label: 'Card', icon: '💳' },
+                  { value: 'upi', label: 'UPI', icon: '📱' },
+                  { value: 'online', label: 'Online', icon: '🌐' }
+                ].map((method) => (
+                  <button
+                    key={method.value}
+                    type="button"
+                    onClick={() => setPaymentMethod(method.value)}
+                    className={`flex items-center justify-center p-2 rounded-lg border transition-colors text-xs ${
+                      paymentMethod === method.value
+                        ? 'bg-secondary-500 text-white border-secondary-500'
+                        : 'bg-white text-secondary-700 border-accent-300 hover:bg-accent-50'
+                    }`}
+                  >
+                    <span className="mr-1">{method.icon}</span>
+                    <span className="font-medium">{method.label}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
           </div>
 
           {/* Cart Items */}

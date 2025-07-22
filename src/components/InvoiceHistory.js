@@ -148,15 +148,18 @@ const InvoiceHistory = () => {
                     <th className="px-6 py-3 text-left text-xs font-medium text-secondary-600 uppercase tracking-wider">
                       Date
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-secondary-600 uppercase tracking-wider">
-                      Items
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-secondary-600 uppercase tracking-wider">
-                      Total
-                    </th>
-                    <th className="px-6 py-3 text-right text-xs font-medium text-secondary-600 uppercase tracking-wider">
-                      Actions
-                    </th>
+                                          <th className="px-6 py-3 text-left text-xs font-medium text-secondary-600 uppercase tracking-wider">
+                        Payment
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-secondary-600 uppercase tracking-wider">
+                        Items
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-secondary-600 uppercase tracking-wider">
+                        Total
+                      </th>
+                      <th className="px-6 py-3 text-right text-xs font-medium text-secondary-600 uppercase tracking-wider">
+                        Actions
+                      </th>
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-accent-200">
@@ -187,6 +190,17 @@ const InvoiceHistory = () => {
                           <Calendar className="h-4 w-4 text-secondary-400 mr-2" />
                           <div className="text-sm text-secondary-700 dark:text-secondary-300">
                             {formatDate(invoice.date)}
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="flex items-center">
+                          <div className="text-sm font-medium text-secondary-700 dark:text-secondary-300">
+                            {invoice.payment_method === 'cash' && '💵 Cash'}
+                            {invoice.payment_method === 'card' && '💳 Card'}
+                            {invoice.payment_method === 'upi' && '📱 UPI'}
+                            {invoice.payment_method === 'online' && '🌐 Online'}
+                            {!invoice.payment_method && '💵 Cash'}
                           </div>
                         </div>
                       </td>
@@ -258,6 +272,15 @@ const InvoiceHistory = () => {
                         {invoice.customerPhone && (
                           <p className="text-xs text-gray-500 dark:text-gray-400">{invoice.customerPhone}</p>
                         )}
+                        <div className="mt-1">
+                          <span className="text-xs text-gray-500 dark:text-gray-400">
+                            {invoice.payment_method === 'cash' && '💵 Cash'}
+                            {invoice.payment_method === 'card' && '💳 Card'}
+                            {invoice.payment_method === 'upi' && '📱 UPI'}
+                            {invoice.payment_method === 'online' && '🌐 Online'}
+                            {!invoice.payment_method && '💵 Cash'}
+                          </span>
+                        </div>
                       </div>
                     </div>
                     
