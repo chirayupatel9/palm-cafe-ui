@@ -7,7 +7,7 @@ import { useAuth } from '../contexts/AuthContext';
 
 const InventoryManagement = () => {
   const { formatCurrency } = useCurrency();
-  const { isAuthenticated, user } = useAuth();
+  const { isAuthenticated, user, loading: authLoading, token } = useAuth();
   const [inventory, setInventory] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showAddForm, setShowAddForm] = useState(false);
@@ -31,9 +31,11 @@ const InventoryManagement = () => {
   });
 
   useEffect(() => {
-    fetchInventory();
-    fetchCategories();
-  }, []);
+    if (isAuthenticated && !authLoading) {
+      fetchInventory();
+      fetchCategories();
+    }
+  }, [isAuthenticated, authLoading]);
 
   const fetchInventory = async () => {
     try {
@@ -49,10 +51,21 @@ const InventoryManagement = () => {
 
   const fetchCategories = async () => {
     try {
+      console.log('🔍 Fetching inventory categories...');
+      console.log('🔑 Auth token:', token ? 'Present' : 'Missing');
+      console.log('👤 User authenticated:', isAuthenticated);
+      
       const response = await axios.get('/inventory/categories');
+      console.log('✅ Categories response:', response.data);
       setCategories(response.data);
     } catch (error) {
-      console.error('Error fetching inventory categories:', error);
+      console.error('❌ Error fetching inventory categories:', error);
+      console.error('📊 Error details:', {
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        headers: error.response?.headers
+      });
       // If no inventory categories exist yet, start with empty array
       setCategories([]);
     }
@@ -258,6 +271,15 @@ const InventoryManagement = () => {
         />
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-secondary-500"></div>
         <p className="mt-3 text-sm text-secondary-600">Loading inventory...</p>
+      </div>
+    );
+  }
+
+  if (authLoading) {
+    return (
+      <div className="flex flex-col items-center justify-center py-12">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600 mb-4"></div>
+        <p className="text-gray-600 dark:text-gray-400">Checking authentication...</p>
       </div>
     );
   }
