@@ -89,6 +89,13 @@ const MenuManagement = ({ menuItems, onUpdate, onAdd, onDelete }) => {
         toast.success('Menu item added successfully');
       }
       
+      // Auto-generate categories from menu items
+      try {
+        await axios.post('/categories/generate');
+      } catch (error) {
+        console.error('Error auto-generating categories:', error);
+      }
+      
       setEditingId(null);
       setShowAddForm(false);
       setFormData({ 
@@ -120,6 +127,13 @@ const MenuManagement = ({ menuItems, onUpdate, onAdd, onDelete }) => {
       try {
         await onDelete(id);
         toast.success('Menu item deleted successfully');
+        
+        // Auto-generate categories from menu items after deletion
+        try {
+          await axios.post('/categories/generate');
+        } catch (error) {
+          console.error('Error auto-generating categories:', error);
+        }
       } catch (error) {
         toast.error('Failed to delete menu item');
       }
@@ -174,6 +188,13 @@ const MenuManagement = ({ menuItems, onUpdate, onAdd, onDelete }) => {
       });
 
       toast.success(response.data.message);
+      
+      // Auto-generate categories from imported menu items
+      try {
+        await axios.post('/categories/generate');
+      } catch (error) {
+        console.error('Error auto-generating categories:', error);
+      }
       
       // Refresh the menu items
       window.location.reload();

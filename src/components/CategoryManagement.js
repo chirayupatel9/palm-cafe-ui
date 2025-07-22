@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Edit, Trash2, Save, X, FolderOpen } from 'lucide-react';
+import { Plus, Edit, Trash2, Save, X, FolderOpen, RefreshCw, Sparkles } from 'lucide-react';
 import toast from 'react-hot-toast';
 import axios from 'axios';
 import { getCategoryColorByIndex } from '../utils/categoryColors';
@@ -14,6 +14,7 @@ const CategoryManagement = () => {
     sort_order: ''
   });
   const [loading, setLoading] = useState(true);
+  const [autoGenerating, setAutoGenerating] = useState(false);
 
   useEffect(() => {
     fetchCategories();
@@ -28,6 +29,20 @@ const CategoryManagement = () => {
       toast.error('Failed to load categories');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const generateCategoriesFromMenu = async () => {
+    try {
+      setAutoGenerating(true);
+      const response = await axios.post('/categories/generate');
+      toast.success(response.data.message);
+      fetchCategories(); // Refresh the list
+    } catch (error) {
+      console.error('Error generating categories:', error);
+      toast.error('Failed to generate categories from menu');
+    } finally {
+      setAutoGenerating(false);
     }
   };
 
@@ -135,13 +150,27 @@ const CategoryManagement = () => {
             <p className="text-sm text-gray-600 dark:text-gray-400">Organize your menu with categories</p>
           </div>
         </div>
-        <button
-          onClick={() => setShowAddForm(true)}
-          className="btn-primary flex items-center justify-center text-sm"
-        >
-          <Plus className="h-4 w-4 mr-2" />
-          Add New Category
-        </button>
+        <div className="flex space-x-2">
+          <button
+            onClick={generateCategoriesFromMenu}
+            disabled={autoGenerating}
+            className="btn-secondary flex items-center justify-center text-sm"
+          >
+            {autoGenerating ? (
+              <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+            ) : (
+              <Sparkles className="h-4 w-4 mr-2" />
+            )}
+            {autoGenerating ? 'Generating...' : 'Auto-Generate'}
+          </button>
+          <button
+            onClick={() => setShowAddForm(true)}
+            className="btn-primary flex items-center justify-center text-sm"
+          >
+            <Plus className="h-4 w-4 mr-2" />
+            Add New Category
+          </button>
+        </div>
       </div>
 
       {/* Add New Category Form */}

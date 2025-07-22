@@ -3,9 +3,11 @@ import { Plus, Edit, Trash2, Package, AlertTriangle, TrendingUp, TrendingDown, S
 import axios from 'axios';
 import toast from 'react-hot-toast';
 import { useCurrency } from '../contexts/CurrencyContext';
+import { useAuth } from '../contexts/AuthContext';
 
 const InventoryManagement = () => {
   const { formatCurrency } = useCurrency();
+  const { isAuthenticated, user } = useAuth();
   const [inventory, setInventory] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showAddForm, setShowAddForm] = useState(false);
@@ -19,6 +21,7 @@ const InventoryManagement = () => {
   const [formData, setFormData] = useState({
     name: '',
     category: '',
+    newCategory: '',
     quantity: '',
     unit: '',
     cost_per_unit: '',
@@ -49,24 +52,33 @@ const InventoryManagement = () => {
       const response = await axios.get('/inventory/categories');
       setCategories(response.data);
     } catch (error) {
-      console.error('Error fetching categories:', error);
+      console.error('Error fetching inventory categories:', error);
+      // If no inventory categories exist yet, start with empty array
+      setCategories([]);
     }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    if (!formData.name || !formData.category || !formData.quantity || !formData.unit) {
+    const categoryToUse = formData.category === 'new' ? formData.newCategory : formData.category;
+    
+    if (!formData.name || !categoryToUse || !formData.quantity || !formData.unit) {
       toast.error('Please fill in all required fields');
       return;
     }
 
     try {
+      const submitData = {
+        ...formData,
+        category: categoryToUse
+      };
+      
       if (editingItem) {
-        await axios.put(`/inventory/${editingItem.id}`, formData);
+        await axios.put(`/inventory/${editingItem.id}`, submitData);
         toast.success('Inventory item updated successfully');
       } else {
-        await axios.post('/inventory', formData);
+        await axios.post('/inventory', submitData);
         toast.success('Inventory item added successfully');
       }
       
@@ -74,6 +86,7 @@ const InventoryManagement = () => {
       setEditingItem(null);
       resetForm();
       fetchInventory();
+      fetchCategories(); // Refresh categories after adding/updating
     } catch (error) {
       console.error('Error saving inventory item:', error);
       toast.error('Failed to save inventory item');
@@ -85,6 +98,7 @@ const InventoryManagement = () => {
     setFormData({
       name: item.name,
       category: item.category,
+      newCategory: '',
       quantity: item.quantity,
       unit: item.unit,
       cost_per_unit: item.cost_per_unit,
@@ -199,6 +213,7 @@ const InventoryManagement = () => {
     setFormData({
       name: '',
       category: '',
+      newCategory: '',
       quantity: '',
       unit: '',
       cost_per_unit: '',
@@ -243,6 +258,28 @@ const InventoryManagement = () => {
         />
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-secondary-500"></div>
         <p className="mt-3 text-sm text-secondary-600">Loading inventory...</p>
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return (
+      <div className="flex flex-col items-center justify-center py-12">
+        <img 
+          src="/images/palm-cafe-logo.png" 
+          alt="Palm Cafe Logo" 
+          className="h-16 w-16 mb-4 opacity-50"
+        />
+        <h2 className="text-xl font-semibold text-secondary-700 dark:text-secondary-300 mb-2">Authentication Required</h2>
+        <p className="text-gray-600 dark:text-gray-400 text-center mb-4">
+          You need to be logged in to access the inventory management system.
+        </p>
+        <button
+          onClick={() => window.location.href = '/login'}
+          className="btn-primary"
+        >
+          Go to Login
+        </button>
       </div>
     );
   }
@@ -432,7 +469,7 @@ const InventoryManagement = () => {
             >
               <option value="all">All Categories</option>
               {categories.map(category => (
-                <option key={category} value={category}>{category}</option>
+                <option key={category.name} value={category.name}>{category.name}</option>
               ))}
             </select>
           </div>
@@ -467,9 +504,22 @@ const InventoryManagement = () => {
                 >
                   <option value="">Select Category</option>
                   {categories.map(category => (
-                    <option key={category} value={category}>{category}</option>
+                    <option key={category.name} value={category.name}>
+                      {category.name} ({category.item_count} items)
+                    </option>
                   ))}
+                  <option value="new">+ Add New Category</option>
                 </select>
+                {formData.category === 'new' && (
+                  <input
+                    type="text"
+                    value={formData.newCategory}
+                    onChange={(e) => setFormData({...formData, newCategory: e.target.value})}
+                    className="input-field mt-2"
+                    placeholder="Enter new category name"
+                    required
+                  />
+                )}
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Quantity *</label>
