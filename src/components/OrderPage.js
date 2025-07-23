@@ -125,19 +125,18 @@ const OrderPage = ({ menuItems }) => {
     }
 
     try {
-      const response = await axios.get(`/customers/search/${phone}`);
-      if (response.data.length > 0) {
-        const customer = response.data.find(c => c.phone === phone);
-        if (customer) {
-          setCustomerInfo(customer);
-          setCustomerName(customer.name);
-          toast.success(`Welcome back, ${customer.name}! You have ${customer.loyalty_points} loyalty points.`);
-        }
+      const response = await axios.get(`/api/customer/login/${phone}`);
+      if (response.data) {
+        const customer = response.data;
+        setCustomerInfo(customer);
+        setCustomerName(customer.name);
+        toast.success(`Welcome back, ${customer.name}! You have ${customer.loyalty_points} loyalty points.`);
       } else {
         setCustomerInfo(null);
       }
     } catch (error) {
       console.error('Error searching customer:', error);
+      setCustomerInfo(null);
     }
   };
 

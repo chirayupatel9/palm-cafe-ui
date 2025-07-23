@@ -21,7 +21,7 @@ const CustomerOrderHistory = ({ customerPhone, setActiveTab }) => {
   const fetchOrderHistory = async () => {
     try {
       setLoading(true);
-      const response = await axios.get(`/customer/orders?customer_phone=${customerPhone}`);
+      const response = await axios.get(`/api/customer/orders?customer_phone=${customerPhone}`);
       setOrders(response.data);
     } catch (error) {
       console.error('Error fetching order history:', error);
@@ -33,12 +33,9 @@ const CustomerOrderHistory = ({ customerPhone, setActiveTab }) => {
 
   const fetchCustomerInfo = async () => {
     try {
-      const response = await axios.get(`/customers/search/${customerPhone}`);
-      if (response.data.length > 0) {
-        const customer = response.data.find(c => c.phone === customerPhone);
-        if (customer) {
-          setCustomerInfo(customer);
-        }
+      const response = await axios.get(`/api/customer/login/${customerPhone}`);
+      if (response.data) {
+        setCustomerInfo(response.data);
       }
     } catch (error) {
       console.error('Error fetching customer info:', error);

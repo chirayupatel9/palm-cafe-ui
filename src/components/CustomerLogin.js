@@ -25,24 +25,24 @@ const CustomerLogin = ({ onLogin, onRegister }) => {
     setLoading(true);
 
     try {
-      const response = await axios.get(`/customers/search/${phone}`);
+      const response = await axios.get(`/api/customer/login/${phone}`);
       
-      if (response.data.length > 0) {
-        const customer = response.data.find(c => c.phone === phone);
-        if (customer) {
-          toast.success(`Welcome back, ${customer.name}!`);
-          onLogin(customer);
-        } else {
-          toast.error('Phone number not found. Please register first.');
-          setShowRegister(true);
-        }
+      if (response.data) {
+        const customer = response.data;
+        toast.success(`Welcome back, ${customer.name}!`);
+        onLogin(customer);
       } else {
         toast.error('Phone number not found. Please register first.');
         setShowRegister(true);
       }
     } catch (error) {
       console.error('Error searching customer:', error);
-      toast.error('Failed to verify phone number');
+      if (error.response?.status === 404) {
+        toast.error('Phone number not found. Please register first.');
+        setShowRegister(true);
+      } else {
+        toast.error('Failed to verify phone number');
+      }
     } finally {
       setLoading(false);
     }
@@ -59,7 +59,7 @@ const CustomerLogin = ({ onLogin, onRegister }) => {
     setLoading(true);
 
     try {
-      const customer = await axios.post('/customers', registerData);
+      const customer = await axios.post('/api/customer/register', registerData);
       toast.success(`Welcome, ${customer.data.name}! You've been registered successfully.`);
       onLogin(customer.data);
     } catch (error) {
