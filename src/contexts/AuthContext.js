@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import axios from 'axios';
+import toast from 'react-hot-toast';
 
 const AuthContext = createContext();
 
@@ -34,6 +35,16 @@ export const AuthProvider = ({ children }) => {
           setUser(response.data.user);
         } catch (error) {
           console.error('Auth check failed:', error);
+          
+          // Handle specific token errors
+          if (error.response?.data?.code === 'TOKEN_EXPIRED') {
+            console.log('Token expired, logging out user');
+            toast.error('Session expired. Please log in again.');
+          } else if (error.response?.data?.code === 'INVALID_TOKEN') {
+            console.log('Invalid token, logging out user');
+            toast.error('Invalid session. Please log in again.');
+          }
+          
           logout();
         }
       }
