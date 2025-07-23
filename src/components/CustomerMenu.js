@@ -117,7 +117,7 @@ const CustomerMenu = ({ customer, cart, setCart, activeTab, setActiveTab, showCa
     }
 
     try {
-      const response = await axios.get(`/api/customer/login/${phone}`);
+      const response = await axios.get(`/customer/login/${phone}`);
       if (response.data) {
         const customer = response.data;
         setCustomerInfo(customer);

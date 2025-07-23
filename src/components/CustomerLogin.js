@@ -25,7 +25,7 @@ const CustomerLogin = ({ onLogin, onRegister }) => {
     setLoading(true);
 
     try {
-      const response = await axios.get(`/api/customer/login/${phone}`);
+      const response = await axios.get(`/customer/login/${phone}`);
       
       if (response.data) {
         const customer = response.data;
@@ -59,7 +59,7 @@ const CustomerLogin = ({ onLogin, onRegister }) => {
     setLoading(true);
 
     try {
-      const customer = await axios.post('/api/customer/register', registerData);
+      const customer = await axios.post('/customer/register', registerData);
       toast.success(`Welcome, ${customer.data.name}! You've been registered successfully.`);
       onLogin(customer.data);
     } catch (error) {
