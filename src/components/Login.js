@@ -31,7 +31,7 @@ const Login = () => {
       
       if (result.success) {
         toast.success('Login successful!');
-        navigate('/');
+        navigate('/admin');
       } else {
         toast.error(result.error);
       }
@@ -128,7 +128,7 @@ const Login = () => {
             </button>
           </div>
 
-          <div className="text-center">
+          <div className="text-center space-y-2">
             <p className="text-sm text-secondary-600 dark:text-gray-400">
               Don't have an account?{' '}
               <Link 
@@ -136,6 +136,14 @@ const Login = () => {
                 className="font-medium text-secondary-600 hover:text-secondary-500 dark:text-secondary-400 dark:hover:text-secondary-300"
               >
                 Sign up here
+              </Link>
+            </p>
+            <p className="text-sm text-secondary-600 dark:text-gray-400">
+              <Link 
+                to="/" 
+                className="font-medium text-secondary-600 hover:text-secondary-500 dark:text-secondary-400 dark:hover:text-secondary-300"
+              >
+                ← Back to Home
               </Link>
             </p>
           </div>

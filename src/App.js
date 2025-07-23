@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
-import { Receipt, Settings, Plus, Calculator, FolderOpen, Menu, X, DollarSign, LogOut, User, Package, Utensils } from 'lucide-react';
+import { Receipt, Settings, Plus, Calculator, FolderOpen, Menu, X, DollarSign, LogOut, User, Package, Utensils, Users } from 'lucide-react';
 import axios from 'axios';
 import { CurrencyProvider } from './contexts/CurrencyContext';
 import { DarkModeProvider } from './contexts/DarkModeContext';
@@ -14,9 +14,12 @@ import TaxSettings from './components/TaxSettings';
 import CurrencySettings from './components/CurrencySettings';
 import InventoryManagement from './components/InventoryManagement';
 import KitchenOrders from './components/KitchenOrders';
+import CustomerManagement from './components/CustomerManagement';
+import CustomerApp from './components/CustomerApp';
+import LandingPage from './components/LandingPage';
 import DarkModeToggle from './components/DarkModeToggle';
 import Login from './components/Login';
-import Register from './components/Register';
+import AdminRegister from './components/AdminRegister';
 import ProtectedRoute from './components/ProtectedRoute';
 
 // Configure axios base URL - use environment variable or fallback to localhost
@@ -106,6 +109,8 @@ function MainApp() {
         return <InventoryManagement />;
       case 'kitchen':
         return <KitchenOrders />;
+      case 'customers':
+        return <CustomerManagement />;
       default:
         return <OrderPage menuItems={menuItems} />;
     }
@@ -114,6 +119,7 @@ function MainApp() {
   const navigationItems = [
     { id: 'order', label: 'New Order', icon: Plus },
     { id: 'kitchen', label: 'Kitchen Orders', icon: Utensils },
+    { id: 'customers', label: 'Customers', icon: Users },
     { id: 'categories', label: 'Categories', icon: FolderOpen },
     { id: 'menu', label: 'Menu Management', icon: Settings },
     { id: 'inventory', label: 'Inventory', icon: Package },
@@ -153,12 +159,34 @@ function MainApp() {
             <h1 className="text-xl sm:text-2xl font-bold text-secondary-700 dark:text-gray-100">Palm Cafe</h1>
           </div>
           
-          <div className="flex items-center space-x-2">
-            {/* User info */}
-            <div className="hidden sm:flex items-center space-x-2 text-sm text-secondary-600 dark:text-gray-400">
-              <User className="h-4 w-4" />
-              <span>{user?.username}</span>
-            </div>
+                      <div className="flex items-center space-x-2">
+              {/* User info */}
+              <div className="hidden sm:flex items-center space-x-2 text-sm text-secondary-600 dark:text-gray-400">
+                <User className="h-4 w-4" />
+                <span>{user?.username}</span>
+              </div>
+              
+              {/* Customer Interface Link */}
+              <a
+                href="/customer"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hidden sm:flex items-center space-x-1 text-sm text-secondary-600 hover:text-secondary-700 dark:text-gray-400 dark:hover:text-gray-300 px-2 py-1 rounded hover:bg-accent-100"
+                title="Open Customer Interface"
+              >
+                <span>👥</span>
+                <span>Customer View</span>
+              </a>
+
+              {/* Admin Registration Link */}
+              <a
+                href="/admin/register"
+                className="hidden sm:flex items-center space-x-1 text-sm text-secondary-600 hover:text-secondary-700 dark:text-gray-400 dark:hover:text-gray-300 px-2 py-1 rounded hover:bg-accent-100"
+                title="Register New Admin"
+              >
+                <span>👑</span>
+                <span>Add Admin</span>
+              </a>
             
             {/* Dark mode toggle */}
             <DarkModeToggle />
@@ -253,9 +281,15 @@ function App() {
         <DarkModeProvider>
           <CurrencyProvider>
             <Routes>
+              <Route path="/" element={<LandingPage />} />
               <Route path="/login" element={<Login />} />
-              <Route path="/register" element={<Register />} />
-              <Route path="/" element={
+              <Route path="/admin/register" element={
+                <ProtectedRoute>
+                  <AdminRegister />
+                </ProtectedRoute>
+              } />
+              <Route path="/customer" element={<CustomerApp />} />
+              <Route path="/admin" element={
                 <ProtectedRoute>
                   <MainApp />
                 </ProtectedRoute>

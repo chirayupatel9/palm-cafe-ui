@@ -79,6 +79,18 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const registerAdmin = async (username, email, password) => {
+    try {
+      const response = await axios.post('/auth/register-admin', { username, email, password });
+      return { success: true };
+    } catch (error) {
+      return { 
+        success: false, 
+        error: error.response?.data?.error || 'Admin registration failed' 
+      };
+    }
+  };
+
   const logout = () => {
     setUser(null);
     setToken(null);
@@ -92,6 +104,7 @@ export const AuthProvider = ({ children }) => {
     loading,
     login,
     register,
+    registerAdmin,
     logout,
     isAuthenticated: !!user
   };

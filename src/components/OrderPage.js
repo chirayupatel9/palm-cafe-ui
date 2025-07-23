@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Plus, Minus, Trash2, Receipt, ShoppingCart, FolderOpen, X } from 'lucide-react';
+import { Plus, Minus, Trash2, Receipt, ShoppingCart, FolderOpen, X, Star } from 'lucide-react';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 import { useCurrency } from '../contexts/CurrencyContext';
@@ -10,6 +10,7 @@ const OrderPage = ({ menuItems }) => {
   const [cart, setCart] = useState([]);
   const [customerName, setCustomerName] = useState('');
   const [customerPhone, setCustomerPhone] = useState('');
+  const [customerInfo, setCustomerInfo] = useState(null);
   const [paymentMethod, setPaymentMethod] = useState('cash');
   const [taxInfo, setTaxInfo] = useState({ taxRate: 0, taxName: 'Tax', taxAmount: 0 });
   const [tipAmount, setTipAmount] = useState(0);
@@ -17,6 +18,8 @@ const OrderPage = ({ menuItems }) => {
   const [loading, setLoading] = useState(false);
   const [groupedMenuItems, setGroupedMenuItems] = useState({});
   const [showCart, setShowCart] = useState(false);
+  const [pointsToRedeem, setPointsToRedeem] = useState(0);
+  const [maxRedeemablePoints, setMaxRedeemablePoints] = useState(0);
 
   // Helper function to ensure price is a number
   const ensureNumber = (value) => {
@@ -42,10 +45,11 @@ const OrderPage = ({ menuItems }) => {
     return cart.reduce((total, item) => total + (ensureNumber(item.price) * item.quantity), 0);
   }, [cart]);
 
-  // Calculate total with tax and tip
+  // Calculate total with tax, tip, and points redemption
   const getTotal = () => {
     const subtotal = getSubtotal();
-    return subtotal + taxInfo.taxAmount + tipAmount;
+    const pointsDiscount = pointsToRedeem * 0.1; // 1 point = 0.1 INR
+    return subtotal + taxInfo.taxAmount + tipAmount - pointsDiscount;
   };
 
   // Fetch tax settings and calculate tax
@@ -69,6 +73,23 @@ const OrderPage = ({ menuItems }) => {
     }
   }, [cart, getSubtotal]);
 
+  // Calculate max redeemable points when cart or customer changes
+  useEffect(() => {
+    if (customerInfo?.loyalty_points && cart.length > 0) {
+      const subtotal = getSubtotal();
+      const maxPoints = Math.min(customerInfo.loyalty_points, Math.floor(subtotal * 10)); // Can't redeem more than order value
+      setMaxRedeemablePoints(maxPoints);
+      
+      // Reset points to redeem if it exceeds max
+      if (pointsToRedeem > maxPoints) {
+        setPointsToRedeem(maxPoints);
+      }
+    } else {
+      setMaxRedeemablePoints(0);
+      setPointsToRedeem(0);
+    }
+  }, [cart, customerInfo?.loyalty_points, pointsToRedeem, getSubtotal]);
+
   // Handle tip percentage change
   const handleTipPercentageChange = (percentage) => {
     setTipPercentage(percentage);
@@ -88,6 +109,35 @@ const OrderPage = ({ menuItems }) => {
       setTipPercentage(newPercentage);
     } else {
       setTipPercentage(0);
+    }
+  };
+
+  // Handle points redemption
+  const handlePointsRedemption = (points) => {
+    const newPoints = Math.min(Math.max(0, points), maxRedeemablePoints);
+    setPointsToRedeem(newPoints);
+  };
+
+  const searchCustomer = async (phone) => {
+    if (!phone || phone.length < 5) {
+      setCustomerInfo(null);
+      return;
+    }
+
+    try {
+      const response = await axios.get(`/customers/search/${phone}`);
+      if (response.data.length > 0) {
+        const customer = response.data.find(c => c.phone === phone);
+        if (customer) {
+          setCustomerInfo(customer);
+          setCustomerName(customer.name);
+          toast.success(`Welcome back, ${customer.name}! You have ${customer.loyalty_points} loyalty points.`);
+        }
+      } else {
+        setCustomerInfo(null);
+      }
+    } catch (error) {
+      console.error('Error searching customer:', error);
     }
   };
 
@@ -150,6 +200,7 @@ const OrderPage = ({ menuItems }) => {
           total: ensureNumber(item.price) * item.quantity
         })),
         tipAmount: tipAmount,
+        pointsRedeemed: pointsToRedeem,
         date: new Date().toISOString()
       };
 
@@ -175,6 +226,7 @@ const OrderPage = ({ menuItems }) => {
       setPaymentMethod('cash');
       setTipAmount(0);
       setTipPercentage(0);
+      setPointsToRedeem(0);
       
       const orderNumber = response.data.orderNumber;
       const successMessage = orderNumber 
@@ -196,6 +248,7 @@ const OrderPage = ({ menuItems }) => {
     setPaymentMethod('cash');
     setTipAmount(0);
     setTipPercentage(0);
+    setPointsToRedeem(0);
     toast.success('Cart cleared');
   };
 
@@ -329,9 +382,67 @@ const OrderPage = ({ menuItems }) => {
                   type="tel"
                   placeholder="Phone Number (optional)"
                   value={customerPhone}
-                  onChange={(e) => setCustomerPhone(e.target.value)}
+                  onChange={(e) => {
+                    setCustomerPhone(e.target.value);
+                    searchCustomer(e.target.value);
+                  }}
                   className="input-field mb-2"
                 />
+                {customerInfo && (
+                  <div className="mb-2 p-2 bg-green-50 border border-green-200 rounded-lg">
+                    <div className="flex items-center text-sm text-green-700">
+                      <Star className="h-4 w-4 mr-1" />
+                      <span>Welcome back! {customerInfo.loyalty_points} loyalty points available</span>
+                    </div>
+                  </div>
+                )}
+
+                {/* Points Redemption */}
+                {cart.length > 0 && customerInfo?.loyalty_points > 0 && (
+                  <div className="mb-4">
+                    <label className="block text-sm font-medium text-secondary-700 dark:text-secondary-300 mb-2 flex items-center">
+                      <Star className="h-4 w-4 mr-2 text-yellow-500" />
+                      Redeem Points
+                      <span className="ml-2 text-sm text-gray-500">
+                        (1 point = ₹0.10)
+                      </span>
+                    </label>
+                    
+                    <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-3 mb-3">
+                      <div className="flex justify-between items-center text-sm">
+                        <span className="text-gray-600 dark:text-gray-400">Available Points:</span>
+                        <span className="font-medium text-yellow-700 dark:text-yellow-300">
+                          {customerInfo.loyalty_points}
+                        </span>
+                      </div>
+                      <div className="flex justify-between items-center text-sm mt-1">
+                        <span className="text-gray-600 dark:text-gray-400">Max Redeemable:</span>
+                        <span className="font-medium text-yellow-700 dark:text-yellow-300">
+                          {maxRedeemablePoints} points
+                        </span>
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-center space-x-2">
+                      <span className="text-sm text-gray-600">Points to redeem:</span>
+                      <input
+                        type="number"
+                        value={pointsToRedeem}
+                        onChange={(e) => handlePointsRedemption(parseInt(e.target.value) || 0)}
+                        min="0"
+                        max={maxRedeemablePoints}
+                        className="flex-1 p-2 border border-gray-300 rounded-lg text-sm"
+                        placeholder="0"
+                      />
+                    </div>
+                    
+                    {pointsToRedeem > 0 && (
+                      <div className="mt-2 text-sm text-green-600 dark:text-green-400">
+                        Customer will save: ₹{(pointsToRedeem * 0.1).toFixed(2)}
+                      </div>
+                    )}
+                  </div>
+                )}
                 
                 {/* Payment Method */}
                 <div className="mb-2">
@@ -506,6 +617,13 @@ const OrderPage = ({ menuItems }) => {
                     </div>
                   )}
                   
+                  {pointsToRedeem > 0 && (
+                    <div className="flex justify-between text-sm text-green-600 dark:text-green-400">
+                      <span>Points Redeemed ({pointsToRedeem} pts):</span>
+                      <span>-{formatCurrency(pointsToRedeem * 0.1)}</span>
+                    </div>
+                  )}
+                  
                   <div className="flex justify-between items-center text-lg font-semibold border-t border-accent-200 pt-2">
                     <span className="text-secondary-700 dark:text-secondary-300">Total:</span>
                     <span className="text-secondary-600 dark:text-secondary-400">{formatCurrency(total)}</span>
@@ -565,9 +683,67 @@ const OrderPage = ({ menuItems }) => {
               type="tel"
               placeholder="Phone Number (optional)"
               value={customerPhone}
-              onChange={(e) => setCustomerPhone(e.target.value)}
+              onChange={(e) => {
+                setCustomerPhone(e.target.value);
+                searchCustomer(e.target.value);
+              }}
               className="input-field mb-2"
             />
+            {customerInfo && (
+              <div className="mb-2 p-2 bg-green-50 border border-green-200 rounded-lg">
+                <div className="flex items-center text-sm text-green-700">
+                  <Star className="h-4 w-4 mr-1" />
+                  <span>Welcome back! {customerInfo.loyalty_points} loyalty points available</span>
+                </div>
+              </div>
+            )}
+
+            {/* Points Redemption */}
+            {cart.length > 0 && customerInfo?.loyalty_points > 0 && (
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-secondary-700 dark:text-secondary-300 mb-2 flex items-center">
+                  <Star className="h-4 w-4 mr-2 text-yellow-500" />
+                  Redeem Points
+                  <span className="ml-2 text-sm text-gray-500">
+                    (1 point = ₹0.10)
+                  </span>
+                </label>
+                
+                <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-3 mb-3">
+                  <div className="flex justify-between items-center text-sm">
+                    <span className="text-gray-600 dark:text-gray-400">Available:</span>
+                    <span className="font-medium text-yellow-700 dark:text-yellow-300">
+                      {customerInfo.loyalty_points} pts
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center text-sm mt-1">
+                    <span className="text-gray-600 dark:text-gray-400">Max:</span>
+                    <span className="font-medium text-yellow-700 dark:text-yellow-300">
+                      {maxRedeemablePoints} pts
+                    </span>
+                  </div>
+                </div>
+                
+                <div className="flex items-center space-x-2">
+                  <span className="text-sm text-gray-600">Points:</span>
+                  <input
+                    type="number"
+                    value={pointsToRedeem}
+                    onChange={(e) => handlePointsRedemption(parseInt(e.target.value) || 0)}
+                    min="0"
+                    max={maxRedeemablePoints}
+                    className="flex-1 p-2 border border-gray-300 rounded-lg text-sm"
+                    placeholder="0"
+                  />
+                </div>
+                
+                {pointsToRedeem > 0 && (
+                  <div className="mt-2 text-sm text-green-600 dark:text-green-400">
+                    Save: ₹{(pointsToRedeem * 0.1).toFixed(2)}
+                  </div>
+                )}
+              </div>
+            )}
             
             {/* Payment Method */}
             <div className="mb-2">
@@ -739,6 +915,13 @@ const OrderPage = ({ menuItems }) => {
                 <div className="flex justify-between text-sm text-gray-600 dark:text-gray-400">
                   <span>Tip:</span>
                   <span>{formatCurrency(tipAmount)}</span>
+                </div>
+              )}
+              
+              {pointsToRedeem > 0 && (
+                <div className="flex justify-between text-sm text-green-600 dark:text-green-400">
+                  <span>Points Redeemed ({pointsToRedeem} pts):</span>
+                  <span>-{formatCurrency(pointsToRedeem * 0.1)}</span>
                 </div>
               )}
               
