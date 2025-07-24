@@ -21,10 +21,12 @@ const CustomerMenu = ({ customer, cart, setCart, activeTab, setActiveTab, showCa
   const [groupedMenuItems, setGroupedMenuItems] = useState({});
   const [taxAmount, setTaxAmount] = useState(0);
   const [taxRate, setTaxRate] = useState(0);
+  const [showTaxInMenu, setShowTaxInMenu] = useState(true);
   const [orderStatus, setOrderStatus] = useState(null);
   const [recentOrder, setRecentOrder] = useState(null);
   const [pointsToRedeem, setPointsToRedeem] = useState(0);
   const [maxRedeemablePoints, setMaxRedeemablePoints] = useState(0);
+  const [paymentMethods, setPaymentMethods] = useState([]);
 
   // Helper function to ensure price is a number
   const ensureNumber = (value) => {
@@ -32,10 +34,11 @@ const CustomerMenu = ({ customer, cart, setCart, activeTab, setActiveTab, showCa
     return isNaN(num) ? 0 : num;
   };
 
-  // Fetch menu items and tax settings
+  // Fetch menu items, tax settings, and payment methods
   useEffect(() => {
     fetchMenuItems();
     fetchTaxSettings();
+    fetchPaymentMethods();
   }, []);
 
   const fetchMenuItems = async () => {
@@ -65,11 +68,22 @@ const CustomerMenu = ({ customer, cart, setCart, activeTab, setActiveTab, showCa
   // Fetch tax settings
   const fetchTaxSettings = async () => {
     try {
-      const response = await axios.get('/tax-settings');
+      const response = await axios.get('/tax-settings/menu');
       const settings = response.data;
-      setTaxRate(settings.tax_rate || 0);
+      setShowTaxInMenu(settings.show_tax_in_menu);
+      
+      // Only fetch tax rate if we need to show it
+      if (settings.show_tax_in_menu) {
+        const taxResponse = await axios.get('/tax-settings');
+        const taxSettings = taxResponse.data;
+        setTaxRate(taxSettings.tax_rate || 0);
+      } else {
+        setTaxRate(0);
+      }
     } catch (error) {
       console.error('Error fetching tax settings:', error);
+      setShowTaxInMenu(false);
+      setTaxRate(0);
     }
   };
 
@@ -96,6 +110,26 @@ const CustomerMenu = ({ customer, cart, setCart, activeTab, setActiveTab, showCa
       setPointsToRedeem(0);
     }
   }, [cart, customer?.loyalty_points, pointsToRedeem]);
+
+  // Fetch payment methods
+  const fetchPaymentMethods = async () => {
+    try {
+      const response = await axios.get('/payment-methods');
+      setPaymentMethods(response.data);
+      
+      // Set default payment method to first available one
+      if (response.data.length > 0) {
+        setPaymentMethod(response.data[0].code);
+      }
+    } catch (error) {
+      console.error('Error fetching payment methods:', error);
+      // Fallback to default payment methods
+      setPaymentMethods([
+        { code: 'cash', name: 'Cash', icon: '💵' },
+        { code: 'upi', name: 'UPI', icon: '📱' }
+      ]);
+    }
+  };
 
   // Calculate subtotal
   const getSubtotal = () => {
@@ -231,18 +265,8 @@ const CustomerMenu = ({ customer, cart, setCart, activeTab, setActiveTab, showCa
 
       const response = await axios.post('/invoices', orderData);
       
-      // Create blob and open PDF in new tab
-      const pdfBlob = new Blob([Uint8Array.from(atob(response.data.pdf), c => c.charCodeAt(0))], {
-        type: 'application/pdf'
-      });
-      
-      const pdfUrl = URL.createObjectURL(pdfBlob);
-      window.open(pdfUrl, '_blank');
-      
-      // Clean up the URL object after a delay
-      setTimeout(() => {
-        URL.revokeObjectURL(pdfUrl);
-      }, 1000);
+      // No auto-download - just show success message
+      // PDF can be generated on-demand using the new endpoint
 
       // Set recent order and status
       const orderNumber = response.data.orderNumber;
@@ -515,24 +539,19 @@ const CustomerMenu = ({ customer, cart, setCart, activeTab, setActiveTab, showCa
               <div className="mb-6">
                 <h3 className="font-medium text-secondary-700 dark:text-secondary-300 mb-3">Payment Method</h3>
                 <div className="grid grid-cols-2 gap-2">
-                  {[
-                    { value: 'cash', label: 'Cash', icon: '💵' },
-                    { value: 'card', label: 'Card', icon: '💳' },
-                    { value: 'upi', label: 'UPI', icon: '📱' },
-                    { value: 'online', label: 'Online', icon: '🌐' }
-                  ].map((method) => (
+                  {paymentMethods.map((method) => (
                     <button
-                      key={method.value}
+                      key={method.code}
                       type="button"
-                      onClick={() => setPaymentMethod(method.value)}
+                      onClick={() => setPaymentMethod(method.code)}
                       className={`flex items-center justify-center p-3 rounded-lg border transition-colors ${
-                        paymentMethod === method.value
+                        paymentMethod === method.code
                           ? 'bg-secondary-500 text-white border-secondary-500'
                           : 'bg-white text-secondary-700 border-accent-300 hover:bg-accent-50'
                       }`}
                     >
                       <span className="mr-2">{method.icon}</span>
-                      <span className="font-medium">{method.label}</span>
+                      <span className="font-medium">{method.name}</span>
                     </button>
                   ))}
                 </div>
@@ -668,7 +687,7 @@ const CustomerMenu = ({ customer, cart, setCart, activeTab, setActiveTab, showCa
                       <span>Subtotal:</span>
                       <span>{formatCurrency(getSubtotal())}</span>
                     </div>
-                    {taxAmount > 0 && (
+                    {showTaxInMenu && taxAmount > 0 && (
                       <div className="flex justify-between">
                         <span>Tax ({taxRate}%):</span>
                         <span>{formatCurrency(taxAmount)}</span>

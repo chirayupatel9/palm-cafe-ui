@@ -20,6 +20,7 @@ const OrderPage = ({ menuItems }) => {
   const [showCart, setShowCart] = useState(false);
   const [pointsToRedeem, setPointsToRedeem] = useState(0);
   const [maxRedeemablePoints, setMaxRedeemablePoints] = useState(0);
+  const [paymentMethods, setPaymentMethods] = useState([]);
 
   // Helper function to ensure price is a number
   const ensureNumber = (value) => {
@@ -27,7 +28,7 @@ const OrderPage = ({ menuItems }) => {
     return isNaN(num) ? 0 : num;
   };
 
-  // Group menu items by category
+  // Group menu items by category and fetch payment methods
   useEffect(() => {
     const grouped = menuItems.reduce((groups, item) => {
       const categoryName = item.category_name || 'Uncategorized';
@@ -38,6 +39,9 @@ const OrderPage = ({ menuItems }) => {
       return groups;
     }, {});
     setGroupedMenuItems(grouped);
+    
+    // Fetch payment methods
+    fetchPaymentMethods();
   }, [menuItems]);
 
   // Calculate subtotal
@@ -89,6 +93,26 @@ const OrderPage = ({ menuItems }) => {
       setPointsToRedeem(0);
     }
   }, [cart, customerInfo?.loyalty_points, pointsToRedeem, getSubtotal]);
+
+  // Fetch payment methods
+  const fetchPaymentMethods = async () => {
+    try {
+      const response = await axios.get('/payment-methods');
+      setPaymentMethods(response.data);
+      
+      // Set default payment method to first available one
+      if (response.data.length > 0) {
+        setPaymentMethod(response.data[0].code);
+      }
+    } catch (error) {
+      console.error('Error fetching payment methods:', error);
+      // Fallback to default payment methods
+      setPaymentMethods([
+        { code: 'cash', name: 'Cash', icon: '💵' },
+        { code: 'upi', name: 'UPI', icon: '📱' }
+      ]);
+    }
+  };
 
   // Handle tip percentage change
   const handleTipPercentageChange = (percentage) => {
@@ -205,18 +229,8 @@ const OrderPage = ({ menuItems }) => {
 
       const response = await axios.post('/invoices', orderData);
       
-      // Create blob and open PDF in new tab
-      const pdfBlob = new Blob([Uint8Array.from(atob(response.data.pdf), c => c.charCodeAt(0))], {
-        type: 'application/pdf'
-      });
-      
-      const pdfUrl = URL.createObjectURL(pdfBlob);
-      window.open(pdfUrl, '_blank');
-      
-      // Clean up the URL object after a delay
-      setTimeout(() => {
-        URL.revokeObjectURL(pdfUrl);
-      }, 1000);
+      // No auto-download - just show success message
+      // PDF can be generated on-demand using the new endpoint
 
       // Clear cart and form
       setCart([]);
@@ -229,8 +243,8 @@ const OrderPage = ({ menuItems }) => {
       
       const orderNumber = response.data.orderNumber;
       const successMessage = orderNumber 
-        ? `Invoice generated and opened! Order #${orderNumber}`
-        : 'Invoice generated and opened!';
+        ? `Order placed successfully! Order #${orderNumber}`
+        : 'Order placed successfully!';
       toast.success(successMessage);
     } catch (error) {
       console.error('Error generating invoice:', error);
@@ -449,24 +463,19 @@ const OrderPage = ({ menuItems }) => {
                     Payment Method
                   </label>
                   <div className="grid grid-cols-2 gap-2">
-                    {[
-                      { value: 'cash', label: 'Cash', icon: '💵' },
-                      { value: 'card', label: 'Card', icon: '💳' },
-                      { value: 'upi', label: 'UPI', icon: '📱' },
-                      { value: 'online', label: 'Online', icon: '🌐' }
-                    ].map((method) => (
+                    {paymentMethods.map((method) => (
                       <button
-                        key={method.value}
+                        key={method.code}
                         type="button"
-                        onClick={() => setPaymentMethod(method.value)}
+                        onClick={() => setPaymentMethod(method.code)}
                         className={`flex items-center justify-center p-3 rounded-lg border transition-colors ${
-                          paymentMethod === method.value
+                          paymentMethod === method.code
                             ? 'bg-secondary-500 text-white border-secondary-500'
                             : 'bg-white text-secondary-700 border-accent-300 hover:bg-accent-50'
                         }`}
                       >
                         <span className="mr-2">{method.icon}</span>
-                        <span className="text-sm font-medium">{method.label}</span>
+                        <span className="text-sm font-medium">{method.name}</span>
                       </button>
                     ))}
                   </div>
