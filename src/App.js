@@ -1,20 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
-import { Receipt, Settings, Plus, Calculator, FolderOpen, Menu, X, DollarSign, LogOut, User, Package, Utensils, Users } from 'lucide-react';
+import { Receipt, Settings, Plus, Calculator, FolderOpen, Menu, X, DollarSign, LogOut, User, Package, Utensils, Users, CreditCard } from 'lucide-react';
 import axios from 'axios';
 import { CurrencyProvider } from './contexts/CurrencyContext';
 import { DarkModeProvider } from './contexts/DarkModeContext';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import OrderPage from './components/OrderPage';
 import MenuManagement from './components/MenuManagement';
-import CategoryManagement from './components/CategoryManagement';
+
 import InvoiceHistory from './components/InvoiceHistory';
-import TaxSettings from './components/TaxSettings';
-import CurrencySettings from './components/CurrencySettings';
+
 import InventoryManagement from './components/InventoryManagement';
 import KitchenOrders from './components/KitchenOrders';
 import CustomerManagement from './components/CustomerManagement';
+import PaymentMethodManagement from './components/PaymentMethodManagement';
 import CustomerApp from './components/CustomerApp';
 import LandingPage from './components/LandingPage';
 import DarkModeToggle from './components/DarkModeToggle';
@@ -97,20 +97,18 @@ function MainApp() {
             onDelete={deleteMenuItem}
           />
         );
-      case 'categories':
-        return <CategoryManagement />;
+
       case 'history':
         return <InvoiceHistory />;
-      case 'tax':
-        return <TaxSettings />;
-      case 'currency':
-        return <CurrencySettings />;
+
       case 'inventory':
         return <InventoryManagement />;
       case 'kitchen':
         return <KitchenOrders />;
       case 'customers':
         return <CustomerManagement />;
+      case 'payment-methods':
+        return <PaymentMethodManagement />;
       default:
         return <OrderPage menuItems={menuItems} />;
     }
@@ -120,12 +118,12 @@ function MainApp() {
     { id: 'order', label: 'New Order', icon: Plus },
     { id: 'kitchen', label: 'Kitchen Orders', icon: Utensils },
     { id: 'customers', label: 'Customers', icon: Users },
-    { id: 'categories', label: 'Categories', icon: FolderOpen },
+    { id: 'payment-methods', label: 'Payment, Currency & Tax', icon: CreditCard },
+
     { id: 'menu', label: 'Menu Management', icon: Settings },
     { id: 'inventory', label: 'Inventory', icon: Package },
     { id: 'history', label: 'Invoice History', icon: Receipt },
-    { id: 'tax', label: 'Tax Settings', icon: Calculator },
-    { id: 'currency', label: 'Currency Settings', icon: DollarSign },
+
   ];
 
   if (loading) {

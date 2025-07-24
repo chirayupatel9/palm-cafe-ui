@@ -759,24 +759,19 @@ const OrderPage = ({ menuItems }) => {
                 Payment Method
               </label>
               <div className="grid grid-cols-2 gap-2">
-                {[
-                  { value: 'cash', label: 'Cash', icon: '💵' },
-                  { value: 'card', label: 'Card', icon: '💳' },
-                  { value: 'upi', label: 'UPI', icon: '📱' },
-                  { value: 'online', label: 'Online', icon: '🌐' }
-                ].map((method) => (
+                {paymentMethods.map((method) => (
                   <button
-                    key={method.value}
+                    key={method.code}
                     type="button"
-                    onClick={() => setPaymentMethod(method.value)}
+                    onClick={() => setPaymentMethod(method.code)}
                     className={`flex items-center justify-center p-2 rounded-lg border transition-colors text-xs ${
-                      paymentMethod === method.value
+                      paymentMethod === method.code
                         ? 'bg-secondary-500 text-white border-secondary-500'
                         : 'bg-white text-secondary-700 border-accent-300 hover:bg-accent-50'
                     }`}
                   >
                     <span className="mr-1">{method.icon}</span>
-                    <span className="font-medium">{method.label}</span>
+                    <span className="font-medium">{method.name}</span>
                   </button>
                 ))}
               </div>

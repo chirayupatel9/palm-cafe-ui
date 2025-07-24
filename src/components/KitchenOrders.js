@@ -11,7 +11,6 @@ const KitchenOrders = () => {
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [showPrintModal, setShowPrintModal] = useState(false);
   const [autoRefresh, setAutoRefresh] = useState(true);
-  const [autoPrint, setAutoPrint] = useState(true);
   const [filterStatus, setFilterStatus] = useState('all');
 
   useEffect(() => {
@@ -39,21 +38,15 @@ const KitchenOrders = () => {
         });
       });
       
-      // Check for new pending orders and auto-print them
+      // Check for new pending orders (auto-print removed)
       const newOrders = response.data.filter(newOrder => 
         newOrder.status === 'pending' && 
         !orders.some(oldOrder => oldOrder.id === newOrder.id)
       );
       
-      if (autoPrint && newOrders.length > 0) {
+      if (newOrders.length > 0) {
         console.log('🆕 New orders detected:', newOrders.length);
-        // Auto-print the first new order
-        try {
-          await printOrder(newOrders[0]);
-          toast.success(`New order #${newOrders[0].order_number} printed automatically!`);
-        } catch (printError) {
-          console.error('Auto-print failed for new order:', printError);
-        }
+        toast.success(`${newOrders.length} new order(s) received!`);
       }
       
       setOrders(response.data);
@@ -74,19 +67,6 @@ const KitchenOrders = () => {
     try {
       await axios.patch(`/orders/${orderId}/status`, { status });
       toast.success(`Order ${status} successfully`);
-      
-      // Auto-print when order status changes to 'preparing' or 'ready'
-      if (autoPrint && (status === 'preparing' || status === 'ready')) {
-        try {
-          const order = orders.find(o => o.id === orderId);
-          if (order) {
-            await printOrder(order);
-          }
-        } catch (printError) {
-          console.error('Auto-print failed:', printError);
-          // Don't show error toast for auto-print failures
-        }
-      }
       
       fetchOrders();
     } catch (error) {
@@ -273,15 +253,6 @@ const KitchenOrders = () => {
               className="rounded"
             />
             <span className="text-sm text-gray-600 dark:text-gray-400">Auto-refresh</span>
-          </label>
-          <label className="flex items-center space-x-2 cursor-pointer">
-            <input
-              type="checkbox"
-              checked={autoPrint}
-              onChange={(e) => setAutoPrint(e.target.checked)}
-              className="rounded"
-            />
-            <span className="text-sm text-gray-600 dark:text-gray-400">Auto-print</span>
           </label>
         </div>
       </div>
