@@ -12,6 +12,7 @@ const KitchenOrders = () => {
   const [showPrintModal, setShowPrintModal] = useState(false);
   const [autoRefresh, setAutoRefresh] = useState(true);
   const [filterStatus, setFilterStatus] = useState('all');
+  const [activeTab, setActiveTab] = useState('today');
 
   useEffect(() => {
     if (isAuthenticated && !authLoading) {
@@ -164,14 +165,47 @@ const KitchenOrders = () => {
     });
   };
 
+  const formatDateOnly = (timestamp) => {
+    return new Date(timestamp).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
+    });
+  };
+
+  const isToday = (timestamp) => {
+    const today = new Date();
+    const orderDate = new Date(timestamp);
+    return today.toDateString() === orderDate.toDateString();
+  };
+
+  const isYesterday = (timestamp) => {
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+    const orderDate = new Date(timestamp);
+    return yesterday.toDateString() === orderDate.toDateString();
+  };
+
+  // Filter orders based on active tab and status filter
   const filteredOrders = orders.filter(order => {
+    // First filter by tab (today vs history)
+    if (activeTab === 'today') {
+      if (!isToday(order.created_at)) return false;
+    } else if (activeTab === 'history') {
+      if (isToday(order.created_at)) return false;
+    }
+
+    // Then filter by status
     if (filterStatus === 'all') return true;
     return order.status === filterStatus;
   });
 
   const pendingOrders = orders.filter(order => 
-    ['pending', 'preparing'].includes(order.status)
+    ['pending', 'preparing'].includes(order.status) && isToday(order.created_at)
   );
+
+  const todayOrders = orders.filter(order => isToday(order.created_at));
+  const historyOrders = orders.filter(order => !isToday(order.created_at));
 
   if (authLoading) {
     return (
@@ -267,7 +301,7 @@ const KitchenOrders = () => {
             <div className="ml-4">
               <p className="text-sm font-medium text-gray-600">Pending</p>
               <p className="text-2xl font-bold text-yellow-600">
-                {orders.filter(o => o.status === 'pending').length}
+                {todayOrders.filter(o => o.status === 'pending').length}
               </p>
             </div>
           </div>
@@ -280,7 +314,7 @@ const KitchenOrders = () => {
             <div className="ml-4">
               <p className="text-sm font-medium text-gray-600">Preparing</p>
               <p className="text-2xl font-bold text-blue-600">
-                {orders.filter(o => o.status === 'preparing').length}
+                {todayOrders.filter(o => o.status === 'preparing').length}
               </p>
             </div>
           </div>
@@ -293,7 +327,7 @@ const KitchenOrders = () => {
             <div className="ml-4">
               <p className="text-sm font-medium text-gray-600">Ready</p>
               <p className="text-2xl font-bold text-green-600">
-                {orders.filter(o => o.status === 'ready').length}
+                {todayOrders.filter(o => o.status === 'ready').length}
               </p>
             </div>
           </div>
@@ -313,20 +347,55 @@ const KitchenOrders = () => {
         </div>
       </div>
 
+      {/* Tabs */}
+      <div className="border-b border-gray-200 dark:border-gray-700">
+        <nav className="-mb-px flex space-x-8">
+          <button
+            onClick={() => setActiveTab('today')}
+            className={`py-2 px-1 border-b-2 font-medium text-sm ${
+              activeTab === 'today'
+                ? 'border-secondary-500 text-secondary-600 dark:text-secondary-400'
+                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'
+            }`}
+          >
+            Today's Orders ({todayOrders.length})
+          </button>
+          <button
+            onClick={() => setActiveTab('history')}
+            className={`py-2 px-1 border-b-2 font-medium text-sm ${
+              activeTab === 'history'
+                ? 'border-secondary-500 text-secondary-600 dark:text-secondary-400'
+                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'
+            }`}
+          >
+            History ({historyOrders.length})
+          </button>
+        </nav>
+      </div>
+
       {/* Filters */}
-      <div className="flex items-center space-x-4">
-        <select
-          value={filterStatus}
-          onChange={(e) => setFilterStatus(e.target.value)}
-          className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
-        >
-          <option value="all">All Orders</option>
-          <option value="pending">Pending</option>
-          <option value="preparing">Preparing</option>
-          <option value="ready">Ready</option>
-          <option value="completed">Completed</option>
-          <option value="cancelled">Cancelled</option>
-        </select>
+      <div className="flex items-center justify-between">
+        <div className="flex items-center space-x-4">
+          <select
+            value={filterStatus}
+            onChange={(e) => setFilterStatus(e.target.value)}
+            className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
+          >
+            <option value="all">All Orders</option>
+            <option value="pending">Pending</option>
+            <option value="preparing">Preparing</option>
+            <option value="ready">Ready</option>
+            <option value="completed">Completed</option>
+            <option value="cancelled">Cancelled</option>
+          </select>
+        </div>
+        <div className="text-sm text-gray-600 dark:text-gray-400">
+          {activeTab === 'today' ? (
+            <span>Showing today's orders ({filteredOrders.length})</span>
+          ) : (
+            <span>Showing historical orders ({filteredOrders.length})</span>
+          )}
+        </div>
       </div>
 
       {/* Orders List */}
@@ -359,7 +428,7 @@ const KitchenOrders = () => {
                     Order #{order.order_number}
                   </h3>
                   <p className="text-sm text-gray-500">
-                    {formatDate(order.created_at)}
+                    {activeTab === 'history' ? formatDateOnly(order.created_at) : formatDate(order.created_at)}
                   </p>
                 </div>
                 <div className="flex items-center space-x-2">
@@ -437,7 +506,7 @@ const KitchenOrders = () => {
               {/* Actions */}
               <div className="flex items-center justify-between pt-3 border-t">
                 <div className="flex space-x-2">
-                  {getNextStatus(order.status) && (
+                  {activeTab === 'today' && getNextStatus(order.status) && (
                     <button
                       onClick={() => updateOrderStatus(order.id, getNextStatus(order.status))}
                       className="btn-primary text-sm px-3 py-1"
@@ -447,7 +516,7 @@ const KitchenOrders = () => {
                        getNextStatus(order.status) === 'completed' ? 'Complete' : 'Update'}
                     </button>
                   )}
-                  {order.status === 'pending' && (
+                  {activeTab === 'today' && order.status === 'pending' && (
                     <button
                       onClick={() => updateOrderStatus(order.id, 'cancelled')}
                       className="btn-secondary text-sm px-3 py-1 text-red-600 border-red-300 hover:bg-red-50"
