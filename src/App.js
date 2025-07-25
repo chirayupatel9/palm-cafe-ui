@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
-import { Receipt, Settings, Plus, Calculator, FolderOpen, Menu, X, DollarSign, LogOut, User, Package, Utensils, Users, CreditCard } from 'lucide-react';
+import { Receipt, Settings, Plus, Menu, X, LogOut, User, Package, Utensils, Users, CreditCard } from 'lucide-react';
 import axios from 'axios';
 import { CurrencyProvider } from './contexts/CurrencyContext';
 import { DarkModeProvider } from './contexts/DarkModeContext';
@@ -35,14 +35,14 @@ function MainApp() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { user, logout } = useAuth();
 
-  // If user is a chef, redirect to chef app
-  if (user?.role === 'chef') {
-    return <ChefApp />;
-  }
-
   useEffect(() => {
     fetchMenuItems();
   }, []);
+
+  // If user is a chef, redirect to chef app (after hooks)
+  if (user?.role === 'chef') {
+    return <ChefApp />;
+  }
 
   const fetchMenuItems = async () => {
     try {
