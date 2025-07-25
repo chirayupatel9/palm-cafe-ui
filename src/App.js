@@ -20,6 +20,8 @@ import LandingPage from './components/LandingPage';
 import DarkModeToggle from './components/DarkModeToggle';
 import Login from './components/Login';
 import AdminRegister from './components/AdminRegister';
+import ChefRegister from './components/ChefRegister';
+import ChefApp from './components/ChefApp';
 import ProtectedRoute from './components/ProtectedRoute';
 
 // Configure axios base URL - use environment variable or fallback to localhost
@@ -32,6 +34,11 @@ function MainApp() {
   const [loading, setLoading] = useState(true);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { user, logout } = useAuth();
+
+  // If user is a chef, redirect to chef app
+  if (user?.role === 'chef') {
+    return <ChefApp />;
+  }
 
   useEffect(() => {
     fetchMenuItems();
@@ -176,6 +183,18 @@ function MainApp() {
                 <span>Customer View</span>
               </a>
 
+              {/* Chef Interface Link */}
+              <a
+                href="/chef"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hidden sm:flex items-center space-x-1 text-sm text-secondary-600 hover:text-secondary-700 dark:text-gray-400 dark:hover:text-gray-300 px-2 py-1 rounded hover:bg-accent-100"
+                title="Open Chef Interface"
+              >
+                <span>👨‍🍳</span>
+                <span>Chef View</span>
+              </a>
+
               {/* Admin Registration Link */}
               <a
                 href="/admin/register"
@@ -184,6 +203,16 @@ function MainApp() {
               >
                 <span>👑</span>
                 <span>Add Admin</span>
+              </a>
+
+              {/* Chef Registration Link */}
+              <a
+                href="/chef/register"
+                className="hidden sm:flex items-center space-x-1 text-sm text-secondary-600 hover:text-secondary-700 dark:text-gray-400 dark:hover:text-gray-300 px-2 py-1 rounded hover:bg-accent-100"
+                title="Register New Chef"
+              >
+                <span>👨‍🍳</span>
+                <span>Add Chef</span>
               </a>
             
             {/* Dark mode toggle */}
@@ -235,6 +264,42 @@ function MainApp() {
               </button>
             );
           })}
+          
+          {/* Additional mobile menu items */}
+          <div className="border-t border-gray-200 dark:border-gray-700 pt-2 mt-2">
+            <a
+              href="/customer"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-full flex items-center px-3 py-3 text-sm font-medium text-secondary-600 hover:bg-accent-100 rounded-lg transition-colors"
+            >
+              <span className="mr-3">👥</span>
+              Customer View
+            </a>
+            <a
+              href="/chef"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-full flex items-center px-3 py-3 text-sm font-medium text-secondary-600 hover:bg-accent-100 rounded-lg transition-colors"
+            >
+              <span className="mr-3">👨‍🍳</span>
+              Chef View
+            </a>
+            <a
+              href="/admin/register"
+              className="w-full flex items-center px-3 py-3 text-sm font-medium text-secondary-600 hover:bg-accent-100 rounded-lg transition-colors"
+            >
+              <span className="mr-3">👑</span>
+              Add Admin
+            </a>
+            <a
+              href="/chef/register"
+              className="w-full flex items-center px-3 py-3 text-sm font-medium text-secondary-600 hover:bg-accent-100 rounded-lg transition-colors"
+            >
+              <span className="mr-3">👨‍🍳</span>
+              Add Chef
+            </a>
+          </div>
         </div>
       </div>
     )}
@@ -286,10 +351,20 @@ function App() {
                   <AdminRegister />
                 </ProtectedRoute>
               } />
+              <Route path="/chef/register" element={
+                <ProtectedRoute>
+                  <ChefRegister />
+                </ProtectedRoute>
+              } />
               <Route path="/customer" element={<CustomerApp />} />
               <Route path="/admin" element={
                 <ProtectedRoute>
                   <MainApp />
+                </ProtectedRoute>
+              } />
+              <Route path="/chef" element={
+                <ProtectedRoute>
+                  <ChefApp />
                 </ProtectedRoute>
               } />
               <Route path="*" element={<Navigate to="/" replace />} />
