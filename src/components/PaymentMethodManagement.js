@@ -40,7 +40,8 @@ const PaymentMethodManagement = () => {
   const [taxFormData, setTaxFormData] = useState({
     tax_rate: '',
     tax_name: '',
-    show_tax_in_menu: true
+    show_tax_in_menu: true,
+    include_tax: true
   });
   const [taxLoading, setTaxLoading] = useState(true);
   const [taxError, setTaxError] = useState('');
@@ -285,14 +286,15 @@ const PaymentMethodManagement = () => {
     setTaxFormData({
       tax_rate: currentTaxSettings.tax_rate.toString(),
       tax_name: currentTaxSettings.tax_name,
-      show_tax_in_menu: currentTaxSettings.show_tax_in_menu
+      show_tax_in_menu: currentTaxSettings.show_tax_in_menu,
+      include_tax: currentTaxSettings.include_tax
     });
     setIsEditingTax(true);
   };
 
   const handleTaxCancel = () => {
     setIsEditingTax(false);
-    setTaxFormData({ tax_rate: '', tax_name: '', show_tax_in_menu: true });
+    setTaxFormData({ tax_rate: '', tax_name: '', show_tax_in_menu: true, include_tax: true });
   };
 
   const handleTaxSubmit = async (e) => {
@@ -314,12 +316,13 @@ const PaymentMethodManagement = () => {
       const response = await axios.put('/tax-settings', {
         tax_rate: taxRate,
         tax_name: taxFormData.tax_name.trim(),
-        show_tax_in_menu: taxFormData.show_tax_in_menu
+        show_tax_in_menu: taxFormData.show_tax_in_menu,
+        include_tax: taxFormData.include_tax
       });
       
       setCurrentTaxSettings(response.data);
       setIsEditingTax(false);
-      setTaxFormData({ tax_rate: '', tax_name: '', show_tax_in_menu: true });
+      setTaxFormData({ tax_rate: '', tax_name: '', show_tax_in_menu: true, include_tax: true });
       setTaxError('');
       
       // Refresh history
@@ -946,6 +949,20 @@ const PaymentMethodManagement = () => {
                   </label>
                 </div>
 
+                <div className="flex items-center">
+                  <input
+                    type="checkbox"
+                    id="include_tax"
+                    name="include_tax"
+                    checked={taxFormData.include_tax}
+                    onChange={(e) => setTaxFormData(prev => ({ ...prev, include_tax: e.target.checked }))}
+                    className="h-4 w-4 text-secondary-500 focus:ring-secondary-500 border-gray-300 rounded"
+                  />
+                  <label htmlFor="include_tax" className="ml-2 text-sm text-secondary-700 dark:text-secondary-300">
+                    Include tax in order calculations
+                  </label>
+                </div>
+
                 <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3">
                   <button
                     type="submit"
@@ -966,7 +983,7 @@ const PaymentMethodManagement = () => {
                 </div>
               </form>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
                 <div className="bg-gradient-to-br from-warm-50 to-warm-100 dark:from-warm-900/30 dark:to-warm-800/20 p-6 rounded-xl border border-warm-200 dark:border-warm-700 shadow-sm hover:shadow-md transition-all duration-200">
                   <div className="flex items-center mb-3">
                     <div className="p-2 bg-secondary-100 dark:bg-secondary-800/50 rounded-lg mr-3">
@@ -1000,6 +1017,17 @@ const PaymentMethodManagement = () => {
                     {currentTaxSettings?.show_tax_in_menu ? 'Tax Rate Visible' : 'Tax Rate Hidden'}
                   </p>
                 </div>
+                <div className="bg-gradient-to-br from-warm-50 to-warm-100 dark:from-warm-900/30 dark:to-warm-800/20 p-6 rounded-xl border border-warm-200 dark:border-warm-700 shadow-sm hover:shadow-md transition-all duration-200">
+                  <div className="flex items-center mb-3">
+                    <div className="p-2 bg-secondary-100 dark:bg-secondary-800/50 rounded-lg mr-3">
+                      <Calculator className="h-5 w-5 text-secondary-600 dark:text-secondary-400" />
+                    </div>
+                    <h5 className="text-sm font-semibold text-secondary-700 dark:text-secondary-300 uppercase tracking-wide">Tax Calculation</h5>
+                  </div>
+                  <p className="text-xl font-bold text-secondary-800 dark:text-secondary-200">
+                    {currentTaxSettings?.include_tax ? 'Tax Included' : 'Tax Excluded'}
+                  </p>
+                </div>
               </div>
             )}
           </div>
@@ -1031,6 +1059,9 @@ const PaymentMethodManagement = () => {
                         Tax Rate
                       </th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                        Tax Calculation
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                         Status
                       </th>
                     </tr>
@@ -1046,6 +1077,15 @@ const PaymentMethodManagement = () => {
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300">
                           {setting.tax_rate}%
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                            setting.include_tax 
+                              ? 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300' 
+                              : 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300'
+                          }`}>
+                            {setting.include_tax ? 'Included' : 'Excluded'}
+                          </span>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
