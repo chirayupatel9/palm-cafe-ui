@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Minus, Trash2, ShoppingCart, X, Star, User, Phone, Mail } from 'lucide-react';
+import { Plus, Minus, Trash2, ShoppingCart, X, Star, User, Phone, Mail, Search } from 'lucide-react';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 import { useCurrency } from '../contexts/CurrencyContext';
@@ -27,6 +27,8 @@ const CustomerMenu = ({ customer, cart, setCart, activeTab, setActiveTab, showCa
   const [pointsToRedeem, setPointsToRedeem] = useState(0);
   const [maxRedeemablePoints, setMaxRedeemablePoints] = useState(0);
   const [paymentMethods, setPaymentMethods] = useState([]);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filteredMenuItems, setFilteredMenuItems] = useState({});
 
   // Helper function to ensure price is a number
   const ensureNumber = (value) => {
@@ -40,6 +42,31 @@ const CustomerMenu = ({ customer, cart, setCart, activeTab, setActiveTab, showCa
     fetchTaxSettings();
     fetchPaymentMethods();
   }, []);
+
+  // Filter menu items based on search query
+  useEffect(() => {
+    if (!searchQuery.trim()) {
+      setFilteredMenuItems(groupedMenuItems);
+      return;
+    }
+
+    const query = searchQuery.toLowerCase().trim();
+    const filtered = {};
+
+    Object.entries(groupedMenuItems).forEach(([categoryName, items]) => {
+      const filteredItems = items.filter(item =>
+        item.name.toLowerCase().includes(query) ||
+        (item.description && item.description.toLowerCase().includes(query)) ||
+        item.category_name.toLowerCase().includes(query)
+      );
+
+      if (filteredItems.length > 0) {
+        filtered[categoryName] = filteredItems;
+      }
+    });
+
+    setFilteredMenuItems(filtered);
+  }, [searchQuery, groupedMenuItems]);
 
   const fetchMenuItems = async () => {
     try {
@@ -426,49 +453,99 @@ const CustomerMenu = ({ customer, cart, setCart, activeTab, setActiveTab, showCa
         {/* Content based on active tab */}
         {activeTab === 'menu' ? (
           <>
+            {/* Search Box */}
+            <div className="mb-8">
+              <div className="relative max-w-md mx-auto">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <Search className="h-5 w-5 text-gray-400" />
+                </div>
+                <input
+                  type="text"
+                  placeholder="Search for food, drinks, or categories..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg leading-5 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-secondary-500 focus:border-secondary-500 transition-colors"
+                />
+                {searchQuery && (
+                  <button
+                    onClick={() => setSearchQuery('')}
+                    className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                  >
+                    <X className="h-5 w-5 text-gray-400 hover:text-gray-600" />
+                  </button>
+                )}
+              </div>
+              {searchQuery && (
+                <div className="text-center mt-2">
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                    {Object.values(filteredMenuItems).flat().length} items found
+                  </p>
+                </div>
+              )}
+            </div>
+
             {/* Menu Items */}
             <div className="space-y-8">
-              {Object.entries(groupedMenuItems).map(([categoryName, items], index) => {
-                const categoryColor = getCategoryColor(categoryName, index);
-                return (
-                  <div key={categoryName} className={`border ${categoryColor.border} rounded-xl p-6 ${categoryColor.bg} shadow-sm`}>
-                    <h3 className={`text-2xl font-bold ${categoryColor.text} mb-6 flex items-center`}>
-                      <span className="mr-3">{categoryColor.icon}</span>
-                      {categoryName}
-                    </h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                      {items.map((item) => (
-                        <div key={item.id} className="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
-                          <div className="p-6">
-                            <div className="flex justify-between items-start mb-3">
-                              <h4 className="text-lg font-semibold text-secondary-700 dark:text-secondary-300">
-                                {item.name}
-                              </h4>
-                              <span className="text-lg font-bold text-secondary-600 dark:text-secondary-400">
-                                {formatCurrency(item.price)}
-                              </span>
-                            </div>
-                            
-                            {item.description && (
-                              <p className="text-gray-600 dark:text-gray-400 text-sm mb-4">
-                                {item.description}
-                              </p>
-                            )}
-                            
-                            <button
-                              onClick={() => addToCart(item)}
-                              className="w-full bg-secondary-500 text-white py-2 px-4 rounded-lg hover:bg-secondary-600 transition-colors flex items-center justify-center"
-                            >
-                              <Plus className="h-4 w-4 mr-2" />
-                              Add to Cart
-                            </button>
-                          </div>
-                        </div>
-                      ))}
+              {Object.keys(filteredMenuItems).length === 0 && searchQuery ? (
+                <div className="text-center py-12">
+                  <Search className="h-16 w-16 mx-auto mb-4 text-gray-300" />
+                  <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">
+                    No items found
+                  </h3>
+                  <p className="text-gray-600 dark:text-gray-400 mb-4">
+                    Try searching for something else or browse all categories
+                  </p>
+                  <button
+                    onClick={() => setSearchQuery('')}
+                    className="bg-secondary-500 text-white px-4 py-2 rounded-lg hover:bg-secondary-600 transition-colors"
+                  >
+                    Clear Search
+                  </button>
+                </div>
+              ) : (
+                Object.entries(filteredMenuItems).map(([categoryName, items], index) => {
+                  const categoryColor = getCategoryColor(categoryName, index);
+                  return (
+                    <div key={categoryName} className={`border ${categoryColor.border} rounded-xl p-6 ${categoryColor.bg} shadow-sm`}>
+                      <h3 className={`text-2xl font-bold ${categoryColor.text} mb-6 flex items-center`}>
+                        <span className="mr-3">{categoryColor.icon}</span>
+                        {categoryName}
+                      </h3>
+                                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                         {items.map((item) => (
+                           <button
+                             key={item.id}
+                             onClick={() => addToCart(item)}
+                             className="w-full bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-all duration-200 hover:scale-105 text-left"
+                           >
+                             <div className="p-6">
+                               <div className="flex justify-between items-start mb-3">
+                                 <h4 className="text-lg font-semibold text-secondary-700 dark:text-secondary-300">
+                                   {item.name}
+                                 </h4>
+                                 <span className="text-lg font-bold text-secondary-600 dark:text-secondary-400">
+                                   {formatCurrency(item.price)}
+                                 </span>
+                               </div>
+                               
+                               {item.description && (
+                                 <p className="text-gray-600 dark:text-gray-400 text-sm mb-4">
+                                   {item.description}
+                                 </p>
+                               )}
+                               
+                               <div className="flex items-center justify-center text-secondary-500 dark:text-secondary-400">
+                                 <Plus className="h-4 w-4 mr-2" />
+                                 <span className="text-sm font-medium">Click to add</span>
+                               </div>
+                             </div>
+                           </button>
+                         ))}
+                       </div>
                     </div>
-                  </div>
-                );
-              })}
+                  );
+                })
+              )}
             </div>
           </>
         ) : (
@@ -477,8 +554,23 @@ const CustomerMenu = ({ customer, cart, setCart, activeTab, setActiveTab, showCa
         )}
       </main>
 
-      {/* Cart Modal */}
-      {showCart && (
+             {/* Floating Cart Button */}
+       <button
+         onClick={() => setShowCart(true)}
+         className="fixed bottom-6 right-6 bg-secondary-500 text-white p-4 rounded-full shadow-lg hover:bg-secondary-600 transition-all duration-200 hover:scale-110 z-40"
+       >
+         <div className="relative">
+           <ShoppingCart className="h-6 w-6" />
+           {cart.length > 0 && (
+             <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-bold">
+               {cart.length}
+             </span>
+           )}
+         </div>
+       </button>
+
+       {/* Cart Modal */}
+       {showCart && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white dark:bg-gray-800 rounded-lg w-full max-w-md max-h-[90vh] overflow-y-auto">
             <div className="p-6">
