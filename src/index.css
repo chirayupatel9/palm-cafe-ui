@@ -24,6 +24,10 @@
   @apply bg-warm-800 hover:bg-warm-700 text-warm-100 border-warm-600;
 }
 
+.dark .btn-materialize {
+  @apply bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800;
+}
+
 .dark .input-field {
   @apply bg-gray-800 border-gray-600 text-gray-100 placeholder-gray-400 focus:ring-secondary-500 focus:border-secondary-500;
 }
@@ -116,6 +120,11 @@
 
   .btn-secondary {
     @apply bg-warm-100 hover:bg-warm-200 text-secondary-700 px-4 py-2 rounded-lg transition-colors duration-200 font-medium border border-warm-300;
+  }
+
+  /* Materialize button style */
+  .btn-materialize {
+    @apply bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white px-4 py-2 rounded-full shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 font-medium border-0;
   }
 
   /* Input field styles */

@@ -255,7 +255,7 @@ const CustomerOrderHistory = ({ customerPhone, setActiveTab }) => {
                     </div>
                     <button
                       onClick={() => reorderItems(order)}
-                      className="text-xs text-green-600 hover:text-green-700 dark:text-green-400 dark:hover:text-green-300 flex items-center"
+                      className="btn-materialize text-xs px-2 py-1 flex items-center"
                     >
                       <Plus className="h-3 w-3 mr-1" />
                       Re-order

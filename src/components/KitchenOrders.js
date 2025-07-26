@@ -629,7 +629,7 @@ const KitchenOrders = () => {
                   <div className="flex items-center space-x-2">
                     <button
                       onClick={() => reorderItems(order)}
-                      className="btn-secondary text-sm px-3 py-1 flex items-center"
+                      className="btn-materialize text-sm px-3 py-1 flex items-center"
                       title="Re-order Items"
                     >
                       <Plus className="h-3 w-3 mr-1" />
