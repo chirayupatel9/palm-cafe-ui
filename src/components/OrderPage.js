@@ -595,59 +595,7 @@ const OrderPage = ({ menuItems }) => {
                   </div>
                 )}
 
-                {/* Extra Charge */}
-                {cart.length > 0 && (
-                  <div className="mb-2">
-                    <div className="flex items-center justify-between mb-3">
-                      <h3 className="font-medium text-secondary-700 dark:text-secondary-300">Extra Charge</h3>
-                      <label className="flex items-center space-x-2 cursor-pointer">
-                        <input
-                          type="checkbox"
-                          checked={extraChargeEnabled}
-                          onChange={(e) => {
-                            setExtraChargeEnabled(e.target.checked);
-                            if (!e.target.checked) {
-                              setExtraCharge(0);
-                              setExtraChargeNote('');
-                            }
-                          }}
-                          className="rounded"
-                        />
-                        <span className="text-sm text-gray-600 dark:text-gray-400">Add extra charge</span>
-                      </label>
-                    </div>
-                    {extraChargeEnabled && (
-                      <div className="space-y-3 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                            Extra Charge Amount
-                          </label>
-                          <input
-                            type="number"
-                            value={extraCharge}
-                            onChange={(e) => setExtraCharge(parseFloat(e.target.value) || 0)}
-                            min="0"
-                            step="0.01"
-                            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-secondary-500 focus:border-transparent"
-                            placeholder="Enter extra charge amount"
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                            Extra Charge Note (optional)
-                          </label>
-                          <input
-                            type="text"
-                            value={extraChargeNote}
-                            onChange={(e) => setExtraChargeNote(e.target.value)}
-                            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-secondary-500 focus:border-transparent"
-                            placeholder="e.g., Service fee, Delivery charge"
-                          />
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                )}
+
 
                 {/* Pickup Option */}
                 <div className="mb-2">
@@ -1057,59 +1005,7 @@ const OrderPage = ({ menuItems }) => {
               </div>
             )}
 
-            {/* Extra Charge */}
-            {cart.length > 0 && (
-              <div className="mb-6">
-                <div className="flex items-center justify-between mb-3">
-                  <h3 className="font-medium text-secondary-700 dark:text-secondary-300">Extra Charge</h3>
-                  <label className="flex items-center space-x-2 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={extraChargeEnabled}
-                      onChange={(e) => {
-                        setExtraChargeEnabled(e.target.checked);
-                        if (!e.target.checked) {
-                          setExtraCharge(0);
-                          setExtraChargeNote('');
-                        }
-                      }}
-                      className="rounded"
-                    />
-                    <span className="text-sm text-gray-600 dark:text-gray-400">Add extra charge</span>
-                  </label>
-                </div>
-                {extraChargeEnabled && (
-                  <div className="space-y-3 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        Extra Charge Amount
-                      </label>
-                      <input
-                        type="number"
-                        value={extraCharge}
-                        onChange={(e) => setExtraCharge(parseFloat(e.target.value) || 0)}
-                        min="0"
-                        step="0.01"
-                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-secondary-500 focus:border-transparent"
-                        placeholder="Enter extra charge amount"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        Extra Charge Note (optional)
-                      </label>
-                      <input
-                        type="text"
-                        value={extraChargeNote}
-                        onChange={(e) => setExtraChargeNote(e.target.value)}
-                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-secondary-500 focus:border-transparent"
-                        placeholder="e.g., Service fee, Delivery charge"
-                      />
-                    </div>
-                  </div>
-                )}
-              </div>
-            )}
+
 
             {/* Pickup Option */}
             <div className="mb-2">
