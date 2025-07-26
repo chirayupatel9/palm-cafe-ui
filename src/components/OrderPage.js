@@ -21,6 +21,7 @@ const OrderPage = ({ menuItems }) => {
   const [pointsToRedeem, setPointsToRedeem] = useState(0);
   const [maxRedeemablePoints, setMaxRedeemablePoints] = useState(0);
   const [paymentMethods, setPaymentMethods] = useState([]);
+  const [pickupOption, setPickupOption] = useState('pickup');
 
   // Helper function to ensure price is a number
   const ensureNumber = (value) => {
@@ -215,6 +216,7 @@ const OrderPage = ({ menuItems }) => {
         customerName: customerName.trim(),
         customerPhone: customerPhone.trim(),
         paymentMethod: paymentMethod,
+        pickupOption: pickupOption,
         items: cart.map(item => ({
           id: item.id,
           name: item.name,
@@ -240,6 +242,7 @@ const OrderPage = ({ menuItems }) => {
       setTipAmount(0);
       setTipPercentage(0);
       setPointsToRedeem(0);
+      setPickupOption('pickup');
       
       const orderNumber = response.data.orderNumber;
       const successMessage = orderNumber 
@@ -262,6 +265,7 @@ const OrderPage = ({ menuItems }) => {
     setTipAmount(0);
     setTipPercentage(0);
     setPointsToRedeem(0);
+    setPickupOption('pickup');
     toast.success('Cart cleared');
   };
 
@@ -479,6 +483,44 @@ const OrderPage = ({ menuItems }) => {
                       </button>
                     ))}
                   </div>
+                </div>
+
+                {/* Pickup Option */}
+                <div className="mb-2">
+                  <label className="block text-sm font-medium text-secondary-700 dark:text-secondary-300 mb-2">
+                    Pickup Option
+                  </label>
+                  <div className="grid grid-cols-2 gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setPickupOption('pickup')}
+                      className={`flex items-center justify-center p-3 rounded-lg border transition-colors ${
+                        pickupOption === 'pickup'
+                          ? 'bg-secondary-500 text-white border-secondary-500'
+                          : 'bg-white text-secondary-700 border-accent-300 hover:bg-accent-50'
+                      }`}
+                    >
+                      <span className="mr-2">🏪</span>
+                      <span className="text-sm font-medium">Pickup</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setPickupOption('dine-in')}
+                      className={`flex items-center justify-center p-3 rounded-lg border transition-colors ${
+                        pickupOption === 'dine-in'
+                          ? 'bg-secondary-500 text-white border-secondary-500'
+                          : 'bg-white text-secondary-700 border-accent-300 hover:bg-accent-50'
+                      }`}
+                    >
+                      <span className="mr-2">🍽️</span>
+                      <span className="text-sm font-medium">Dine-in</span>
+                    </button>
+                  </div>
+                  <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
+                    {pickupOption === 'pickup' 
+                      ? 'Order will be ready for pickup at the counter' 
+                      : 'Order will be served at the table'}
+                  </p>
                 </div>
               </div>
 
@@ -775,6 +817,44 @@ const OrderPage = ({ menuItems }) => {
                   </button>
                 ))}
               </div>
+            </div>
+
+            {/* Pickup Option */}
+            <div className="mb-2">
+              <label className="block text-sm font-medium text-secondary-700 dark:text-secondary-300 mb-2">
+                Pickup Option
+              </label>
+              <div className="grid grid-cols-2 gap-2">
+                <button
+                  type="button"
+                  onClick={() => setPickupOption('pickup')}
+                  className={`flex items-center justify-center p-2 rounded-lg border transition-colors text-xs ${
+                    pickupOption === 'pickup'
+                      ? 'bg-secondary-500 text-white border-secondary-500'
+                      : 'bg-white text-secondary-700 border-accent-300 hover:bg-accent-50'
+                  }`}
+                >
+                  <span className="mr-1">🏪</span>
+                  <span className="font-medium">Pickup</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setPickupOption('dine-in')}
+                  className={`flex items-center justify-center p-2 rounded-lg border transition-colors text-xs ${
+                    pickupOption === 'dine-in'
+                      ? 'bg-secondary-500 text-white border-secondary-500'
+                      : 'bg-white text-secondary-700 border-accent-300 hover:bg-accent-50'
+                  }`}
+                >
+                  <span className="mr-1">🍽️</span>
+                  <span className="font-medium">Dine-in</span>
+                </button>
+              </div>
+              <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
+                {pickupOption === 'pickup' 
+                  ? 'Order will be ready for pickup at the counter' 
+                  : 'Order will be served at the table'}
+              </p>
             </div>
 
             {/* UPI QR Code Display */}
