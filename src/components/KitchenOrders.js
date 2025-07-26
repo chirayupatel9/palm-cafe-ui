@@ -551,6 +551,18 @@ const KitchenOrders = () => {
                           </p>
                         </div>
                       )}
+                      {order.extra_charge > 0 && (
+                        <div className="mt-2 p-2 bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800 rounded">
+                          <p className="text-xs font-medium text-orange-800 dark:text-orange-200">
+                            Extra Charge: ₹{order.extra_charge}
+                          </p>
+                          {order.extra_charge_note && (
+                            <p className="text-xs text-orange-700 dark:text-orange-300">
+                              Note: {order.extra_charge_note}
+                            </p>
+                          )}
+                        </div>
+                      )}
                     </div>
 
                     {/* Order Items */}
