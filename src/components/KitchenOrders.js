@@ -101,6 +101,34 @@ const KitchenOrders = () => {
     }
   };
 
+  const reorderItems = async (order) => {
+    try {
+      // Create a new order with the same items
+      const orderData = {
+        customer_name: order.customer_name || 'Walk-in Customer',
+        customer_phone: order.customer_phone || '',
+        items: order.items.map(item => ({
+          menu_item_id: item.menu_item_id,
+          quantity: item.quantity,
+          price: item.price,
+          name: item.name
+        })),
+        notes: `Re-order from Order #${order.order_number}`,
+        payment_method: order.payment_method || 'cash',
+        pickup_option: order.pickup_option || 'pickup'
+      };
+
+      const response = await axios.post('/orders', orderData);
+      toast.success(`Re-order created successfully! New Order #${response.data.order_number}`);
+      
+      // Refresh orders to show the new order
+      fetchOrders();
+    } catch (error) {
+      console.error('Error creating re-order:', error);
+      toast.error('Failed to create re-order');
+    }
+  };
+
   const getStatusIcon = (status) => {
     switch (status) {
       case 'pending':
@@ -585,13 +613,23 @@ const KitchenOrders = () => {
                       </div>
                     )}
                   </div>
-                  <button
-                    onClick={() => printOrder(order)}
-                    className="btn-secondary text-sm px-3 py-1"
-                    title="Print Order"
-                  >
-                    <Printer className="h-4 w-4" />
-                  </button>
+                  <div className="flex items-center space-x-2">
+                    <button
+                      onClick={() => reorderItems(order)}
+                      className="btn-secondary text-sm px-3 py-1 flex items-center"
+                      title="Re-order Items"
+                    >
+                      <Plus className="h-3 w-3 mr-1" />
+                      Re-order
+                    </button>
+                    <button
+                      onClick={() => printOrder(order)}
+                      className="btn-secondary text-sm px-3 py-1"
+                      title="Print Order"
+                    >
+                      <Printer className="h-4 w-4" />
+                    </button>
+                  </div>
                 </div>
               </div>
             );

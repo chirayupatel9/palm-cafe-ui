@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Clock, Package, CheckCircle, XCircle, Calendar, Receipt, Star, Menu } from 'lucide-react';
+import { Clock, Package, CheckCircle, XCircle, Calendar, Receipt, Star, Menu, Plus } from 'lucide-react';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 import { useCurrency } from '../contexts/CurrencyContext';
@@ -114,6 +114,35 @@ const CustomerOrderHistory = ({ customerPhone, setActiveTab }) => {
     }
   };
 
+  const reorderItems = async (order) => {
+    try {
+      // Create a new order with the same items
+      const orderData = {
+        customer_name: customerInfo?.name || 'Walk-in Customer',
+        customer_phone: customerPhone,
+        customer_email: customerInfo?.email || '',
+        items: order.items.map(item => ({
+          menu_item_id: item.menu_item_id,
+          quantity: item.quantity,
+          price: item.price,
+          name: item.name
+        })),
+        notes: `Re-order from Order #${order.order_number}`,
+        payment_method: order.payment_method || 'cash',
+        pickup_option: order.pickup_option || 'pickup'
+      };
+
+      const response = await axios.post('/orders', orderData);
+      toast.success(`Re-order created successfully! New Order #${response.data.order_number}`);
+      
+      // Switch back to menu tab to show the new order
+      setActiveTab('menu');
+    } catch (error) {
+      console.error('Error creating re-order:', error);
+      toast.error('Failed to create re-order');
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center py-8">
@@ -224,6 +253,13 @@ const CustomerOrderHistory = ({ customerPhone, setActiveTab }) => {
                       <Star className="h-3 w-3 mr-1" />
                       <span>+{calculatePointsEarned(order.final_amount)} pts</span>
                     </div>
+                    <button
+                      onClick={() => reorderItems(order)}
+                      className="text-xs text-green-600 hover:text-green-700 dark:text-green-400 dark:hover:text-green-300 flex items-center"
+                    >
+                      <Plus className="h-3 w-3 mr-1" />
+                      Re-order
+                    </button>
                     <button
                       onClick={() => downloadInvoice(order.order_number)}
                       className="text-xs text-secondary-600 hover:text-secondary-700 dark:text-secondary-400 dark:hover:text-secondary-300"
