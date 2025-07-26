@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Clock, CheckCircle, XCircle, Printer, RefreshCw, AlertTriangle, Coffee, Utensils, Plus } from 'lucide-react';
+import { Clock, CheckCircle, XCircle, Printer, RefreshCw, AlertTriangle, Coffee, Utensils, Plus, ChevronDown, ChevronUp } from 'lucide-react';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 import { useAuth } from '../contexts/AuthContext';
@@ -13,6 +13,7 @@ const KitchenOrders = () => {
   const [autoRefresh, setAutoRefresh] = useState(true);
   const [filterStatus, setFilterStatus] = useState('all');
   const [activeTab, setActiveTab] = useState('today');
+  const [expandedHistoryCards, setExpandedHistoryCards] = useState(new Set());
 
   useEffect(() => {
     if (isAuthenticated && !authLoading) {
@@ -188,14 +189,17 @@ const KitchenOrders = () => {
 
   // Filter orders based on active tab and status filter
   const filteredOrders = orders.filter(order => {
-    // First filter by tab (today vs history)
+    // First filter by tab (today vs history vs cancelled)
     if (activeTab === 'today') {
       if (!isToday(order.created_at)) return false;
     } else if (activeTab === 'history') {
-      if (isToday(order.created_at)) return false;
+      if (isToday(order.created_at) || order.status === 'cancelled') return false;
+    } else if (activeTab === 'cancelled') {
+      if (order.status !== 'cancelled') return false;
     }
 
-    // Then filter by status
+    // Then filter by status (only for today and history tabs)
+    if (activeTab === 'cancelled') return true; // Show all cancelled orders regardless of status filter
     if (filterStatus === 'all') return true;
     return order.status === filterStatus;
   });
@@ -205,7 +209,23 @@ const KitchenOrders = () => {
   );
 
   const todayOrders = orders.filter(order => isToday(order.created_at));
-  const historyOrders = orders.filter(order => !isToday(order.created_at));
+  const historyOrders = orders.filter(order => !isToday(order.created_at) && order.status !== 'cancelled');
+  const cancelledOrders = orders.filter(order => order.status === 'cancelled');
+
+  const toggleHistoryCard = (orderId) => {
+    const newExpanded = new Set(expandedHistoryCards);
+    if (newExpanded.has(orderId)) {
+      newExpanded.delete(orderId);
+    } else {
+      newExpanded.add(orderId);
+    }
+    setExpandedHistoryCards(newExpanded);
+  };
+
+  const getStatusOptions = (currentStatus) => {
+    const allStatuses = ['pending', 'preparing', 'ready', 'completed', 'cancelled'];
+    return allStatuses.filter(status => status !== currentStatus);
+  };
 
   if (authLoading) {
     return (
@@ -370,30 +390,46 @@ const KitchenOrders = () => {
           >
             History ({historyOrders.length})
           </button>
+          <button
+            onClick={() => setActiveTab('cancelled')}
+            className={`py-2 px-1 border-b-2 font-medium text-sm ${
+              activeTab === 'cancelled'
+                ? 'border-secondary-500 text-secondary-600 dark:text-secondary-400'
+                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'
+            }`}
+          >
+            Cancelled ({cancelledOrders.length})
+          </button>
         </nav>
       </div>
 
       {/* Filters */}
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-4">
-          <select
-            value={filterStatus}
-            onChange={(e) => setFilterStatus(e.target.value)}
-            className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
-          >
-            <option value="all">All Orders</option>
-            <option value="pending">Pending</option>
-            <option value="preparing">Preparing</option>
-            <option value="ready">Ready</option>
-            <option value="completed">Completed</option>
-            <option value="cancelled">Cancelled</option>
-          </select>
+          {activeTab !== 'cancelled' && (
+            <select
+              value={filterStatus}
+              onChange={(e) => setFilterStatus(e.target.value)}
+              className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
+            >
+              <option value="all">All Orders</option>
+              <option value="pending">Pending</option>
+              <option value="preparing">Preparing</option>
+              <option value="ready">Ready</option>
+              <option value="completed">Completed</option>
+              <option value="cancelled">Cancelled</option>
+            </select>
+          )}
         </div>
         <div className="text-sm text-gray-600 dark:text-gray-400">
-          {activeTab === 'today' ? (
+          {activeTab === 'today' && (
             <span>Showing today's orders ({filteredOrders.length})</span>
-          ) : (
+          )}
+          {activeTab === 'history' && (
             <span>Showing historical orders ({filteredOrders.length})</span>
+          )}
+          {activeTab === 'cancelled' && (
+            <span>Showing cancelled orders ({filteredOrders.length})</span>
           )}
         </div>
       </div>
@@ -410,131 +446,156 @@ const KitchenOrders = () => {
         </div>
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-          {filteredOrders.map((order) => (
-            <div
-              key={order.id}
-              className={`card border-l-4 ${
-                order.status === 'pending' ? 'border-l-yellow-500' :
-                order.status === 'preparing' ? 'border-l-blue-500' :
-                order.status === 'ready' ? 'border-l-green-500' :
-                order.status === 'completed' ? 'border-l-green-600' :
-                'border-l-red-500'
-              }`}
-            >
-              {/* Order Header */}
-              <div className="flex items-center justify-between mb-4">
-                <div>
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
-                    Order #{order.order_number}
-                  </h3>
-                  <p className="text-sm text-gray-500">
-                    {activeTab === 'history' ? formatDateOnly(order.created_at) : formatDate(order.created_at)}
-                  </p>
+          {filteredOrders.map((order) => {
+            const isHistoryCard = activeTab === 'history';
+            const isCancelledCard = activeTab === 'cancelled';
+            const isExpanded = expandedHistoryCards.has(order.id);
+            
+            return (
+              <div
+                key={order.id}
+                className={`card border-l-4 ${
+                  order.status === 'pending' ? 'border-l-yellow-500' :
+                  order.status === 'preparing' ? 'border-l-blue-500' :
+                  order.status === 'ready' ? 'border-l-green-500' :
+                  order.status === 'completed' ? 'border-l-green-600' :
+                  'border-l-red-500'
+                }`}
+              >
+                {/* Order Header */}
+                <div className="flex items-center justify-between mb-4">
+                  <div>
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                      Order #{order.order_number}
+                    </h3>
+                    <p className="text-sm text-gray-500">
+                      {activeTab === 'history' ? formatDateOnly(order.created_at) : formatDate(order.created_at)}
+                    </p>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    {getStatusIcon(order.status)}
+                    <span className={`px-2 py-1 text-xs font-medium rounded-full border ${getStatusColor(order.status)}`}>
+                      {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
+                    </span>
+                    {(isHistoryCard || isCancelledCard) && (
+                      <button
+                        onClick={() => toggleHistoryCard(order.id)}
+                        className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
+                      >
+                        {isExpanded ? (
+                          <ChevronUp className="h-4 w-4 text-gray-500" />
+                        ) : (
+                          <ChevronDown className="h-4 w-4 text-gray-500" />
+                        )}
+                      </button>
+                    )}
+                  </div>
                 </div>
-                <div className="flex items-center space-x-2">
-                  {getStatusIcon(order.status)}
-                  <span className={`px-2 py-1 text-xs font-medium rounded-full border ${getStatusColor(order.status)}`}>
-                    {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
-                  </span>
-                </div>
-              </div>
 
-              {/* Customer Info */}
-              <div className="mb-4 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                <p className="font-medium text-gray-900 dark:text-gray-100">
-                  {order.customer_name || 'Walk-in Customer'}
-                </p>
-                {order.customer_phone && order.customer_phone.trim() !== '' && (
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
-                    📞 {order.customer_phone}
-                  </p>
-                )}
-                {order.payment_method && (
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
-                    💳 {order.payment_method.toUpperCase()}
-                  </p>
-                )}
-              </div>
+                {/* Show full details only if not history/cancelled card or if card is expanded */}
+                {(!isHistoryCard && !isCancelledCard || isExpanded) && (
+                  <>
+                    {/* Customer Info */}
+                    <div className="mb-4 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                      <p className="font-medium text-gray-900 dark:text-gray-100">
+                        {order.customer_name || 'Walk-in Customer'}
+                      </p>
+                      {order.customer_phone && order.customer_phone.trim() !== '' && (
+                        <p className="text-sm text-gray-600 dark:text-gray-400">
+                          📞 {order.customer_phone}
+                        </p>
+                      )}
+                      {order.payment_method && (
+                        <p className="text-sm text-gray-600 dark:text-gray-400">
+                          💳 {order.payment_method.toUpperCase()}
+                        </p>
+                      )}
+                    </div>
 
-              {/* Order Items */}
-              <div className="mb-4">
-                <h4 className="font-medium text-gray-900 dark:text-gray-100 mb-2">Items:</h4>
-                {order.items && order.items.length > 0 ? (
-                  <div className="space-y-2">
-                    {order.items.map((item, index) => (
-                      <div key={index} className="flex justify-between items-center">
-                        <div className="flex items-center space-x-2">
-                          <span className="text-sm font-medium text-gray-900 dark:text-gray-100">
-                            {item.quantity}x
-                          </span>
-                          <span className="text-sm text-gray-700 dark:text-gray-300">
-                            {item.name || 'Unknown Item'}
-                          </span>
+                    {/* Order Items */}
+                    <div className="mb-4">
+                      <h4 className="font-medium text-gray-900 dark:text-gray-100 mb-2">Items:</h4>
+                      {order.items && order.items.length > 0 ? (
+                        <div className="space-y-2">
+                          {order.items.map((item, index) => (
+                            <div key={index} className="flex justify-between items-center">
+                              <div className="flex items-center space-x-2">
+                                <span className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                                  {item.quantity}x
+                                </span>
+                                <span className="text-sm text-gray-700 dark:text-gray-300">
+                                  {item.name || 'Unknown Item'}
+                                </span>
+                              </div>
+                              <span className="text-sm text-gray-600 dark:text-gray-400">
+                                ₹{item.price || 0}
+                              </span>
+                            </div>
+                          ))}
                         </div>
-                        <span className="text-sm text-gray-600 dark:text-gray-400">
-                          ₹{item.price || 0}
+                      ) : (
+                        <p className="text-sm text-gray-500 dark:text-gray-400 italic">
+                          No items found
+                        </p>
+                      )}
+                    </div>
+
+                    {/* Order Total */}
+                    <div className="border-t pt-3 mb-4">
+                      <div className="flex justify-between items-center">
+                        <span className="font-medium text-gray-900 dark:text-gray-100">Total:</span>
+                        <span className="font-bold text-lg text-gray-900 dark:text-gray-100">
+                          ₹{order.final_amount}
                         </span>
                       </div>
-                    ))}
-                  </div>
-                ) : (
-                  <p className="text-sm text-gray-500 dark:text-gray-400 italic">
-                    No items found
-                  </p>
+                    </div>
+
+                    {/* Notes */}
+                    {order.notes && (
+                      <div className="mb-4 p-3 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
+                        <p className="text-sm text-yellow-800 dark:text-yellow-200">
+                          <strong>Notes:</strong> {order.notes}
+                        </p>
+                      </div>
+                    )}
+                  </>
                 )}
-              </div>
 
-              {/* Order Total */}
-              <div className="border-t pt-3 mb-4">
-                <div className="flex justify-between items-center">
-                  <span className="font-medium text-gray-900 dark:text-gray-100">Total:</span>
-                  <span className="font-bold text-lg text-gray-900 dark:text-gray-100">
-                    ₹{order.final_amount}
-                  </span>
+                {/* Actions */}
+                <div className="flex items-center justify-between pt-3 border-t">
+                  <div className="flex space-x-2">
+                    {/* Show update buttons for today's orders and for admin/chef in history/cancelled tabs */}
+                    {(activeTab === 'today' || (user?.role === 'admin' || user?.role === 'chef')) && (
+                      <div className="flex flex-wrap gap-1">
+                        {getStatusOptions(order.status).map((status) => (
+                          <button
+                            key={status}
+                            onClick={() => updateOrderStatus(order.id, status)}
+                            className={`text-xs px-2 py-1 rounded border ${
+                              status === 'cancelled' 
+                                ? 'text-red-600 border-red-300 hover:bg-red-50' 
+                                : status === 'completed'
+                                ? 'text-green-600 border-green-300 hover:bg-green-50'
+                                : 'text-blue-600 border-blue-300 hover:bg-blue-50'
+                            }`}
+                          >
+                            {status.charAt(0).toUpperCase() + status.slice(1)}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                  <button
+                    onClick={() => printOrder(order)}
+                    className="btn-secondary text-sm px-3 py-1"
+                    title="Print Order"
+                  >
+                    <Printer className="h-4 w-4" />
+                  </button>
                 </div>
               </div>
-
-              {/* Notes */}
-              {order.notes && (
-                <div className="mb-4 p-3 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
-                  <p className="text-sm text-yellow-800 dark:text-yellow-200">
-                    <strong>Notes:</strong> {order.notes}
-                  </p>
-                </div>
-              )}
-
-              {/* Actions */}
-              <div className="flex items-center justify-between pt-3 border-t">
-                <div className="flex space-x-2">
-                  {activeTab === 'today' && getNextStatus(order.status) && (
-                    <button
-                      onClick={() => updateOrderStatus(order.id, getNextStatus(order.status))}
-                      className="btn-primary text-sm px-3 py-1"
-                    >
-                      {getNextStatus(order.status) === 'preparing' ? 'Start Preparing' :
-                       getNextStatus(order.status) === 'ready' ? 'Mark Ready' :
-                       getNextStatus(order.status) === 'completed' ? 'Complete' : 'Update'}
-                    </button>
-                  )}
-                  {activeTab === 'today' && order.status === 'pending' && (
-                    <button
-                      onClick={() => updateOrderStatus(order.id, 'cancelled')}
-                      className="btn-secondary text-sm px-3 py-1 text-red-600 border-red-300 hover:bg-red-50"
-                    >
-                      Cancel
-                    </button>
-                  )}
-                </div>
-                <button
-                  onClick={() => printOrder(order)}
-                  className="btn-secondary text-sm px-3 py-1"
-                  title="Print Order"
-                >
-                  <Printer className="h-4 w-4" />
-                </button>
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>
