@@ -27,6 +27,7 @@ const OrderPage = ({ menuItems }) => {
   const [splitAmount, setSplitAmount] = useState(0);
   const [extraCharge, setExtraCharge] = useState(0);
   const [extraChargeNote, setExtraChargeNote] = useState('');
+  const [extraChargeEnabled, setExtraChargeEnabled] = useState(false);
 
   // Helper function to ensure price is a number
   const ensureNumber = (value) => {
@@ -305,6 +306,7 @@ const OrderPage = ({ menuItems }) => {
     setSplitAmount(0);
     setExtraCharge(0);
     setExtraChargeNote('');
+    setExtraChargeEnabled(false);
     toast.success('Cart cleared');
   };
 
@@ -601,8 +603,9 @@ const OrderPage = ({ menuItems }) => {
                       <label className="flex items-center space-x-2 cursor-pointer">
                         <input
                           type="checkbox"
-                          checked={extraCharge > 0 || extraChargeNote}
+                          checked={extraChargeEnabled}
                           onChange={(e) => {
+                            setExtraChargeEnabled(e.target.checked);
                             if (!e.target.checked) {
                               setExtraCharge(0);
                               setExtraChargeNote('');
@@ -613,7 +616,7 @@ const OrderPage = ({ menuItems }) => {
                         <span className="text-sm text-gray-600 dark:text-gray-400">Add extra charge</span>
                       </label>
                     </div>
-                    {(extraCharge > 0 || extraChargeNote) && (
+                    {extraChargeEnabled && (
                       <div className="space-y-3 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
                         <div>
                           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -1062,8 +1065,9 @@ const OrderPage = ({ menuItems }) => {
                   <label className="flex items-center space-x-2 cursor-pointer">
                     <input
                       type="checkbox"
-                      checked={extraCharge > 0}
+                      checked={extraChargeEnabled}
                       onChange={(e) => {
+                        setExtraChargeEnabled(e.target.checked);
                         if (!e.target.checked) {
                           setExtraCharge(0);
                           setExtraChargeNote('');
@@ -1074,7 +1078,7 @@ const OrderPage = ({ menuItems }) => {
                     <span className="text-sm text-gray-600 dark:text-gray-400">Add extra charge</span>
                   </label>
                 </div>
-                {(extraCharge > 0 || extraChargeNote) && (
+                {extraChargeEnabled && (
                   <div className="space-y-3 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -1274,19 +1278,19 @@ const OrderPage = ({ menuItems }) => {
               <div className="flex items-center space-x-2">
                 <input
                   type="checkbox"
-                  checked={extraCharge > 0}
+                  checked={extraChargeEnabled}
                   onChange={(e) => {
-                    if (e.target.checked) {
-                      setExtraCharge(0); // Clear if checked
-                    } else {
-                      setExtraCharge(0); // Clear if unchecked
+                    setExtraChargeEnabled(e.target.checked);
+                    if (!e.target.checked) {
+                      setExtraCharge(0);
+                      setExtraChargeNote('');
                     }
                   }}
                   className="rounded"
                 />
                 <span className="text-sm text-gray-600 dark:text-gray-400">Add extra charge</span>
               </div>
-              {extraCharge > 0 && (
+              {extraChargeEnabled && (
                 <div className="space-y-3 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
