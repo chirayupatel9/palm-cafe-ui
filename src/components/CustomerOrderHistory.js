@@ -331,6 +331,19 @@ const CustomerOrderHistory = ({ customerPhone, setActiveTab }) => {
                         {order.payment_method}
                       </span>
                     </div>
+                    {order.split_payment && (
+                      <div className="mt-2 p-2 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded">
+                        <p className="text-xs font-medium text-blue-800 dark:text-blue-200">
+                          Split Payment
+                        </p>
+                        <p className="text-xs text-blue-700 dark:text-blue-300">
+                          ₹{order.split_amount} via {order.split_payment_method?.toUpperCase() || 'SPLIT'}
+                        </p>
+                        <p className="text-xs text-blue-700 dark:text-blue-300">
+                          ₹{(order.final_amount - order.split_amount).toFixed(2)} via {order.payment_method?.toUpperCase() || 'PRIMARY'}
+                        </p>
+                      </div>
+                    )}
                   </div>
                 )}
 

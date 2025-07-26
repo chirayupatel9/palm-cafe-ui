@@ -22,6 +22,9 @@ const OrderPage = ({ menuItems }) => {
   const [maxRedeemablePoints, setMaxRedeemablePoints] = useState(0);
   const [paymentMethods, setPaymentMethods] = useState([]);
   const [pickupOption, setPickupOption] = useState('pickup');
+  const [splitPayment, setSplitPayment] = useState(false);
+  const [splitPaymentMethod, setSplitPaymentMethod] = useState('upi');
+  const [splitAmount, setSplitAmount] = useState(0);
 
   // Helper function to ensure price is a number
   const ensureNumber = (value) => {
@@ -198,6 +201,7 @@ const OrderPage = ({ menuItems }) => {
     );
   };
 
+  // Generate invoice
   const generateInvoice = async () => {
     if (cart.length === 0) {
       toast.error('Please add items to cart first');
@@ -206,6 +210,16 @@ const OrderPage = ({ menuItems }) => {
 
     if (!customerName.trim()) {
       toast.error('Please enter customer name');
+      return;
+    }
+
+    if (splitPayment && splitAmount <= 0) {
+      toast.error('Please enter the split payment amount');
+      return;
+    }
+
+    if (splitPayment && splitAmount >= getTotal()) {
+      toast.error('Split amount cannot be greater than or equal to total amount');
       return;
     }
 
@@ -226,29 +240,43 @@ const OrderPage = ({ menuItems }) => {
         })),
         tipAmount: tipAmount,
         pointsRedeemed: pointsToRedeem,
-        date: new Date().toISOString()
+        date: new Date().toISOString(),
+        splitPayment: splitPayment,
+        splitPaymentMethod: splitPaymentMethod,
+        splitAmount: splitAmount
       };
 
       const response = await axios.post('/invoices', orderData);
       
-      // No auto-download - just show success message
-      // PDF can be generated on-demand using the new endpoint
+      // Download the PDF
+      const pdfResponse = await axios.get(`/invoices/${response.data.orderNumber}/download`);
+      
+      // Create blob and open PDF in new tab
+      const pdfBlob = new Blob([Uint8Array.from(atob(pdfResponse.data.pdf), c => c.charCodeAt(0))], {
+        type: 'application/pdf'
+      });
+      
+      const pdfUrl = URL.createObjectURL(pdfBlob);
+      window.open(pdfUrl, '_blank');
+      
+      // Clean up the URL object after a delay
+      setTimeout(() => {
+        URL.revokeObjectURL(pdfUrl);
+      }, 1000);
 
       // Clear cart and form
       setCart([]);
       setCustomerName('');
       setCustomerPhone('');
-      setPaymentMethod('cash');
+      setCustomerInfo(null);
       setTipAmount(0);
       setTipPercentage(0);
       setPointsToRedeem(0);
       setPickupOption('pickup');
+      setSplitPayment(false);
+      setSplitAmount(0);
       
-      const orderNumber = response.data.orderNumber;
-      const successMessage = orderNumber 
-        ? `Order placed successfully! Order #${orderNumber}`
-        : 'Order placed successfully!';
-      toast.success(successMessage);
+      toast.success(`Invoice generated successfully! Order #${response.data.orderNumber}`);
     } catch (error) {
       console.error('Error generating invoice:', error);
       toast.error('Failed to generate invoice');
@@ -257,15 +285,18 @@ const OrderPage = ({ menuItems }) => {
     }
   };
 
+  // Clear cart
   const clearCart = () => {
     setCart([]);
     setCustomerName('');
     setCustomerPhone('');
-    setPaymentMethod('cash');
+    setCustomerInfo(null);
     setTipAmount(0);
     setTipPercentage(0);
     setPointsToRedeem(0);
     setPickupOption('pickup');
+    setSplitPayment(false);
+    setSplitAmount(0);
     toast.success('Cart cleared');
   };
 
@@ -484,6 +515,75 @@ const OrderPage = ({ menuItems }) => {
                     ))}
                   </div>
                 </div>
+
+                {/* Split Payment Option */}
+                {cart.length > 0 && (
+                  <div className="mb-2">
+                    <div className="flex items-center justify-between mb-3">
+                      <h3 className="font-medium text-secondary-700 dark:text-secondary-300">Split Payment</h3>
+                      <label className="flex items-center space-x-2 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={splitPayment}
+                          onChange={(e) => {
+                            setSplitPayment(e.target.checked);
+                            if (!e.target.checked) {
+                              setSplitAmount(0);
+                            }
+                          }}
+                          className="rounded"
+                        />
+                        <span className="text-sm text-gray-600 dark:text-gray-400">Enable split payment</span>
+                      </label>
+                    </div>
+                    
+                    {splitPayment && (
+                      <div className="space-y-3 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                            Split Payment Method
+                          </label>
+                          <div className="grid grid-cols-2 gap-2">
+                            {paymentMethods.filter(method => method.code !== paymentMethod).map((method) => (
+                              <button
+                                key={method.code}
+                                type="button"
+                                onClick={() => setSplitPaymentMethod(method.code)}
+                                className={`flex items-center justify-center p-3 rounded-lg border transition-colors ${
+                                  splitPaymentMethod === method.code
+                                    ? 'bg-secondary-500 text-white border-secondary-500'
+                                    : 'bg-white text-secondary-700 border-accent-300 hover:bg-accent-50'
+                                }`}
+                              >
+                                <span className="mr-2">{method.icon}</span>
+                                <span className="font-medium">{method.name}</span>
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                        
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                            Amount paid via {paymentMethods.find(m => m.code === splitPaymentMethod)?.name || 'split method'}
+                          </label>
+                          <input
+                            type="number"
+                            value={splitAmount}
+                            onChange={(e) => setSplitAmount(parseFloat(e.target.value) || 0)}
+                            min="0"
+                            max={getTotal() - 0.01}
+                            step="0.01"
+                            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-secondary-500 focus:border-transparent"
+                            placeholder="Enter amount"
+                          />
+                          <p className="text-xs text-gray-500 mt-1">
+                            Remaining amount: ₹{(getTotal() - splitAmount).toFixed(2)} via {paymentMethods.find(m => m.code === paymentMethod)?.name || 'primary method'}
+                          </p>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
 
                 {/* Pickup Option */}
                 <div className="mb-2">
@@ -796,28 +896,95 @@ const OrderPage = ({ menuItems }) => {
             )}
             
             {/* Payment Method */}
-            <div className="mb-2">
-              <label className="block text-sm font-medium text-secondary-700 dark:text-secondary-300 mb-2">
-                Payment Method
-              </label>
+            <div className="mb-6">
+              <h3 className="font-medium text-secondary-700 dark:text-secondary-300 mb-3">Payment Method</h3>
               <div className="grid grid-cols-2 gap-2">
                 {paymentMethods.map((method) => (
                   <button
                     key={method.code}
                     type="button"
                     onClick={() => setPaymentMethod(method.code)}
-                    className={`flex items-center justify-center p-2 rounded-lg border transition-colors text-xs ${
+                    className={`flex items-center justify-center p-3 rounded-lg border transition-colors ${
                       paymentMethod === method.code
                         ? 'bg-secondary-500 text-white border-secondary-500'
                         : 'bg-white text-secondary-700 border-accent-300 hover:bg-accent-50'
                     }`}
                   >
-                    <span className="mr-1">{method.icon}</span>
+                    <span className="mr-2">{method.icon}</span>
                     <span className="font-medium">{method.name}</span>
                   </button>
                 ))}
               </div>
             </div>
+
+            {/* Split Payment Option */}
+            {cart.length > 0 && (
+              <div className="mb-6">
+                <div className="flex items-center justify-between mb-3">
+                  <h3 className="font-medium text-secondary-700 dark:text-secondary-300">Split Payment</h3>
+                  <label className="flex items-center space-x-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={splitPayment}
+                      onChange={(e) => {
+                        setSplitPayment(e.target.checked);
+                        if (!e.target.checked) {
+                          setSplitAmount(0);
+                        }
+                      }}
+                      className="rounded"
+                    />
+                    <span className="text-sm text-gray-600 dark:text-gray-400">Enable split payment</span>
+                  </label>
+                </div>
+                
+                {splitPayment && (
+                  <div className="space-y-3 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        Split Payment Method
+                      </label>
+                      <div className="grid grid-cols-2 gap-2">
+                        {paymentMethods.filter(method => method.code !== paymentMethod).map((method) => (
+                          <button
+                            key={method.code}
+                            type="button"
+                            onClick={() => setSplitPaymentMethod(method.code)}
+                            className={`flex items-center justify-center p-3 rounded-lg border transition-colors ${
+                              splitPaymentMethod === method.code
+                                ? 'bg-secondary-500 text-white border-secondary-500'
+                                : 'bg-white text-secondary-700 border-accent-300 hover:bg-accent-50'
+                            }`}
+                          >
+                            <span className="mr-2">{method.icon}</span>
+                            <span className="font-medium">{method.name}</span>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                    
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        Amount paid via {paymentMethods.find(m => m.code === splitPaymentMethod)?.name || 'split method'}
+                      </label>
+                      <input
+                        type="number"
+                        value={splitAmount}
+                        onChange={(e) => setSplitAmount(parseFloat(e.target.value) || 0)}
+                        min="0"
+                        max={getTotal() - 0.01}
+                        step="0.01"
+                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-secondary-500 focus:border-transparent"
+                        placeholder="Enter amount"
+                      />
+                      <p className="text-xs text-gray-500 mt-1">
+                        Remaining amount: ₹{(getTotal() - splitAmount).toFixed(2)} via {paymentMethods.find(m => m.code === paymentMethod)?.name || 'primary method'}
+                      </p>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
 
             {/* Pickup Option */}
             <div className="mb-2">

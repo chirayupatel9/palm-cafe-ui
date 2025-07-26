@@ -30,6 +30,9 @@ const CustomerMenu = ({ customer, cart, setCart, activeTab, setActiveTab, showCa
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredMenuItems, setFilteredMenuItems] = useState({});
   const [pickupOption, setPickupOption] = useState('pickup');
+  const [splitPayment, setSplitPayment] = useState(false);
+  const [splitPaymentMethod, setSplitPaymentMethod] = useState('upi');
+  const [splitAmount, setSplitAmount] = useState(0);
 
   // Helper function to ensure price is a number
   const ensureNumber = (value) => {
@@ -271,6 +274,16 @@ const CustomerMenu = ({ customer, cart, setCart, activeTab, setActiveTab, showCa
       return;
     }
 
+    if (splitPayment && splitAmount <= 0) {
+      toast.error('Please enter the split payment amount');
+      return;
+    }
+
+    if (splitPayment && splitAmount >= getTotal()) {
+      toast.error('Split amount cannot be greater than or equal to total amount');
+      return;
+    }
+
     setOrderLoading(true);
 
     try {
@@ -289,7 +302,10 @@ const CustomerMenu = ({ customer, cart, setCart, activeTab, setActiveTab, showCa
         })),
         tipAmount: tipAmount,
         pointsRedeemed: pointsToRedeem,
-        date: new Date().toISOString()
+        date: new Date().toISOString(),
+        splitPayment: splitPayment,
+        splitPaymentMethod: splitPaymentMethod,
+        splitAmount: splitAmount
       };
 
       const response = await axios.post('/invoices', orderData);
@@ -315,6 +331,8 @@ const CustomerMenu = ({ customer, cart, setCart, activeTab, setActiveTab, showCa
       setTipPercentage(0);
       setPointsToRedeem(0);
       setPickupOption('pickup');
+      setSplitPayment(false);
+      setSplitAmount(0);
       
       const successMessage = orderNumber 
         ? `Order placed successfully! Order #${orderNumber}`
@@ -334,6 +352,8 @@ const CustomerMenu = ({ customer, cart, setCart, activeTab, setActiveTab, showCa
     setTipAmount(0);
     setTipPercentage(0);
     setPickupOption('pickup');
+    setSplitPayment(false);
+    setSplitAmount(0);
     toast.success('Cart cleared');
   };
 
@@ -652,6 +672,75 @@ const CustomerMenu = ({ customer, cart, setCart, activeTab, setActiveTab, showCa
                   ))}
                 </div>
               </div>
+
+              {/* Split Payment Option */}
+              {cart.length > 0 && (
+                <div className="mb-6">
+                  <div className="flex items-center justify-between mb-3">
+                    <h3 className="font-medium text-secondary-700 dark:text-secondary-300">Split Payment</h3>
+                    <label className="flex items-center space-x-2 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={splitPayment}
+                        onChange={(e) => {
+                          setSplitPayment(e.target.checked);
+                          if (!e.target.checked) {
+                            setSplitAmount(0);
+                          }
+                        }}
+                        className="rounded"
+                      />
+                      <span className="text-sm text-gray-600 dark:text-gray-400">Enable split payment</span>
+                    </label>
+                  </div>
+                  
+                  {splitPayment && (
+                    <div className="space-y-3 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                          Split Payment Method
+                        </label>
+                        <div className="grid grid-cols-2 gap-2">
+                          {paymentMethods.filter(method => method.code !== paymentMethod).map((method) => (
+                            <button
+                              key={method.code}
+                              type="button"
+                              onClick={() => setSplitPaymentMethod(method.code)}
+                              className={`flex items-center justify-center p-3 rounded-lg border transition-colors ${
+                                splitPaymentMethod === method.code
+                                  ? 'bg-secondary-500 text-white border-secondary-500'
+                                  : 'bg-white text-secondary-700 border-accent-300 hover:bg-accent-50'
+                              }`}
+                            >
+                              <span className="mr-2">{method.icon}</span>
+                              <span className="font-medium">{method.name}</span>
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                      
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                          Amount paid via {paymentMethods.find(m => m.code === splitPaymentMethod)?.name || 'split method'}
+                        </label>
+                        <input
+                          type="number"
+                          value={splitAmount}
+                          onChange={(e) => setSplitAmount(parseFloat(e.target.value) || 0)}
+                          min="0"
+                          max={getTotal() - 0.01}
+                          step="0.01"
+                          className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-secondary-500 focus:border-transparent"
+                          placeholder="Enter amount"
+                        />
+                        <p className="text-xs text-gray-500 mt-1">
+                          Remaining amount: ₹{(getTotal() - splitAmount).toFixed(2)} via {paymentMethods.find(m => m.code === paymentMethod)?.name || 'primary method'}
+                        </p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
 
               {/* Pickup Option */}
               <div className="mb-6">
