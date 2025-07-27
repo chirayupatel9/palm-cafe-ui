@@ -122,13 +122,17 @@ const CustomerApp = () => {
               )}
               
               {/* Back to Home Button */}
-              <a
-                href="/"
-                className="p-2 rounded-md text-secondary-600 hover:text-secondary-700 hover:bg-accent-100 dark:text-gray-400 dark:hover:text-gray-300 dark:hover:bg-gray-700"
-                title="Back to Home"
+              <button
+                onClick={() => {
+                  setActiveTab('menu');
+                  setShowCart(false);
+                  setShowLoginModal(false);
+                }}
+                className="p-2 rounded-md text-secondary-600 hover:text-secondary-700 hover:bg-accent-100 dark:text-gray-400 dark:hover:text-gray-300 dark:hover:bg-gray-700 transition-colors"
+                title="Back to Menu"
               >
                 <span className="text-lg">🏠</span>
-              </a>
+              </button>
               
               {/* Logout Button - Only show if logged in */}
               {customer && (
