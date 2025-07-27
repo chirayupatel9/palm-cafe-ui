@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Clock, CheckCircle, XCircle, Printer, RefreshCw, AlertTriangle, Coffee, Utensils, Plus, ChevronDown, ChevronUp, ShoppingCart } from 'lucide-react';
+import { Clock, CheckCircle, XCircle, Printer, RefreshCw, AlertTriangle, Coffee, Utensils, ChevronDown, ChevronUp, ShoppingCart } from 'lucide-react';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 import { useAuth } from '../contexts/AuthContext';
@@ -84,33 +84,7 @@ const KitchenOrders = ({ cart, setCart }) => {
     }
   };
 
-  const reorderItems = async (order) => {
-    try {
-      // Create a new order with the same items
-      const orderData = {
-        customer_name: order.customer_name || 'Walk-in Customer',
-        customer_phone: order.customer_phone || '',
-        items: order.items.map(item => ({
-          menu_item_id: item.menu_item_id,
-          quantity: item.quantity,
-          price: item.price,
-          name: item.name
-        })),
-        notes: `Re-order from Order #${order.order_number}`,
-        payment_method: order.payment_method || 'cash',
-        pickup_option: order.pickup_option || 'pickup'
-      };
 
-      const response = await axios.post('/orders', orderData);
-      toast.success(`Re-order created successfully! New Order #${response.data.order_number}`);
-      
-      // Refresh orders to show the new order
-      fetchOrders();
-    } catch (error) {
-      console.error('Error creating re-order:', error);
-      toast.error('Failed to create re-order');
-    }
-  };
 
   const addOrderToCart = (order) => {
     try {
@@ -338,23 +312,22 @@ const KitchenOrders = ({ cart, setCart }) => {
             <RefreshCw className="h-4 w-4 mr-2" />
             Refresh
           </button>
-          <button
-            onClick={async () => {
-              try {
-                await axios.post('/orders/test');
-                toast.success('Test order created!');
-                fetchOrders();
-              } catch (error) {
-                console.error('Error creating test order:', error);
-                toast.error('Failed to create test order');
-              }
-            }}
-            className="btn-primary flex items-center"
-            title="Create Test Order"
-          >
-            <Plus className="h-4 w-4 mr-2" />
-            Test Order
-          </button>
+                     <button
+             onClick={async () => {
+               try {
+                 await axios.post('/orders/test');
+                 toast.success('Test order created!');
+                 fetchOrders();
+               } catch (error) {
+                 console.error('Error creating test order:', error);
+                 toast.error('Failed to create test order');
+               }
+             }}
+             className="btn-primary flex items-center"
+             title="Create Test Order"
+           >
+             Test Order
+           </button>
           <label className="flex items-center space-x-2 cursor-pointer">
             <input
               type="checkbox"
@@ -668,21 +641,13 @@ const KitchenOrders = ({ cart, setCart }) => {
                   </div>
                   <div className="flex items-center space-x-2">
                     <button
-                      onClick={() => reorderItems(order)}
-                      className="btn-materialize text-sm px-3 py-1 flex items-center"
-                                              title="Re-order Items"
+                      onClick={() => addOrderToCart(order)}
+                      className="text-sm px-3 py-1 rounded border text-green-600 border-green-300 hover:bg-green-50 flex items-center"
+                      title="Add to Cart"
                     >
-                                              <Plus className="h-3 w-3 mr-1" />
-                        Re-order
+                      <ShoppingCart className="h-3 w-3 mr-1" />
+                      Add to Cart
                     </button>
-                                         <button
-                       onClick={() => addOrderToCart(order)}
-                       className="btn-materialize text-sm px-3 py-1 flex items-center"
-                       title="Add to Cart"
-                     >
-                       <ShoppingCart className="h-3 w-3 mr-1" />
-                       Add to Cart
-                     </button>
                     <button
                       onClick={() => printOrder(order)}
                       className="btn-secondary text-sm px-3 py-1"
