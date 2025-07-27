@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Clock, CheckCircle, XCircle, Printer, RefreshCw, AlertTriangle, Coffee, Utensils, Plus, ChevronDown, ChevronUp } from 'lucide-react';
+import { Clock, CheckCircle, XCircle, Printer, RefreshCw, AlertTriangle, Coffee, Utensils, Plus, ChevronDown, ChevronUp, ShoppingCart } from 'lucide-react';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 import { useAuth } from '../contexts/AuthContext';
 
-const KitchenOrders = () => {
+const KitchenOrders = ({ cart, setCart }) => {
   const { isAuthenticated, user, loading: authLoading } = useAuth();
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -109,6 +109,51 @@ const KitchenOrders = () => {
     } catch (error) {
       console.error('Error creating re-order:', error);
       toast.error('Failed to create re-order');
+    }
+  };
+
+  const addOrderToCart = (order) => {
+    try {
+      // Ensure setCart is a function
+      if (typeof setCart !== 'function') {
+        console.error('setCart is not a function:', setCart);
+        toast.error('Cart functionality not available');
+        return;
+      }
+      
+      // Ensure cart is initialized as an array
+      if (!cart || !Array.isArray(cart)) {
+        setCart([]);
+        return;
+      }
+
+      // Add all items from the order to cart
+      order.items.forEach(item => {
+        const cartItem = {
+          id: item.menu_item_id,
+          name: item.name,
+          price: item.price,
+          quantity: item.quantity
+        };
+        
+        // Check if item already exists in cart
+        const existingItemIndex = cart.findIndex(cartItem => cartItem.id === item.menu_item_id);
+        
+        if (existingItemIndex !== -1) {
+          // Update quantity of existing item
+          const updatedCart = [...cart];
+          updatedCart[existingItemIndex].quantity += item.quantity;
+          setCart(updatedCart);
+        } else {
+          // Add new item to cart
+          setCart(prevCart => [...prevCart, cartItem]);
+        }
+      });
+      
+      toast.success(`Items from Order #${order.order_number} added to cart!`);
+    } catch (error) {
+      console.error('Error adding order to cart:', error);
+      toast.error('Failed to add order to cart');
     }
   };
 
@@ -625,11 +670,19 @@ const KitchenOrders = () => {
                     <button
                       onClick={() => reorderItems(order)}
                       className="btn-materialize text-sm px-3 py-1 flex items-center"
-                      title="Re-order Items"
+                                              title="Re-order Items"
                     >
-                      <Plus className="h-3 w-3 mr-1" />
-                      Re-order
+                                              <Plus className="h-3 w-3 mr-1" />
+                        Re-order
                     </button>
+                                         <button
+                       onClick={() => addOrderToCart(order)}
+                       className="btn-materialize text-sm px-3 py-1 flex items-center"
+                       title="Add to Cart"
+                     >
+                       <ShoppingCart className="h-3 w-3 mr-1" />
+                       Add to Cart
+                     </button>
                     <button
                       onClick={() => printOrder(order)}
                       className="btn-secondary text-sm px-3 py-1"

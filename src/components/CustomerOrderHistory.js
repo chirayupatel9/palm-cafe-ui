@@ -4,7 +4,7 @@ import axios from 'axios';
 import toast from 'react-hot-toast';
 import { useCurrency } from '../contexts/CurrencyContext';
 
-const CustomerOrderHistory = ({ customerPhone, setActiveTab }) => {
+const CustomerOrderHistory = ({ customerPhone, setActiveTab, cart, setCart }) => {
   const { formatCurrency } = useCurrency();
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -114,32 +114,38 @@ const CustomerOrderHistory = ({ customerPhone, setActiveTab }) => {
     }
   };
 
-  const reorderItems = async (order) => {
+  const addOrderToCart = (order) => {
     try {
-      // Create a new order with the same items
-      const orderData = {
-        customer_name: customerInfo?.name || 'Walk-in Customer',
-        customer_phone: customerPhone,
-        customer_email: customerInfo?.email || '',
-        items: order.items.map(item => ({
-          menu_item_id: item.menu_item_id,
-          quantity: item.quantity,
+      // Add all items from the order to cart
+      order.items.forEach(item => {
+        const cartItem = {
+          id: item.menu_item_id,
+          name: item.name,
           price: item.price,
-          name: item.name
-        })),
-        notes: `Re-order from Order #${order.order_number}`,
-        payment_method: order.payment_method || 'cash',
-        pickup_option: order.pickup_option || 'pickup'
-      };
-
-      const response = await axios.post('/orders', orderData);
-      toast.success(`Re-order created successfully! New Order #${response.data.order_number}`);
+          quantity: item.quantity
+        };
+        
+        // Check if item already exists in cart
+        const existingItemIndex = cart.findIndex(cartItem => cartItem.id === item.menu_item_id);
+        
+        if (existingItemIndex !== -1) {
+          // Update quantity of existing item
+          const updatedCart = [...cart];
+          updatedCart[existingItemIndex].quantity += item.quantity;
+          setCart(updatedCart);
+        } else {
+          // Add new item to cart
+          setCart(prevCart => [...prevCart, cartItem]);
+        }
+      });
       
-      // Switch back to menu tab to show the new order
+      toast.success(`Items from Order #${order.order_number} added to cart!`);
+      
+      // Switch back to menu tab to show the cart
       setActiveTab('menu');
     } catch (error) {
-      console.error('Error creating re-order:', error);
-      toast.error('Failed to create re-order');
+      console.error('Error adding order to cart:', error);
+      toast.error('Failed to add order to cart');
     }
   };
 
@@ -254,11 +260,12 @@ const CustomerOrderHistory = ({ customerPhone, setActiveTab }) => {
                       <span>+{calculatePointsEarned(order.final_amount)} pts</span>
                     </div>
                     <button
-                      onClick={() => reorderItems(order)}
-                      className="btn-materialize text-xs px-2 py-1 flex items-center"
-                    >
-                      <Plus className="h-3 w-3 mr-1" />
-                      Re-order
+                      onClick={() => addOrderToCart(order)}
+                                              className="btn-materialize text-xs px-2 py-1 flex items-center"
+                        title="Add to Cart"
+                      >
+                        <Plus className="h-3 w-3 mr-1" />
+                        Add to Cart
                     </button>
                     <button
                       onClick={() => downloadInvoice(order.order_number)}

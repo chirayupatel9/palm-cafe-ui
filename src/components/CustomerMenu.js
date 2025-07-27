@@ -551,7 +551,12 @@ const CustomerMenu = ({
           </>
         ) : (
           /* Order History Tab */
-                          <CustomerOrderHistory customerPhone={customer?.phone} setActiveTab={setActiveTab} />
+                          <CustomerOrderHistory 
+                            customerPhone={customer?.phone} 
+                            setActiveTab={setActiveTab}
+                            cart={cart}
+                            setCart={setCart}
+                          />
         )}
       </main>
 

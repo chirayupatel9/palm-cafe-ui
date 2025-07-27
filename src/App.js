@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
-import { Receipt, Settings, Plus, Menu, X, LogOut, User, Package, Utensils, Users, CreditCard } from 'lucide-react';
+import { Receipt, Settings, Plus, Menu, X, LogOut, User, Package, Utensils, Users, CreditCard, ShoppingCart } from 'lucide-react';
 import axios from 'axios';
 import { CurrencyProvider } from './contexts/CurrencyContext';
 import { DarkModeProvider } from './contexts/DarkModeContext';
@@ -33,6 +33,7 @@ function MainApp() {
   const [menuItems, setMenuItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [cart, setCart] = useState([]);
   const { user, logout } = useAuth();
 
   useEffect(() => {
@@ -94,7 +95,7 @@ function MainApp() {
   const renderPage = () => {
     switch (currentPage) {
       case 'order':
-        return <OrderPage menuItems={menuItems} />;
+        return <OrderPage menuItems={menuItems} cart={cart} setCart={setCart} />;
       case 'menu':
         return (
           <MenuManagement
@@ -106,12 +107,12 @@ function MainApp() {
         );
 
       case 'history':
-        return <InvoiceHistory />;
+        return <InvoiceHistory cart={cart} setCart={setCart} setCurrentPage={setCurrentPage} />;
 
       case 'inventory':
         return <InventoryManagement />;
       case 'kitchen':
-        return <KitchenOrders />;
+        return <KitchenOrders cart={cart} setCart={setCart} />;
       case 'customers':
         return <CustomerManagement />;
       case 'payment-methods':
@@ -162,6 +163,14 @@ function MainApp() {
               className="h-10 w-10 mr-3"
             />
             <h1 className="text-xl sm:text-2xl font-bold text-secondary-700 dark:text-gray-100">Palm Cafe</h1>
+            {cart && cart.length > 0 && (
+              <div className="ml-4 flex items-center space-x-1 text-sm text-secondary-600 dark:text-gray-400">
+                <ShoppingCart className="h-4 w-4" />
+                <span className="bg-secondary-100 text-secondary-800 px-2 py-1 rounded-full text-xs font-medium">
+                  {cart.length} items
+                </span>
+              </div>
+            )}
           </div>
           
                       <div className="flex items-center space-x-2">

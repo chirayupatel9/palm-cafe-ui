@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Utensils, LogOut, User } from 'lucide-react';
+import { Utensils, LogOut, User, ShoppingCart } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import KitchenOrders from './KitchenOrders';
 import DarkModeToggle from './DarkModeToggle';
@@ -7,6 +7,7 @@ import DarkModeToggle from './DarkModeToggle';
 const ChefApp = () => {
   const { user, logout } = useAuth();
   const [currentPage, setCurrentPage] = useState('kitchen');
+  const [cart, setCart] = useState([]);
 
   const handleLogout = () => {
     logout();
@@ -15,9 +16,9 @@ const ChefApp = () => {
   const renderPage = () => {
     switch (currentPage) {
       case 'kitchen':
-        return <KitchenOrders />;
+        return <KitchenOrders cart={cart} setCart={setCart} />;
       default:
-        return <KitchenOrders />;
+        return <KitchenOrders cart={cart} setCart={setCart} />;
     }
   };
 
@@ -48,6 +49,16 @@ const ChefApp = () => {
             </div>
             
             <div className="flex items-center space-x-2">
+              {/* Cart indicator */}
+              {cart && cart.length > 0 && (
+                <div className="flex items-center space-x-1 text-sm text-secondary-600 dark:text-gray-400">
+                  <ShoppingCart className="h-4 w-4" />
+                  <span className="bg-secondary-100 text-secondary-800 px-2 py-1 rounded-full text-xs font-medium">
+                    {cart.length} items
+                  </span>
+                </div>
+              )}
+              
               {/* User info */}
               <div className="hidden sm:flex items-center space-x-2 text-sm text-secondary-600 dark:text-gray-400">
                 <User className="h-4 w-4" />

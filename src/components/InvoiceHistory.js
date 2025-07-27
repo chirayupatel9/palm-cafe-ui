@@ -1,16 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import { Download, Calendar, User, DollarSign, Percent, Heart, BarChart3 } from 'lucide-react';
+import { Download, Calendar, User, DollarSign, Percent, Heart, BarChart3, Plus, ShoppingCart, X } from 'lucide-react';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 import { useCurrency } from '../contexts/CurrencyContext';
 import DailyReports from './DailyReports';
 
-const InvoiceHistory = () => {
+const InvoiceHistory = ({ cart, setCart, setCurrentPage }) => {
   const { formatCurrency, currencySettings } = useCurrency();
   const [invoices, setInvoices] = useState([]);
   const [statistics, setStatistics] = useState(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('invoices'); // 'invoices' or 'reports'
+  const [selectedInvoice, setSelectedInvoice] = useState(null);
+  const [showInvoiceDetails, setShowInvoiceDetails] = useState(false);
 
   useEffect(() => {
     fetchInvoices();
@@ -65,6 +67,97 @@ const InvoiceHistory = () => {
     } catch (error) {
       console.error('Error downloading invoice:', error);
       toast.error('Failed to open invoice');
+    }
+  };
+
+  const addInvoiceToCart = (invoice) => {
+    try {
+      // Fetch the order details to get the items
+      axios.get(`/orders?order_number=${invoice.order_number}`).then(response => {
+        const orders = response.data;
+        
+        // The API returns an array, so we need to get the first order
+        if (!orders || orders.length === 0) {
+          toast.error('Order not found');
+          return;
+        }
+        
+        const order = orders[0];
+        
+        // Ensure setCart is a function
+        if (typeof setCart !== 'function') {
+          console.error('setCart is not a function:', setCart);
+          toast.error('Cart functionality not available');
+          return;
+        }
+        
+        // Ensure cart is initialized as an array
+        if (!cart || !Array.isArray(cart)) {
+          setCart([]);
+          return;
+        }
+
+        // Add all items from the order to cart
+        order.items.forEach(item => {
+          const cartItem = {
+            id: item.menu_item_id,
+            name: item.name,
+            price: item.price,
+            quantity: item.quantity
+          };
+          
+          // Check if item already exists in cart
+          const existingItemIndex = cart.findIndex(cartItem => cartItem.id === item.menu_item_id);
+          
+          if (existingItemIndex !== -1) {
+            // Update quantity of existing item
+            const updatedCart = [...cart];
+            updatedCart[existingItemIndex].quantity += item.quantity;
+            setCart(updatedCart);
+          } else {
+            // Add new item to cart
+            setCart(prevCart => [...prevCart, cartItem]);
+          }
+        });
+        
+        toast.success(`Items from Invoice #${getInvoiceNumber(invoice)} added to cart!`);
+        
+        // Switch to order page to show the cart
+        if (setCurrentPage) {
+          setCurrentPage('order');
+        }
+      }).catch(error => {
+        console.error('Error fetching order details:', error);
+        toast.error('Failed to add items to cart');
+      });
+    } catch (error) {
+      console.error('Error adding invoice to cart:', error);
+      toast.error('Failed to add items to cart');
+    }
+  };
+
+  const viewInvoiceDetails = async (invoice) => {
+    try {
+      if (!invoice.order_number) {
+        toast.error('No order details available for this invoice');
+        return;
+      }
+      
+      const response = await axios.get(`/orders?order_number=${invoice.order_number}`);
+      const orders = response.data;
+      
+      // The API returns an array, so we need to get the first order
+      if (!orders || orders.length === 0) {
+        toast.error('Order not found');
+        return;
+      }
+      
+      const order = orders[0];
+      setSelectedInvoice({ ...invoice, orderDetails: order });
+      setShowInvoiceDetails(true);
+    } catch (error) {
+      console.error('Error fetching order details:', error);
+      toast.error('Failed to load order details');
     }
   };
 
@@ -254,12 +347,33 @@ const InvoiceHistory = () => {
                             </div>
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                            <button
-                              onClick={() => openInvoice(getInvoiceNumber(invoice))}
-                              className="text-secondary-600 hover:text-secondary-900 dark:text-secondary-400 dark:hover:text-secondary-300"
-                            >
-                              <Download className="h-4 w-4" />
-                            </button>
+                            <div className="flex items-center justify-end space-x-2">
+                              {invoice.order_number && (
+                                <>
+                                  <button
+                                    onClick={() => viewInvoiceDetails(invoice)}
+                                    className="text-secondary-600 hover:text-secondary-900 dark:text-secondary-400 dark:hover:text-secondary-300"
+                                    title="View Details"
+                                  >
+                                    <Plus className="h-4 w-4" />
+                                  </button>
+                                  <button
+                                    onClick={() => addInvoiceToCart(invoice)}
+                                    className="text-secondary-600 hover:text-secondary-900 dark:text-secondary-400 dark:hover:text-secondary-300"
+                                    title="Add to Cart"
+                                  >
+                                    <ShoppingCart className="h-4 w-4" />
+                                  </button>
+                                </>
+                              )}
+                              <button
+                                onClick={() => openInvoice(getInvoiceNumber(invoice))}
+                                className="text-secondary-600 hover:text-secondary-900 dark:text-secondary-400 dark:hover:text-secondary-300"
+                                title="Download Invoice"
+                              >
+                                <Download className="h-4 w-4" />
+                              </button>
+                            </div>
                           </td>
                         </tr>
                       ))}
@@ -280,12 +394,33 @@ const InvoiceHistory = () => {
                             {invoice.order_number ? `Order #${invoice.order_number}` : 'No order number'}
                           </div>
                         </div>
-                        <button
-                          onClick={() => openInvoice(getInvoiceNumber(invoice))}
-                          className="text-secondary-600 hover:text-secondary-900 dark:text-secondary-400 dark:hover:text-secondary-300"
-                        >
-                          <Download className="h-5 w-5" />
-                        </button>
+                        <div className="flex items-center space-x-2">
+                          {invoice.order_number && (
+                            <>
+                              <button
+                                onClick={() => viewInvoiceDetails(invoice)}
+                                className="text-secondary-600 hover:text-secondary-900 dark:text-secondary-400 dark:hover:text-secondary-300"
+                                title="View Details"
+                              >
+                                <Plus className="h-4 w-4" />
+                              </button>
+                              <button
+                                onClick={() => addInvoiceToCart(invoice)}
+                                className="text-secondary-600 hover:text-secondary-900 dark:text-secondary-400 dark:hover:text-secondary-300"
+                                title="Add to Cart"
+                              >
+                                <ShoppingCart className="h-4 w-4" />
+                              </button>
+                            </>
+                          )}
+                          <button
+                            onClick={() => openInvoice(getInvoiceNumber(invoice))}
+                            className="text-secondary-600 hover:text-secondary-900 dark:text-secondary-400 dark:hover:text-secondary-300"
+                            title="Download Invoice"
+                          >
+                            <Download className="h-4 w-4" />
+                          </button>
+                        </div>
                       </div>
                       
                       <div className="space-y-2">
@@ -403,6 +538,87 @@ const InvoiceHistory = () => {
         </>
       ) : (
         <DailyReports />
+      )}
+
+      {/* Invoice Details Modal */}
+      {showInvoiceDetails && selectedInvoice && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-6">
+              <div className="flex justify-between items-start mb-4">
+                <div>
+                  <h3 className="text-lg font-semibold text-secondary-700 dark:text-secondary-300">
+                    Invoice #{getInvoiceNumber(selectedInvoice)}
+                  </h3>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                    Order #{selectedInvoice.order_number}
+                  </p>
+                </div>
+                <button
+                  onClick={() => setShowInvoiceDetails(false)}
+                  className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                >
+                  <X className="h-6 w-6" />
+                </button>
+              </div>
+
+              <div className="space-y-4">
+                <div className="grid grid-cols-2 gap-4 text-sm">
+                  <div>
+                    <span className="font-medium text-gray-700 dark:text-gray-300">Customer:</span>
+                    <p className="text-gray-600 dark:text-gray-400">{selectedInvoice.customer_name}</p>
+                  </div>
+                  <div>
+                    <span className="font-medium text-gray-700 dark:text-gray-300">Date:</span>
+                    <p className="text-gray-600 dark:text-gray-400">{formatDate(selectedInvoice.invoice_date)}</p>
+                  </div>
+                </div>
+
+                {selectedInvoice.orderDetails && (
+                  <div>
+                    <h4 className="font-medium text-gray-700 dark:text-gray-300 mb-2">Order Items:</h4>
+                    <div className="space-y-2">
+                      {selectedInvoice.orderDetails.items.map((item, index) => (
+                        <div key={index} className="flex justify-between items-center py-2 border-b border-gray-200 dark:border-gray-700">
+                          <div>
+                            <p className="font-medium text-gray-700 dark:text-gray-300">{item.name}</p>
+                            <p className="text-sm text-gray-500 dark:text-gray-400">
+                              Qty: {item.quantity} × {formatCurrency(item.price)}
+                            </p>
+                          </div>
+                          <p className="font-medium text-secondary-700 dark:text-secondary-300">
+                            {formatCurrency(item.price * item.quantity)}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                <div className="flex justify-end space-x-3 pt-4 border-t border-gray-200 dark:border-gray-700">
+                  <button
+                    onClick={() => setShowInvoiceDetails(false)}
+                    className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 dark:text-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 rounded-lg transition-colors"
+                  >
+                    Close
+                  </button>
+                  {selectedInvoice.order_number && (
+                    <button
+                      onClick={() => {
+                        addInvoiceToCart(selectedInvoice);
+                        setShowInvoiceDetails(false);
+                      }}
+                      className="px-4 py-2 text-sm font-medium text-white bg-secondary-600 hover:bg-secondary-700 rounded-lg transition-colors flex items-center"
+                    >
+                      <ShoppingCart className="h-4 w-4 mr-2" />
+                      Add to Cart
+                    </button>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

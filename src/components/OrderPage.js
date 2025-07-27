@@ -6,7 +6,7 @@ import { useCurrency } from '../contexts/CurrencyContext';
 import { getCategoryColor } from '../utils/categoryColors';
 import { useAuth } from '../contexts/AuthContext';
 
-const OrderPage = ({ menuItems }) => {
+const OrderPage = ({ menuItems, cart: externalCart, setCart: setExternalCart }) => {
   const { formatCurrency } = useCurrency();
   const { user } = useAuth();
   const [cart, setCart] = useState([]);
@@ -30,6 +30,17 @@ const OrderPage = ({ menuItems }) => {
   const [extraCharge, setExtraCharge] = useState(0);
   const [extraChargeNote, setExtraChargeNote] = useState('');
   const [extraChargeEnabled, setExtraChargeEnabled] = useState(false);
+
+  // Use external cart if provided, otherwise use internal cart
+  const currentCart = externalCart || cart;
+  const setCurrentCart = setExternalCart || setCart;
+
+  // Show cart automatically if external cart has items
+  useEffect(() => {
+    if (externalCart && externalCart.length > 0) {
+      setShowCart(true);
+    }
+  }, [externalCart]);
 
   // Helper function to ensure price is a number
   const ensureNumber = (value) => {
@@ -55,8 +66,8 @@ const OrderPage = ({ menuItems }) => {
 
   // Calculate subtotal
   const getSubtotal = useCallback(() => {
-    return cart.reduce((total, item) => total + (ensureNumber(item.price) * item.quantity), 0);
-  }, [cart]);
+    return currentCart.reduce((total, item) => total + (ensureNumber(item.price) * item.quantity), 0);
+  }, [currentCart]);
 
   // Calculate total with tax, tip, and points redemption
   const getTotal = () => {
@@ -84,11 +95,11 @@ const OrderPage = ({ menuItems }) => {
     } else {
       setTaxInfo({ taxRate: 0, taxName: 'Tax', taxAmount: 0 });
     }
-  }, [cart, getSubtotal]);
+  }, [currentCart, getSubtotal]);
 
   // Calculate max redeemable points when cart or customer changes
   useEffect(() => {
-    if (customerInfo?.loyalty_points && cart.length > 0) {
+    if (customerInfo?.loyalty_points && currentCart.length > 0) {
       const subtotal = getSubtotal();
       const maxPoints = Math.min(customerInfo.loyalty_points, Math.floor(subtotal * 10)); // Can't redeem more than order value
       setMaxRedeemablePoints(maxPoints);
@@ -101,7 +112,7 @@ const OrderPage = ({ menuItems }) => {
       setMaxRedeemablePoints(0);
       setPointsToRedeem(0);
     }
-  }, [cart, customerInfo?.loyalty_points, pointsToRedeem, getSubtotal]);
+  }, [currentCart, customerInfo?.loyalty_points, pointsToRedeem, getSubtotal]);
 
   // Fetch payment methods
   const fetchPaymentMethods = async () => {
@@ -174,7 +185,7 @@ const OrderPage = ({ menuItems }) => {
   };
 
   const addToCart = (item) => {
-    setCart(prevCart => {
+    setCurrentCart(prevCart => {
       const existingItem = prevCart.find(cartItem => cartItem.id === item.id);
       if (existingItem) {
         return prevCart.map(cartItem =>
@@ -190,7 +201,7 @@ const OrderPage = ({ menuItems }) => {
   };
 
   const removeFromCart = (itemId) => {
-    setCart(prevCart => prevCart.filter(item => item.id !== itemId));
+    setCurrentCart(prevCart => prevCart.filter(item => item.id !== itemId));
     toast.success('Item removed from cart');
   };
 
@@ -199,7 +210,7 @@ const OrderPage = ({ menuItems }) => {
       removeFromCart(itemId);
       return;
     }
-    setCart(prevCart =>
+    setCurrentCart(prevCart =>
       prevCart.map(item =>
         item.id === itemId ? { ...item, quantity: newQuantity } : item
       )
@@ -208,7 +219,7 @@ const OrderPage = ({ menuItems }) => {
 
   // Generate invoice
   const generateInvoice = async () => {
-    if (cart.length === 0) {
+    if (currentCart.length === 0) {
       toast.error('Please add items to cart first');
       return;
     }
@@ -242,7 +253,7 @@ const OrderPage = ({ menuItems }) => {
         customerPhone: customerPhone.trim(),
         paymentMethod: paymentMethod,
         pickupOption: pickupOption,
-        items: cart.map(item => ({
+        items: currentCart.map(item => ({
           id: item.id,
           name: item.name,
           price: ensureNumber(item.price),
@@ -278,7 +289,7 @@ const OrderPage = ({ menuItems }) => {
       }, 1000);
 
       // Clear cart and form
-      setCart([]);
+      setCurrentCart([]);
       setCustomerName('');
       setCustomerPhone('');
       setCustomerInfo(null);
@@ -302,7 +313,7 @@ const OrderPage = ({ menuItems }) => {
 
   // Clear cart
   const clearCart = () => {
-    setCart([]);
+    setCurrentCart([]);
     setCustomerName('');
     setCustomerPhone('');
     setCustomerInfo(null);
@@ -403,9 +414,9 @@ const OrderPage = ({ menuItems }) => {
           className="bg-secondary-500 text-white p-4 rounded-full shadow-lg hover:bg-secondary-600 transition-colors"
         >
           <ShoppingCart className="h-6 w-6" />
-          {cart.length > 0 && (
+          {currentCart.length > 0 && (
             <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-6 w-6 flex items-center justify-center">
-              {cart.length}
+              {currentCart.length}
             </span>
           )}
         </button>
@@ -424,7 +435,7 @@ const OrderPage = ({ menuItems }) => {
                     className="h-8 w-8 mr-2"
                   />
                   <h2 className="text-xl font-semibold text-secondary-700">
-                    Cart ({cart.length})
+                    Cart ({currentCart.length})
                   </h2>
                 </div>
                 <button
@@ -464,7 +475,7 @@ const OrderPage = ({ menuItems }) => {
                 )}
 
                 {/* Points Redemption */}
-                {cart.length > 0 && customerInfo?.loyalty_points > 0 && (
+                {currentCart.length > 0 && customerInfo?.loyalty_points > 0 && (
                   <div className="mb-4">
                     <label className="block text-sm font-medium text-secondary-700 dark:text-secondary-300 mb-2 flex items-center">
                       <Star className="h-4 w-4 mr-2 text-yellow-500" />
@@ -535,7 +546,7 @@ const OrderPage = ({ menuItems }) => {
                 </div>
 
                 {/* Split Payment Option - Admin Only */}
-                {cart.length > 0 && user?.role === 'admin' && (
+                {currentCart.length > 0 && user?.role === 'admin' && (
                   <div className="mb-2">
                     <div className="flex items-center justify-between mb-3">
                       <h3 className="font-medium text-secondary-700 dark:text-secondary-300">Split Payment</h3>
@@ -687,7 +698,7 @@ const OrderPage = ({ menuItems }) => {
               )}
 
               {/* Cart Items */}
-              {cart.length === 0 ? (
+              {currentCart.length === 0 ? (
                 <div className="text-center py-8 text-gray-500">
                   <ShoppingCart className="h-12 w-12 mx-auto mb-2 text-gray-300" />
                   <p>Your cart is empty</p>
@@ -695,7 +706,7 @@ const OrderPage = ({ menuItems }) => {
                 </div>
               ) : (
                 <div className="space-y-3 mb-4">
-                  {cart.map((item) => (
+                  {currentCart.map((item) => (
                     <div key={item.id} className="flex items-center justify-between p-3 bg-accent-50 rounded-lg border border-accent-200">
                       <div className="flex-1">
                         <h4 className="font-medium text-secondary-700 text-sm">{item.name}</h4>
@@ -728,7 +739,7 @@ const OrderPage = ({ menuItems }) => {
               )}
 
               {/* Tip Selection */}
-              {cart.length > 0 && (
+              {currentCart.length > 0 && (
                 <div className="border-t border-accent-200 pt-4 mb-4">
                   <h3 className="font-medium text-secondary-700 dark:text-secondary-300 mb-3">Tip</h3>
                   
@@ -766,7 +777,7 @@ const OrderPage = ({ menuItems }) => {
               )}
 
               {/* Totals */}
-              {cart.length > 0 && (
+              {currentCart.length > 0 && (
                 <div className="border-t border-accent-200 pt-4 mb-4 space-y-2">
                   <div className="flex justify-between text-sm text-gray-600 dark:text-gray-400">
                     <span>Subtotal:</span>
@@ -814,7 +825,7 @@ const OrderPage = ({ menuItems }) => {
                   generateInvoice();
                   setShowCart(false);
                 }}
-                disabled={cart.length === 0 || loading}
+                disabled={currentCart.length === 0 || loading}
                 className="btn-primary w-full flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed py-3"
               >
                 <Receipt className="h-4 w-4 mr-2" />
@@ -837,7 +848,7 @@ const OrderPage = ({ menuItems }) => {
               />
               <h2 className="text-xl font-semibold text-secondary-700 dark:text-secondary-300">Cart</h2>
             </div>
-            {cart.length > 0 && (
+            {currentCart.length > 0 && (
               <button
                 onClick={clearCart}
                 className="text-red-500 hover:text-red-700 text-sm"
@@ -876,7 +887,7 @@ const OrderPage = ({ menuItems }) => {
             )}
 
             {/* Points Redemption */}
-            {cart.length > 0 && customerInfo?.loyalty_points > 0 && (
+            {currentCart.length > 0 && customerInfo?.loyalty_points > 0 && (
               <div className="mb-4">
                 <label className="block text-sm font-medium text-secondary-700 dark:text-secondary-300 mb-2 flex items-center">
                   <Star className="h-4 w-4 mr-2 text-yellow-500" />
@@ -945,7 +956,7 @@ const OrderPage = ({ menuItems }) => {
             </div>
 
             {/* Split Payment Option */}
-            {cart.length > 0 && user?.role === 'admin' && (
+            {currentCart.length > 0 && user?.role === 'admin' && (
               <div className="mb-6">
                 <div className="flex items-center justify-between mb-3">
                   <h3 className="font-medium text-secondary-700 dark:text-secondary-300">Split Payment</h3>
@@ -1097,7 +1108,7 @@ const OrderPage = ({ menuItems }) => {
           </div>
 
           {/* Cart Items */}
-          {cart.length === 0 ? (
+          {currentCart.length === 0 ? (
             <div className="text-center py-8 text-gray-500 dark:text-gray-400">
               <ShoppingCart className="h-12 w-12 mx-auto mb-2 text-gray-300 dark:text-gray-500" />
               <p>Your cart is empty</p>
@@ -1105,7 +1116,7 @@ const OrderPage = ({ menuItems }) => {
             </div>
           ) : (
             <div className="space-y-3 mb-4">
-              {cart.map((item) => (
+              {currentCart.map((item) => (
                 <div key={item.id} className="flex items-center justify-between p-3 bg-accent-50 rounded-lg border border-accent-200">
                   <div className="flex-1">
                     <h4 className="font-medium text-secondary-700 dark:text-secondary-300">{item.name}</h4>
@@ -1138,7 +1149,7 @@ const OrderPage = ({ menuItems }) => {
           )}
 
           {/* Tip Selection */}
-          {cart.length > 0 && (
+          {currentCart.length > 0 && (
             <div className="border-t border-accent-200 pt-4 mb-4">
               <h3 className="font-medium text-secondary-700 dark:text-secondary-300 mb-3">Tip</h3>
               
@@ -1176,7 +1187,7 @@ const OrderPage = ({ menuItems }) => {
           )}
 
           {/* Extra Charge */}
-          {cart.length > 0 && (
+          {currentCart.length > 0 && (
             <div className="border-t border-accent-200 pt-4 mb-4">
               <h3 className="font-medium text-secondary-700 dark:text-secondary-300 mb-3">Extra Charge</h3>
               <div className="flex items-center space-x-2">
@@ -1228,7 +1239,7 @@ const OrderPage = ({ menuItems }) => {
           )}
 
           {/* Totals */}
-          {cart.length > 0 && (
+          {currentCart.length > 0 && (
             <div className="border-t border-accent-200 pt-4 mb-4 space-y-2">
               <div className="flex justify-between text-sm text-gray-600 dark:text-gray-400">
                 <span>Subtotal:</span>
@@ -1273,7 +1284,7 @@ const OrderPage = ({ menuItems }) => {
           {/* Generate Invoice Button */}
           <button
             onClick={generateInvoice}
-            disabled={cart.length === 0 || loading}
+            disabled={currentCart.length === 0 || loading}
             className="btn-primary w-full flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <Receipt className="h-4 w-4 mr-2" />
