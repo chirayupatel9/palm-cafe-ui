@@ -4,9 +4,11 @@ import axios from 'axios';
 import toast from 'react-hot-toast';
 import { useCurrency } from '../contexts/CurrencyContext';
 import { getCategoryColor } from '../utils/categoryColors';
+import { useAuth } from '../contexts/AuthContext';
 
 const OrderPage = ({ menuItems }) => {
   const { formatCurrency } = useCurrency();
+  const { user } = useAuth();
   const [cart, setCart] = useState([]);
   const [customerName, setCustomerName] = useState('');
   const [customerPhone, setCustomerPhone] = useState('');
@@ -213,6 +215,12 @@ const OrderPage = ({ menuItems }) => {
 
     if (!customerName.trim()) {
       toast.error('Please enter customer name');
+      return;
+    }
+
+    // Only allow split payment for admins
+    if (splitPayment && user?.role !== 'admin') {
+      toast.error('Split payment is only available for administrators');
       return;
     }
 
@@ -526,8 +534,8 @@ const OrderPage = ({ menuItems }) => {
                   </div>
                 </div>
 
-                {/* Split Payment Option */}
-                {cart.length > 0 && (
+                {/* Split Payment Option - Admin Only */}
+                {cart.length > 0 && user?.role === 'admin' && (
                   <div className="mb-2">
                     <div className="flex items-center justify-between mb-3">
                       <h3 className="font-medium text-secondary-700 dark:text-secondary-300">Split Payment</h3>
@@ -937,7 +945,7 @@ const OrderPage = ({ menuItems }) => {
             </div>
 
             {/* Split Payment Option */}
-            {cart.length > 0 && (
+            {cart.length > 0 && user?.role === 'admin' && (
               <div className="mb-6">
                 <div className="flex items-center justify-between mb-3">
                   <h3 className="font-medium text-secondary-700 dark:text-secondary-300">Split Payment</h3>
