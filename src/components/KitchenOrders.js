@@ -27,18 +27,7 @@ const KitchenOrders = () => {
 
   const fetchOrders = async () => {
     try {
-      console.log('🔍 Frontend: Fetching orders...');
       const response = await axios.get('/orders');
-      console.log('✅ Frontend: Orders received:', response.data);
-      
-      // Debug: Check items in orders
-      response.data.forEach((order, index) => {
-        console.log(`📋 Order ${index + 1} (${order.order_number}):`, {
-          id: order.id,
-          items_count: order.items ? order.items.length : 0,
-          items: order.items
-        });
-      });
       
       // Check for new pending orders (auto-print removed)
       const newOrders = response.data.filter(newOrder => 
@@ -47,18 +36,12 @@ const KitchenOrders = () => {
       );
       
       if (newOrders.length > 0) {
-        console.log('🆕 New orders detected:', newOrders.length);
         toast.success(`${newOrders.length} new order(s) received!`);
       }
       
       setOrders(response.data);
     } catch (error) {
-      console.error('❌ Frontend: Error fetching orders:', error);
-      console.error('📊 Error details:', {
-        status: error.response?.status,
-        statusText: error.response?.statusText,
-        data: error.response?.data
-      });
+      console.error('Error fetching orders:', error);
       toast.error('Failed to load orders');
     } finally {
       setLoading(false);
