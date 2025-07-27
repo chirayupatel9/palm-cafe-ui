@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { toast } from 'react-hot-toast';
+import { useAuth } from '../contexts/AuthContext';
 import { 
   Users, 
   Search, 
@@ -19,6 +20,7 @@ import {
 } from 'lucide-react';
 
 const CustomerManagement = () => {
+  const { isAuthenticated, user, loading: authLoading } = useAuth();
   const [customers, setCustomers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
@@ -41,9 +43,11 @@ const CustomerManagement = () => {
   });
 
   useEffect(() => {
-    fetchCustomers();
-    fetchStatistics();
-  }, []);
+    if (isAuthenticated && !authLoading) {
+      fetchCustomers();
+      fetchStatistics();
+    }
+  }, [isAuthenticated, authLoading]);
 
   const fetchCustomers = async () => {
     try {
@@ -174,6 +178,37 @@ const CustomerManagement = () => {
     if (filterActive === 'inactive') return !customer.is_active;
     return true;
   });
+
+  if (authLoading) {
+    return (
+      <div className="flex flex-col items-center justify-center py-12">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600 mb-4"></div>
+        <p className="text-gray-600 dark:text-gray-400">Loading authentication...</p>
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return (
+      <div className="flex flex-col items-center justify-center py-12">
+        <img 
+          src="/images/palm-cafe-logo.png" 
+          alt="Palm Cafe Logo" 
+          className="h-16 w-16 mb-4 opacity-50"
+        />
+        <h2 className="text-xl font-semibold text-secondary-700 dark:text-secondary-300 mb-2">Authentication Required</h2>
+        <p className="text-gray-600 dark:text-gray-400 text-center mb-4">
+          You need to be logged in to access customer management.
+        </p>
+        <button
+          onClick={() => window.location.href = '/login'}
+          className="btn-primary"
+        >
+          Go to Login
+        </button>
+      </div>
+    );
+  }
 
   if (loading && customers.length === 0) {
     return (
