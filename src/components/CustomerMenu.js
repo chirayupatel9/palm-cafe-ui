@@ -6,14 +6,23 @@ import { useCurrency } from '../contexts/CurrencyContext';
 import { getCategoryColor } from '../utils/categoryColors';
 import CustomerOrderHistory from './CustomerOrderHistory';
 
-const CustomerMenu = ({ customer, cart, setCart, activeTab, setActiveTab, showCart, setShowCart }) => {
+const CustomerMenu = ({ 
+  customer, 
+  cart, 
+  setCart, 
+  activeTab, 
+  setActiveTab, 
+  showCart, 
+  setShowCart,
+  onAddToCart,
+  onPlaceOrder,
+  showLoginModal,
+  setShowLoginModal
+}) => {
   const { formatCurrency } = useCurrency();
   const [menuItems, setMenuItems] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [customerInfo, setCustomerInfo] = useState(customer);
-  const [customerName, setCustomerName] = useState(customer?.name || '');
-  const [customerPhone, setCustomerPhone] = useState(customer?.phone || '');
-  const [customerEmail, setCustomerEmail] = useState(customer?.email || '');
+
   const [paymentMethod, setPaymentMethod] = useState('cash');
   const [tipAmount, setTipAmount] = useState(0);
   const [tipPercentage, setTipPercentage] = useState(0);
@@ -171,45 +180,27 @@ const CustomerMenu = ({ customer, cart, setCart, activeTab, setActiveTab, showCa
     return subtotal + taxAmount + tipAmount - pointsDiscount;
   };
 
-  // Search for existing customer
-  const searchCustomer = async (phone) => {
-    if (!phone || phone.length < 5) {
-      setCustomerInfo(null);
-      return;
-    }
 
-    try {
-      const response = await axios.get(`/customer/login/${phone}`);
-      if (response.data) {
-        const customer = response.data;
-        setCustomerInfo(customer);
-        setCustomerName(customer.name);
-        setCustomerEmail(customer.email || '');
-        toast.success(`Welcome back, ${customer.name}! You have ${customer.loyalty_points} loyalty points.`);
-      } else {
-        setCustomerInfo(null);
-      }
-    } catch (error) {
-      console.error('Error searching customer:', error);
-      setCustomerInfo(null);
-    }
-  };
 
   // Add item to cart
   const addToCart = (item) => {
-    setCart(prevCart => {
-      const existingItem = prevCart.find(cartItem => cartItem.id === item.id);
-      if (existingItem) {
-        return prevCart.map(cartItem =>
-          cartItem.id === item.id
-            ? { ...cartItem, quantity: cartItem.quantity + 1 }
-            : cartItem
-        );
-      } else {
-        return [...prevCart, { ...item, quantity: 1 }];
-      }
-    });
-    toast.success(`${item.name} added to cart`);
+    if (onAddToCart) {
+      onAddToCart(item);
+    } else {
+      setCart(prevCart => {
+        const existingItem = prevCart.find(cartItem => cartItem.id === item.id);
+        if (existingItem) {
+          return prevCart.map(cartItem =>
+            cartItem.id === item.id
+              ? { ...cartItem, quantity: cartItem.quantity + 1 }
+              : cartItem
+          );
+        } else {
+          return [...prevCart, { ...item, quantity: 1 }];
+        }
+      });
+      toast.success(`${item.name} added to cart`);
+    }
   };
 
   // Remove item from cart
@@ -266,8 +257,12 @@ const CustomerMenu = ({ customer, cart, setCart, activeTab, setActiveTab, showCa
       return;
     }
 
-    if (!customerName.trim()) {
-      toast.error('Please enter your name');
+    if (!customer || !customer.name) {
+      if (onPlaceOrder) {
+        onPlaceOrder();
+      } else {
+        toast.error('Customer information is required. Please contact support.');
+      }
       return;
     }
 
@@ -277,9 +272,9 @@ const CustomerMenu = ({ customer, cart, setCart, activeTab, setActiveTab, showCa
 
     try {
       const orderData = {
-        customerName: customerName.trim(),
-        customerPhone: customerPhone.trim(),
-        customerEmail: customerEmail.trim(),
+        customerName: customer.name,
+        customerPhone: customer.phone || '',
+        customerEmail: customer.email || '',
         paymentMethod: paymentMethod,
         pickupOption: pickupOption,
         items: cart.map(item => ({
@@ -342,7 +337,7 @@ const CustomerMenu = ({ customer, cart, setCart, activeTab, setActiveTab, showCa
   // Check order status
   const checkOrderStatus = async (orderNumber) => {
     try {
-      const response = await axios.get(`/customer/orders?customer_phone=${customerPhone}`);
+      const response = await axios.get(`/customer/orders?customer_phone=${customer?.phone}`);
       const order = response.data.find(o => o.order_number === orderNumber);
       if (order) {
         setOrderStatus(order.status);
@@ -556,7 +551,7 @@ const CustomerMenu = ({ customer, cart, setCart, activeTab, setActiveTab, showCa
           </>
         ) : (
           /* Order History Tab */
-          <CustomerOrderHistory customerPhone={customerPhone} setActiveTab={setActiveTab} />
+                          <CustomerOrderHistory customerPhone={customer?.phone} setActiveTab={setActiveTab} />
         )}
       </main>
 
@@ -592,281 +587,319 @@ const CustomerMenu = ({ customer, cart, setCart, activeTab, setActiveTab, showCa
                 </button>
               </div>
 
-              {/* Customer Information */}
-              <div className="mb-6">
-                <h3 className="font-medium text-secondary-700 dark:text-secondary-300 mb-3">Customer Information</h3>
-                
-                <input
-                  type="text"
-                  placeholder="Your Name *"
-                  value={customerName}
-                  onChange={(e) => setCustomerName(e.target.value)}
-                  className="w-full p-3 border border-gray-300 rounded-lg mb-3 focus:ring-2 focus:ring-secondary-500 focus:border-transparent"
-                />
-                
-                <input
-                  type="tel"
-                  placeholder="Phone Number"
-                  value={customerPhone}
-                  onChange={(e) => {
-                    setCustomerPhone(e.target.value);
-                    searchCustomer(e.target.value);
-                  }}
-                  className="w-full p-3 border border-gray-300 rounded-lg mb-3 focus:ring-2 focus:ring-secondary-500 focus:border-transparent"
-                />
-                
-                <input
-                  type="email"
-                  placeholder="Email Address"
-                  value={customerEmail}
-                  onChange={(e) => setCustomerEmail(e.target.value)}
-                  className="w-full p-3 border border-gray-300 rounded-lg mb-3 focus:ring-2 focus:ring-secondary-500 focus:border-transparent"
-                />
-
-                {customerInfo && (
-                  <div className="p-3 bg-green-50 border border-green-200 rounded-lg mb-3">
-                    <div className="flex items-center text-sm text-green-700">
-                      <Star className="h-4 w-4 mr-2" />
-                      <span>Welcome back! {customerInfo.loyalty_points} loyalty points available</span>
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              {/* Payment Method */}
-              <div className="mb-6">
-                <h3 className="font-medium text-secondary-700 dark:text-secondary-300 mb-3">Payment Method</h3>
-                <div className="grid grid-cols-2 gap-2">
-                  {paymentMethods.map((method) => (
+              {/* Login Required Message */}
+              {!customer && (
+                <div className="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                  <div className="text-center">
+                    <h3 className="text-lg font-medium text-yellow-800 mb-2">
+                      Login Required
+                    </h3>
+                    <p className="text-sm text-yellow-700 mb-4">
+                      Please login to view your cart and place orders.
+                    </p>
                     <button
-                      key={method.code}
-                      type="button"
-                      onClick={() => setPaymentMethod(method.code)}
-                      className={`flex items-center justify-center p-3 rounded-lg border transition-colors ${
-                        paymentMethod === method.code
-                          ? 'bg-secondary-500 text-white border-secondary-500'
-                          : 'bg-white text-secondary-700 border-accent-300 hover:bg-accent-50'
-                      }`}
+                      onClick={() => {
+                        setShowCart(false);
+                        setShowLoginModal(true);
+                      }}
+                      className="bg-secondary-500 text-white px-4 py-2 rounded-lg hover:bg-secondary-600 transition-colors"
                     >
-                      <span className="mr-2">{method.icon}</span>
-                      <span className="font-medium">{method.name}</span>
+                      Login Now
                     </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Split Payment Option - Hidden for customers */}
-
-              {/* Pickup Option */}
-              <div className="mb-6">
-                <h3 className="font-medium text-secondary-700 dark:text-secondary-300 mb-3">Pickup Option</h3>
-                <div className="grid grid-cols-2 gap-2">
-                  <button
-                    type="button"
-                    onClick={() => setPickupOption('pickup')}
-                    className={`flex items-center justify-center p-3 rounded-lg border transition-colors ${
-                      pickupOption === 'pickup'
-                        ? 'bg-secondary-500 text-white border-secondary-500'
-                        : 'bg-white text-secondary-700 border-accent-300 hover:bg-accent-50'
-                    }`}
-                  >
-                    <span className="mr-2">🏪</span>
-                    <span className="font-medium">Pickup</span>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setPickupOption('dine-in')}
-                    className={`flex items-center justify-center p-3 rounded-lg border transition-colors ${
-                      pickupOption === 'dine-in'
-                        ? 'bg-secondary-500 text-white border-secondary-500'
-                        : 'bg-white text-secondary-700 border-accent-300 hover:bg-accent-50'
-                    }`}
-                  >
-                    <span className="mr-2">🍽️</span>
-                    <span className="font-medium">Dine-in</span>
-                  </button>
-                </div>
-                <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">
-                  {pickupOption === 'pickup' 
-                    ? 'Your order will be ready for pickup at the counter' 
-                    : 'Your order will be served at your table'}
-                </p>
-              </div>
-
-              {/* Cart Items */}
-              {cart.length === 0 ? (
-                <div className="text-center py-8 text-gray-500">
-                  <ShoppingCart className="h-12 w-12 mx-auto mb-2 text-gray-300" />
-                  <p>Your cart is empty</p>
-                  <p className="text-sm">Add items from the menu</p>
-                </div>
-              ) : (
-                <div className="space-y-3 mb-6">
-                  {cart.map((item) => (
-                    <div key={item.id} className="flex items-center justify-between p-3 bg-accent-50 rounded-lg">
-                      <div className="flex-1">
-                        <h4 className="font-medium text-secondary-700">{item.name}</h4>
-                        <p className="text-sm text-gray-600">{formatCurrency(item.price)} each</p>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <button
-                          onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                          className="p-1 text-gray-500 hover:text-gray-700"
-                        >
-                          <Minus className="h-4 w-4" />
-                        </button>
-                        <span className="w-8 text-center font-medium">{item.quantity}</span>
-                        <button
-                          onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                          className="p-1 text-gray-500 hover:text-gray-700"
-                        >
-                          <Plus className="h-4 w-4" />
-                        </button>
-                        <button
-                          onClick={() => removeFromCart(item.id)}
-                          className="p-1 text-red-500 hover:text-red-700"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </button>
-                      </div>
-                    </div>
-                  ))}
+                  </div>
                 </div>
               )}
 
-              {/* Points Redemption */}
-              {cart.length > 0 && customer?.loyalty_points > 0 && (
-                <div className="mb-6">
-                  <h3 className="font-medium text-secondary-700 dark:text-secondary-300 mb-3 flex items-center">
-                    <Star className="h-4 w-4 mr-2 text-yellow-500" />
-                    Redeem Points
-                    <span className="ml-2 text-sm text-gray-500">
-                      (1 point = ₹0.10)
-                    </span>
-                  </h3>
-                  
-                  <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-3 mb-3">
-                    <div className="flex justify-between items-center text-sm">
-                      <span className="text-gray-600 dark:text-gray-400">Available Points:</span>
-                      <span className="font-medium text-yellow-700 dark:text-yellow-300">
-                        {customer.loyalty_points}
-                      </span>
+              {/* Cart Content - Only show when logged in */}
+              {customer && (
+                <>
+                  {/* Customer Information */}
+                  <div className="mb-6">
+                    <h3 className="font-medium text-secondary-700 dark:text-secondary-300 mb-3">Customer Information</h3>
+                    
+                    <div className="space-y-3">
+                      <div className="p-3 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg">
+                        <div className="flex items-center">
+                          <User className="h-4 w-4 text-gray-500 mr-2" />
+                          <span className="text-sm text-gray-600 dark:text-gray-400">Name:</span>
+                          <span className="ml-2 font-medium text-gray-900 dark:text-gray-100">
+                            {customer?.name || 'Not provided'}
+                          </span>
+                        </div>
+                      </div>
+                      
+                      <div className="p-3 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg">
+                        <div className="flex items-center">
+                          <Phone className="h-4 w-4 text-gray-500 mr-2" />
+                          <span className="text-sm text-gray-600 dark:text-gray-400">Phone:</span>
+                          <span className="ml-2 font-medium text-gray-900 dark:text-gray-100">
+                            {customer?.phone || 'Not provided'}
+                          </span>
+                        </div>
+                      </div>
+                      
+                      <div className="p-3 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg">
+                        <div className="flex items-center">
+                          <Mail className="h-4 w-4 text-gray-500 mr-2" />
+                          <span className="text-sm text-gray-600 dark:text-gray-400">Email:</span>
+                          <span className="ml-2 font-medium text-gray-900 dark:text-gray-100">
+                            {customer?.email || 'Not provided'}
+                          </span>
+                        </div>
+                      </div>
                     </div>
-                    <div className="flex justify-between items-center text-sm mt-1">
-                      <span className="text-gray-600 dark:text-gray-400">Max Redeemable:</span>
-                      <span className="font-medium text-yellow-700 dark:text-yellow-300">
-                        {maxRedeemablePoints} points
-                      </span>
-                    </div>
+
+                    {customer && customer.loyalty_points > 0 && (
+                      <div className="p-3 bg-green-50 border border-green-200 rounded-lg mt-3">
+                        <div className="flex items-center text-sm text-green-700">
+                          <Star className="h-4 w-4 mr-2" />
+                          <span>Welcome back! {customer.loyalty_points} loyalty points available</span>
+                        </div>
+                      </div>
+                    )}
                   </div>
-                  
-                  <div className="flex items-center space-x-2">
-                    <span className="text-sm text-gray-600">Points to redeem:</span>
-                    <input
-                      type="number"
-                      value={pointsToRedeem}
-                      onChange={(e) => handlePointsRedemption(parseInt(e.target.value) || 0)}
-                      min="0"
-                      max={maxRedeemablePoints}
-                      className="flex-1 p-2 border border-gray-300 rounded-lg text-sm"
-                      placeholder="0"
-                    />
-                  </div>
-                  
-                  {pointsToRedeem > 0 && (
-                    <div className="mt-2 text-sm text-green-600 dark:text-green-400">
-                      You'll save: ₹{(pointsToRedeem * 0.1).toFixed(2)}
-                    </div>
-                  )}
-                </div>
+                </>
               )}
 
-              {/* Tip Selection */}
-              {cart.length > 0 && (
-                <div className="mb-6">
-                  <h3 className="font-medium text-secondary-700 dark:text-secondary-300 mb-3">Tip</h3>
-                  
-                  <div className="grid grid-cols-3 gap-2 mb-3">
-                    {[0, 10, 15, 18, 20, 25].map((percentage) => (
+              {/* Cart Content - Only show when logged in */}
+              {customer && (
+                <>
+                  {/* Payment Method */}
+                  <div className="mb-6">
+                    <h3 className="font-medium text-secondary-700 dark:text-secondary-300 mb-3">Payment Method</h3>
+                    <div className="grid grid-cols-2 gap-2">
+                      {paymentMethods.map((method) => (
+                        <button
+                          key={method.code}
+                          type="button"
+                          onClick={() => setPaymentMethod(method.code)}
+                          className={`flex items-center justify-center p-3 rounded-lg border transition-colors ${
+                            paymentMethod === method.code
+                              ? 'bg-secondary-500 text-white border-secondary-500'
+                              : 'bg-white text-secondary-700 border-accent-300 hover:bg-accent-50'
+                          }`}
+                        >
+                          <span className="mr-2">{method.icon}</span>
+                          <span className="font-medium">{method.name}</span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Split Payment Option - Hidden for customers */}
+
+                  {/* Pickup Option */}
+                  <div className="mb-6">
+                    <h3 className="font-medium text-secondary-700 dark:text-secondary-300 mb-3">Pickup Option</h3>
+                    <div className="grid grid-cols-2 gap-2">
                       <button
-                        key={percentage}
-                        onClick={() => handleTipPercentageChange(percentage)}
-                        className={`py-2 px-3 text-sm rounded-lg border transition-colors ${
-                          tipPercentage === percentage
+                        type="button"
+                        onClick={() => setPickupOption('pickup')}
+                        className={`flex items-center justify-center p-3 rounded-lg border transition-colors ${
+                          pickupOption === 'pickup'
                             ? 'bg-secondary-500 text-white border-secondary-500'
                             : 'bg-white text-secondary-700 border-accent-300 hover:bg-accent-50'
                         }`}
                       >
-                        {percentage === 0 ? 'No Tip' : `${percentage}%`}
+                        <span className="mr-2">🏪</span>
+                        <span className="font-medium">Pickup</span>
                       </button>
-                    ))}
-                  </div>
-                  
-                  <div className="flex items-center space-x-2">
-                    <span className="text-sm text-gray-600">Custom:</span>
-                    <input
-                      type="number"
-                      value={tipAmount.toFixed(2)}
-                      onChange={(e) => handleTipAmountChange(e.target.value)}
-                      className="flex-1 p-2 border border-gray-300 rounded-lg text-sm"
-                      placeholder="0.00"
-                    />
-                  </div>
-                </div>
-              )}
-
-              {/* Order Summary */}
-              {cart.length > 0 && (
-                <div className="border-t border-accent-200 pt-4 mb-6">
-                  <div className="space-y-2">
-                    <div className="flex justify-between">
-                      <span>Subtotal:</span>
-                      <span>{formatCurrency(getSubtotal())}</span>
+                      <button
+                        type="button"
+                        onClick={() => setPickupOption('dine-in')}
+                        className={`flex items-center justify-center p-3 rounded-lg border transition-colors ${
+                          pickupOption === 'dine-in'
+                            ? 'bg-secondary-500 text-white border-secondary-500'
+                            : 'bg-white text-secondary-700 border-accent-300 hover:bg-accent-50'
+                        }`}
+                      >
+                        <span className="mr-2">🍽️</span>
+                        <span className="font-medium">Dine-in</span>
+                      </button>
                     </div>
-                    {showTaxInMenu && taxAmount > 0 && (
-                      <div className="flex justify-between">
-                        <span>Tax ({taxRate}%):</span>
-                        <span>{formatCurrency(taxAmount)}</span>
-                      </div>
-                    )}
-                    {tipAmount > 0 && (
-                      <div className="flex justify-between">
-                        <span>Tip:</span>
-                        <span>{formatCurrency(tipAmount)}</span>
-                      </div>
-                    )}
-                    {pointsToRedeem > 0 && (
-                      <div className="flex justify-between text-green-600 dark:text-green-400">
-                        <span>Points Redeemed ({pointsToRedeem} pts):</span>
-                        <span>-{formatCurrency(pointsToRedeem * 0.1)}</span>
-                      </div>
-                    )}
-                    <div className="flex justify-between font-bold text-lg">
-                      <span>Total:</span>
-                      <span>{formatCurrency(getTotal())}</span>
-                    </div>
+                    <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">
+                      {pickupOption === 'pickup' 
+                        ? 'Your order will be ready for pickup at the counter' 
+                        : 'Your order will be served at your table'}
+                    </p>
                   </div>
-                </div>
-              )}
 
-              {/* Action Buttons */}
-              {cart.length > 0 && (
-                <div className="space-y-3">
-                  <button
-                    onClick={placeOrder}
-                    disabled={orderLoading}
-                    className="w-full bg-secondary-500 text-white py-3 px-4 rounded-lg hover:bg-secondary-600 transition-colors disabled:opacity-50"
-                  >
-                    {orderLoading ? 'Placing Order...' : 'Place Order'}
-                  </button>
-                  
-                  <button
-                    onClick={clearCart}
-                    className="w-full bg-gray-500 text-white py-2 px-4 rounded-lg hover:bg-gray-600 transition-colors"
-                  >
-                    Clear Cart
-                  </button>
-                </div>
+                  {/* Cart Items */}
+                  {cart.length === 0 ? (
+                    <div className="text-center py-8 text-gray-500">
+                      <ShoppingCart className="h-12 w-12 mx-auto mb-2 text-gray-300" />
+                      <p>Your cart is empty</p>
+                      <p className="text-sm">Add items from the menu</p>
+                    </div>
+                  ) : (
+                    <div className="space-y-3 mb-6">
+                      {cart.map((item) => (
+                        <div key={item.id} className="flex items-center justify-between p-3 bg-accent-50 rounded-lg">
+                          <div className="flex-1">
+                            <h4 className="font-medium text-secondary-700">{item.name}</h4>
+                            <p className="text-sm text-gray-600">{formatCurrency(item.price)} each</p>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <button
+                              onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                              className="p-1 text-gray-500 hover:text-gray-700"
+                            >
+                              <Minus className="h-4 w-4" />
+                            </button>
+                            <span className="w-8 text-center font-medium">{item.quantity}</span>
+                            <button
+                              onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                              className="p-1 text-gray-500 hover:text-gray-700"
+                            >
+                              <Plus className="h-4 w-4" />
+                            </button>
+                            <button
+                              onClick={() => removeFromCart(item.id)}
+                              className="p-1 text-red-500 hover:text-red-700"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Points Redemption */}
+                  {cart.length > 0 && customer?.loyalty_points > 0 && (
+                    <div className="mb-6">
+                      <h3 className="font-medium text-secondary-700 dark:text-secondary-300 mb-3 flex items-center">
+                        <Star className="h-4 w-4 mr-2 text-yellow-500" />
+                        Redeem Points
+                        <span className="ml-2 text-sm text-gray-500">
+                          (1 point = ₹0.10)
+                        </span>
+                      </h3>
+                      
+                      <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-3 mb-3">
+                        <div className="flex justify-between items-center text-sm">
+                          <span className="text-gray-600 dark:text-gray-400">Available Points:</span>
+                          <span className="font-medium text-yellow-700 dark:text-yellow-300">
+                            {customer.loyalty_points}
+                          </span>
+                        </div>
+                        <div className="flex justify-between items-center text-sm mt-1">
+                          <span className="text-gray-600 dark:text-gray-400">Max Redeemable:</span>
+                          <span className="font-medium text-yellow-700 dark:text-yellow-300">
+                            {maxRedeemablePoints} points
+                          </span>
+                        </div>
+                      </div>
+                      
+                      <div className="flex items-center space-x-2">
+                        <span className="text-sm text-gray-600">Points to redeem:</span>
+                        <input
+                          type="number"
+                          value={pointsToRedeem}
+                          onChange={(e) => handlePointsRedemption(parseInt(e.target.value) || 0)}
+                          min="0"
+                          max={maxRedeemablePoints}
+                          className="flex-1 p-2 border border-gray-300 rounded-lg text-sm"
+                          placeholder="0"
+                        />
+                      </div>
+                      
+                      {pointsToRedeem > 0 && (
+                        <div className="mt-2 text-sm text-green-600 dark:text-green-400">
+                          You'll save: ₹{(pointsToRedeem * 0.1).toFixed(2)}
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Tip Selection */}
+                  {cart.length > 0 && (
+                    <div className="mb-6">
+                      <h3 className="font-medium text-secondary-700 dark:text-secondary-300 mb-3">Tip</h3>
+                      
+                      <div className="grid grid-cols-3 gap-2 mb-3">
+                        {[0, 10, 15, 18, 20, 25].map((percentage) => (
+                          <button
+                            key={percentage}
+                            onClick={() => handleTipPercentageChange(percentage)}
+                            className={`py-2 px-3 text-sm rounded-lg border transition-colors ${
+                              tipPercentage === percentage
+                                ? 'bg-secondary-500 text-white border-secondary-500'
+                                : 'bg-white text-secondary-700 border-accent-300 hover:bg-accent-50'
+                            }`}
+                          >
+                            {percentage === 0 ? 'No Tip' : `${percentage}%`}
+                          </button>
+                        ))}
+                      </div>
+                      
+                      <div className="flex items-center space-x-2">
+                        <span className="text-sm text-gray-600">Custom:</span>
+                        <input
+                          type="number"
+                          value={tipAmount.toFixed(2)}
+                          onChange={(e) => handleTipAmountChange(e.target.value)}
+                          className="flex-1 p-2 border border-gray-300 rounded-lg text-sm"
+                          placeholder="0.00"
+                        />
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Order Summary */}
+                  {cart.length > 0 && (
+                    <div className="border-t border-accent-200 pt-4 mb-6">
+                      <div className="space-y-2">
+                        <div className="flex justify-between">
+                          <span>Subtotal:</span>
+                          <span>{formatCurrency(getSubtotal())}</span>
+                        </div>
+                        {showTaxInMenu && taxAmount > 0 && (
+                          <div className="flex justify-between">
+                            <span>Tax ({taxRate}%):</span>
+                            <span>{formatCurrency(taxAmount)}</span>
+                          </div>
+                        )}
+                        {tipAmount > 0 && (
+                          <div className="flex justify-between">
+                            <span>Tip:</span>
+                            <span>{formatCurrency(tipAmount)}</span>
+                          </div>
+                        )}
+                        {pointsToRedeem > 0 && (
+                          <div className="flex justify-between text-green-600 dark:text-green-400">
+                            <span>Points Redeemed ({pointsToRedeem} pts):</span>
+                            <span>-{formatCurrency(pointsToRedeem * 0.1)}</span>
+                          </div>
+                        )}
+                        <div className="flex justify-between font-bold text-lg">
+                          <span>Total:</span>
+                          <span>{formatCurrency(getTotal())}</span>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Action Buttons */}
+                  {cart.length > 0 && (
+                    <div className="space-y-3">
+                      <button
+                        onClick={placeOrder}
+                        disabled={orderLoading}
+                        className="w-full bg-secondary-500 text-white py-3 px-4 rounded-lg hover:bg-secondary-600 transition-colors disabled:opacity-50"
+                      >
+                        {orderLoading ? 'Placing Order...' : 'Place Order'}
+                      </button>
+                      
+                      <button
+                        onClick={clearCart}
+                        className="w-full bg-gray-500 text-white py-2 px-4 rounded-lg hover:bg-gray-600 transition-colors"
+                      >
+                        Clear Cart
+                      </button>
+                    </div>
+                  )}
+                </>
               )}
             </div>
           </div>

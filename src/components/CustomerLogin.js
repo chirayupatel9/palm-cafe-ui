@@ -71,177 +71,153 @@ const CustomerLogin = ({ onLogin, onRegister }) => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-accent-50 dark:bg-gray-900 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
-        <div className="text-center">
-          <img 
-            src="/images/palm-cafe-logo.png" 
-            alt="Palm Cafe Logo" 
-            className="h-20 w-20 mx-auto mb-4"
-          />
-          <h2 className="text-3xl font-bold text-secondary-700 dark:text-secondary-300">
-            Welcome to Palm Cafe
-          </h2>
-          <p className="mt-2 text-gray-600 dark:text-gray-400">
-            {showRegister ? 'Create your account to start ordering' : 'Enter your phone number to continue'}
-          </p>
-        </div>
-
-        {!showRegister ? (
-          // Login Form
-          <form onSubmit={handleLogin} className="space-y-6">
-            <div>
-              <label htmlFor="phone" className="block text-sm font-medium text-secondary-700 dark:text-secondary-300 mb-2">
-                Phone Number
-              </label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Phone className="h-5 w-5 text-gray-400" />
-                </div>
-                <input
-                  id="phone"
-                  type="tel"
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
-                  placeholder="Enter your phone number"
-                  className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary-500 focus:border-transparent"
-                  required
-                />
+    <div className="w-full space-y-6">
+      {!showRegister ? (
+        // Login Form
+        <form onSubmit={handleLogin} className="space-y-4">
+          <div>
+            <label htmlFor="phone" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Phone Number
+            </label>
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <Phone className="h-5 w-5 text-gray-400" />
               </div>
-            </div>
-
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-secondary-500 hover:bg-secondary-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-secondary-500 disabled:opacity-50"
-            >
-              {loading ? (
-                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-              ) : (
-                <>
-                  Continue
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </>
-              )}
-            </button>
-
-            <div className="text-center">
-              <button
-                type="button"
-                onClick={() => setShowRegister(true)}
-                className="text-secondary-600 hover:text-secondary-500 text-sm flex items-center justify-center mx-auto"
-              >
-                <UserPlus className="h-4 w-4 mr-1" />
-                New customer? Register here
-              </button>
-            </div>
-          </form>
-        ) : (
-          // Register Form
-          <form onSubmit={handleRegister} className="space-y-6">
-            <div>
-              <label htmlFor="name" className="block text-sm font-medium text-secondary-700 dark:text-secondary-300 mb-2">
-                Full Name *
-              </label>
               <input
-                id="name"
-                type="text"
-                value={registerData.name}
-                onChange={(e) => setRegisterData({...registerData, name: e.target.value})}
-                placeholder="Enter your full name"
-                className="block w-full px-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary-500 focus:border-transparent"
+                id="phone"
+                type="tel"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                placeholder="Enter your phone number"
+                className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary-500 focus:border-transparent transition-material"
                 required
               />
             </div>
+          </div>
 
-            <div>
-              <label htmlFor="registerPhone" className="block text-sm font-medium text-secondary-700 dark:text-secondary-300 mb-2">
-                Phone Number *
-              </label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Phone className="h-5 w-5 text-gray-400" />
-                </div>
-                <input
-                  id="registerPhone"
-                  type="tel"
-                  value={registerData.phone}
-                  onChange={(e) => setRegisterData({...registerData, phone: e.target.value})}
-                  placeholder="Enter your phone number"
-                  className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary-500 focus:border-transparent"
-                  required
-                />
-              </div>
-            </div>
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-lg shadow-material-2 text-sm font-medium text-white bg-secondary-500 hover:bg-secondary-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-secondary-500 disabled:opacity-50 transition-material ripple hover-lift"
+          >
+            {loading ? (
+              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+            ) : (
+              <>
+                Continue
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </>
+            )}
+          </button>
 
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-secondary-700 dark:text-secondary-300 mb-2">
-                Email Address
-              </label>
-              <input
-                id="email"
-                type="email"
-                value={registerData.email}
-                onChange={(e) => setRegisterData({...registerData, email: e.target.value})}
-                placeholder="Enter your email address"
-                className="block w-full px-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary-500 focus:border-transparent"
-              />
-            </div>
-
-            <div>
-              <label htmlFor="address" className="block text-sm font-medium text-secondary-700 dark:text-secondary-300 mb-2">
-                Address
-              </label>
-              <textarea
-                id="address"
-                value={registerData.address}
-                onChange={(e) => setRegisterData({...registerData, address: e.target.value})}
-                placeholder="Enter your address"
-                rows="3"
-                className="block w-full px-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary-500 focus:border-transparent"
-              />
-            </div>
-
+          <div className="text-center">
             <button
-              type="submit"
-              disabled={loading}
-              className="w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-secondary-500 hover:bg-secondary-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-secondary-500 disabled:opacity-50"
+              type="button"
+              onClick={() => setShowRegister(true)}
+              className="text-secondary-600 hover:text-secondary-500 text-sm flex items-center justify-center mx-auto transition-material"
             >
-              {loading ? (
-                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-              ) : (
-                <>
-                  Create Account
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </>
-              )}
+              <UserPlus className="h-4 w-4 mr-1" />
+              New customer? Register here
             </button>
+          </div>
+        </form>
+      ) : (
+        // Register Form
+        <form onSubmit={handleRegister} className="space-y-4">
+          <div>
+            <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Full Name *
+            </label>
+            <input
+              id="name"
+              type="text"
+              value={registerData.name}
+              onChange={(e) => setRegisterData({...registerData, name: e.target.value})}
+              placeholder="Enter your full name"
+              className="block w-full px-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary-500 focus:border-transparent transition-material"
+              required
+            />
+          </div>
 
-            <div className="text-center">
-              <button
-                type="button"
-                onClick={() => setShowRegister(false)}
-                className="text-secondary-600 hover:text-secondary-500 text-sm"
-              >
-                Already have an account? Login here
-              </button>
+          <div>
+            <label htmlFor="registerPhone" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Phone Number *
+            </label>
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <Phone className="h-5 w-5 text-gray-400" />
+              </div>
+              <input
+                id="registerPhone"
+                type="tel"
+                value={registerData.phone}
+                onChange={(e) => setRegisterData({...registerData, phone: e.target.value})}
+                placeholder="Enter your phone number"
+                className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary-500 focus:border-transparent transition-material"
+                required
+              />
             </div>
-          </form>
-        )}
+          </div>
 
-        <div className="text-center space-y-2">
-          <p className="text-xs text-gray-500 dark:text-gray-400">
-            By continuing, you agree to our terms of service and privacy policy
-          </p>
-          <p className="text-sm text-secondary-600 dark:text-gray-400">
-            <a 
-              href="/" 
-              className="font-medium text-secondary-600 hover:text-secondary-500 dark:text-secondary-400 dark:hover:text-secondary-300"
+          <div>
+            <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Email Address
+            </label>
+            <input
+              id="email"
+              type="email"
+              value={registerData.email}
+              onChange={(e) => setRegisterData({...registerData, email: e.target.value})}
+              placeholder="Enter your email address"
+              className="block w-full px-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary-500 focus:border-transparent transition-material"
+            />
+          </div>
+
+          <div>
+            <label htmlFor="address" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Address
+            </label>
+            <textarea
+              id="address"
+              value={registerData.address}
+              onChange={(e) => setRegisterData({...registerData, address: e.target.value})}
+              placeholder="Enter your address"
+              rows="3"
+              className="block w-full px-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary-500 focus:border-transparent transition-material"
+            />
+          </div>
+
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-lg shadow-material-2 text-sm font-medium text-white bg-secondary-500 hover:bg-secondary-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-secondary-500 disabled:opacity-50 transition-material ripple hover-lift"
+          >
+            {loading ? (
+              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+            ) : (
+              <>
+                Create Account
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </>
+            )}
+          </button>
+
+          <div className="text-center">
+            <button
+              type="button"
+              onClick={() => setShowRegister(false)}
+              className="text-secondary-600 hover:text-secondary-500 text-sm transition-material"
             >
-              ← Back to Home
-            </a>
-          </p>
-        </div>
+              Already have an account? Login here
+            </button>
+          </div>
+        </form>
+      )}
+
+      <div className="text-center space-y-2">
+        <p className="text-xs text-gray-500 dark:text-gray-400">
+          By continuing, you agree to our terms of service and privacy policy
+        </p>
       </div>
     </div>
   );
