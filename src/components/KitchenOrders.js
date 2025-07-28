@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Clock, CheckCircle, XCircle, Printer, RefreshCw, AlertTriangle, Coffee, Utensils, ChevronDown, ChevronUp, ShoppingCart } from 'lucide-react';
+import { Clock, CheckCircle, XCircle, Printer, RefreshCw, AlertTriangle, Coffee, Utensils, ChevronDown, ChevronUp, ShoppingCart, Plus } from 'lucide-react';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 import { useAuth } from '../contexts/AuthContext';
@@ -15,6 +15,12 @@ const KitchenOrders = ({ cart, setCart }) => {
   const [activeTab, setActiveTab] = useState('today');
   const [expandedHistoryCards, setExpandedHistoryCards] = useState(new Set());
 
+  // Pagination states
+  const [displayedOrders, setDisplayedOrders] = useState([]);
+  const [itemsPerPage] = useState(10);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+
   useEffect(() => {
     if (isAuthenticated && !authLoading) {
       fetchOrders();
@@ -24,6 +30,29 @@ const KitchenOrders = ({ cart, setCart }) => {
       }
     }
   }, [isAuthenticated, authLoading, autoRefresh]);
+
+  // Update displayed orders when orders or filters change
+  useEffect(() => {
+    const filteredOrders = orders.filter(order => {
+      if (filterStatus !== 'all' && order.status !== filterStatus) return false;
+      if (activeTab === 'today' && !isToday(order.created_at)) return false;
+      if (activeTab === 'yesterday' && !isYesterday(order.created_at)) return false;
+      return true;
+    });
+
+    // Sort by created_at (newest first)
+    const sortedOrders = filteredOrders.sort((a, b) => {
+      const dateA = new Date(a.created_at || 0);
+      const dateB = new Date(b.created_at || 0);
+      return dateB - dateA;
+    });
+
+    // Show first 10 items initially
+    const initialDisplay = sortedOrders.slice(0, itemsPerPage);
+    setDisplayedOrders(initialDisplay);
+    setCurrentPage(1);
+    setHasMore(sortedOrders.length > itemsPerPage);
+  }, [orders, filterStatus, activeTab, itemsPerPage]);
 
   const fetchOrders = async () => {
     try {
@@ -218,21 +247,23 @@ const KitchenOrders = ({ cart, setCart }) => {
   };
 
   // Filter orders based on active tab and status filter
-  const filteredOrders = orders.filter(order => {
-    // First filter by tab (today vs history vs cancelled)
-    if (activeTab === 'today') {
-      if (!isToday(order.created_at)) return false;
-    } else if (activeTab === 'history') {
-      if (isToday(order.created_at) || order.status === 'cancelled') return false;
-    } else if (activeTab === 'cancelled') {
-      if (order.status !== 'cancelled') return false;
-    }
+  const getFilteredOrders = () => {
+    return orders.filter(order => {
+      // First filter by tab (today vs history vs cancelled)
+      if (activeTab === 'today') {
+        if (!isToday(order.created_at)) return false;
+      } else if (activeTab === 'history') {
+        if (isToday(order.created_at) || order.status === 'cancelled') return false;
+      } else if (activeTab === 'cancelled') {
+        if (order.status !== 'cancelled') return false;
+      }
 
-    // Then filter by status (only for today and history tabs)
-    if (activeTab === 'cancelled') return true; // Show all cancelled orders regardless of status filter
-    if (filterStatus === 'all') return true;
-    return order.status === filterStatus;
-  });
+      // Then filter by status (only for today and history tabs)
+      if (activeTab === 'cancelled') return true; // Show all cancelled orders regardless of status filter
+      if (filterStatus === 'all') return true;
+      return order.status === filterStatus;
+    });
+  };
 
   const pendingOrders = orders.filter(order => 
     ['pending', 'preparing'].includes(order.status) && isToday(order.created_at)
@@ -255,6 +286,28 @@ const KitchenOrders = ({ cart, setCart }) => {
   const getStatusOptions = (currentStatus) => {
     const allStatuses = ['pending', 'preparing', 'ready', 'completed', 'cancelled'];
     return allStatuses.filter(status => status !== currentStatus);
+  };
+
+  const handleShowMore = () => {
+    const filteredOrders = orders.filter(order => {
+      if (filterStatus !== 'all' && order.status !== filterStatus) return false;
+      if (activeTab === 'today' && !isToday(order.created_at)) return false;
+      if (activeTab === 'yesterday' && !isYesterday(order.created_at)) return false;
+      return true;
+    });
+
+    const sortedOrders = filteredOrders.sort((a, b) => {
+      const dateA = new Date(a.created_at || 0);
+      const dateB = new Date(b.created_at || 0);
+      return dateB - dateA;
+    });
+
+    const nextPage = currentPage + 1;
+    const nextItems = sortedOrders.slice(0, nextPage * itemsPerPage);
+    
+    setDisplayedOrders(nextItems);
+    setCurrentPage(nextPage);
+    setHasMore(nextItems.length < sortedOrders.length);
   };
 
   if (authLoading) {
@@ -400,7 +453,10 @@ const KitchenOrders = ({ cart, setCart }) => {
       <div className="border-b border-gray-200 dark:border-gray-700">
         <nav className="-mb-px flex space-x-8">
           <button
-            onClick={() => setActiveTab('today')}
+            onClick={() => {
+              setActiveTab('today');
+              setCurrentPage(1); // Reset pagination when tab changes
+            }}
             className={`py-2 px-1 border-b-2 font-medium text-sm ${
               activeTab === 'today'
                 ? 'border-secondary-500 text-secondary-600 dark:text-secondary-400'
@@ -410,7 +466,10 @@ const KitchenOrders = ({ cart, setCart }) => {
             Today's Orders ({todayOrders.length})
           </button>
           <button
-            onClick={() => setActiveTab('history')}
+            onClick={() => {
+              setActiveTab('history');
+              setCurrentPage(1); // Reset pagination when tab changes
+            }}
             className={`py-2 px-1 border-b-2 font-medium text-sm ${
               activeTab === 'history'
                 ? 'border-secondary-500 text-secondary-600 dark:text-secondary-400'
@@ -420,7 +479,10 @@ const KitchenOrders = ({ cart, setCart }) => {
             History ({historyOrders.length})
           </button>
           <button
-            onClick={() => setActiveTab('cancelled')}
+            onClick={() => {
+              setActiveTab('cancelled');
+              setCurrentPage(1); // Reset pagination when tab changes
+            }}
             className={`py-2 px-1 border-b-2 font-medium text-sm ${
               activeTab === 'cancelled'
                 ? 'border-secondary-500 text-secondary-600 dark:text-secondary-400'
@@ -438,7 +500,10 @@ const KitchenOrders = ({ cart, setCart }) => {
           {activeTab !== 'cancelled' && (
             <select
               value={filterStatus}
-              onChange={(e) => setFilterStatus(e.target.value)}
+              onChange={(e) => {
+                setFilterStatus(e.target.value);
+                setCurrentPage(1); // Reset pagination when filter changes
+              }}
               className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
             >
               <option value="all">All Orders</option>
@@ -452,13 +517,13 @@ const KitchenOrders = ({ cart, setCart }) => {
         </div>
         <div className="text-sm text-gray-600 dark:text-gray-400">
           {activeTab === 'today' && (
-            <span>Showing today's orders ({filteredOrders.length})</span>
+            <span>Showing today's orders ({displayedOrders.length} of {getFilteredOrders().length})</span>
           )}
           {activeTab === 'history' && (
-            <span>Showing historical orders ({filteredOrders.length})</span>
+            <span>Showing historical orders ({displayedOrders.length} of {getFilteredOrders().length})</span>
           )}
           {activeTab === 'cancelled' && (
-            <span>Showing cancelled orders ({filteredOrders.length})</span>
+            <span>Showing cancelled orders ({displayedOrders.length} of {getFilteredOrders().length})</span>
           )}
         </div>
       </div>
@@ -468,29 +533,30 @@ const KitchenOrders = ({ cart, setCart }) => {
         <div className="flex justify-center py-8">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
         </div>
-      ) : filteredOrders.length === 0 ? (
+      ) : displayedOrders.length === 0 ? (
         <div className="text-center py-8">
           <Coffee className="h-12 w-12 text-gray-400 mx-auto mb-4" />
           <p className="text-gray-500">No orders found</p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-          {filteredOrders.map((order) => {
-            const isHistoryCard = activeTab === 'history';
-            const isCancelledCard = activeTab === 'cancelled';
-            const isExpanded = expandedHistoryCards.has(order.id);
-            
-            return (
-              <div
-                key={order.id}
-                className={`card border-l-4 ${
-                  order.status === 'pending' ? 'border-l-yellow-500' :
-                  order.status === 'preparing' ? 'border-l-blue-500' :
-                  order.status === 'ready' ? 'border-l-green-500' :
-                  order.status === 'completed' ? 'border-l-green-600' :
-                  'border-l-red-500'
-                }`}
-              >
+        <div>
+          <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+            {displayedOrders.map((order) => {
+              const isHistoryCard = activeTab === 'history';
+              const isCancelledCard = activeTab === 'cancelled';
+              const isExpanded = expandedHistoryCards.has(order.id);
+              
+              return (
+                <div
+                  key={order.id}
+                  className={`card border-l-4 ${
+                    order.status === 'pending' ? 'border-l-yellow-500' :
+                    order.status === 'preparing' ? 'border-l-blue-500' :
+                    order.status === 'ready' ? 'border-l-green-500' :
+                    order.status === 'completed' ? 'border-l-green-600' :
+                    'border-l-red-500'
+                  }`}
+                >
                 {/* Order Header */}
                 <div className="flex items-center justify-between mb-4">
                   <div>
@@ -660,6 +726,20 @@ const KitchenOrders = ({ cart, setCart }) => {
               </div>
             );
           })}
+          </div>
+
+          {/* Show More Button */}
+          {hasMore && displayedOrders.length > 0 && (
+            <div className="mt-6 text-center">
+              <button
+                onClick={handleShowMore}
+                className="btn-secondary flex items-center mx-auto"
+              >
+                <Plus className="h-4 w-4 mr-2" />
+                Show More ({currentPage * itemsPerPage} of {getFilteredOrders().length})
+              </button>
+            </div>
+          )}
         </div>
       )}
     </div>

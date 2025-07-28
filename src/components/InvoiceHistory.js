@@ -14,10 +14,32 @@ const InvoiceHistory = ({ cart, setCart, setCurrentPage }) => {
   const [selectedInvoice, setSelectedInvoice] = useState(null);
   const [showInvoiceDetails, setShowInvoiceDetails] = useState(false);
 
+  // Pagination states
+  const [displayedInvoices, setDisplayedInvoices] = useState([]);
+  const [itemsPerPage] = useState(10);
+  const [currentPage, setCurrentPageLocal] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+
   useEffect(() => {
     fetchInvoices();
     fetchStatistics();
   }, []);
+
+  // Update displayed invoices when invoices change
+  useEffect(() => {
+    // Sort by created_at (newest first)
+    const sortedInvoices = invoices.sort((a, b) => {
+      const dateA = new Date(a.created_at || 0);
+      const dateB = new Date(b.created_at || 0);
+      return dateB - dateA;
+    });
+
+    // Show first 10 items initially
+    const initialDisplay = sortedInvoices.slice(0, itemsPerPage);
+    setDisplayedInvoices(initialDisplay);
+    setCurrentPageLocal(1);
+    setHasMore(sortedInvoices.length > itemsPerPage);
+  }, [invoices, itemsPerPage]);
 
   const fetchInvoices = async () => {
     try {
@@ -182,6 +204,22 @@ const InvoiceHistory = ({ cart, setCart, setCurrentPage }) => {
     return invoice.invoice_number || invoice.invoiceNumber || invoice.id || 'Unknown';
   };
 
+  const handleShowMore = () => {
+    // Sort by created_at (newest first)
+    const sortedInvoices = invoices.sort((a, b) => {
+      const dateA = new Date(a.created_at || 0);
+      const dateB = new Date(b.created_at || 0);
+      return dateB - dateA;
+    });
+
+    const nextPage = currentPage + 1;
+    const nextItems = sortedInvoices.slice(0, nextPage * itemsPerPage);
+    
+    setDisplayedInvoices(nextItems);
+    setCurrentPageLocal(nextPage);
+    setHasMore(nextItems.length < sortedInvoices.length);
+  };
+
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center py-12">
@@ -209,7 +247,7 @@ const InvoiceHistory = ({ cart, setCart, setCurrentPage }) => {
           <div>
             <h2 className="text-xl sm:text-2xl font-bold text-secondary-700 dark:text-secondary-300">Invoice History & Reports</h2>
             <div className="text-sm text-gray-500 dark:text-gray-400">
-              {activeTab === 'invoices' ? `Total Invoices: ${invoices.length}` : 'Business insights and analytics'}
+              {activeTab === 'invoices' ? `Total Invoices: ${invoices.length} | Showing: ${displayedInvoices.length} of ${invoices.length}` : 'Business insights and analytics'}
             </div>
           </div>
         </div>
@@ -219,7 +257,10 @@ const InvoiceHistory = ({ cart, setCart, setCurrentPage }) => {
       <div className="border-b border-accent-200 dark:border-gray-700">
         <nav className="-mb-px flex space-x-8">
           <button
-            onClick={() => setActiveTab('invoices')}
+                           onClick={() => {
+                 setActiveTab('invoices');
+                 setCurrentPageLocal(1); // Reset pagination when tab changes
+               }}
             className={`py-2 px-1 border-b-2 font-medium text-sm ${
               activeTab === 'invoices'
                 ? 'border-secondary-500 text-secondary-600 dark:text-secondary-400'
@@ -232,7 +273,10 @@ const InvoiceHistory = ({ cart, setCart, setCurrentPage }) => {
             </div>
           </button>
           <button
-            onClick={() => setActiveTab('reports')}
+                           onClick={() => {
+                 setActiveTab('reports');
+                 setCurrentPageLocal(1); // Reset pagination when tab changes
+               }}
             className={`py-2 px-1 border-b-2 font-medium text-sm ${
               activeTab === 'reports'
                 ? 'border-secondary-500 text-secondary-600 dark:text-secondary-400'
@@ -247,11 +291,88 @@ const InvoiceHistory = ({ cart, setCart, setCurrentPage }) => {
         </nav>
       </div>
 
-      {/* Conditional Content */}
-      {activeTab === 'invoices' ? (
-        <>
-          {/* Invoices List */}
-          <div className="card">
+             {/* Conditional Content */}
+       {activeTab === 'invoices' ? (
+         <>
+           {/* Summary Stats */}
+           {invoices.length > 0 && statistics && (
+             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 sm:gap-6 mb-6">
+               <div className="card">
+                 <div className="flex items-center">
+                   <div className="flex-shrink-0">
+                     <div className="h-6 w-6 sm:h-8 sm:w-8 bg-secondary-500 rounded-full flex items-center justify-center">
+                       <span className="text-white text-xs sm:text-sm font-bold">{currencySettings.currency_symbol}</span>
+                     </div>
+                   </div>
+                   <div className="ml-3 sm:ml-4">
+                     <div className="text-xs sm:text-sm font-medium text-gray-500 dark:text-gray-400">Total Revenue</div>
+                     <div className="text-lg sm:text-2xl font-semibold text-secondary-700 dark:text-secondary-300">
+                       {formatCurrency(statistics.totalRevenue)}
+                     </div>
+                   </div>
+                 </div>
+               </div>
+               
+               <div className="card">
+                 <div className="flex items-center">
+                   <div className="flex-shrink-0">
+                     <Calendar className="h-6 w-6 sm:h-8 sm:w-8 text-secondary-500" />
+                   </div>
+                   <div className="ml-3 sm:ml-4">
+                     <div className="text-xs sm:text-sm font-medium text-gray-500 dark:text-gray-400">Total Orders</div>
+                     <div className="text-lg sm:text-2xl font-semibold text-secondary-700 dark:text-secondary-300">
+                       {statistics.totalOrders}
+                     </div>
+                   </div>
+                 </div>
+               </div>
+               
+               <div className="card">
+                 <div className="flex items-center">
+                   <div className="flex-shrink-0">
+                     <User className="h-6 w-6 sm:h-8 sm:w-8 text-secondary-500" />
+                   </div>
+                   <div className="ml-3 sm:ml-4">
+                     <div className="text-xs sm:text-sm font-medium text-gray-500 dark:text-gray-400">Unique Customers</div>
+                     <div className="text-lg sm:text-2xl font-semibold text-secondary-700 dark:text-secondary-300">
+                       {statistics.uniqueCustomers}
+                     </div>
+                   </div>
+                 </div>
+               </div>
+
+               <div className="card">
+                 <div className="flex items-center">
+                   <div className="flex-shrink-0">
+                     <Percent className="h-6 w-6 sm:h-8 sm:w-8 text-green-500" />
+                   </div>
+                   <div className="ml-3 sm:ml-4">
+                     <div className="text-xs sm:text-sm font-medium text-gray-500 dark:text-gray-400">Total Tax Collected</div>
+                     <div className="text-lg sm:text-2xl font-semibold text-secondary-700 dark:text-secondary-300">
+                       {formatCurrency(statistics.totalTax)}
+                     </div>
+                   </div>
+                 </div>
+               </div>
+
+               <div className="card">
+                 <div className="flex items-center">
+                   <div className="flex-shrink-0">
+                     <Heart className="h-6 w-6 sm:h-8 sm:w-8 text-red-500" />
+                   </div>
+                   <div className="ml-3 sm:ml-4">
+                     <div className="text-xs sm:text-sm font-medium text-gray-500 dark:text-gray-400">Total Tips</div>
+                     <div className="text-lg sm:text-2xl font-semibold text-secondary-700 dark:text-secondary-300">
+                       {formatCurrency(statistics.totalTips)}
+                     </div>
+                   </div>
+                 </div>
+               </div>
+             </div>
+           )}
+
+           {/* Invoices List */}
+           <div className="card">
             {invoices.length === 0 ? (
               <div className="text-center py-8 sm:py-12 text-gray-500 dark:text-gray-400">
                 <img 
@@ -296,7 +417,7 @@ const InvoiceHistory = ({ cart, setCart, setCurrentPage }) => {
                       </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-accent-200">
-                      {invoices.map((invoice) => (
+                      {displayedInvoices.map((invoice) => (
                         <tr key={getInvoiceNumber(invoice)} className="hover:bg-accent-50">
                           <td className="px-6 py-4 whitespace-nowrap">
                             <div className="text-sm font-medium text-secondary-700 dark:text-secondary-300">
@@ -379,11 +500,24 @@ const InvoiceHistory = ({ cart, setCart, setCurrentPage }) => {
                       ))}
                     </tbody>
                   </table>
+                  
+                  {/* Show More Button for Desktop */}
+                  {hasMore && displayedInvoices.length > 0 && (
+                    <div className="mt-6 text-center">
+                      <button
+                        onClick={handleShowMore}
+                        className="btn-secondary flex items-center mx-auto"
+                      >
+                        <Plus className="h-4 w-4 mr-2" />
+                        Show More ({currentPage * itemsPerPage} of {invoices.length})
+                      </button>
+                    </div>
+                  )}
                 </div>
 
                 {/* Mobile Cards */}
                 <div className="lg:hidden space-y-4">
-                  {invoices.map((invoice) => (
+                  {displayedInvoices.map((invoice) => (
                     <div key={getInvoiceNumber(invoice)} className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-accent-200 dark:border-gray-700 p-4">
                       <div className="flex justify-between items-start mb-3">
                         <div>
@@ -454,87 +588,23 @@ const InvoiceHistory = ({ cart, setCart, setCurrentPage }) => {
                       </div>
                     </div>
                   ))}
+
+                  {/* Show More Button */}
+                  {hasMore && displayedInvoices.length > 0 && (
+                    <div className="mt-6 text-center">
+                      <button
+                        onClick={handleShowMore}
+                        className="btn-secondary flex items-center mx-auto"
+                      >
+                        <Plus className="h-4 w-4 mr-2" />
+                        Show More ({currentPage * itemsPerPage} of {invoices.length})
+                      </button>
+                    </div>
+                  )}
                 </div>
               </>
             )}
           </div>
-
-          {/* Summary Stats */}
-          {invoices.length > 0 && statistics && (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 sm:gap-6">
-              <div className="card">
-                <div className="flex items-center">
-                  <div className="flex-shrink-0">
-                    <div className="h-6 w-6 sm:h-8 sm:w-8 bg-secondary-500 rounded-full flex items-center justify-center">
-                      <span className="text-white text-xs sm:text-sm font-bold">{currencySettings.currency_symbol}</span>
-                    </div>
-                  </div>
-                  <div className="ml-3 sm:ml-4">
-                    <div className="text-xs sm:text-sm font-medium text-gray-500 dark:text-gray-400">Total Revenue</div>
-                    <div className="text-lg sm:text-2xl font-semibold text-secondary-700 dark:text-secondary-300">
-                      {formatCurrency(statistics.totalRevenue)}
-                    </div>
-                  </div>
-                </div>
-              </div>
-              
-              <div className="card">
-                <div className="flex items-center">
-                  <div className="flex-shrink-0">
-                    <Calendar className="h-6 w-6 sm:h-8 sm:w-8 text-secondary-500" />
-                  </div>
-                  <div className="ml-3 sm:ml-4">
-                    <div className="text-xs sm:text-sm font-medium text-gray-500 dark:text-gray-400">Total Orders</div>
-                    <div className="text-lg sm:text-2xl font-semibold text-secondary-700 dark:text-secondary-300">
-                      {statistics.totalOrders}
-                    </div>
-                  </div>
-                </div>
-              </div>
-              
-              <div className="card">
-                <div className="flex items-center">
-                  <div className="flex-shrink-0">
-                    <User className="h-6 w-6 sm:h-8 sm:w-8 text-secondary-500" />
-                  </div>
-                  <div className="ml-3 sm:ml-4">
-                    <div className="text-xs sm:text-sm font-medium text-gray-500 dark:text-gray-400">Unique Customers</div>
-                    <div className="text-lg sm:text-2xl font-semibold text-secondary-700 dark:text-secondary-300">
-                      {statistics.uniqueCustomers}
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="card">
-                <div className="flex items-center">
-                  <div className="flex-shrink-0">
-                    <Percent className="h-6 w-6 sm:h-8 sm:w-8 text-green-500" />
-                  </div>
-                  <div className="ml-3 sm:ml-4">
-                    <div className="text-xs sm:text-sm font-medium text-gray-500 dark:text-gray-400">Total Tax Collected</div>
-                    <div className="text-lg sm:text-2xl font-semibold text-secondary-700 dark:text-secondary-300">
-                      {formatCurrency(statistics.totalTax)}
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="card">
-                <div className="flex items-center">
-                  <div className="flex-shrink-0">
-                    <Heart className="h-6 w-6 sm:h-8 sm:w-8 text-red-500" />
-                  </div>
-                  <div className="ml-3 sm:ml-4">
-                    <div className="text-xs sm:text-sm font-medium text-gray-500 dark:text-gray-400">Total Tips</div>
-                    <div className="text-lg sm:text-2xl font-semibold text-secondary-700 dark:text-secondary-300">
-                      {formatCurrency(statistics.totalTips)}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
         </>
       ) : (
         <DailyReports />
