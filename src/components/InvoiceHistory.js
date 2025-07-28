@@ -19,6 +19,9 @@ const InvoiceHistory = ({ cart, setCart, setCurrentPage }) => {
   const [itemsPerPage] = useState(10);
   const [currentPage, setCurrentPageLocal] = useState(1);
   const [hasMore, setHasMore] = useState(true);
+  
+  // Search state
+  const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
     fetchInvoices();
@@ -27,8 +30,24 @@ const InvoiceHistory = ({ cart, setCart, setCurrentPage }) => {
 
   // Update displayed invoices when invoices change
   useEffect(() => {
+    // Filter invoices based on search query
+    const filteredInvoices = invoices.filter(invoice => {
+      if (!searchQuery.trim()) return true;
+      
+      const query = searchQuery.toLowerCase();
+      const invoiceNumber = getInvoiceNumber(invoice).toLowerCase();
+      const orderNumber = (invoice.order_number || '').toLowerCase();
+      const customerName = (invoice.customer_name || '').toLowerCase();
+      const customerPhone = (invoice.customer_phone || '').toLowerCase();
+      
+      return invoiceNumber.includes(query) ||
+             orderNumber.includes(query) ||
+             customerName.includes(query) ||
+             customerPhone.includes(query);
+    });
+
     // Sort by created_at (newest first)
-    const sortedInvoices = invoices.sort((a, b) => {
+    const sortedInvoices = filteredInvoices.sort((a, b) => {
       const dateA = new Date(a.created_at || 0);
       const dateB = new Date(b.created_at || 0);
       return dateB - dateA;
@@ -39,7 +58,7 @@ const InvoiceHistory = ({ cart, setCart, setCurrentPage }) => {
     setDisplayedInvoices(initialDisplay);
     setCurrentPageLocal(1);
     setHasMore(sortedInvoices.length > itemsPerPage);
-  }, [invoices, itemsPerPage]);
+  }, [invoices, itemsPerPage, searchQuery]);
 
   const fetchInvoices = async () => {
     try {
@@ -205,8 +224,24 @@ const InvoiceHistory = ({ cart, setCart, setCurrentPage }) => {
   };
 
   const handleShowMore = () => {
+    // Filter invoices based on search query
+    const filteredInvoices = invoices.filter(invoice => {
+      if (!searchQuery.trim()) return true;
+      
+      const query = searchQuery.toLowerCase();
+      const invoiceNumber = getInvoiceNumber(invoice).toLowerCase();
+      const orderNumber = (invoice.order_number || '').toLowerCase();
+      const customerName = (invoice.customer_name || '').toLowerCase();
+      const customerPhone = (invoice.customer_phone || '').toLowerCase();
+      
+      return invoiceNumber.includes(query) ||
+             orderNumber.includes(query) ||
+             customerName.includes(query) ||
+             customerPhone.includes(query);
+    });
+
     // Sort by created_at (newest first)
-    const sortedInvoices = invoices.sort((a, b) => {
+    const sortedInvoices = filteredInvoices.sort((a, b) => {
       const dateA = new Date(a.created_at || 0);
       const dateB = new Date(b.created_at || 0);
       return dateB - dateA;
@@ -246,9 +281,20 @@ const InvoiceHistory = ({ cart, setCart, setCurrentPage }) => {
           />
           <div>
             <h2 className="text-xl sm:text-2xl font-bold text-secondary-700 dark:text-secondary-300">Invoice History & Reports</h2>
-            <div className="text-sm text-gray-500 dark:text-gray-400">
-              {activeTab === 'invoices' ? `Total Invoices: ${invoices.length} | Showing: ${displayedInvoices.length} of ${invoices.length}` : 'Business insights and analytics'}
-            </div>
+                         <div className="text-sm text-gray-500 dark:text-gray-400">
+               {activeTab === 'invoices' ? (
+                 searchQuery ? 
+                   `Total Invoices: ${invoices.length} | Filtered: ${displayedInvoices.length} of ${invoices.filter(invoice => {
+                     const query = searchQuery.toLowerCase();
+                     const invoiceNumber = getInvoiceNumber(invoice).toLowerCase();
+                     const orderNumber = (invoice.order_number || '').toLowerCase();
+                     const customerName = (invoice.customer_name || '').toLowerCase();
+                     const customerPhone = (invoice.customer_phone || '').toLowerCase();
+                     return invoiceNumber.includes(query) || orderNumber.includes(query) || customerName.includes(query) || customerPhone.includes(query);
+                   }).length}` :
+                   `Total Invoices: ${invoices.length} | Showing: ${displayedInvoices.length} of ${invoices.length}`
+               ) : 'Business insights and analytics'}
+             </div>
           </div>
         </div>
       </div>
@@ -289,12 +335,56 @@ const InvoiceHistory = ({ cart, setCart, setCurrentPage }) => {
             </div>
           </button>
         </nav>
-      </div>
+             </div>
 
-             {/* Conditional Content */}
-       {activeTab === 'invoices' ? (
-         <>
-           {/* Summary Stats */}
+              {/* Conditional Content */}
+        {activeTab === 'invoices' ? (
+          <>
+                         {/* Search Bar */}
+             <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700 p-6">
+               <div className="flex items-center space-x-4">
+                 <div className="flex-1 relative">
+                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                     <svg
+                       className="h-5 w-5 text-gray-400"
+                       fill="none"
+                       stroke="currentColor"
+                       viewBox="0 0 24 24"
+                     >
+                       <path
+                         strokeLinecap="round"
+                         strokeLinejoin="round"
+                         strokeWidth={2}
+                         d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                       />
+                     </svg>
+                   </div>
+                   <input
+                     type="text"
+                     placeholder="Search by invoice number, order number, customer name, or phone..."
+                     value={searchQuery}
+                     onChange={(e) => setSearchQuery(e.target.value)}
+                     className="w-full pl-12 pr-4 py-4 text-lg border-0 bg-gray-50 dark:bg-gray-700 rounded-xl focus:ring-2 focus:ring-secondary-500 focus:bg-white dark:focus:bg-gray-600 transition-all duration-200 placeholder-gray-400 dark:placeholder-gray-500"
+                   />
+                 </div>
+                 {searchQuery && (
+                   <button
+                     onClick={() => setSearchQuery('')}
+                     className="px-6 py-4 text-sm font-medium text-gray-600 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200 bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 rounded-xl transition-all duration-200"
+                     title="Clear search"
+                   >
+                     Clear
+                   </button>
+                 )}
+               </div>
+               {searchQuery && (
+                 <div className="mt-3 text-sm text-gray-500 dark:text-gray-400">
+                   Searching for: <span className="font-medium text-secondary-600 dark:text-secondary-400">"{searchQuery}"</span>
+                 </div>
+               )}
+             </div>
+
+            {/* Summary Stats */}
            {invoices.length > 0 && statistics && (
              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 sm:gap-6 mb-6">
                <div className="card">
@@ -459,7 +549,7 @@ const InvoiceHistory = ({ cart, setCart, setCurrentPage }) => {
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
                             <div className="text-sm text-secondary-600 dark:text-secondary-400">
-                              {invoice.items_count || 0} items
+                              {invoice.items ? invoice.items.length : 0} items
                             </div>
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
@@ -501,18 +591,26 @@ const InvoiceHistory = ({ cart, setCart, setCurrentPage }) => {
                     </tbody>
                   </table>
                   
-                  {/* Show More Button for Desktop */}
-                  {hasMore && displayedInvoices.length > 0 && (
-                    <div className="mt-6 text-center">
-                      <button
-                        onClick={handleShowMore}
-                        className="btn-secondary flex items-center mx-auto"
-                      >
-                        <Plus className="h-4 w-4 mr-2" />
-                        Show More ({currentPage * itemsPerPage} of {invoices.length})
-                      </button>
-                    </div>
-                  )}
+                                     {/* Show More Button for Desktop */}
+                   {hasMore && displayedInvoices.length > 0 && (
+                     <div className="mt-6 text-center">
+                       <button
+                         onClick={handleShowMore}
+                         className="btn-secondary flex items-center mx-auto"
+                       >
+                         <Plus className="h-4 w-4 mr-2" />
+                         Show More ({currentPage * itemsPerPage} of {invoices.filter(invoice => {
+                           if (!searchQuery.trim()) return true;
+                           const query = searchQuery.toLowerCase();
+                           const invoiceNumber = getInvoiceNumber(invoice).toLowerCase();
+                           const orderNumber = (invoice.order_number || '').toLowerCase();
+                           const customerName = (invoice.customer_name || '').toLowerCase();
+                           const customerPhone = (invoice.customer_phone || '').toLowerCase();
+                           return invoiceNumber.includes(query) || orderNumber.includes(query) || customerName.includes(query) || customerPhone.includes(query);
+                         }).length})
+                       </button>
+                     </div>
+                   )}
                 </div>
 
                 {/* Mobile Cards */}
@@ -579,7 +677,7 @@ const InvoiceHistory = ({ cart, setCart, setCurrentPage }) => {
                         
                         <div className="flex justify-between items-center text-sm">
                           <span className="text-gray-500 dark:text-gray-400">
-                            {invoice.items_count || 0} items • {invoice.payment_method || 'Cash'}
+                            {invoice.items ? invoice.items.length : 0} items • {invoice.payment_method || 'Cash'}
                           </span>
                           <span className="font-medium text-secondary-700 dark:text-secondary-300">
                             {formatCurrency(invoice.total_amount)}
@@ -597,7 +695,15 @@ const InvoiceHistory = ({ cart, setCart, setCurrentPage }) => {
                         className="btn-secondary flex items-center mx-auto"
                       >
                         <Plus className="h-4 w-4 mr-2" />
-                        Show More ({currentPage * itemsPerPage} of {invoices.length})
+                        Show More ({currentPage * itemsPerPage} of {invoices.filter(invoice => {
+                          if (!searchQuery.trim()) return true;
+                          const query = searchQuery.toLowerCase();
+                          const invoiceNumber = getInvoiceNumber(invoice).toLowerCase();
+                          const orderNumber = (invoice.order_number || '').toLowerCase();
+                          const customerName = (invoice.customer_name || '').toLowerCase();
+                          const customerPhone = (invoice.customer_phone || '').toLowerCase();
+                          return invoiceNumber.includes(query) || orderNumber.includes(query) || customerName.includes(query) || customerPhone.includes(query);
+                        }).length})
                       </button>
                     </div>
                   )}
