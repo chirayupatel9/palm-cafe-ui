@@ -289,7 +289,7 @@ const CustomerMenu = ({
         date: new Date().toISOString()
       };
 
-      const response = await axios.post('/invoices', orderData);
+      const response = await axios.post('/customer/orders', orderData);
       
       // No auto-download - just show success message
       // PDF can be generated on-demand using the new endpoint
