@@ -10,7 +10,7 @@ const InvoiceHistory = ({ cart, setCart, setCurrentPage }) => {
   const [invoices, setInvoices] = useState([]);
   const [statistics, setStatistics] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState('invoices'); // 'invoices' or 'reports'
+  const [activeTab, setActiveTab] = useState('reports'); // 'reports' or 'invoices'
   const [selectedInvoice, setSelectedInvoice] = useState(null);
   const [showInvoiceDetails, setShowInvoiceDetails] = useState(false);
 
@@ -299,46 +299,48 @@ const InvoiceHistory = ({ cart, setCart, setCurrentPage }) => {
         </div>
       </div>
 
-      {/* Tabs */}
-      <div className="border-b border-accent-200 dark:border-gray-700">
-        <nav className="-mb-px flex space-x-8">
-          <button
-                           onClick={() => {
-                 setActiveTab('invoices');
-                 setCurrentPageLocal(1); // Reset pagination when tab changes
-               }}
-            className={`py-2 px-1 border-b-2 font-medium text-sm ${
-              activeTab === 'invoices'
-                ? 'border-secondary-500 text-secondary-600 dark:text-secondary-400'
-                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'
-            }`}
-          >
-            <div className="flex items-center">
-              <Download className="h-4 w-4 mr-2" />
-              Invoice History
-            </div>
-          </button>
-          <button
-                           onClick={() => {
-                 setActiveTab('reports');
-                 setCurrentPageLocal(1); // Reset pagination when tab changes
-               }}
-            className={`py-2 px-1 border-b-2 font-medium text-sm ${
-              activeTab === 'reports'
-                ? 'border-secondary-500 text-secondary-600 dark:text-secondary-400'
-                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'
-            }`}
-          >
-            <div className="flex items-center">
-              <BarChart3 className="h-4 w-4 mr-2" />
-              Daily Reports
-            </div>
-          </button>
-        </nav>
+             {/* Tabs */}
+       <div className="border-b border-accent-200 dark:border-gray-700">
+         <nav className="-mb-px flex space-x-8">
+           <button
+                            onClick={() => {
+                  setActiveTab('reports');
+                  setCurrentPageLocal(1); // Reset pagination when tab changes
+                }}
+             className={`py-2 px-1 border-b-2 font-medium text-sm ${
+               activeTab === 'reports'
+                 ? 'border-secondary-500 text-secondary-600 dark:text-secondary-400'
+                 : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'
+             }`}
+           >
+             <div className="flex items-center">
+               <BarChart3 className="h-4 w-4 mr-2" />
+               Daily Reports
              </div>
+           </button>
+           <button
+                            onClick={() => {
+                  setActiveTab('invoices');
+                  setCurrentPageLocal(1); // Reset pagination when tab changes
+                }}
+             className={`py-2 px-1 border-b-2 font-medium text-sm ${
+               activeTab === 'invoices'
+                 ? 'border-secondary-500 text-secondary-600 dark:text-secondary-400'
+                 : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'
+             }`}
+           >
+             <div className="flex items-center">
+               <Download className="h-4 w-4 mr-2" />
+               Invoice History
+             </div>
+           </button>
+         </nav>
+              </div>
 
-              {/* Conditional Content */}
-        {activeTab === 'invoices' ? (
+                             {/* Conditional Content */}
+         {activeTab === 'reports' ? (
+           <DailyReports />
+         ) : (
           <>
                          {/* Search Bar */}
              <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700 p-6">
@@ -711,10 +713,8 @@ const InvoiceHistory = ({ cart, setCart, setCurrentPage }) => {
               </>
             )}
           </div>
-        </>
-      ) : (
-        <DailyReports />
-      )}
+                 </>
+       )}
 
       {/* Invoice Details Modal */}
       {showInvoiceDetails && selectedInvoice && (

@@ -17,6 +17,14 @@ const DailyReports = () => {
     fetchDailyReports();
   }, [timeRange]);
 
+  useEffect(() => {
+    console.log('DailyData state changed:', dailyData);
+    if (dailyData.length > 0) {
+      console.log('Sample data item:', dailyData[0]);
+      console.log('All earnings values:', dailyData.map(d => ({ date: d.date, earnings: d.earnings, orders: d.orders })));
+    }
+  }, [dailyData]);
+
   const fetchDailyReports = async () => {
     try {
       setLoading(true);
@@ -24,6 +32,10 @@ const DailyReports = () => {
         axios.get(`/reports/daily?days=${timeRange}`),
         axios.get('/reports/top-items')
       ]);
+
+      console.log('Daily data received:', dailyResponse.data);
+      console.log('Top items received:', topItemsResponse.data);
+      console.log('Daily data array:', dailyResponse.data.dailyData);
 
       setDailyData(dailyResponse.data.dailyData || []);
       setTopItems(topItemsResponse.data.topItems || []);
@@ -48,31 +60,165 @@ const DailyReports = () => {
 
   const getMaxValue = (data, key) => {
     if (!data || data.length === 0) return 0;
-    return Math.max(...data.map(item => item[key] || 0));
+    const values = data.map(item => {
+      const value = key === 'earnings' ? parseFloat(item[key]) || 0 : parseInt(item[key]) || 0;
+      return value;
+    });
+    console.log(`Max value for ${key}:`, Math.max(...values), 'Values:', values);
+    return Math.max(...values);
   };
 
-  const renderBarChart = (data, key, color) => {
+  const renderLineChart = (data, key, color) => {
     if (!data || data.length === 0) return null;
     
     const maxValue = getMaxValue(data, key);
-    if (maxValue === 0) return null;
+    console.log(`Rendering line chart for ${key}, maxValue:`, maxValue);
+    
+    if (maxValue === 0) {
+      return (
+        <div className="flex items-center justify-center h-48 text-gray-500 dark:text-gray-400">
+          <p>No data available for this period</p>
+        </div>
+      );
+    }
+
+    // Calculate points for the line chart
+    const points = data.map((item, index) => {
+      const value = key === 'earnings' ? parseFloat(item[key]) || 0 : parseInt(item[key]) || 0;
+      const heightPercentage = maxValue > 0 ? (value / maxValue) * 100 : 0;
+      const x = (index / (data.length - 1)) * 100; // X position (0-100%)
+      const y = 100 - heightPercentage; // Y position (inverted for SVG)
+      
+      console.log(`Point ${index}: value=${value}, x=${x}%, y=${y}%`);
+      
+      return { x, y, value, date: item.date };
+    });
+
+    // Create SVG path for the line
+    const pathData = points.map((point, index) => {
+      if (index === 0) return `M ${point.x} ${point.y}`;
+      return `L ${point.x} ${point.y}`;
+    }).join(' ');
 
     return (
-      <div className="flex items-end space-x-1 h-32">
-        {data.map((item, index) => {
-          const height = maxValue > 0 ? (item[key] / maxValue) * 100 : 0;
-          return (
-            <div key={index} className="flex-1 flex flex-col items-center">
-              <div 
-                className={`w-full rounded-t ${color}`}
-                style={{ height: `${height}%` }}
-              ></div>
-              <div className="text-xs text-gray-500 mt-1 transform -rotate-45 origin-left">
-                {formatDate(item.date)}
-              </div>
+      <div className="w-full h-48 relative">
+        <svg className="w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
+          {/* Grid lines */}
+          <defs>
+            <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
+              <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#e5e7eb" strokeWidth="0.5" opacity="0.3"/>
+            </pattern>
+          </defs>
+          <rect width="100" height="100" fill="url(#grid)" />
+          
+          {/* Line chart */}
+          <path
+            d={pathData}
+            stroke={color === 'bg-green-500' ? '#10b981' : '#3b82f6'}
+            strokeWidth="3"
+            fill="none"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+          
+          {/* Data points */}
+          {points.map((point, index) => (
+            <circle
+              key={index}
+              cx={point.x}
+              cy={point.y}
+              r="3"
+              fill={color === 'bg-green-500' ? '#10b981' : '#3b82f6'}
+              stroke="white"
+              strokeWidth="2"
+            />
+          ))}
+        </svg>
+        
+        {/* Date labels */}
+        <div className="flex justify-between mt-2 px-2">
+          {points.map((point, index) => (
+            <div key={index} className="text-xs text-gray-500 transform -rotate-45 origin-left whitespace-nowrap">
+              {formatDate(point.date)}
             </div>
-          );
-        })}
+          ))}
+        </div>
+      </div>
+    );
+  };
+
+  // Test line chart function
+  const renderTestLineChart = (color) => {
+    const testData = [
+      { value: 20, label: 'Mon' },
+      { value: 35, label: 'Tue' },
+      { value: 15, label: 'Wed' },
+      { value: 50, label: 'Thu' },
+      { value: 30, label: 'Fri' },
+      { value: 45, label: 'Sat' },
+      { value: 25, label: 'Sun' }
+    ];
+    
+    const maxValue = Math.max(...testData.map(d => d.value));
+    
+    // Calculate points for the line chart
+    const points = testData.map((item, index) => {
+      const heightPercentage = (item.value / maxValue) * 100;
+      const x = (index / (testData.length - 1)) * 100;
+      const y = 100 - heightPercentage;
+      
+      return { x, y, value: item.value, label: item.label };
+    });
+
+    // Create SVG path for the line
+    const pathData = points.map((point, index) => {
+      if (index === 0) return `M ${point.x} ${point.y}`;
+      return `L ${point.x} ${point.y}`;
+    }).join(' ');
+
+    return (
+      <div className="w-full h-48 relative">
+        <svg className="w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
+          {/* Grid lines */}
+          <defs>
+            <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
+              <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#e5e7eb" strokeWidth="0.5" opacity="0.3"/>
+            </pattern>
+          </defs>
+          <rect width="100" height="100" fill="url(#grid)" />
+          
+          {/* Line chart */}
+          <path
+            d={pathData}
+            stroke={color === 'bg-green-500' ? '#10b981' : '#3b82f6'}
+            strokeWidth="3"
+            fill="none"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+          
+          {/* Data points */}
+          {points.map((point, index) => (
+            <circle
+              key={index}
+              cx={point.x}
+              cy={point.y}
+              r="3"
+              fill={color === 'bg-green-500' ? '#10b981' : '#3b82f6'}
+              stroke="white"
+              strokeWidth="2"
+            />
+          ))}
+        </svg>
+        
+        {/* Date labels */}
+        <div className="flex justify-between mt-2 px-2">
+          {points.map((point, index) => (
+            <div key={index} className="text-xs text-gray-500 transform -rotate-45 origin-left whitespace-nowrap">
+              {point.label}
+            </div>
+          ))}
+        </div>
       </div>
     );
   };
@@ -187,11 +333,12 @@ const DailyReports = () => {
           </h3>
           {dailyData.length > 0 ? (
             <div>
-              {renderBarChart(dailyData, 'earnings', 'bg-green-500')}
+                             {/* Test line chart to verify rendering */}
+               {renderTestLineChart('bg-green-500')}
               <div className="mt-4 text-sm text-gray-500 dark:text-gray-400">
                 <div className="flex justify-between">
-                  <span>Lowest: {formatCurrency(Math.min(...dailyData.map(d => d.earnings || 0)))}</span>
-                  <span>Highest: {formatCurrency(Math.max(...dailyData.map(d => d.earnings || 0)))}</span>
+                  <span>Lowest: {formatCurrency(Math.min(...dailyData.map(d => parseFloat(d.earnings) || 0)))}</span>
+                  <span>Highest: {formatCurrency(Math.max(...dailyData.map(d => parseFloat(d.earnings) || 0)))}</span>
                 </div>
               </div>
             </div>
@@ -210,11 +357,12 @@ const DailyReports = () => {
           </h3>
           {dailyData.length > 0 ? (
             <div>
-              {renderBarChart(dailyData, 'orders', 'bg-blue-500')}
+                             {/* Test line chart to verify rendering */}
+               {renderTestLineChart('bg-blue-500')}
               <div className="mt-4 text-sm text-gray-500 dark:text-gray-400">
                 <div className="flex justify-between">
-                  <span>Lowest: {Math.min(...dailyData.map(d => d.orders || 0))} orders</span>
-                  <span>Highest: {Math.max(...dailyData.map(d => d.orders || 0))} orders</span>
+                  <span>Lowest: {Math.min(...dailyData.map(d => parseInt(d.orders) || 0))} orders</span>
+                  <span>Highest: {Math.max(...dailyData.map(d => parseInt(d.orders) || 0))} orders</span>
                 </div>
               </div>
             </div>
