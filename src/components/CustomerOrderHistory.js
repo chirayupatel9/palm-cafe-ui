@@ -94,7 +94,17 @@ const CustomerOrderHistory = ({ customerPhone, setActiveTab, cart, setCart }) =>
 
   const downloadInvoice = async (orderNumber) => {
     try {
-      const response = await axios.get(`/invoices/${orderNumber}/download`);
+      // First, get the invoice number for this order
+      const invoiceResponse = await axios.get(`/invoices/order/${orderNumber}`);
+      const invoice = invoiceResponse.data;
+      
+      if (!invoice || !invoice.invoice_number) {
+        toast.error('No invoice found for this order');
+        return;
+      }
+      
+      // Now download the PDF using the invoice number
+      const response = await axios.get(`/invoices/${invoice.invoice_number}/download`);
       
       // Create blob and open PDF in new tab
       const pdfBlob = new Blob([Uint8Array.from(atob(response.data.pdf), c => c.charCodeAt(0))], {
@@ -110,7 +120,11 @@ const CustomerOrderHistory = ({ customerPhone, setActiveTab, cart, setCart }) =>
       }, 1000);
     } catch (error) {
       console.error('Error downloading invoice:', error);
-      toast.error('Failed to download invoice');
+      if (error.response?.status === 404) {
+        toast.error('No invoice found for this order');
+      } else {
+        toast.error('Failed to download invoice');
+      }
     }
   };
 

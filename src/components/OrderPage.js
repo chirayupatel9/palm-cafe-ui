@@ -273,7 +273,7 @@ const OrderPage = ({ menuItems, cart: externalCart, setCart: setExternalCart }) 
       const response = await axios.post('/invoices', orderData);
       
       // Download the PDF
-      const pdfResponse = await axios.get(`/invoices/${response.data.orderNumber}/download`);
+      const pdfResponse = await axios.get(`/invoices/${response.data.invoiceNumber}/download`);
       
       // Create blob and open PDF in new tab
       const pdfBlob = new Blob([Uint8Array.from(atob(pdfResponse.data.pdf), c => c.charCodeAt(0))], {
