@@ -586,7 +586,7 @@ const CustomerMenu = ({
                 </h2>
                 <button
                   onClick={() => setShowCart(false)}
-                  className="text-gray-500 hover:text-gray-700"
+                  className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
                 >
                   <X className="h-6 w-6" />
                 </button>
@@ -655,8 +655,8 @@ const CustomerMenu = ({
                     </div>
 
                     {customer && customer.loyalty_points > 0 && (
-                      <div className="p-3 bg-green-50 border border-green-200 rounded-lg mt-3">
-                        <div className="flex items-center text-sm text-green-700">
+                      <div className="p-3 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg mt-3">
+                        <div className="flex items-center text-sm text-green-700 dark:text-green-300">
                           <Star className="h-4 w-4 mr-2" />
                           <span>Welcome back! {customer.loyalty_points} loyalty points available</span>
                         </div>
@@ -681,7 +681,7 @@ const CustomerMenu = ({
                           className={`flex items-center justify-center p-3 rounded-lg border transition-colors ${
                             paymentMethod === method.code
                               ? 'bg-secondary-500 text-white border-secondary-500'
-                              : 'bg-white text-secondary-700 border-accent-300 hover:bg-accent-50'
+                              : 'bg-white dark:bg-gray-700 text-secondary-700 dark:text-gray-200 border-accent-300 dark:border-gray-600 hover:bg-accent-50 dark:hover:bg-gray-600'
                           }`}
                         >
                           <span className="mr-2">{method.icon}</span>
@@ -703,7 +703,7 @@ const CustomerMenu = ({
                         className={`flex items-center justify-center p-3 rounded-lg border transition-colors ${
                           pickupOption === 'pickup'
                             ? 'bg-secondary-500 text-white border-secondary-500'
-                            : 'bg-white text-secondary-700 border-accent-300 hover:bg-accent-50'
+                            : 'bg-white dark:bg-gray-700 text-secondary-700 dark:text-gray-200 border-accent-300 dark:border-gray-600 hover:bg-accent-50 dark:hover:bg-gray-600'
                         }`}
                       >
                         <span className="mr-2">🏪</span>
@@ -715,7 +715,7 @@ const CustomerMenu = ({
                         className={`flex items-center justify-center p-3 rounded-lg border transition-colors ${
                           pickupOption === 'dine-in'
                             ? 'bg-secondary-500 text-white border-secondary-500'
-                            : 'bg-white text-secondary-700 border-accent-300 hover:bg-accent-50'
+                            : 'bg-white dark:bg-gray-700 text-secondary-700 dark:text-gray-200 border-accent-300 dark:border-gray-600 hover:bg-accent-50 dark:hover:bg-gray-600'
                         }`}
                       >
                         <span className="mr-2">🍽️</span>
@@ -731,36 +731,36 @@ const CustomerMenu = ({
 
                   {/* Cart Items */}
                   {cart.length === 0 ? (
-                    <div className="text-center py-8 text-gray-500">
-                      <ShoppingCart className="h-12 w-12 mx-auto mb-2 text-gray-300" />
+                    <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+                      <ShoppingCart className="h-12 w-12 mx-auto mb-2 text-gray-300 dark:text-gray-500" />
                       <p>Your cart is empty</p>
                       <p className="text-sm">Add items from the menu</p>
                     </div>
                   ) : (
                     <div className="space-y-3 mb-6">
                       {cart.map((item) => (
-                        <div key={item.id} className="flex items-center justify-between p-3 bg-accent-50 rounded-lg">
+                        <div key={item.id} className="flex items-center justify-between p-3 bg-accent-50 dark:bg-gray-700 rounded-lg border border-accent-200 dark:border-gray-600">
                           <div className="flex-1">
-                            <h4 className="font-medium text-secondary-700">{item.name}</h4>
-                            <p className="text-sm text-gray-600">{formatCurrency(item.price)} each</p>
+                            <h4 className="font-medium text-secondary-700 dark:text-secondary-300">{item.name}</h4>
+                            <p className="text-sm text-gray-600 dark:text-gray-400">{formatCurrency(item.price)} each</p>
                           </div>
                           <div className="flex items-center space-x-2">
                             <button
                               onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                              className="p-1 text-gray-500 hover:text-gray-700"
+                              className="p-1 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
                             >
                               <Minus className="h-4 w-4" />
                             </button>
-                            <span className="w-8 text-center font-medium">{item.quantity}</span>
+                            <span className="w-8 text-center font-medium text-gray-900 dark:text-gray-100">{item.quantity}</span>
                             <button
                               onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                              className="p-1 text-gray-500 hover:text-gray-700"
+                              className="p-1 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
                             >
                               <Plus className="h-4 w-4" />
                             </button>
                             <button
                               onClick={() => removeFromCart(item.id)}
-                              className="p-1 text-red-500 hover:text-red-700"
+                              className="p-1 text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300"
                             >
                               <Trash2 className="h-4 w-4" />
                             </button>
@@ -830,7 +830,7 @@ const CustomerMenu = ({
                             className={`py-2 px-3 text-sm rounded-lg border transition-colors ${
                               tipPercentage === percentage
                                 ? 'bg-secondary-500 text-white border-secondary-500'
-                                : 'bg-white text-secondary-700 border-accent-300 hover:bg-accent-50'
+                                : 'bg-white dark:bg-gray-700 text-secondary-700 dark:text-gray-200 border-accent-300 dark:border-gray-600 hover:bg-accent-50 dark:hover:bg-gray-600'
                             }`}
                           >
                             {percentage === 0 ? 'No Tip' : `${percentage}%`}
@@ -839,12 +839,12 @@ const CustomerMenu = ({
                       </div>
                       
                       <div className="flex items-center space-x-2">
-                        <span className="text-sm text-gray-600">Custom:</span>
+                        <span className="text-sm text-gray-600 dark:text-gray-400">Custom:</span>
                         <input
                           type="number"
                           value={tipAmount.toFixed(2)}
                           onChange={(e) => handleTipAmountChange(e.target.value)}
-                          className="flex-1 p-2 border border-gray-300 rounded-lg text-sm"
+                          className="flex-1 p-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                           placeholder="0.00"
                         />
                       </div>
@@ -853,20 +853,20 @@ const CustomerMenu = ({
 
                   {/* Order Summary */}
                   {cart.length > 0 && (
-                    <div className="border-t border-accent-200 pt-4 mb-6">
+                    <div className="border-t border-accent-200 dark:border-gray-600 pt-4 mb-6">
                       <div className="space-y-2">
-                        <div className="flex justify-between">
+                        <div className="flex justify-between text-gray-700 dark:text-gray-300">
                           <span>Subtotal:</span>
                           <span>{formatCurrency(getSubtotal())}</span>
                         </div>
                         {showTaxInMenu && taxAmount > 0 && (
-                          <div className="flex justify-between">
+                          <div className="flex justify-between text-gray-700 dark:text-gray-300">
                             <span>Tax ({taxRate}%):</span>
                             <span>{formatCurrency(taxAmount)}</span>
                           </div>
                         )}
                         {tipAmount > 0 && (
-                          <div className="flex justify-between">
+                          <div className="flex justify-between text-gray-700 dark:text-gray-300">
                             <span>Tip:</span>
                             <span>{formatCurrency(tipAmount)}</span>
                           </div>
@@ -877,7 +877,7 @@ const CustomerMenu = ({
                             <span>-{formatCurrency(pointsToRedeem * 0.1)}</span>
                           </div>
                         )}
-                        <div className="flex justify-between font-bold text-lg">
+                        <div className="flex justify-between font-bold text-lg text-gray-900 dark:text-gray-100">
                           <span>Total:</span>
                           <span>{formatCurrency(getTotal())}</span>
                         </div>

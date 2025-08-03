@@ -425,7 +425,7 @@ const OrderPage = ({ menuItems, cart: externalCart, setCart: setExternalCart }) 
       {/* Mobile Cart Overlay */}
       {showCart && (
         <div className="lg:hidden fixed inset-0 bg-black bg-opacity-50 z-40">
-          <div className="absolute bottom-0 left-0 right-0 bg-white rounded-t-lg max-h-[80vh] overflow-y-auto">
+          <div className="absolute bottom-0 left-0 right-0 bg-white dark:bg-gray-800 rounded-t-lg max-h-[80vh] overflow-y-auto">
             <div className="p-4">
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center">
@@ -434,13 +434,13 @@ const OrderPage = ({ menuItems, cart: externalCart, setCart: setExternalCart }) 
                     alt="Palm Cafe Logo" 
                     className="h-8 w-8 mr-2"
                   />
-                  <h2 className="text-xl font-semibold text-secondary-700">
+                  <h2 className="text-xl font-semibold text-secondary-700 dark:text-secondary-300">
                     Cart ({currentCart.length})
                   </h2>
                 </div>
                 <button
                   onClick={() => setShowCart(false)}
-                  className="text-gray-500 hover:text-gray-700"
+                  className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
                 >
                   <X className="h-6 w-6" />
                 </button>
@@ -466,8 +466,8 @@ const OrderPage = ({ menuItems, cart: externalCart, setCart: setExternalCart }) 
                   className="input-field mb-2"
                 />
                 {customerInfo && (
-                  <div className="mb-2 p-2 bg-green-50 border border-green-200 rounded-lg">
-                    <div className="flex items-center text-sm text-green-700">
+                  <div className="mb-2 p-2 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
+                    <div className="flex items-center text-sm text-green-700 dark:text-green-300">
                       <Star className="h-4 w-4 mr-1" />
                       <span>Welcome back! {customerInfo.loyalty_points} loyalty points available</span>
                     </div>
@@ -501,14 +501,14 @@ const OrderPage = ({ menuItems, cart: externalCart, setCart: setExternalCart }) 
                     </div>
                     
                     <div className="flex items-center space-x-2">
-                      <span className="text-sm text-gray-600">Points to redeem:</span>
+                      <span className="text-sm text-gray-600 dark:text-gray-400">Points to redeem:</span>
                       <input
                         type="number"
                         value={pointsToRedeem}
                         onChange={(e) => handlePointsRedemption(parseInt(e.target.value) || 0)}
                         min="0"
                         max={maxRedeemablePoints}
-                        className="flex-1 p-2 border border-gray-300 rounded-lg text-sm"
+                        className="flex-1 p-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                         placeholder="0"
                       />
                     </div>
@@ -699,36 +699,36 @@ const OrderPage = ({ menuItems, cart: externalCart, setCart: setExternalCart }) 
 
               {/* Cart Items */}
               {currentCart.length === 0 ? (
-                <div className="text-center py-8 text-gray-500">
-                  <ShoppingCart className="h-12 w-12 mx-auto mb-2 text-gray-300" />
+                <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+                  <ShoppingCart className="h-12 w-12 mx-auto mb-2 text-gray-300 dark:text-gray-500" />
                   <p>Your cart is empty</p>
                   <p className="text-sm">Add items from the menu</p>
                 </div>
               ) : (
                 <div className="space-y-3 mb-4">
                   {currentCart.map((item) => (
-                    <div key={item.id} className="flex items-center justify-between p-3 bg-accent-50 rounded-lg border border-accent-200">
+                    <div key={item.id} className="flex items-center justify-between p-3 bg-accent-50 dark:bg-gray-700 rounded-lg border border-accent-200 dark:border-gray-600">
                       <div className="flex-1">
-                        <h4 className="font-medium text-secondary-700 text-sm">{item.name}</h4>
-                        <p className="text-xs text-gray-600">{formatCurrency(ensureNumber(item.price))} each</p>
+                        <h4 className="font-medium text-secondary-700 dark:text-secondary-300 text-sm">{item.name}</h4>
+                        <p className="text-xs text-gray-600 dark:text-gray-400">{formatCurrency(ensureNumber(item.price))} each</p>
                       </div>
                       <div className="flex items-center space-x-2">
                         <button
                           onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                          className="p-2 text-gray-500 hover:text-gray-700 bg-white rounded-full border"
+                          className="p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 bg-white dark:bg-gray-600 rounded-full border dark:border-gray-500"
                         >
                           <Minus className="h-4 w-4" />
                         </button>
-                        <span className="w-8 text-center font-medium text-sm">{item.quantity}</span>
+                        <span className="w-8 text-center font-medium text-sm text-gray-900 dark:text-gray-100">{item.quantity}</span>
                         <button
                           onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                          className="p-2 text-gray-500 hover:text-gray-700 bg-white rounded-full border"
+                          className="p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 bg-white dark:bg-gray-600 rounded-full border dark:border-gray-500"
                         >
                           <Plus className="h-4 w-4" />
                         </button>
                         <button
                           onClick={() => removeFromCart(item.id)}
-                          className="p-2 text-red-500 hover:text-red-700 bg-white rounded-full border"
+                          className="p-2 text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 bg-white dark:bg-gray-600 rounded-full border dark:border-gray-500"
                         >
                           <Trash2 className="h-4 w-4" />
                         </button>
@@ -752,7 +752,7 @@ const OrderPage = ({ menuItems, cart: externalCart, setCart: setExternalCart }) 
                         className={`py-2 px-3 text-sm rounded-lg border transition-colors ${
                           tipPercentage === percentage
                             ? 'bg-secondary-500 text-white border-secondary-500'
-                            : 'bg-white text-secondary-700 border-accent-300 hover:bg-accent-50'
+                            : 'bg-white dark:bg-gray-700 text-secondary-700 dark:text-gray-200 border-accent-300 dark:border-gray-600 hover:bg-accent-50 dark:hover:bg-gray-600'
                         }`}
                       >
                         {percentage === 0 ? 'No Tip' : `${percentage}%`}
@@ -762,14 +762,14 @@ const OrderPage = ({ menuItems, cart: externalCart, setCart: setExternalCart }) 
                   
                   {/* Custom tip amount */}
                   <div className="flex items-center space-x-2">
-                    <span className="text-sm text-gray-600">Custom:</span>
+                    <span className="text-sm text-gray-600 dark:text-gray-400">Custom:</span>
                     <input
                       type="number"
                       value={tipAmount.toFixed(2)}
                       onChange={(e) => handleTipAmountChange(e.target.value)}
                       step="0.01"
                       min="0"
-                      className="flex-1 px-3 py-2 border border-accent-300 rounded-lg text-sm focus:ring-2 focus:ring-secondary-500 focus:border-transparent"
+                      className="flex-1 px-3 py-2 border border-accent-300 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-secondary-500 focus:border-transparent"
                       placeholder="0.00"
                     />
                   </div>
@@ -1117,28 +1117,28 @@ const OrderPage = ({ menuItems, cart: externalCart, setCart: setExternalCart }) 
           ) : (
             <div className="space-y-3 mb-4">
               {currentCart.map((item) => (
-                <div key={item.id} className="flex items-center justify-between p-3 bg-accent-50 rounded-lg border border-accent-200">
+                <div key={item.id} className="flex items-center justify-between p-3 bg-accent-50 dark:bg-gray-700 rounded-lg border border-accent-200 dark:border-gray-600">
                   <div className="flex-1">
                     <h4 className="font-medium text-secondary-700 dark:text-secondary-300">{item.name}</h4>
-                                            <p className="text-sm text-gray-600 dark:text-gray-400">{formatCurrency(ensureNumber(item.price))} each</p>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">{formatCurrency(ensureNumber(item.price))} each</p>
                   </div>
                   <div className="flex items-center space-x-2">
                     <button
                       onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                      className="p-1 text-gray-500 hover:text-gray-700"
+                      className="p-1 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
                     >
                       <Minus className="h-4 w-4" />
                     </button>
-                    <span className="w-8 text-center font-medium">{item.quantity}</span>
+                    <span className="w-8 text-center font-medium text-gray-900 dark:text-gray-100">{item.quantity}</span>
                     <button
                       onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                      className="p-1 text-gray-500 hover:text-gray-700"
+                      className="p-1 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
                     >
                       <Plus className="h-4 w-4" />
                     </button>
                     <button
                       onClick={() => removeFromCart(item.id)}
-                      className="p-1 text-red-500 hover:text-red-700 ml-2"
+                      className="p-1 text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 ml-2"
                     >
                       <Trash2 className="h-4 w-4" />
                     </button>
@@ -1159,11 +1159,11 @@ const OrderPage = ({ menuItems, cart: externalCart, setCart: setExternalCart }) 
                   <button
                     key={percentage}
                     onClick={() => handleTipPercentageChange(percentage)}
-                    className={`py-2 px-3 text-sm rounded-lg border transition-colors ${
-                      tipPercentage === percentage
-                        ? 'bg-secondary-500 text-white border-secondary-500'
-                        : 'bg-white text-secondary-700 border-accent-300 hover:bg-accent-50'
-                    }`}
+                                            className={`py-2 px-3 text-sm rounded-lg border transition-colors ${
+                          tipPercentage === percentage
+                            ? 'bg-secondary-500 text-white border-secondary-500'
+                            : 'bg-white dark:bg-gray-700 text-secondary-700 dark:text-gray-200 border-accent-300 dark:border-gray-600 hover:bg-accent-50 dark:hover:bg-gray-600'
+                        }`}
                   >
                     {percentage === 0 ? 'No Tip' : `${percentage}%`}
                   </button>
@@ -1172,14 +1172,14 @@ const OrderPage = ({ menuItems, cart: externalCart, setCart: setExternalCart }) 
               
               {/* Custom tip amount */}
               <div className="flex items-center space-x-2">
-                <span className="text-sm text-gray-600">Custom:</span>
+                <span className="text-sm text-gray-600 dark:text-gray-400">Custom:</span>
                 <input
                   type="number"
                   value={tipAmount.toFixed(2)}
                   onChange={(e) => handleTipAmountChange(e.target.value)}
                   step="0.01"
                   min="0"
-                  className="flex-1 px-3 py-2 border border-accent-300 rounded-lg text-sm focus:ring-2 focus:ring-secondary-500 focus:border-transparent"
+                  className="flex-1 px-3 py-2 border border-accent-300 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-secondary-500 focus:border-transparent"
                   placeholder="0.00"
                 />
               </div>
