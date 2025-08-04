@@ -3,8 +3,10 @@ import { Toaster } from 'react-hot-toast';
 import CustomerLogin from './CustomerLogin';
 import CustomerMenu from './CustomerMenu';
 import { LogOut, User, ShoppingCart, History, LogIn, X } from 'lucide-react';
+import { useDarkMode } from '../contexts/DarkModeContext';
 
 const CustomerApp = () => {
+  const { isDarkMode } = useDarkMode();
   const [customer, setCustomer] = useState(null);
   const [cart, setCart] = useState([]);
   const [activeTab, setActiveTab] = useState('menu');
@@ -22,12 +24,12 @@ const CustomerApp = () => {
     setActiveTab('menu');
   };
 
+  const handleCustomerUpdate = (updatedCustomer) => {
+    setCustomer(updatedCustomer);
+  };
+
   const handleAddToCart = (item) => {
-    if (!customer) {
-      setShowLoginModal(true);
-      return;
-    }
-    // If customer is logged in, add to cart normally
+    // Allow adding to cart without login
     setCart(prevCart => {
       const existingItem = prevCart.find(cartItem => cartItem.id === item.id);
       if (existingItem) {
@@ -52,7 +54,7 @@ const CustomerApp = () => {
   };
 
   return (
-    <div>
+    <div className={`min-h-screen ${isDarkMode ? 'bg-gray-900' : 'bg-accent-50'}`}>
       <Toaster position="top-right" />
       
       {/* Customer Header */}
@@ -69,18 +71,12 @@ const CustomerApp = () => {
             </div>
             
             <div className="flex items-center space-x-4">
-              {/* Cart Button */}
-              <button
-                onClick={() => {
-                  if (!customer) {
-                    setShowLoginModal(true);
-                    return;
-                  }
-                  setShowCart(true);
-                }}
-                className="relative p-3 bg-secondary-500 text-white rounded-full hover:bg-secondary-600 transition-colors"
-                title={customer ? "View Cart" : "Login to view cart"}
-              >
+                             {/* Cart Button */}
+               <button
+                 onClick={() => setShowCart(true)}
+                 className="relative p-3 bg-secondary-500 text-white rounded-full hover:bg-secondary-600 transition-colors"
+                 title="View Cart"
+               >
                 <ShoppingCart className="h-6 w-6" />
                 {cart.length > 0 && (
                   <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-6 w-6 flex items-center justify-center">
@@ -105,11 +101,15 @@ const CustomerApp = () => {
                 <div className="hidden sm:flex items-center space-x-2 text-sm text-secondary-600 dark:text-gray-400">
                   <User className="h-4 w-4" />
                   <span>{customer.name}</span>
-                  {customer.loyalty_points > 0 && (
-                    <span className="bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full text-xs">
-                      {customer.loyalty_points} pts
-                    </span>
-                  )}
+                                     {customer.loyalty_points > 0 && (
+                     <span className={`px-2 py-1 rounded-full text-xs ${
+                       isDarkMode 
+                         ? 'bg-yellow-900/30 text-yellow-300 border border-yellow-700' 
+                         : 'bg-yellow-100 text-yellow-800'
+                     }`}>
+                       {customer.loyalty_points} pts
+                     </span>
+                   )}
                 </div>
               ) : (
                 <button
@@ -162,57 +162,66 @@ const CustomerApp = () => {
         onPlaceOrder={handlePlaceOrder}
         showLoginModal={showLoginModal}
         setShowLoginModal={setShowLoginModal}
+        onCustomerUpdate={handleCustomerUpdate}
       />
 
-      {/* Login Modal */}
-      {showLoginModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4 animate-fadeIn backdrop-blur-sm">
-          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-material-5 max-w-md w-full mx-4 transform transition-all duration-300 animate-slideIn hover-lift">
-            {/* Modal Header */}
-            <div className="relative p-6 border-b border-gray-200 dark:border-gray-700">
-              <div className="flex items-center justify-center mb-4">
-                <div className="w-16 h-16 bg-secondary-500 rounded-full flex items-center justify-center shadow-lg">
-                  <img 
-                    src="/images/palm-cafe-logo.png" 
-                    alt="Palm Cafe Logo" 
-                    className="w-10 h-10"
-                  />
-                </div>
-              </div>
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white text-center mb-2">
-                Welcome to Palm Cafe
-              </h2>
-              <p className="text-gray-600 dark:text-gray-400 text-center text-sm">
-                Enter your phone number to continue
-              </p>
-              
-              {/* Close Button */}
-              <button
-                onClick={() => setShowLoginModal(false)}
-                className="absolute top-4 right-4 p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-              >
-                <X className="h-5 w-5 text-gray-500" />
-              </button>
-            </div>
+             {/* Login Modal */}
+       {showLoginModal && (
+         <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4 animate-fadeIn backdrop-blur-sm">
+           <div className={`${isDarkMode ? 'bg-gray-800' : 'bg-white'} rounded-2xl shadow-material-5 max-w-md w-full mx-4 transform transition-all duration-300 animate-slideIn hover-lift`}>
+             {/* Modal Header */}
+             <div className={`relative p-6 border-b ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}`}>
+               <div className="flex items-center justify-center mb-4">
+                 <div className="w-16 h-16 bg-secondary-500 rounded-full flex items-center justify-center shadow-lg">
+                   <img 
+                     src="/images/palm-cafe-logo.png" 
+                     alt="Palm Cafe Logo" 
+                     className="w-10 h-10"
+                   />
+                 </div>
+               </div>
+               <h2 className={`text-2xl font-bold text-center mb-2 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                 Welcome to Palm Cafe
+               </h2>
+               <p className={`text-center text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                 Enter your phone number to continue
+               </p>
+               
+               {/* Close Button */}
+               <button
+                 onClick={() => setShowLoginModal(false)}
+                 className={`absolute top-4 right-4 p-2 rounded-full transition-colors ${
+                   isDarkMode 
+                     ? 'hover:bg-gray-700 text-gray-400' 
+                     : 'hover:bg-gray-100 text-gray-500'
+                 }`}
+               >
+                 <X className="h-5 w-5" />
+               </button>
+             </div>
 
-            {/* Modal Body */}
-            <div className="p-6">
-              <CustomerLogin onLogin={handleLogin} />
-              
-              {/* Continue Browsing Option */}
-              <div className="mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
-                <button
-                  onClick={() => setShowLoginModal(false)}
-                  className="w-full text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 text-sm transition-colors flex items-center justify-center"
-                >
-                  <span className="mr-2">←</span>
-                  Continue browsing without login
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+             {/* Modal Body */}
+             <div className="p-6">
+               <CustomerLogin onLogin={handleLogin} />
+               
+               {/* Continue Browsing Option */}
+               <div className={`mt-6 pt-4 border-t ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}`}>
+                 <button
+                   onClick={() => setShowLoginModal(false)}
+                   className={`w-full text-sm transition-colors flex items-center justify-center ${
+                     isDarkMode 
+                       ? 'text-gray-400 hover:text-gray-200' 
+                       : 'text-gray-500 hover:text-gray-700'
+                   }`}
+                 >
+                   <span className="mr-2">←</span>
+                   Continue browsing without login
+                 </button>
+               </div>
+             </div>
+           </div>
+         </div>
+       )}
     </div>
   );
 };

@@ -114,7 +114,7 @@ const CustomerLogin = ({ onLogin, onRegister }) => {
             <button
               type="button"
               onClick={() => setShowRegister(true)}
-              className="text-secondary-600 hover:text-secondary-500 text-sm flex items-center justify-center mx-auto transition-material"
+              className="text-secondary-200 hover:text-secondary-400 text-sm flex items-center justify-center mx-auto transition-material"
             >
               <UserPlus className="h-4 w-4 mr-1" />
               New customer? Register here

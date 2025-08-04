@@ -3,10 +3,12 @@ import { Plus, Edit, Trash2, Save, X, Download, Upload, FolderOpen, RefreshCw, S
 import toast from 'react-hot-toast';
 import axios from 'axios';
 import { useCurrency } from '../contexts/CurrencyContext';
+import { useDarkMode } from '../contexts/DarkModeContext';
 import { getCategoryColor, getCategoryColorByIndex } from '../utils/categoryColors';
 
 const MenuManagement = ({ menuItems, onUpdate, onAdd, onDelete }) => {
   const { formatCurrency } = useCurrency();
+  const { isDarkMode } = useDarkMode();
   const [activeTab, setActiveTab] = useState('menu-items');
   const [editingId, setEditingId] = useState(null);
   const [showAddForm, setShowAddForm] = useState(false);
@@ -338,24 +340,24 @@ const MenuManagement = ({ menuItems, onUpdate, onAdd, onDelete }) => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-secondary-700 dark:text-secondary-300">
+          <h2 className={`text-2xl font-bold ${isDarkMode ? 'text-secondary-300' : 'text-secondary-700'}`}>
             Menu & Category Management
           </h2>
-          <p className="text-gray-600 dark:text-gray-400">
+          <p className={`${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
             Manage your cafe's menu items and categories
           </p>
         </div>
       </div>
 
       {/* Tab Navigation */}
-      <div className="border-b border-gray-200 dark:border-gray-700">
+      <div className={`border-b ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}`}>
         <nav className="-mb-px flex space-x-8">
           <button
             onClick={() => setActiveTab('menu-items')}
             className={`py-2 px-1 border-b-2 font-medium text-sm ${
               activeTab === 'menu-items'
-                ? 'border-secondary-500 text-secondary-600 dark:text-secondary-400'
-                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'
+                ? `border-secondary-500 ${isDarkMode ? 'text-secondary-400' : 'text-secondary-600'}`
+                : `border-transparent ${isDarkMode ? 'text-gray-400 hover:text-gray-300' : 'text-gray-500 hover:text-gray-700 hover:border-gray-300'}`
             }`}
           >
             <div className="flex items-center">
@@ -367,8 +369,8 @@ const MenuManagement = ({ menuItems, onUpdate, onAdd, onDelete }) => {
             onClick={() => setActiveTab('categories')}
             className={`py-2 px-1 border-b-2 font-medium text-sm ${
               activeTab === 'categories'
-                ? 'border-secondary-500 text-secondary-600 dark:text-secondary-400'
-                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'
+                ? `border-secondary-500 ${isDarkMode ? 'text-secondary-400' : 'text-secondary-600'}`
+                : `border-transparent ${isDarkMode ? 'text-gray-400 hover:text-gray-300' : 'text-gray-500 hover:text-gray-700 hover:border-gray-300'}`
             }`}
           >
             <div className="flex items-center">
@@ -391,8 +393,8 @@ const MenuManagement = ({ menuItems, onUpdate, onAdd, onDelete }) => {
                 className="h-10 w-10 mr-3"
               />
               <div>
-                <h3 className="text-xl sm:text-2xl font-bold text-secondary-700 dark:text-secondary-300">Menu Items</h3>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Manage your cafe's menu items</p>
+                <h3 className={`text-xl sm:text-2xl font-bold ${isDarkMode ? 'text-secondary-300' : 'text-secondary-700'}`}>Menu Items</h3>
+                <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Manage your cafe's menu items</p>
               </div>
             </div>
             <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3">
@@ -428,7 +430,7 @@ const MenuManagement = ({ menuItems, onUpdate, onAdd, onDelete }) => {
           {/* Category Filter */}
           <div className="card">
             <div className="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-4">
-              <label className="text-sm font-medium text-secondary-700 dark:text-secondary-300">Filter by Category:</label>
+              <label className={`text-sm font-medium ${isDarkMode ? 'text-secondary-300' : 'text-secondary-700'}`}>Filter by Category:</label>
               <select
                 value={selectedCategory}
                 onChange={(e) => setSelectedCategory(e.target.value)}
@@ -447,7 +449,7 @@ const MenuManagement = ({ menuItems, onUpdate, onAdd, onDelete }) => {
           {/* Add New Item Form */}
           {showAddForm && (
             <div className="card">
-              <h3 className="text-lg font-semibold text-secondary-700 dark:text-secondary-300 mb-4">Add New Menu Item</h3>
+              <h3 className={`text-lg font-semibold mb-4 ${isDarkMode ? 'text-secondary-300' : 'text-secondary-700'}`}>Add New Menu Item</h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
                 <select
                   value={formData.category_id}
@@ -510,7 +512,7 @@ const MenuManagement = ({ menuItems, onUpdate, onAdd, onDelete }) => {
           {/* Menu Items by Category */}
           {Object.keys(groupedMenuItems).length === 0 ? (
             <div className="card">
-              <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+              <div className={`text-center py-8 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
                 <img 
                   src="/images/palm-cafe-logo.png" 
                   alt="Palm Cafe Logo" 
@@ -532,29 +534,29 @@ const MenuManagement = ({ menuItems, onUpdate, onAdd, onDelete }) => {
                 
                 {/* Desktop Table */}
                 <div className="hidden lg:block overflow-x-auto">
-                  <table className="min-w-full divide-y divide-accent-200">
-                    <thead className="bg-accent-50">
+                  <table className={`min-w-full divide-y ${isDarkMode ? 'divide-gray-700' : 'divide-accent-200'}`}>
+                    <thead className={isDarkMode ? 'bg-gray-700' : 'bg-accent-50'}>
                       <tr>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-secondary-600 uppercase tracking-wider">
+                        <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${isDarkMode ? 'text-gray-300' : 'text-secondary-600'}`}>
                           Item
                         </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-secondary-600 uppercase tracking-wider">
+                        <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${isDarkMode ? 'text-gray-300' : 'text-secondary-600'}`}>
                           Description
                         </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-secondary-600 uppercase tracking-wider">
+                        <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${isDarkMode ? 'text-gray-300' : 'text-secondary-600'}`}>
                           Price
                         </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-secondary-600 uppercase tracking-wider">
+                        <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${isDarkMode ? 'text-gray-300' : 'text-secondary-600'}`}>
                           Sort Order
                         </th>
-                        <th className="px-6 py-3 text-right text-xs font-medium text-secondary-600 uppercase tracking-wider">
+                        <th className={`px-6 py-3 text-right text-xs font-medium uppercase tracking-wider ${isDarkMode ? 'text-gray-300' : 'text-secondary-600'}`}>
                           Actions
                         </th>
                       </tr>
                     </thead>
-                    <tbody className="bg-white divide-y divide-accent-200">
+                    <tbody className={`${isDarkMode ? 'bg-gray-800 divide-gray-700' : 'bg-white divide-accent-200'}`}>
                       {items.map((item) => (
-                        <tr key={item.id} className="hover:bg-accent-50">
+                        <tr key={item.id} className={isDarkMode ? 'hover:bg-gray-700' : 'hover:bg-accent-50'}>
                           {editingId === item.id ? (
                             // Edit Mode
                             <>
@@ -611,7 +613,7 @@ const MenuManagement = ({ menuItems, onUpdate, onAdd, onDelete }) => {
                                   <button onClick={handleSave} className="text-green-600 hover:text-green-900">
                                     <Save className="h-4 w-4" />
                                   </button>
-                                  <button onClick={handleCancel} className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200">
+                                  <button onClick={handleCancel} className={`${isDarkMode ? 'text-gray-400 hover:text-gray-200' : 'text-gray-600 hover:text-gray-900'}`}>
                                     <X className="h-4 w-4" />
                                   </button>
                                 </div>
@@ -621,30 +623,30 @@ const MenuManagement = ({ menuItems, onUpdate, onAdd, onDelete }) => {
                             // View Mode
                             <>
                               <td className="px-6 py-4 whitespace-nowrap">
-                                <div className="text-sm font-medium text-secondary-700 dark:text-secondary-300">{item.name}</div>
+                                <div className={`text-sm font-medium ${isDarkMode ? 'text-secondary-300' : 'text-secondary-700'}`}>{item.name}</div>
                               </td>
                               <td className="px-6 py-4 whitespace-nowrap">
-                                <div className="text-sm text-gray-600 dark:text-gray-400">{item.description}</div>
+                                <div className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>{item.description}</div>
                               </td>
                               <td className="px-6 py-4 whitespace-nowrap">
-                                <div className="text-sm font-semibold text-secondary-600">
+                                <div className={`text-sm font-semibold ${isDarkMode ? 'text-secondary-400' : 'text-secondary-600'}`}>
                                   {formatCurrency(ensureNumber(item.price))}
                                 </div>
                               </td>
                               <td className="px-6 py-4 whitespace-nowrap">
-                                <div className="text-sm text-gray-500 dark:text-gray-400">{item.sort_order || 0}</div>
+                                <div className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>{item.sort_order || 0}</div>
                               </td>
                               <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                 <div className="flex justify-end space-x-2">
                                   <button
                                     onClick={() => handleEdit(item)}
-                                    className="text-blue-600 hover:text-blue-900"
+                                    className={`${isDarkMode ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-900'}`}
                                   >
                                     <Edit className="h-4 w-4" />
                                   </button>
                                   <button
                                     onClick={() => handleDelete(item.id, item.name)}
-                                    className="text-red-600 hover:text-red-900"
+                                    className={`${isDarkMode ? 'text-red-400 hover:text-red-300' : 'text-red-600 hover:text-red-900'}`}
                                   >
                                     <Trash2 className="h-4 w-4" />
                                   </button>
@@ -661,7 +663,7 @@ const MenuManagement = ({ menuItems, onUpdate, onAdd, onDelete }) => {
                 {/* Mobile Cards */}
                 <div className="lg:hidden space-y-3">
                   {items.map((item) => (
-                    <div key={item.id} className="border border-accent-200 rounded-lg p-4 bg-white">
+                    <div key={item.id} className={`border rounded-lg p-4 ${isDarkMode ? 'border-gray-700 bg-gray-800' : 'border-accent-200 bg-white'}`}>
                       {editingId === item.id ? (
                         // Edit Mode Mobile
                         <div className="space-y-3">
@@ -724,28 +726,28 @@ const MenuManagement = ({ menuItems, onUpdate, onAdd, onDelete }) => {
                         // View Mode Mobile
                         <div>
                           <div className="flex justify-between items-start mb-2">
-                            <h4 className="font-medium text-secondary-700 dark:text-secondary-300">{item.name}</h4>
+                            <h4 className={`font-medium ${isDarkMode ? 'text-secondary-300' : 'text-secondary-700'}`}>{item.name}</h4>
                             <div className="flex space-x-2">
                               <button
                                 onClick={() => handleEdit(item)}
-                                className="p-2 text-blue-600 hover:text-blue-900 bg-blue-50 rounded-full"
+                                className={`p-2 rounded-full ${isDarkMode ? 'text-blue-400 hover:text-blue-300 bg-blue-900/30' : 'text-blue-600 hover:text-blue-900 bg-blue-50'}`}
                               >
                                 <Edit className="h-4 w-4" />
                               </button>
                               <button
                                 onClick={() => handleDelete(item.id, item.name)}
-                                className="p-2 text-red-600 hover:text-red-900 bg-red-50 rounded-full"
+                                className={`p-2 rounded-full ${isDarkMode ? 'text-red-400 hover:text-red-300 bg-red-900/30' : 'text-red-600 hover:text-red-900 bg-red-50'}`}
                               >
                                 <Trash2 className="h-4 w-4" />
                               </button>
                             </div>
                           </div>
-                          <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">{item.description}</p>
+                          <p className={`text-sm mb-2 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>{item.description}</p>
                           <div className="flex justify-between items-center text-sm">
-                            <span className="font-semibold text-secondary-600">
+                            <span className={`font-semibold ${isDarkMode ? 'text-secondary-400' : 'text-secondary-600'}`}>
                               {formatCurrency(ensureNumber(item.price))}
                             </span>
-                            <span className="text-gray-500 dark:text-gray-400">Sort: {item.sort_order || 0}</span>
+                            <span className={`${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>Sort: {item.sort_order || 0}</span>
                           </div>
                         </div>
                       )}
@@ -771,11 +773,11 @@ const MenuManagement = ({ menuItems, onUpdate, onAdd, onDelete }) => {
                 className="h-10 w-10 mr-3"
               />
               <div>
-                <h3 className="text-xl sm:text-2xl font-bold text-secondary-700 dark:text-secondary-300 flex items-center">
+                <h3 className={`text-xl sm:text-2xl font-bold flex items-center ${isDarkMode ? 'text-secondary-300' : 'text-secondary-700'}`}>
                   <FolderOpen className="h-6 w-6 mr-2" />
                   Category Management
                 </h3>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Organize your menu with categories</p>
+                <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Organize your menu with categories</p>
               </div>
             </div>
             <div className="flex space-x-2">
@@ -804,7 +806,7 @@ const MenuManagement = ({ menuItems, onUpdate, onAdd, onDelete }) => {
           {/* Add New Category Form */}
           {showCategoryForm && (
             <div className="card">
-              <h3 className="text-lg font-semibold text-secondary-700 dark:text-secondary-300 mb-4">Add New Category</h3>
+              <h3 className={`text-lg font-semibold mb-4 ${isDarkMode ? 'text-secondary-300' : 'text-secondary-700'}`}>Add New Category</h3>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <input
                   type="text"
@@ -844,9 +846,9 @@ const MenuManagement = ({ menuItems, onUpdate, onAdd, onDelete }) => {
 
           {/* Categories List */}
           <div className="card">
-            <h3 className="text-lg font-semibold text-secondary-700 dark:text-secondary-300 mb-4">Current Categories</h3>
+            <h3 className={`text-lg font-semibold mb-4 ${isDarkMode ? 'text-secondary-300' : 'text-secondary-700'}`}>Current Categories</h3>
             {categories.length === 0 ? (
-              <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+              <div className={`text-center py-8 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
                 <img 
                   src="/images/palm-cafe-logo.png" 
                   alt="Palm Cafe Logo" 
@@ -859,31 +861,31 @@ const MenuManagement = ({ menuItems, onUpdate, onAdd, onDelete }) => {
               <>
                 {/* Desktop Table */}
                 <div className="hidden lg:block overflow-x-auto">
-                  <table className="min-w-full divide-y divide-accent-200">
-                    <thead className="bg-accent-50 dark:bg-accent-900/20">
+                  <table className={`min-w-full divide-y ${isDarkMode ? 'divide-gray-700' : 'divide-accent-200'}`}>
+                    <thead className={isDarkMode ? 'bg-gray-700' : 'bg-accent-50'}>
                       <tr>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-secondary-600 dark:text-secondary-400 uppercase tracking-wider">
+                        <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${isDarkMode ? 'text-gray-300' : 'text-secondary-600'}`}>
                           Category
                         </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-secondary-600 dark:text-secondary-400 uppercase tracking-wider">
+                        <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${isDarkMode ? 'text-gray-300' : 'text-secondary-600'}`}>
                           Description
                         </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-secondary-600 dark:text-secondary-400 uppercase tracking-wider">
+                        <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${isDarkMode ? 'text-gray-300' : 'text-secondary-600'}`}>
                           Items
                         </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-secondary-600 dark:text-secondary-400 uppercase tracking-wider">
+                        <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${isDarkMode ? 'text-gray-300' : 'text-secondary-600'}`}>
                           Sort Order
                         </th>
-                        <th className="px-6 py-3 text-right text-xs font-medium text-secondary-600 dark:text-secondary-400 uppercase tracking-wider">
+                        <th className={`px-6 py-3 text-right text-xs font-medium uppercase tracking-wider ${isDarkMode ? 'text-gray-300' : 'text-secondary-600'}`}>
                           Actions
                         </th>
                       </tr>
                     </thead>
-                    <tbody className="bg-white dark:bg-gray-800 divide-y divide-accent-200 dark:divide-accent-700">
+                    <tbody className={`${isDarkMode ? 'bg-gray-800 divide-gray-700' : 'bg-white divide-accent-200'}`}>
                       {categories.map((category, index) => {
                         const categoryColor = getCategoryColorByIndex(index);
                         return (
-                        <tr key={category.id} className={`hover:${categoryColor.hover}`}>
+                        <tr key={category.id} className={isDarkMode ? 'hover:bg-gray-700' : `hover:${categoryColor.hover}`}>
                           {categoryEditingId === category.id ? (
                             // Edit Mode
                             <>
@@ -904,7 +906,7 @@ const MenuManagement = ({ menuItems, onUpdate, onAdd, onDelete }) => {
                                 />
                               </td>
                               <td className="px-6 py-4 whitespace-nowrap">
-                                <span className="text-sm text-gray-500 dark:text-gray-400">{category.item_count} items</span>
+                                <span className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>{category.item_count} items</span>
                               </td>
                               <td className="px-6 py-4 whitespace-nowrap">
                                 <input
@@ -917,10 +919,10 @@ const MenuManagement = ({ menuItems, onUpdate, onAdd, onDelete }) => {
                               </td>
                               <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                 <div className="flex justify-end space-x-2">
-                                  <button onClick={handleCategorySave} className="text-green-600 hover:text-green-900 dark:text-green-400 dark:hover:text-green-300">
+                                  <button onClick={handleCategorySave} className="text-green-600 hover:text-green-900">
                                     <Save className="h-4 w-4" />
                                   </button>
-                                  <button onClick={handleCategoryCancel} className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200">
+                                  <button onClick={handleCategoryCancel} className={`${isDarkMode ? 'text-gray-400 hover:text-gray-200' : 'text-gray-600 hover:text-gray-900'}`}>
                                     <X className="h-4 w-4" />
                                   </button>
                                 </div>
@@ -932,35 +934,35 @@ const MenuManagement = ({ menuItems, onUpdate, onAdd, onDelete }) => {
                               <td className="px-6 py-4 whitespace-nowrap">
                                 <div className="flex items-center">
                                   <FolderOpen className="h-5 w-5 text-secondary-500 mr-3" />
-                                  <div className="text-sm font-medium text-secondary-700 dark:text-secondary-300">{category.name}</div>
+                                  <div className={`text-sm font-medium ${isDarkMode ? 'text-secondary-300' : 'text-secondary-700'}`}>{category.name}</div>
                                 </div>
                               </td>
                               <td className="px-6 py-4 whitespace-nowrap">
-                                <div className="text-sm text-gray-600 dark:text-gray-400">{category.description}</div>
+                                <div className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>{category.description}</div>
                               </td>
                               <td className="px-6 py-4 whitespace-nowrap">
                                 <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
                                   category.item_count > 0 
-                                    ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300' 
-                                    : 'bg-accent-100 text-accent-800 dark:bg-accent-900/30 dark:text-accent-300'
+                                    ? isDarkMode ? 'bg-green-900/30 text-green-300' : 'bg-green-100 text-green-800'
+                                    : isDarkMode ? 'bg-accent-900/30 text-accent-300' : 'bg-accent-100 text-accent-800'
                                 }`}>
                                   {category.item_count} items
                                 </span>
                               </td>
                               <td className="px-6 py-4 whitespace-nowrap">
-                                <div className="text-sm text-gray-500 dark:text-gray-400">{category.sort_order}</div>
+                                <div className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>{category.sort_order}</div>
                               </td>
                               <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                 <div className="flex justify-end space-x-2">
                                   <button
                                     onClick={() => handleCategoryEdit(category)}
-                                    className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300"
+                                    className={`${isDarkMode ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-900'}`}
                                   >
                                     <Edit className="h-4 w-4" />
                                   </button>
                                   <button
                                     onClick={() => handleCategoryDelete(category.id, category.name, category.item_count)}
-                                    className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300"
+                                    className={`${isDarkMode ? 'text-red-400 hover:text-red-300' : 'text-red-600 hover:text-red-900'}`}
                                   >
                                     <Trash2 className="h-4 w-4" />
                                   </button>
@@ -978,7 +980,7 @@ const MenuManagement = ({ menuItems, onUpdate, onAdd, onDelete }) => {
                 {/* Mobile Cards */}
                 <div className="lg:hidden space-y-3">
                   {categories.map((category) => (
-                    <div key={category.id} className="border border-accent-200 dark:border-accent-700 rounded-lg p-4 bg-white dark:bg-gray-800 shadow-sm hover:shadow-md transition-shadow">
+                    <div key={category.id} className={`border rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow ${isDarkMode ? 'border-gray-700 bg-gray-800' : 'border-accent-200 bg-white'}`}>
                       {categoryEditingId === category.id ? (
                         // Edit Mode Mobile
                         <div className="space-y-3">
@@ -1022,20 +1024,20 @@ const MenuManagement = ({ menuItems, onUpdate, onAdd, onDelete }) => {
                             <div className="flex items-center">
                               <FolderOpen className="h-5 w-5 text-secondary-500 mr-3" />
                               <div>
-                                <h4 className="font-medium text-secondary-700 dark:text-secondary-300">{category.name}</h4>
-                                <p className="text-sm text-gray-600 dark:text-gray-400">{category.description}</p>
+                                <h4 className={`font-medium ${isDarkMode ? 'text-secondary-300' : 'text-secondary-700'}`}>{category.name}</h4>
+                                <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>{category.description}</p>
                               </div>
                             </div>
                             <div className="flex space-x-2">
                               <button
                                 onClick={() => handleCategoryEdit(category)}
-                                className="p-2 text-blue-600 hover:text-blue-900 bg-blue-50 dark:bg-blue-900/30 dark:text-blue-400 dark:hover:text-blue-300 rounded-full transition-colors"
+                                className={`p-2 rounded-full transition-colors ${isDarkMode ? 'text-blue-400 hover:text-blue-300 bg-blue-900/30' : 'text-blue-600 hover:text-blue-900 bg-blue-50'}`}
                               >
                                 <Edit className="h-4 w-4" />
                               </button>
                               <button
                                 onClick={() => handleCategoryDelete(category.id, category.name, category.item_count)}
-                                className="p-2 text-red-600 hover:text-red-900 bg-red-50 dark:bg-red-900/30 dark:text-red-400 dark:hover:text-red-300 rounded-full transition-colors"
+                                className={`p-2 rounded-full transition-colors ${isDarkMode ? 'text-red-400 hover:text-red-300 bg-red-900/30' : 'text-red-600 hover:text-red-900 bg-red-50'}`}
                               >
                                 <Trash2 className="h-4 w-4" />
                               </button>
@@ -1044,12 +1046,12 @@ const MenuManagement = ({ menuItems, onUpdate, onAdd, onDelete }) => {
                           <div className="flex justify-between items-center text-sm">
                             <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
                               category.item_count > 0 
-                                ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300' 
-                                : 'bg-accent-100 text-accent-800 dark:bg-accent-900/30 dark:text-accent-300'
+                                ? isDarkMode ? 'bg-green-900/30 text-green-300' : 'bg-green-100 text-green-800'
+                                : isDarkMode ? 'bg-accent-900/30 text-accent-300' : 'bg-accent-100 text-accent-800'
                             }`}>
                               {category.item_count} items
                             </span>
-                            <span className="text-gray-500 dark:text-gray-400">Sort: {category.sort_order}</span>
+                            <span className={`${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>Sort: {category.sort_order}</span>
                           </div>
                         </div>
                       )}

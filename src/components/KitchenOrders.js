@@ -3,9 +3,11 @@ import { Clock, CheckCircle, XCircle, Printer, RefreshCw, AlertTriangle, Coffee,
 import axios from 'axios';
 import toast from 'react-hot-toast';
 import { useAuth } from '../contexts/AuthContext';
+import { useDarkMode } from '../contexts/DarkModeContext';
 
 const KitchenOrders = ({ cart, setCart }) => {
   const { isAuthenticated, user, loading: authLoading } = useAuth();
+  const { isDarkMode } = useDarkMode();
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedOrder, setSelectedOrder] = useState(null);
@@ -178,19 +180,36 @@ const KitchenOrders = ({ cart, setCart }) => {
   };
 
   const getStatusColor = (status) => {
-    switch (status) {
-      case 'pending':
-        return 'bg-yellow-100 text-yellow-800 border-yellow-200';
-      case 'preparing':
-        return 'bg-blue-100 text-blue-800 border-blue-200';
-      case 'ready':
-        return 'bg-green-100 text-green-800 border-green-200';
-      case 'completed':
-        return 'bg-green-200 text-green-900 border-green-300';
-      case 'cancelled':
-        return 'bg-red-100 text-red-800 border-red-200';
-      default:
-        return 'bg-gray-100 text-gray-800 border-gray-200';
+    if (isDarkMode) {
+      switch (status) {
+        case 'pending':
+          return 'bg-yellow-900 text-yellow-300 border-yellow-700';
+        case 'preparing':
+          return 'bg-blue-900 text-blue-300 border-blue-700';
+        case 'ready':
+          return 'bg-green-900 text-green-300 border-green-700';
+        case 'completed':
+          return 'bg-green-800 text-green-200 border-green-600';
+        case 'cancelled':
+          return 'bg-red-900 text-red-300 border-red-700';
+        default:
+          return 'bg-gray-700 text-gray-300 border-gray-600';
+      }
+    } else {
+      switch (status) {
+        case 'pending':
+          return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+        case 'preparing':
+          return 'bg-blue-100 text-blue-800 border-blue-200';
+        case 'ready':
+          return 'bg-green-100 text-green-800 border-green-200';
+        case 'completed':
+          return 'bg-green-200 text-green-900 border-green-300';
+        case 'cancelled':
+          return 'bg-red-100 text-red-800 border-red-200';
+        default:
+          return 'bg-gray-100 text-gray-800 border-gray-200';
+      }
     }
   };
 
@@ -397,12 +416,12 @@ const KitchenOrders = ({ cart, setCart }) => {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <div className="card">
           <div className="flex items-center">
-            <div className="p-2 bg-yellow-100 rounded-lg">
-              <Clock className="h-6 w-6 text-yellow-600" />
+            <div className={`p-2 rounded-lg ${isDarkMode ? 'bg-yellow-900' : 'bg-yellow-100'}`}>
+              <Clock className={`h-6 w-6 ${isDarkMode ? 'text-yellow-400' : 'text-yellow-600'}`} />
             </div>
             <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600">Pending</p>
-              <p className="text-2xl font-bold text-yellow-600">
+              <p className={`text-sm font-medium ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Pending</p>
+              <p className={`text-2xl font-bold ${isDarkMode ? 'text-yellow-400' : 'text-yellow-600'}`}>
                 {todayOrders.filter(o => o.status === 'pending').length}
               </p>
             </div>
@@ -410,12 +429,12 @@ const KitchenOrders = ({ cart, setCart }) => {
         </div>
         <div className="card">
           <div className="flex items-center">
-            <div className="p-2 bg-blue-100 rounded-lg">
-              <Utensils className="h-6 w-6 text-blue-600" />
+            <div className={`p-2 rounded-lg ${isDarkMode ? 'bg-blue-900' : 'bg-blue-100'}`}>
+              <Utensils className={`h-6 w-6 ${isDarkMode ? 'text-blue-400' : 'text-blue-600'}`} />
             </div>
             <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600">Preparing</p>
-              <p className="text-2xl font-bold text-blue-600">
+              <p className={`text-sm font-medium ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Preparing</p>
+              <p className={`text-2xl font-bold ${isDarkMode ? 'text-blue-400' : 'text-blue-600'}`}>
                 {todayOrders.filter(o => o.status === 'preparing').length}
               </p>
             </div>
@@ -423,12 +442,12 @@ const KitchenOrders = ({ cart, setCart }) => {
         </div>
         <div className="card">
           <div className="flex items-center">
-            <div className="p-2 bg-green-100 rounded-lg">
-              <CheckCircle className="h-6 w-6 text-green-600" />
+            <div className={`p-2 rounded-lg ${isDarkMode ? 'bg-green-900' : 'bg-green-100'}`}>
+              <CheckCircle className={`h-6 w-6 ${isDarkMode ? 'text-green-400' : 'text-green-600'}`} />
             </div>
             <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600">Ready</p>
-              <p className="text-2xl font-bold text-green-600">
+              <p className={`text-sm font-medium ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Ready</p>
+              <p className={`text-2xl font-bold ${isDarkMode ? 'text-green-400' : 'text-green-600'}`}>
                 {todayOrders.filter(o => o.status === 'ready').length}
               </p>
             </div>
@@ -436,12 +455,12 @@ const KitchenOrders = ({ cart, setCart }) => {
         </div>
         <div className="card">
           <div className="flex items-center">
-            <div className="p-2 bg-gray-100 rounded-lg">
-              <Coffee className="h-6 w-6 text-gray-600" />
+            <div className={`p-2 rounded-lg ${isDarkMode ? 'bg-gray-700' : 'bg-gray-100'}`}>
+              <Coffee className={`h-6 w-6 ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`} />
             </div>
             <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600">Total Active</p>
-              <p className="text-2xl font-bold text-gray-600">
+              <p className={`text-sm font-medium ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Total Active</p>
+              <p className={`text-2xl font-bold ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
                 {pendingOrders.length}
               </p>
             </div>
@@ -504,7 +523,11 @@ const KitchenOrders = ({ cart, setCart }) => {
                 setFilterStatus(e.target.value);
                 setCurrentPage(1); // Reset pagination when filter changes
               }}
-              className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
+              className={`px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 ${
+                isDarkMode 
+                  ? 'bg-gray-800 border-gray-600 text-gray-100' 
+                  : 'border-gray-300 bg-white text-gray-900'
+              }`}
             >
               <option value="all">All Orders</option>
               <option value="pending">Pending</option>
@@ -693,10 +716,16 @@ const KitchenOrders = ({ cart, setCart }) => {
                             onClick={() => updateOrderStatus(order.id, status)}
                             className={`text-xs px-2 py-1 rounded border ${
                               status === 'cancelled' 
-                                ? 'text-red-600 border-red-300 hover:bg-red-50' 
+                                ? isDarkMode 
+                                  ? 'text-red-400 border-red-600 hover:bg-red-900' 
+                                  : 'text-red-600 border-red-300 hover:bg-red-50'
                                 : status === 'completed'
-                                ? 'text-green-600 border-green-300 hover:bg-green-50'
-                                : 'text-blue-600 border-blue-300 hover:bg-blue-50'
+                                ? isDarkMode
+                                  ? 'text-green-400 border-green-600 hover:bg-green-900'
+                                  : 'text-green-600 border-green-300 hover:bg-green-50'
+                                : isDarkMode
+                                  ? 'text-blue-400 border-blue-600 hover:bg-blue-900'
+                                  : 'text-blue-600 border-blue-300 hover:bg-blue-50'
                             }`}
                           >
                             {status.charAt(0).toUpperCase() + status.slice(1)}
@@ -708,7 +737,11 @@ const KitchenOrders = ({ cart, setCart }) => {
                   <div className="flex items-center space-x-2">
                     <button
                       onClick={() => addOrderToCart(order)}
-                      className="text-sm px-3 py-1 rounded border text-green-600 border-green-300 hover:bg-green-50 flex items-center"
+                      className={`text-sm px-3 py-1 rounded border flex items-center ${
+                        isDarkMode 
+                          ? 'text-green-400 border-green-600 hover:bg-green-900' 
+                          : 'text-green-600 border-green-300 hover:bg-green-50'
+                      }`}
                       title="Add to Cart"
                     >
                       <ShoppingCart className="h-3 w-3 mr-1" />

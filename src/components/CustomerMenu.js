@@ -17,7 +17,8 @@ const CustomerMenu = ({
   onAddToCart,
   onPlaceOrder,
   showLoginModal,
-  setShowLoginModal
+  setShowLoginModal,
+  onCustomerUpdate
 }) => {
   const { formatCurrency } = useCurrency();
   const [menuItems, setMenuItems] = useState([]);
@@ -199,8 +200,8 @@ const CustomerMenu = ({
           return [...prevCart, { ...item, quantity: 1 }];
         }
       });
-      toast.success(`${item.name} added to cart`);
     }
+    toast.success(`${item.name} added to cart`);
   };
 
   // Remove item from cart
@@ -266,8 +267,6 @@ const CustomerMenu = ({
       return;
     }
 
-
-
     setOrderLoading(true);
 
     try {
@@ -291,9 +290,6 @@ const CustomerMenu = ({
 
       const response = await axios.post('/customer/orders', orderData);
       
-      // No auto-download - just show success message
-      // PDF can be generated on-demand using the new endpoint
-
       // Set recent order and status
       const orderNumber = response.data.orderNumber;
       setRecentOrder({
@@ -304,6 +300,26 @@ const CustomerMenu = ({
         timestamp: new Date()
       });
       setOrderStatus('pending');
+      
+      // Update customer points after successful order
+      if (customer.phone) {
+        try {
+          const customerResponse = await axios.get(`/customer/login/${customer.phone}`);
+          if (customerResponse.data) {
+            // Update the customer data with new points
+            const updatedCustomer = {
+              ...customer,
+              loyalty_points: customerResponse.data.loyalty_points
+            };
+            // Update customer data in parent component
+            if (onCustomerUpdate) {
+              onCustomerUpdate(updatedCustomer);
+            }
+          }
+        } catch (error) {
+          console.error('Error updating customer points:', error);
+        }
+      }
       
       // Clear cart and form
       setCart([]);
@@ -399,7 +415,14 @@ const CustomerMenu = ({
 
         {/* Order Status Display - Only show on menu tab */}
         {activeTab === 'menu' && recentOrder && (
-          <div className="mb-8 p-4 bg-white dark:bg-gray-800 rounded-lg shadow-md border-l-4 border-secondary-500">
+          <div 
+            className="mb-8 p-4 bg-white dark:bg-gray-800 rounded-lg shadow-md border-l-4 border-secondary-500 cursor-pointer hover:shadow-lg transition-all duration-200"
+            onClick={() => {
+              setActiveTab('history');
+              // Scroll to top when switching tabs
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
+          >
             <div className="flex items-center justify-between">
               <div>
                 <h3 className="text-lg font-semibold text-secondary-700 dark:text-secondary-300">
@@ -437,9 +460,13 @@ const CustomerMenu = ({
                 </p>
               </div>
             )}
-            <div className="mt-3 flex justify-end">
+            <div className="mt-3 flex justify-between items-center">
+              <div className="text-xs text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300">
+                Click to view order details →
+              </div>
               <button
-                onClick={() => {
+                onClick={(e) => {
+                  e.stopPropagation(); // Prevent triggering the card click
                   setRecentOrder(null);
                   setOrderStatus(null);
                 }}
@@ -592,31 +619,106 @@ const CustomerMenu = ({
                 </button>
               </div>
 
-              {/* Login Required Message */}
-              {!customer && (
-                <div className="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-                  <div className="text-center">
-                    <h3 className="text-lg font-medium text-yellow-800 mb-2">
-                      Login Required
-                    </h3>
-                    <p className="text-sm text-yellow-700 mb-4">
-                      Please login to view your cart and place orders.
-                    </p>
-                    <button
-                      onClick={() => {
-                        setShowCart(false);
-                        setShowLoginModal(true);
-                      }}
-                      className="bg-secondary-500 text-white px-4 py-2 rounded-lg hover:bg-secondary-600 transition-colors"
-                    >
-                      Login Now
-                    </button>
-                  </div>
-                </div>
-              )}
+                             {/* Cart Items - Show for all users */}
+               {cart.length === 0 ? (
+                 <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+                   <ShoppingCart className="h-12 w-12 mx-auto mb-2 text-gray-300 dark:text-gray-500" />
+                   <p>Your cart is empty</p>
+                   <p className="text-sm">Add items from the menu</p>
+                 </div>
+               ) : (
+                 <div className="space-y-3 mb-6">
+                   {cart.map((item) => (
+                     <div key={item.id} className="flex items-center justify-between p-3 bg-accent-50 dark:bg-gray-700 rounded-lg border border-accent-200 dark:border-gray-600">
+                       <div className="flex-1">
+                         <h4 className="font-medium text-secondary-700 dark:text-secondary-300">{item.name}</h4>
+                         <p className="text-sm text-gray-600 dark:text-gray-400">{formatCurrency(item.price)} each</p>
+                       </div>
+                       <div className="flex items-center space-x-2">
+                         <button
+                           onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                           className="p-1 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+                         >
+                           <Minus className="h-4 w-4" />
+                         </button>
+                         <span className="w-8 text-center font-medium text-gray-900 dark:text-gray-100">{item.quantity}</span>
+                         <button
+                           onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                           className="p-1 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+                         >
+                           <Plus className="h-4 w-4" />
+                         </button>
+                         <button
+                           onClick={() => removeFromCart(item.id)}
+                           className="p-1 text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300"
+                         >
+                           <Trash2 className="h-4 w-4" />
+                         </button>
+                       </div>
+                     </div>
+                   ))}
+                 </div>
+               )}
 
-              {/* Cart Content - Only show when logged in */}
-              {customer && (
+               {/* Order Summary - Show for all users */}
+               {cart.length > 0 && (
+                 <div className="border-t border-accent-200 dark:border-gray-600 pt-4 mb-6">
+                   <div className="space-y-2">
+                     <div className="flex justify-between text-gray-700 dark:text-gray-300">
+                       <span>Subtotal:</span>
+                       <span>{formatCurrency(getSubtotal())}</span>
+                     </div>
+                     {showTaxInMenu && taxAmount > 0 && (
+                       <div className="flex justify-between text-gray-700 dark:text-gray-300">
+                         <span>Tax ({taxRate}%):</span>
+                         <span>{formatCurrency(taxAmount)}</span>
+                       </div>
+                     )}
+                     {tipAmount > 0 && (
+                       <div className="flex justify-between text-gray-700 dark:text-gray-300">
+                         <span>Tip:</span>
+                         <span>{formatCurrency(tipAmount)}</span>
+                       </div>
+                     )}
+                     {pointsToRedeem > 0 && (
+                       <div className="flex justify-between text-green-600 dark:text-green-400">
+                         <span>Points Redeemed ({pointsToRedeem} pts):</span>
+                         <span>-{formatCurrency(pointsToRedeem * 0.1)}</span>
+                       </div>
+                     )}
+                     <div className="flex justify-between font-bold text-lg text-gray-900 dark:text-gray-100">
+                       <span>Total:</span>
+                       <span>{formatCurrency(getTotal())}</span>
+                     </div>
+                   </div>
+                 </div>
+               )}
+
+               {/* Login Required Message - Show when not logged in and cart has items */}
+               {!customer && cart.length > 0 && (
+                 <div className="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                   <div className="text-center">
+                     <h3 className="text-lg font-medium text-yellow-800 mb-2">
+                       Login Required to Place Order
+                     </h3>
+                     <p className="text-sm text-yellow-700 mb-4">
+                       Please login to place your order and earn loyalty points.
+                     </p>
+                     <button
+                       onClick={() => {
+                         setShowCart(false);
+                         setShowLoginModal(true);
+                       }}
+                       className="bg-secondary-500 text-white px-4 py-2 rounded-lg hover:bg-secondary-600 transition-colors"
+                     >
+                       Login Now
+                     </button>
+                   </div>
+                 </div>
+               )}
+
+               {/* Customer Information and Order Options - Only show when logged in */}
+               {customer && (
                 <>
                   {/* Customer Information */}
                   <div className="mb-6">
@@ -729,46 +831,7 @@ const CustomerMenu = ({
                     </p>
                   </div>
 
-                  {/* Cart Items */}
-                  {cart.length === 0 ? (
-                    <div className="text-center py-8 text-gray-500 dark:text-gray-400">
-                      <ShoppingCart className="h-12 w-12 mx-auto mb-2 text-gray-300 dark:text-gray-500" />
-                      <p>Your cart is empty</p>
-                      <p className="text-sm">Add items from the menu</p>
-                    </div>
-                  ) : (
-                    <div className="space-y-3 mb-6">
-                      {cart.map((item) => (
-                        <div key={item.id} className="flex items-center justify-between p-3 bg-accent-50 dark:bg-gray-700 rounded-lg border border-accent-200 dark:border-gray-600">
-                          <div className="flex-1">
-                            <h4 className="font-medium text-secondary-700 dark:text-secondary-300">{item.name}</h4>
-                            <p className="text-sm text-gray-600 dark:text-gray-400">{formatCurrency(item.price)} each</p>
-                          </div>
-                          <div className="flex items-center space-x-2">
-                            <button
-                              onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                              className="p-1 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
-                            >
-                              <Minus className="h-4 w-4" />
-                            </button>
-                            <span className="w-8 text-center font-medium text-gray-900 dark:text-gray-100">{item.quantity}</span>
-                            <button
-                              onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                              className="p-1 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
-                            >
-                              <Plus className="h-4 w-4" />
-                            </button>
-                            <button
-                              onClick={() => removeFromCart(item.id)}
-                              className="p-1 text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300"
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </button>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
+                  
 
                   {/* Points Redemption */}
                   {cart.length > 0 && customer?.loyalty_points > 0 && (
@@ -851,59 +914,50 @@ const CustomerMenu = ({
                     </div>
                   )}
 
-                  {/* Order Summary */}
-                  {cart.length > 0 && (
-                    <div className="border-t border-accent-200 dark:border-gray-600 pt-4 mb-6">
-                      <div className="space-y-2">
-                        <div className="flex justify-between text-gray-700 dark:text-gray-300">
-                          <span>Subtotal:</span>
-                          <span>{formatCurrency(getSubtotal())}</span>
-                        </div>
-                        {showTaxInMenu && taxAmount > 0 && (
-                          <div className="flex justify-between text-gray-700 dark:text-gray-300">
-                            <span>Tax ({taxRate}%):</span>
-                            <span>{formatCurrency(taxAmount)}</span>
-                          </div>
-                        )}
-                        {tipAmount > 0 && (
-                          <div className="flex justify-between text-gray-700 dark:text-gray-300">
-                            <span>Tip:</span>
-                            <span>{formatCurrency(tipAmount)}</span>
-                          </div>
-                        )}
-                        {pointsToRedeem > 0 && (
-                          <div className="flex justify-between text-green-600 dark:text-green-400">
-                            <span>Points Redeemed ({pointsToRedeem} pts):</span>
-                            <span>-{formatCurrency(pointsToRedeem * 0.1)}</span>
-                          </div>
-                        )}
-                        <div className="flex justify-between font-bold text-lg text-gray-900 dark:text-gray-100">
-                          <span>Total:</span>
-                          <span>{formatCurrency(getTotal())}</span>
-                        </div>
-                      </div>
-                    </div>
-                  )}
+                  
 
-                  {/* Action Buttons */}
-                  {cart.length > 0 && (
-                    <div className="space-y-3">
-                      <button
-                        onClick={placeOrder}
-                        disabled={orderLoading}
-                        className="w-full bg-secondary-500 text-white py-3 px-4 rounded-lg hover:bg-secondary-600 transition-colors disabled:opacity-50"
-                      >
-                        {orderLoading ? 'Placing Order...' : 'Place Order'}
-                      </button>
-                      
-                      <button
-                        onClick={clearCart}
-                        className="w-full bg-gray-500 text-white py-2 px-4 rounded-lg hover:bg-gray-600 transition-colors"
-                      >
-                        Clear Cart
-                      </button>
-                    </div>
-                  )}
+                                     {/* Action Buttons */}
+                   {cart.length > 0 && (
+                     <div className="space-y-3">
+                       {customer ? (
+                         <>
+                           <button
+                             onClick={placeOrder}
+                             disabled={orderLoading}
+                             className="w-full bg-secondary-500 text-white py-3 px-4 rounded-lg hover:bg-secondary-600 transition-colors disabled:opacity-50"
+                           >
+                             {orderLoading ? 'Placing Order...' : 'Place Order'}
+                           </button>
+                           
+                           <button
+                             onClick={clearCart}
+                             className="w-full bg-gray-500 text-white py-2 px-4 rounded-lg hover:bg-gray-600 transition-colors"
+                           >
+                             Clear Cart
+                           </button>
+                         </>
+                       ) : (
+                         <>
+                           <button
+                             onClick={() => {
+                               setShowCart(false);
+                               setShowLoginModal(true);
+                             }}
+                             className="w-full bg-secondary-500 text-white py-3 px-4 rounded-lg hover:bg-secondary-600 transition-colors"
+                           >
+                             Login to Place Order
+                           </button>
+                           
+                           <button
+                             onClick={clearCart}
+                             className="w-full bg-gray-500 text-white py-2 px-4 rounded-lg hover:bg-gray-600 transition-colors"
+                           >
+                             Clear Cart
+                           </button>
+                         </>
+                       )}
+                     </div>
+                   )}
                 </>
               )}
             </div>
