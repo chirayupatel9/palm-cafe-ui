@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Clock, Package, CheckCircle, XCircle, Calendar, Receipt, Star, Menu, Plus } from 'lucide-react';
+import { Clock, Package, CheckCircle, XCircle, Calendar, Receipt, Star, Menu, Plus, Download } from 'lucide-react';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 import { useCurrency } from '../contexts/CurrencyContext';
@@ -10,6 +10,8 @@ const CustomerOrderHistory = ({ customerPhone, setActiveTab, cart, setCart }) =>
   const [loading, setLoading] = useState(true);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [customerInfo, setCustomerInfo] = useState(null);
+  const [downloadingInvoices, setDownloadingInvoices] = useState(new Set());
+  const [ordersWithInvoices, setOrdersWithInvoices] = useState(new Set());
 
   useEffect(() => {
     if (customerPhone) {
@@ -17,6 +19,12 @@ const CustomerOrderHistory = ({ customerPhone, setActiveTab, cart, setCart }) =>
       fetchCustomerInfo();
     }
   }, [customerPhone]);
+
+  useEffect(() => {
+    if (orders.length > 0) {
+      checkInvoicesAvailability();
+    }
+  }, [orders]);
 
   const fetchOrderHistory = async () => {
     try {
@@ -39,6 +47,34 @@ const CustomerOrderHistory = ({ customerPhone, setActiveTab, cart, setCart }) =>
       }
     } catch (error) {
       console.error('Error fetching customer info:', error);
+    }
+  };
+
+  const checkInvoicesAvailability = async () => {
+    try {
+      const allInvoicesResponse = await axios.get('/invoices');
+      const allInvoices = allInvoicesResponse.data;
+      const availableInvoices = new Set();
+      
+      console.log('Checking invoices for orders:', orders.map(o => o.order_number));
+      console.log('Available invoices:', allInvoices.map(i => i.order_number));
+      
+      orders.forEach(order => {
+        // Check if invoice exists in the invoices list
+        const hasInvoice = allInvoices.some(invoice => invoice.order_number === order.order_number);
+        
+        // Also check if order status allows for invoice generation
+        const canHaveInvoice = ['completed', 'ready', 'cancelled'].includes(order.status);
+        
+        if (hasInvoice || canHaveInvoice) {
+          availableInvoices.add(order.order_number);
+          console.log(`Order ${order.order_number} (${order.status}): Invoice available = ${hasInvoice}, Can have invoice = ${canHaveInvoice}`);
+        }
+      });
+      
+      setOrdersWithInvoices(availableInvoices);
+    } catch (error) {
+      console.error('Error checking invoices availability:', error);
     }
   };
 
@@ -94,30 +130,94 @@ const CustomerOrderHistory = ({ customerPhone, setActiveTab, cart, setCart }) =>
 
   const downloadInvoice = async (orderNumber) => {
     try {
-      // First, get the invoice number for this order
-      const invoiceResponse = await axios.get(`/invoices/order/${orderNumber}`);
-      const invoice = invoiceResponse.data;
+      // Set loading state for this specific order
+      setDownloadingInvoices(prev => new Set(prev).add(orderNumber));
       
-      if (!invoice || !invoice.invoice_number) {
-        toast.error('No invoice found for this order');
-        return;
+      // Try to get the invoice number for this order using the correct API endpoint
+      let invoiceNumber = null;
+      
+      try {
+        const invoiceResponse = await axios.get(`/invoices/order/${orderNumber}`);
+        const invoice = invoiceResponse.data;
+        invoiceNumber = invoice?.invoice_number;
+      } catch (error) {
+        console.log('Could not find invoice by order number, trying alternative method');
+      }
+      
+      // If we couldn't get the invoice number, try to find it in the invoices list
+      if (!invoiceNumber) {
+        try {
+          const allInvoicesResponse = await axios.get('/invoices');
+          const allInvoices = allInvoicesResponse.data;
+          const matchingInvoice = allInvoices.find(inv => inv.order_number === orderNumber);
+          invoiceNumber = matchingInvoice?.invoice_number;
+        } catch (error) {
+          console.log('Could not find invoice in all invoices list');
+        }
+      }
+      
+      if (!invoiceNumber) {
+        // Check if this order can have an invoice generated
+        const order = orders.find(o => o.order_number === orderNumber);
+        if (order && ['completed', 'ready', 'cancelled'].includes(order.status)) {
+          // Try to generate invoice on-demand
+          try {
+            toast.loading('Generating invoice...');
+            const generateResponse = await axios.post('/invoices', {
+              order_number: orderNumber,
+              customer_name: order.customer_name || customerInfo?.name,
+              customer_phone: order.customer_phone || customerPhone,
+              payment_method: order.payment_method,
+              items: order.items,
+              total_amount: order.final_amount,
+              tax_amount: order.tax_amount || 0,
+              tip_amount: order.tip_amount || 0,
+              points_redeemed: order.points_redeemed || 0
+            });
+            
+            if (generateResponse.data && generateResponse.data.invoiceNumber) {
+              invoiceNumber = generateResponse.data.invoiceNumber;
+              toast.dismiss();
+              toast.success('Invoice generated successfully!');
+            } else {
+              toast.dismiss();
+              toast.error('Failed to generate invoice. Please contact support.');
+              return;
+            }
+          } catch (generateError) {
+            toast.dismiss();
+            console.error('Error generating invoice:', generateError);
+            toast.error('Failed to generate invoice. Please contact support.');
+            return;
+          }
+        } else {
+          toast.error('No invoice found for this order. Invoices are generated when orders are completed.');
+          return;
+        }
       }
       
       // Now download the PDF using the invoice number
-      const response = await axios.get(`/invoices/${invoice.invoice_number}/download`);
+      const response = await axios.get(`/invoices/${invoiceNumber}/download`);
       
-      // Create blob and open PDF in new tab
+      // Create blob and download the PDF
       const pdfBlob = new Blob([Uint8Array.from(atob(response.data.pdf), c => c.charCodeAt(0))], {
         type: 'application/pdf'
       });
       
       const pdfUrl = URL.createObjectURL(pdfBlob);
-      window.open(pdfUrl, '_blank');
+      const link = document.createElement('a');
+      link.href = pdfUrl;
+      link.download = `Invoice-${invoiceNumber}.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
       
       // Clean up the URL object after a delay
       setTimeout(() => {
         URL.revokeObjectURL(pdfUrl);
       }, 1000);
+      
+      toast.success('Invoice downloaded successfully');
     } catch (error) {
       console.error('Error downloading invoice:', error);
       if (error.response?.status === 404) {
@@ -125,6 +225,13 @@ const CustomerOrderHistory = ({ customerPhone, setActiveTab, cart, setCart }) =>
       } else {
         toast.error('Failed to download invoice');
       }
+    } finally {
+      // Clear loading state for this order
+      setDownloadingInvoices(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(orderNumber);
+        return newSet;
+      });
     }
   };
 
@@ -250,9 +357,14 @@ const CustomerOrderHistory = ({ customerPhone, setActiveTab, cart, setCart }) =>
                 <div className="flex items-center space-x-3">
                   {getStatusIcon(order.status)}
                   <div>
-                    <h3 className="font-semibold text-secondary-700 dark:text-secondary-300">
-                      Order #{order.order_number}
-                    </h3>
+                    <div className="flex items-center space-x-2">
+                      <h3 className="font-semibold text-secondary-700 dark:text-secondary-300">
+                        Order #{order.order_number}
+                      </h3>
+                      {ordersWithInvoices.has(order.order_number) && (
+                        <Receipt className="h-4 w-4 text-green-500" title="Invoice available" />
+                      )}
+                    </div>
                     <div className="flex items-center space-x-4 text-sm text-gray-600 dark:text-gray-400">
                       <div className="flex items-center">
                         <Calendar className="h-3 w-3 mr-1" />
@@ -283,9 +395,47 @@ const CustomerOrderHistory = ({ customerPhone, setActiveTab, cart, setCart }) =>
                     </button>
                     <button
                       onClick={() => downloadInvoice(order.order_number)}
-                      className="text-xs text-secondary-600 hover:text-secondary-700 dark:text-secondary-400 dark:hover:text-secondary-300"
+                      disabled={downloadingInvoices.has(order.order_number)}
+                      className={`text-xs px-2 py-1 rounded flex items-center transition-colors ${
+                        downloadingInvoices.has(order.order_number)
+                          ? 'bg-gray-400 text-white cursor-not-allowed'
+                          : ordersWithInvoices.has(order.order_number)
+                          ? 'bg-secondary-500 text-white hover:bg-secondary-600'
+                          : ['completed', 'ready', 'cancelled'].includes(order.status)
+                          ? 'bg-orange-500 text-white hover:bg-orange-600'
+                          : 'bg-gray-400 text-white cursor-not-allowed'
+                      }`}
+                      title={
+                        downloadingInvoices.has(order.order_number) 
+                          ? "Downloading..." 
+                          : ordersWithInvoices.has(order.order_number)
+                          ? "Download Invoice"
+                          : ['completed', 'ready', 'cancelled'].includes(order.status)
+                          ? "Invoice can be generated"
+                          : "No invoice available for pending orders"
+                      }
                     >
-                      Download Invoice
+                      {downloadingInvoices.has(order.order_number) ? (
+                        <>
+                          <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-white mr-1"></div>
+                          Downloading...
+                        </>
+                      ) : ordersWithInvoices.has(order.order_number) ? (
+                        <>
+                          <Download className="h-3 w-3 mr-1" />
+                          Download
+                        </>
+                      ) : ['completed', 'ready', 'cancelled'].includes(order.status) ? (
+                        <>
+                          <Receipt className="h-3 w-3 mr-1" />
+                          Generate
+                        </>
+                      ) : (
+                        <>
+                          <Receipt className="h-3 w-3 mr-1" />
+                          No Invoice
+                        </>
+                      )}
                     </button>
                   </div>
                 </div>
