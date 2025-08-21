@@ -4,7 +4,7 @@ import toast from 'react-hot-toast';
 import axios from 'axios';
 import { useCurrency } from '../contexts/CurrencyContext';
 import { useDarkMode } from '../contexts/DarkModeContext';
-import { getCategoryColor, getCategoryColorByIndex } from '../utils/categoryColors';
+import { getImageUrl } from '../utils/imageUtils';
 
 const MenuManagement = ({ menuItems, onUpdate, onAdd, onDelete }) => {
   const { formatCurrency } = useCurrency();
@@ -19,9 +19,11 @@ const MenuManagement = ({ menuItems, onUpdate, onAdd, onDelete }) => {
     name: '',
     description: '',
     price: '',
-    sort_order: ''
+    sort_order: '',
+    image_url: ''
   });
   const [loading, setLoading] = useState(false);
+  const [imageUploading, setImageUploading] = useState(false);
 
   // Category management state
   const [categoryEditingId, setCategoryEditingId] = useState(null);
@@ -68,7 +70,8 @@ const MenuManagement = ({ menuItems, onUpdate, onAdd, onDelete }) => {
       name: item.name,
       description: item.description,
       price: ensureNumber(item.price).toString(),
-      sort_order: item.sort_order ? item.sort_order.toString() : ''
+      sort_order: item.sort_order ? item.sort_order.toString() : '',
+      image_url: item.image_url || ''
     });
   };
 
@@ -86,22 +89,26 @@ const MenuManagement = ({ menuItems, onUpdate, onAdd, onDelete }) => {
 
     try {
       if (editingId) {
-        await onUpdate(editingId, {
+        const updateData = {
           category_id: formData.category_id,
           name: formData.name.trim(),
           description: formData.description.trim(),
           price: price,
-          sort_order: parseInt(formData.sort_order) || 0
-        });
+          sort_order: parseInt(formData.sort_order) || 0,
+          image_url: formData.image_url
+        };
+        await onUpdate(editingId, updateData);
         toast.success('Menu item updated successfully');
       } else {
-        await onAdd({
+        const addData = {
           category_id: formData.category_id,
           name: formData.name.trim(),
           description: formData.description.trim(),
           price: price,
-          sort_order: parseInt(formData.sort_order) || 0
-        });
+          sort_order: parseInt(formData.sort_order) || 0,
+          image_url: formData.image_url
+        };
+        await onAdd(addData);
         toast.success('Menu item added successfully');
       }
       
@@ -119,7 +126,8 @@ const MenuManagement = ({ menuItems, onUpdate, onAdd, onDelete }) => {
         name: '', 
         description: '', 
         price: '',
-        sort_order: ''
+        sort_order: '',
+        image_url: ''
       });
     } catch (error) {
       console.error('Error saving menu item:', error);
@@ -136,7 +144,8 @@ const MenuManagement = ({ menuItems, onUpdate, onAdd, onDelete }) => {
       name: '', 
       description: '', 
       price: '',
-      sort_order: ''
+      sort_order: '',
+      image_url: ''
     });
   };
 
@@ -160,6 +169,40 @@ const MenuManagement = ({ menuItems, onUpdate, onAdd, onDelete }) => {
 
   const handleInputChange = (field, value) => {
     setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleImageUpload = async (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      toast.error('Please select an image file');
+      return;
+    }
+
+    try {
+      setImageUploading(true);
+      const formData = new FormData();
+      formData.append('image', file);
+
+      const response = await axios.post('/menu/upload-image', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      });
+
+      if (response.data.success) {
+        setFormData(prev => ({ ...prev, image_url: response.data.image_url }));
+        toast.success('Image uploaded successfully');
+      } else {
+        toast.error('Failed to upload image');
+      }
+    } catch (error) {
+      console.error('Error uploading image:', error);
+      toast.error('Failed to upload image');
+    } finally {
+      setImageUploading(false);
+    }
   };
 
   const handleExport = async () => {
@@ -496,6 +539,33 @@ const MenuManagement = ({ menuItems, onUpdate, onAdd, onDelete }) => {
                   className="input-field"
                 />
               </div>
+              {/* Image Upload Section */}
+              <div className="mt-4">
+                <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-secondary-300' : 'text-secondary-700'}`}>
+                  Item Image
+                </label>
+                <div className="flex items-center space-x-4">
+                  {formData.image_url && (
+                    <img
+                      src={formData.image_url}
+                      alt="Menu Item"
+                      className="w-16 h-16 object-cover border rounded-lg"
+                    />
+                  )}
+                  <div className="flex-1">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleImageUpload}
+                      className="input-field"
+                      disabled={imageUploading}
+                    />
+                  </div>
+                  {imageUploading && (
+                    <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-secondary-500"></div>
+                  )}
+                </div>
+              </div>
               <div className="flex flex-col sm:flex-row justify-end space-y-2 sm:space-y-0 sm:space-x-3 mt-4">
                 <button onClick={handleCancel} className="btn-secondary flex items-center justify-center">
                   <X className="h-4 w-4 mr-2" />
@@ -524,11 +594,10 @@ const MenuManagement = ({ menuItems, onUpdate, onAdd, onDelete }) => {
             </div>
           ) : (
             Object.entries(groupedMenuItems).map(([categoryName, items], index) => {
-              const categoryColor = getCategoryColor(categoryName, index);
               return (
                 <div key={categoryName} className="card">
-                  <h3 className={`text-lg font-semibold ${categoryColor.text} mb-4 flex items-center`}>
-                    <FolderOpen className={`h-5 w-5 mr-2 ${categoryColor.text}`} />
+                  <h3 className={`text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4 flex items-center`}>
+                    <FolderOpen className={`h-5 w-5 mr-2 text-gray-600 dark:text-gray-400`} />
                     {categoryName} ({items.length} items)
                   </h3>
                 
@@ -537,6 +606,12 @@ const MenuManagement = ({ menuItems, onUpdate, onAdd, onDelete }) => {
                   <table className={`min-w-full divide-y ${isDarkMode ? 'divide-gray-700' : 'divide-accent-200'}`}>
                     <thead className={isDarkMode ? 'bg-gray-700' : 'bg-accent-50'}>
                       <tr>
+                        <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${isDarkMode ? 'text-gray-300' : 'text-secondary-600'}`}>
+                          Image
+                        </th>
+                        <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${isDarkMode ? 'text-gray-300' : 'text-secondary-600'}`}>
+                          Category
+                        </th>
                         <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${isDarkMode ? 'text-gray-300' : 'text-secondary-600'}`}>
                           Item
                         </th>
@@ -560,6 +635,29 @@ const MenuManagement = ({ menuItems, onUpdate, onAdd, onDelete }) => {
                           {editingId === item.id ? (
                             // Edit Mode
                             <>
+                              <td className="px-6 py-4 whitespace-nowrap">
+                                <div className="flex items-center space-x-2">
+                                  {formData.image_url && (
+                                    <img
+                                      src={getImageUrl(formData.image_url)}
+                                      alt="Menu Item"
+                                      className="w-12 h-12 object-cover rounded-lg border"
+                                    />
+                                  )}
+                                  <input
+                                    type="file"
+                                    accept="image/*"
+                                    onChange={handleImageUpload}
+                                    className="text-xs"
+                                    disabled={imageUploading}
+                                  />
+                                </div>
+                                {imageUploading && (
+                                  <div className="mt-1">
+                                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-secondary-500"></div>
+                                  </div>
+                                )}
+                              </td>
                               <td className="px-6 py-4 whitespace-nowrap">
                                 <select
                                   value={formData.category_id}
@@ -623,6 +721,24 @@ const MenuManagement = ({ menuItems, onUpdate, onAdd, onDelete }) => {
                             // View Mode
                             <>
                               <td className="px-6 py-4 whitespace-nowrap">
+                                {item.image_url ? (
+                                  <img
+                                    src={getImageUrl(item.image_url)}
+                                    alt={item.name}
+                                    className="w-12 h-12 object-cover rounded-lg border"
+                                  />
+                                ) : (
+                                  <div className="w-12 h-12 bg-gray-200 dark:bg-gray-700 rounded-lg flex items-center justify-center">
+                                    <span className="text-gray-500 dark:text-gray-400 text-xs">No Image</span>
+                                  </div>
+                                )}
+                              </td>
+                              <td className="px-6 py-4 whitespace-nowrap">
+                                <div className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                                  {categories.find(cat => cat.id === item.category_id)?.name || 'Unknown'}
+                                </div>
+                              </td>
+                              <td className="px-6 py-4 whitespace-nowrap">
                                 <div className={`text-sm font-medium ${isDarkMode ? 'text-secondary-300' : 'text-secondary-700'}`}>{item.name}</div>
                               </td>
                               <td className="px-6 py-4 whitespace-nowrap">
@@ -667,6 +783,27 @@ const MenuManagement = ({ menuItems, onUpdate, onAdd, onDelete }) => {
                       {editingId === item.id ? (
                         // Edit Mode Mobile
                         <div className="space-y-3">
+                          <div className="flex items-center space-x-2">
+                            {formData.image_url && (
+                              <img
+                                src={getImageUrl(formData.image_url)}
+                                alt="Menu Item"
+                                className="w-12 h-12 object-cover rounded-lg border"
+                              />
+                            )}
+                            <input
+                              type="file"
+                              accept="image/*"
+                              onChange={handleImageUpload}
+                              className="text-xs"
+                              disabled={imageUploading}
+                            />
+                          </div>
+                          {imageUploading && (
+                            <div className="mt-1">
+                              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-secondary-500"></div>
+                            </div>
+                          )}
                           <select
                             value={formData.category_id}
                             onChange={(e) => handleInputChange('category_id', e.target.value)}
@@ -725,29 +862,44 @@ const MenuManagement = ({ menuItems, onUpdate, onAdd, onDelete }) => {
                       ) : (
                         // View Mode Mobile
                         <div>
-                          <div className="flex justify-between items-start mb-2">
-                            <h4 className={`font-medium ${isDarkMode ? 'text-secondary-300' : 'text-secondary-700'}`}>{item.name}</h4>
-                            <div className="flex space-x-2">
-                              <button
-                                onClick={() => handleEdit(item)}
-                                className={`p-2 rounded-full ${isDarkMode ? 'text-blue-400 hover:text-blue-300 bg-blue-900/30' : 'text-blue-600 hover:text-blue-900 bg-blue-50'}`}
-                              >
-                                <Edit className="h-4 w-4" />
-                              </button>
-                              <button
-                                onClick={() => handleDelete(item.id, item.name)}
-                                className={`p-2 rounded-full ${isDarkMode ? 'text-red-400 hover:text-red-300 bg-red-900/30' : 'text-red-600 hover:text-red-900 bg-red-50'}`}
-                              >
-                                <Trash2 className="h-4 w-4" />
-                              </button>
+                          <div className="flex items-start space-x-3 mb-3">
+                            {item.image_url ? (
+                              <img
+                                src={getImageUrl(item.image_url)}
+                                alt={item.name}
+                                className="w-16 h-16 object-cover rounded-lg border flex-shrink-0"
+                              />
+                            ) : (
+                              <div className="w-16 h-16 bg-gray-200 dark:bg-gray-700 rounded-lg flex items-center justify-center flex-shrink-0">
+                                <span className="text-gray-500 dark:text-gray-400 text-xs">No Image</span>
+                              </div>
+                            )}
+                            <div className="flex-1">
+                              <div className="flex justify-between items-start mb-2">
+                                <h4 className={`font-medium ${isDarkMode ? 'text-secondary-300' : 'text-secondary-700'}`}>{item.name}</h4>
+                                <div className="flex space-x-2">
+                                  <button
+                                    onClick={() => handleEdit(item)}
+                                    className={`p-2 rounded-full ${isDarkMode ? 'text-blue-400 hover:text-blue-300 bg-blue-900/30' : 'text-blue-600 hover:text-blue-900 bg-blue-50'}`}
+                                  >
+                                    <Edit className="h-4 w-4" />
+                                  </button>
+                                  <button
+                                    onClick={() => handleDelete(item.id, item.name)}
+                                    className={`p-2 rounded-full ${isDarkMode ? 'text-red-400 hover:text-red-300 bg-red-900/30' : 'text-red-600 hover:text-red-900 bg-red-50'}`}
+                                  >
+                                    <Trash2 className="h-4 w-4" />
+                                  </button>
+                                </div>
+                              </div>
+                              <p className={`text-sm mb-2 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>{item.description}</p>
+                              <div className="flex justify-between items-center text-sm">
+                                <span className={`font-semibold ${isDarkMode ? 'text-secondary-400' : 'text-secondary-600'}`}>
+                                  {formatCurrency(ensureNumber(item.price))}
+                                </span>
+                                <span className={`${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>Sort: {item.sort_order || 0}</span>
+                              </div>
                             </div>
-                          </div>
-                          <p className={`text-sm mb-2 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>{item.description}</p>
-                          <div className="flex justify-between items-center text-sm">
-                            <span className={`font-semibold ${isDarkMode ? 'text-secondary-400' : 'text-secondary-600'}`}>
-                              {formatCurrency(ensureNumber(item.price))}
-                            </span>
-                            <span className={`${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>Sort: {item.sort_order || 0}</span>
                           </div>
                         </div>
                       )}
@@ -883,9 +1035,8 @@ const MenuManagement = ({ menuItems, onUpdate, onAdd, onDelete }) => {
                     </thead>
                     <tbody className={`${isDarkMode ? 'bg-gray-800 divide-gray-700' : 'bg-white divide-accent-200'}`}>
                       {categories.map((category, index) => {
-                        const categoryColor = getCategoryColorByIndex(index);
                         return (
-                        <tr key={category.id} className={isDarkMode ? 'hover:bg-gray-700' : `hover:${categoryColor.hover}`}>
+                        <tr key={category.id} className={isDarkMode ? 'hover:bg-gray-700' : 'hover:bg-accent-50'}>
                           {categoryEditingId === category.id ? (
                             // Edit Mode
                             <>

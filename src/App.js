@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
-import { Receipt, Settings, Plus, Menu, X, LogOut, User, Package, Utensils, Users, CreditCard, ShoppingCart } from 'lucide-react';
+import { Receipt, Settings, Plus, Menu, X, LogOut, User, Package, Utensils, Users, CreditCard, ShoppingCart, Building } from 'lucide-react';
 import axios from 'axios';
 import { CurrencyProvider } from './contexts/CurrencyContext';
 import { DarkModeProvider } from './contexts/DarkModeContext';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { CafeSettingsProvider, useCafeSettings } from './contexts/CafeSettingsContext';
+import { ColorSchemeProvider } from './contexts/ColorSchemeContext';
 import OrderPage from './components/OrderPage';
 import MenuManagement from './components/MenuManagement';
 
@@ -15,17 +17,24 @@ import InventoryManagement from './components/InventoryManagement';
 import KitchenOrders from './components/KitchenOrders';
 import CustomerManagement from './components/CustomerManagement';
 import PaymentMethodManagement from './components/PaymentMethodManagement';
+import CafeSettings from './components/CafeSettings';
+import CafeInfo from './components/CafeInfo';
 import CustomerApp from './components/CustomerApp';
 import LandingPage from './components/LandingPage';
 import DarkModeToggle from './components/DarkModeToggle';
 import Login from './components/Login';
 import AdminRegister from './components/AdminRegister';
 import ChefRegister from './components/ChefRegister';
+import ReceptionRegister from './components/ReceptionRegister';
 import ChefApp from './components/ChefApp';
+import ReceptionApp from './components/ReceptionApp';
+import SuperadminApp from './components/SuperadminApp';
 import ProtectedRoute from './components/ProtectedRoute';
+import RoleBasedRedirect from './components/RoleBasedRedirect';
+import DashboardRedirect from './components/DashboardRedirect';
 
 // Configure axios base URL - use environment variable or fallback to HTTPS API
-const API_BASE_URL = "https://palmcafeapi.nevyaa.com" || "http://localhost:5000";
+const API_BASE_URL = process.env.REACT_APP_API_URL || "https://api.cafe.nevyaa.com";
 axios.defaults.baseURL = `${API_BASE_URL}/api`;
 
 function MainApp() {
@@ -35,15 +44,13 @@ function MainApp() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [cart, setCart] = useState([]);
   const { user, logout } = useAuth();
+  const { cafeSettings, loading: cafeSettingsLoading } = useCafeSettings();
 
   useEffect(() => {
     fetchMenuItems();
   }, []);
 
-  // If user is a chef, redirect to chef app (after hooks)
-  if (user?.role === 'chef') {
-    return <ChefApp />;
-  }
+
 
   const fetchMenuItems = async () => {
     try {
@@ -117,6 +124,8 @@ function MainApp() {
         return <CustomerManagement />;
       case 'payment-methods':
         return <PaymentMethodManagement />;
+      case 'cafe-settings':
+        return cafeSettings?.admin_can_access_settings ? <CafeSettings /> : <div>Access denied</div>;
       default:
         return <OrderPage menuItems={menuItems} />;
     }
@@ -124,26 +133,21 @@ function MainApp() {
 
   const navigationItems = [
     { id: 'order', label: 'New Order', icon: Plus },
-    { id: 'kitchen', label: 'Kitchen Orders', icon: Utensils },
-    { id: 'customers', label: 'Customers', icon: Users },
-    { id: 'payment-methods', label: 'Payment, Currency & Tax', icon: CreditCard },
-
-    { id: 'menu', label: 'Menu Management', icon: Settings },
-    { id: 'inventory', label: 'Inventory', icon: Package },
-    { id: 'history', label: 'Invoice History', icon: Receipt },
-
+    ...(cafeSettings?.show_kitchen_tab ? [{ id: 'kitchen', label: 'Kitchen Orders', icon: Utensils }] : []),
+    ...(cafeSettings?.show_customers_tab ? [{ id: 'customers', label: 'Customers', icon: Users }] : []),
+    ...(cafeSettings?.show_payment_methods_tab ? [{ id: 'payment-methods', label: 'Payment, Currency & Tax', icon: CreditCard }] : []),
+    ...(cafeSettings?.admin_can_access_settings ? [{ id: 'cafe-settings', label: 'Cafe Settings', icon: Building }] : []),
+    ...(cafeSettings?.admin_can_manage_menu ? [{ id: 'menu', label: 'Menu Management', icon: Settings }] : []),
+    ...(cafeSettings?.admin_can_manage_inventory ? [{ id: 'inventory', label: 'Inventory', icon: Package }] : []),
+    ...(cafeSettings?.admin_can_view_reports ? [{ id: 'history', label: 'Invoice History', icon: Receipt }] : []),
   ];
 
-  if (loading) {
+  if (loading || cafeSettingsLoading) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-accent-50 dark:bg-gray-900">
-        <img 
-          src="/images/palm-cafe-logo.png" 
-          alt="Palm Cafe Logo" 
-          className="h-16 w-16 mb-4"
-        />
+        <CafeInfo logoSize="h-16 w-16" nameSize="text-xl" className="mb-4" />
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-secondary-500"></div>
-        <p className="mt-4 text-secondary-600 dark:text-gray-400">Loading Palm Cafe...</p>
+        <p className="mt-4 text-secondary-600 dark:text-gray-400">Loading {cafeSettings.cafe_name}...</p>
       </div>
     );
   }
@@ -157,12 +161,7 @@ function MainApp() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           <div className="flex items-center">
-            <img 
-              src="/images/palm-cafe-logo.png" 
-              alt="Palm Cafe Logo" 
-              className="h-10 w-10 mr-3"
-            />
-            <h1 className="text-xl sm:text-2xl font-bold text-secondary-700 dark:text-gray-100">Palm Cafe</h1>
+            <CafeInfo />
             {cart && cart.length > 0 && (
               <div className="ml-4 flex items-center space-x-1 text-sm text-secondary-600 dark:text-gray-400">
                 <ShoppingCart className="h-4 w-4" />
@@ -173,7 +172,7 @@ function MainApp() {
             )}
           </div>
           
-                      <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-2">
               {/* User info */}
               <div className="hidden sm:flex items-center space-x-2 text-sm text-secondary-600 dark:text-gray-400">
                 <User className="h-4 w-4" />
@@ -222,6 +221,16 @@ function MainApp() {
               >
                 <span>👨‍🍳</span>
                 <span>Add Chef</span>
+              </a>
+
+              {/* Reception Registration Link */}
+              <a
+                href="/reception/register"
+                className="hidden sm:flex items-center space-x-1 text-sm text-secondary-600 hover:text-secondary-700 dark:text-gray-400 dark:hover:text-gray-300 px-2 py-1 rounded hover:bg-accent-100"
+                title="Register New Reception"
+              >
+                <span>📞</span>
+                <span>Add Reception</span>
               </a>
             
             {/* Dark mode toggle */}
@@ -308,6 +317,13 @@ function MainApp() {
               <span className="mr-3">👨‍🍳</span>
               Add Chef
             </a>
+            <a
+              href="/reception/register"
+              className="w-full flex items-center px-3 py-3 text-sm font-medium text-secondary-600 hover:bg-accent-100 rounded-lg transition-colors"
+            >
+              <span className="mr-3">📞</span>
+              Add Reception
+            </a>
           </div>
         </div>
       </div>
@@ -347,37 +363,86 @@ function MainApp() {
 }
 
 function App() {
+  // Set document title dynamically based on cafe settings
+  React.useEffect(() => {
+    const updateTitle = async () => {
+      try {
+        const response = await axios.get('/cafe-settings');
+        if (response.data && response.data.cafe_name) {
+          document.title = response.data.cafe_name;
+        }
+      } catch (error) {
+        console.error('Error fetching cafe settings for title:', error);
+        document.title = 'Cafe Management System'; // Fallback
+      }
+    };
+    
+    updateTitle();
+  }, []);
+
   return (
     <Router>
       <AuthProvider>
         <DarkModeProvider>
           <CurrencyProvider>
-            <Routes>
-              <Route path="/" element={<LandingPage />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/admin/register" element={
-                <ProtectedRoute>
-                  <AdminRegister />
-                </ProtectedRoute>
-              } />
-              <Route path="/chef/register" element={
-                <ProtectedRoute>
-                  <ChefRegister />
-                </ProtectedRoute>
-              } />
-              <Route path="/customer" element={<CustomerApp />} />
-              <Route path="/admin" element={
-                <ProtectedRoute>
-                  <MainApp />
-                </ProtectedRoute>
-              } />
-              <Route path="/chef" element={
-                <ProtectedRoute>
-                  <ChefApp />
-                </ProtectedRoute>
-              } />
-              <Route path="*" element={<Navigate to="/" replace />} />
-            </Routes>
+            <CafeSettingsProvider>
+              <ColorSchemeProvider>
+                <Routes>
+                  <Route path="/" element={<LandingPage />} />
+                  <Route path="/login" element={<Login />} />
+                  <Route path="/admin/register" element={
+                    <ProtectedRoute>
+                      <AdminRegister />
+                    </ProtectedRoute>
+                  } />
+                  <Route path="/chef/register" element={
+                    <ProtectedRoute>
+                      <ChefRegister />
+                    </ProtectedRoute>
+                  } />
+                  <Route path="/reception/register" element={
+                    <ProtectedRoute>
+                      <ReceptionRegister />
+                    </ProtectedRoute>
+                  } />
+                  <Route path="/customer" element={<CustomerApp />} />
+                  <Route path="/admin" element={
+                    <ProtectedRoute>
+                      <RoleBasedRedirect>
+                        <MainApp />
+                      </RoleBasedRedirect>
+                    </ProtectedRoute>
+                  } />
+                  <Route path="/chef" element={
+                    <ProtectedRoute>
+                      <RoleBasedRedirect>
+                        <ChefApp />
+                      </RoleBasedRedirect>
+                    </ProtectedRoute>
+                  } />
+                  <Route path="/reception" element={
+                    <ProtectedRoute>
+                      <RoleBasedRedirect>
+                        <ReceptionApp />
+                      </RoleBasedRedirect>
+                    </ProtectedRoute>
+                  } />
+                  <Route path="/superadmin" element={
+                    <ProtectedRoute>
+                      <RoleBasedRedirect>
+                        <SuperadminApp />
+                      </RoleBasedRedirect>
+                    </ProtectedRoute>
+                  } />
+                  <Route path="/dashboard" element={
+                    <ProtectedRoute>
+                      <DashboardRedirect />
+                    </ProtectedRoute>
+                  } />
+                  <Route path="*" element={<Navigate to="/" replace />} />
+                </Routes>
+              </ColorSchemeProvider>
+            </CafeSettingsProvider>
           </CurrencyProvider>
         </DarkModeProvider>
       </AuthProvider>

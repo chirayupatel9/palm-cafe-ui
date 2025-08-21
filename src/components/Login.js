@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
+import { useCafeSettings } from '../contexts/CafeSettingsContext';
 import { Link, useNavigate } from 'react-router-dom';
 import { Eye, EyeOff, Coffee } from 'lucide-react';
 import toast from 'react-hot-toast';
@@ -13,6 +14,7 @@ const Login = () => {
   const [loading, setLoading] = useState(false);
   
   const { login } = useAuth();
+  const { cafeSettings } = useCafeSettings();
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -31,7 +33,9 @@ const Login = () => {
       
       if (result.success) {
         toast.success('Login successful!');
-        navigate('/admin');
+        
+        // Redirect to dashboard, which will automatically route to the appropriate role-based dashboard
+        navigate('/dashboard');
       } else {
         toast.error(result.error);
       }
@@ -48,13 +52,13 @@ const Login = () => {
         <div>
           <div className="flex justify-center">
             <img 
-              src="/images/palm-cafe-logo.png" 
-              alt="Palm Cafe Logo" 
+              src={cafeSettings.logo_url} 
+              alt={`${cafeSettings.cafe_name} Logo`} 
               className="h-16 w-16"
             />
           </div>
           <h2 className="mt-6 text-center text-3xl font-extrabold text-secondary-700 dark:text-gray-100">
-            Welcome back to Palm Cafe
+            Welcome back to {cafeSettings.cafe_name}
           </h2>
           <p className="mt-2 text-center text-sm text-secondary-600 dark:text-gray-400">
             Sign in to your account

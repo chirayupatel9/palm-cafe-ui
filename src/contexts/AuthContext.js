@@ -61,7 +61,7 @@ export const AuthProvider = ({ children }) => {
       setToken(authToken);
       localStorage.setItem('token', authToken);
       
-      return { success: true };
+      return { success: true, user: userData };
     } catch (error) {
       return { 
         success: false, 
@@ -112,6 +112,30 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const registerReception = async (username, email, password) => {
+    try {
+      const response = await axios.post('/auth/register-reception', { username, email, password });
+      return { success: true };
+    } catch (error) {
+      return { 
+        success: false, 
+        error: error.response?.data?.error || 'Reception registration failed' 
+      };
+    }
+  };
+
+  const registerSuperadmin = async (username, email, password) => {
+    try {
+      const response = await axios.post('/auth/register-superadmin', { username, email, password });
+      return { success: true };
+    } catch (error) {
+      return { 
+        success: false, 
+        error: error.response?.data?.error || 'Superadmin registration failed' 
+      };
+    }
+  };
+
   const logout = () => {
     setUser(null);
     setToken(null);
@@ -127,6 +151,8 @@ export const AuthProvider = ({ children }) => {
     register,
     registerAdmin,
     registerChef,
+    registerReception,
+    registerSuperadmin,
     logout,
     isAuthenticated: !!user
   };

@@ -8,12 +8,13 @@ const DarkModeToggle = ({ className = '' }) => {
   return (
     <button
       onClick={toggleDarkMode}
-      className={`p-2 rounded-lg transition-colors duration-200 ${
+      className={`p-2 rounded-lg transition-all duration-200 hover:scale-105 ${
         isDarkMode
-          ? 'bg-gray-700 text-yellow-400 hover:bg-gray-600'
-          : 'bg-accent-100 text-secondary-600 hover:bg-accent-200'
+          ? 'bg-yellow-500 text-gray-900 hover:bg-yellow-400 shadow-lg'
+          : 'bg-gray-700 text-yellow-400 hover:bg-gray-600 shadow-lg'
       } ${className}`}
       aria-label={isDarkMode ? 'Switch to light mode' : 'Switch to dark mode'}
+      title={isDarkMode ? 'Switch to light mode' : 'Switch to dark mode'}
     >
       {isDarkMode ? (
         <Sun className="h-5 w-5" />

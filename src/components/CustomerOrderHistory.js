@@ -172,7 +172,8 @@ const CustomerOrderHistory = ({ customerPhone, setActiveTab, cart, setCart }) =>
               total_amount: order.final_amount,
               tax_amount: order.tax_amount || 0,
               tip_amount: order.tip_amount || 0,
-              points_redeemed: order.points_redeemed || 0
+              points_redeemed: order.points_redeemed || 0,
+              date: new Date().toISOString()
             });
             
             if (generateResponse.data && generateResponse.data.invoiceNumber) {

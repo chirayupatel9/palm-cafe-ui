@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Minus, Trash2, ShoppingCart, X, Star, User, Phone, Mail, Search } from 'lucide-react';
+import { Plus, Minus, Trash2, ShoppingCart, X, Search, User, Phone, Mail, MapPin, Clock, CheckCircle, XCircle, AlertCircle, CreditCard, Gift, Star, ChevronDown, ChevronUp } from 'lucide-react';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 import { useCurrency } from '../contexts/CurrencyContext';
-import { getCategoryColor } from '../utils/categoryColors';
+import { useCafeSettings } from '../contexts/CafeSettingsContext';
+import { useDarkMode } from '../contexts/DarkModeContext';
 import CustomerOrderHistory from './CustomerOrderHistory';
+import { getImageUrl } from '../utils/imageUtils';
 
 const CustomerMenu = ({ 
   customer, 
@@ -21,6 +23,7 @@ const CustomerMenu = ({
   onCustomerUpdate
 }) => {
   const { formatCurrency } = useCurrency();
+  const { cafeSettings } = useCafeSettings();
   const [menuItems, setMenuItems] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -399,7 +402,7 @@ const CustomerMenu = ({
         {/* Welcome Message */}
         <div className="text-center mb-8">
           <h2 className="text-3xl font-bold text-secondary-700 dark:text-secondary-300 mb-2">
-            Welcome to Palm Cafe
+            Welcome to {cafeSettings?.cafe_name || 'Our Cafe'}
           </h2>
           <p className="text-lg text-gray-600 dark:text-gray-400">
             Browse our delicious menu and place your order
@@ -532,11 +535,10 @@ const CustomerMenu = ({
                 </div>
               ) : (
                 Object.entries(filteredMenuItems).map(([categoryName, items], index) => {
-                  const categoryColor = getCategoryColor(categoryName, index);
                   return (
-                    <div key={categoryName} className={`border ${categoryColor.border} rounded-xl p-6 ${categoryColor.bg} shadow-sm`}>
-                      <h3 className={`text-2xl font-bold ${categoryColor.text} mb-6 flex items-center`}>
-                        <span className="mr-3">{categoryColor.icon}</span>
+                    <div key={categoryName} className={`border border-gray-200 dark:border-gray-700 rounded-xl p-6 bg-gray-50 dark:bg-gray-800 shadow-sm`}>
+                      <h3 className={`text-2xl font-bold text-gray-900 dark:text-gray-100 mb-6 flex items-center`}>
+                        <span className="mr-3">📁</span>
                         {categoryName}
                       </h3>
                                              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -546,6 +548,15 @@ const CustomerMenu = ({
                              onClick={() => addToCart(item)}
                              className="w-full bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-all duration-200 hover:scale-105 text-left"
                            >
+                             {cafeSettings?.show_menu_images && item.image_url && (
+                               <div className="w-full h-48 overflow-hidden">
+                                 <img
+                                   src={getImageUrl(item.image_url)}
+                                   alt={item.name}
+                                   className="w-full h-full object-cover"
+                                 />
+                               </div>
+                             )}
                              <div className="p-6">
                                <div className="flex justify-between items-start mb-3">
                                  <h4 className="text-lg font-semibold text-secondary-700 dark:text-secondary-300">
@@ -630,9 +641,18 @@ const CustomerMenu = ({
                  <div className="space-y-3 mb-6">
                    {cart.map((item) => (
                      <div key={item.id} className="flex items-center justify-between p-3 bg-accent-50 dark:bg-gray-700 rounded-lg border border-accent-200 dark:border-gray-600">
-                       <div className="flex-1">
-                         <h4 className="font-medium text-secondary-700 dark:text-secondary-300">{item.name}</h4>
-                         <p className="text-sm text-gray-600 dark:text-gray-400">{formatCurrency(item.price)} each</p>
+                       <div className="flex items-center space-x-3 flex-1">
+                         {cafeSettings?.show_menu_images && item.image_url && (
+                           <img
+                             src={getImageUrl(item.image_url)}
+                             alt={item.name}
+                             className="w-12 h-12 object-cover rounded-lg border"
+                           />
+                         )}
+                         <div className="flex-1">
+                           <h4 className="font-medium text-secondary-700 dark:text-secondary-300">{item.name}</h4>
+                           <p className="text-sm text-gray-600 dark:text-gray-400">{formatCurrency(item.price)} each</p>
+                         </div>
                        </div>
                        <div className="flex items-center space-x-2">
                          <button

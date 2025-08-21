@@ -4,9 +4,11 @@ import CustomerLogin from './CustomerLogin';
 import CustomerMenu from './CustomerMenu';
 import { LogOut, User, ShoppingCart, History, LogIn, X } from 'lucide-react';
 import { useDarkMode } from '../contexts/DarkModeContext';
+import { useCafeSettings } from '../contexts/CafeSettingsContext';
 
 const CustomerApp = () => {
   const { isDarkMode } = useDarkMode();
+  const { cafeSettings } = useCafeSettings();
   const [customer, setCustomer] = useState(null);
   const [cart, setCart] = useState([]);
   const [activeTab, setActiveTab] = useState('menu');
@@ -63,11 +65,11 @@ const CustomerApp = () => {
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center">
               <img 
-                src="/images/palm-cafe-logo.png" 
-                alt="Palm Cafe Logo" 
+                src={cafeSettings.logo_url} 
+                alt={`${cafeSettings.cafe_name} Logo`} 
                 className="h-10 w-10 mr-3"
               />
-              <h1 className="text-xl sm:text-2xl font-bold text-secondary-700 dark:text-gray-100">Palm Cafe</h1>
+              <h1 className="text-xl sm:text-2xl font-bold text-secondary-700 dark:text-gray-100">{cafeSettings.cafe_name}</h1>
             </div>
             
             <div className="flex items-center space-x-4">
@@ -174,14 +176,14 @@ const CustomerApp = () => {
                <div className="flex items-center justify-center mb-4">
                  <div className="w-16 h-16 bg-secondary-500 rounded-full flex items-center justify-center shadow-lg">
                    <img 
-                     src="/images/palm-cafe-logo.png" 
-                     alt="Palm Cafe Logo" 
+                     src={cafeSettings.logo_url} 
+                     alt={`${cafeSettings.cafe_name} Logo`} 
                      className="w-10 h-10"
                    />
                  </div>
                </div>
                <h2 className={`text-2xl font-bold text-center mb-2 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                 Welcome to Palm Cafe
+                 Welcome to {cafeSettings.cafe_name}
                </h2>
                <p className={`text-center text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
                  Enter your phone number to continue

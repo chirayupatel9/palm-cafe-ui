@@ -1,13 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { Clock, CheckCircle, XCircle, Printer, RefreshCw, AlertTriangle, Coffee, Utensils, ChevronDown, ChevronUp, ShoppingCart, Plus } from 'lucide-react';
+import { Clock, CheckCircle, XCircle, Printer, RefreshCw, AlertTriangle, Coffee, Utensils, ChevronDown, ChevronUp, ShoppingCart, Plus, Edit, Save, X, Trash2 } from 'lucide-react';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 import { useAuth } from '../contexts/AuthContext';
 import { useDarkMode } from '../contexts/DarkModeContext';
+import { useCafeSettings } from '../contexts/CafeSettingsContext';
+import PrintModal from './PrintModal';
 
 const KitchenOrders = ({ cart, setCart }) => {
   const { isAuthenticated, user, loading: authLoading } = useAuth();
   const { isDarkMode } = useDarkMode();
+  const { cafeSettings } = useCafeSettings();
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedOrder, setSelectedOrder] = useState(null);
@@ -15,6 +18,8 @@ const KitchenOrders = ({ cart, setCart }) => {
   const [autoRefresh, setAutoRefresh] = useState(true);
   const [filterStatus, setFilterStatus] = useState('all');
   const [activeTab, setActiveTab] = useState('today');
+  const [todaySubTab, setTodaySubTab] = useState('active'); // 'active' for pending/preparing, 'completed' for completed
+  const [searchQuery, setSearchQuery] = useState('');
   const [expandedHistoryCards, setExpandedHistoryCards] = useState(new Set());
 
   // Pagination states
@@ -22,10 +27,16 @@ const KitchenOrders = ({ cart, setCart }) => {
   const [itemsPerPage] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
+  
+  // Editing states
+  const [editingOrder, setEditingOrder] = useState(null);
+  const [menuItems, setMenuItems] = useState([]);
+  const [editFormData, setEditFormData] = useState({});
 
   useEffect(() => {
     if (isAuthenticated && !authLoading) {
       fetchOrders();
+      fetchMenuItems();
       if (autoRefresh) {
         const interval = setInterval(fetchOrders, 30000); // Refresh every 30 seconds
         return () => clearInterval(interval);
@@ -36,9 +47,61 @@ const KitchenOrders = ({ cart, setCart }) => {
   // Update displayed orders when orders or filters change
   useEffect(() => {
     const filteredOrders = orders.filter(order => {
-      if (filterStatus !== 'all' && order.status !== filterStatus) return false;
-      if (activeTab === 'today' && !isToday(order.created_at)) return false;
-      if (activeTab === 'yesterday' && !isYesterday(order.created_at)) return false;
+      // First filter by tab (today vs history vs cancelled)
+      if (activeTab === 'today') {
+        if (!isToday(order.created_at)) return false;
+        
+        // Then filter by today's sub-tab
+        if (todaySubTab === 'active') {
+          // Show only pending and preparing orders
+          if (!['pending', 'preparing'].includes(order.status)) return false;
+        } else if (todaySubTab === 'completed') {
+          // Show only completed orders
+          if (order.status !== 'completed') return false;
+        }
+      } else if (activeTab === 'history') {
+        if (isToday(order.created_at) || order.status === 'cancelled') return false;
+      } else if (activeTab === 'cancelled') {
+        if (order.status !== 'cancelled') return false;
+      }
+
+      // Then filter by status (only for today and history tabs)
+      if (activeTab === 'cancelled') return true; // Show all cancelled orders regardless of status filter
+      if (filterStatus !== 'all') {
+        if (activeTab === 'today' && todaySubTab === 'active') {
+          // For today's active tab, only show pending and preparing
+          if (!['pending', 'preparing'].includes(order.status)) return false;
+        } else if (activeTab === 'today' && todaySubTab === 'completed') {
+          // For today's completed tab, only show completed
+          if (order.status !== 'completed') return false;
+        } else {
+          // For other tabs, use the filterStatus
+          if (order.status !== filterStatus) return false;
+        }
+      }
+
+      // Finally filter by search query
+      if (searchQuery.trim()) {
+        const query = searchQuery.toLowerCase();
+        const orderNumber = order.order_number?.toString().toLowerCase() || '';
+        const customerName = order.customer_name?.toLowerCase() || '';
+        const customerPhone = order.customer_phone?.toLowerCase() || '';
+        const customerEmail = order.customer_email?.toLowerCase() || '';
+        const notes = order.notes?.toLowerCase() || '';
+        
+        // Check if any item names match the search
+        const itemNames = order.items?.map(item => item.name?.toLowerCase() || '').join(' ') || '';
+        
+        if (!orderNumber.includes(query) && 
+            !customerName.includes(query) && 
+            !customerPhone.includes(query) && 
+            !customerEmail.includes(query) && 
+            !notes.includes(query) && 
+            !itemNames.includes(query)) {
+          return false;
+        }
+      }
+
       return true;
     });
 
@@ -54,7 +117,7 @@ const KitchenOrders = ({ cart, setCart }) => {
     setDisplayedOrders(initialDisplay);
     setCurrentPage(1);
     setHasMore(sortedOrders.length > itemsPerPage);
-  }, [orders, filterStatus, activeTab, itemsPerPage]);
+  }, [orders, filterStatus, activeTab, todaySubTab, searchQuery, itemsPerPage]);
 
   const fetchOrders = async () => {
     try {
@@ -79,6 +142,131 @@ const KitchenOrders = ({ cart, setCart }) => {
     }
   };
 
+  const fetchMenuItems = async () => {
+    try {
+      const response = await axios.get('/menu');
+      setMenuItems(response.data);
+    } catch (error) {
+      console.error('Error fetching menu items:', error);
+      toast.error('Failed to load menu items');
+    }
+  };
+
+  const startEditing = (order) => {
+    setEditingOrder(order.id);
+    setEditFormData({
+      customer_name: order.customer_name || '',
+      customer_email: order.customer_email || '',
+      customer_phone: order.customer_phone || '',
+      payment_method: order.payment_method || '',
+      split_payment: order.split_payment || false,
+      split_payment_method: order.split_payment_method || '',
+      split_amount: order.split_amount || 0,
+      extra_charge: order.extra_charge || 0,
+      extra_charge_note: order.extra_charge_note || '',
+      notes: order.notes || '',
+      items: order.items ? [...order.items] : []
+    });
+  };
+
+  const cancelEditing = () => {
+    setEditingOrder(null);
+    setEditFormData({});
+  };
+
+  const saveOrder = async () => {
+    try {
+      // Calculate totals
+      const totalAmount = editFormData.items.reduce((sum, item) => sum + (item.total || 0), 0);
+      const taxAmount = totalAmount * 0.085; // 8.5% tax
+      const finalAmount = totalAmount + taxAmount + (editFormData.extra_charge || 0);
+
+      const orderData = {
+        ...editFormData,
+        total_amount: totalAmount,
+        tax_amount: taxAmount,
+        final_amount: finalAmount
+      };
+
+      await axios.put(`/orders/${editingOrder}`, orderData);
+      toast.success('Order updated successfully');
+      
+      // Refresh orders
+      fetchOrders();
+      cancelEditing();
+    } catch (error) {
+      console.error('Error updating order:', error);
+      toast.error('Failed to update order');
+    }
+  };
+
+  const updateEditFormData = (field, value) => {
+    setEditFormData(prev => ({
+      ...prev,
+      [field]: value
+    }));
+  };
+
+  const addItemToOrder = () => {
+    if (menuItems.length === 0) {
+      toast.error('No menu items available');
+      return;
+    }
+
+    const newItem = {
+      id: Date.now(), // Temporary ID for frontend
+      menu_item_id: menuItems[0].id,
+      name: menuItems[0].name,
+      quantity: 1,
+      price: menuItems[0].price,
+      total: menuItems[0].price
+    };
+
+    setEditFormData(prev => ({
+      ...prev,
+      items: [...prev.items, newItem]
+    }));
+  };
+
+  const updateOrderItem = (index, field, value) => {
+    setEditFormData(prev => {
+      const newItems = [...prev.items];
+      newItems[index] = {
+        ...newItems[index],
+        [field]: value
+      };
+
+      // Recalculate total for this item
+      if (field === 'quantity' || field === 'price') {
+        const quantity = field === 'quantity' ? value : newItems[index].quantity;
+        const price = field === 'price' ? value : newItems[index].price;
+        newItems[index].total = quantity * price;
+      }
+
+      // Update item name if menu_item_id changes
+      if (field === 'menu_item_id') {
+        const selectedMenuItem = menuItems.find(item => item.id === parseInt(value));
+        if (selectedMenuItem) {
+          newItems[index].name = selectedMenuItem.name;
+          newItems[index].price = selectedMenuItem.price;
+          newItems[index].total = newItems[index].quantity * selectedMenuItem.price;
+        }
+      }
+
+      return {
+        ...prev,
+        items: newItems
+      };
+    });
+  };
+
+  const removeOrderItem = (index) => {
+    setEditFormData(prev => ({
+      ...prev,
+      items: prev.items.filter((_, i) => i !== index)
+    }));
+  };
+
   const updateOrderStatus = async (orderId, status) => {
     try {
       await axios.patch(`/orders/${orderId}/status`, { status });
@@ -92,27 +280,8 @@ const KitchenOrders = ({ cart, setCart }) => {
   };
 
   const printOrder = async (order) => {
-    try {
-      const response = await axios.post(`/orders/${order.id}/print`, {}, {
-        responseType: 'blob'
-      });
-      
-      // Create blob and download
-      const blob = new Blob([response.data], { type: 'text/plain' });
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `order-${order.order_number}.txt`;
-      document.body.appendChild(a);
-      a.click();
-      window.URL.revokeObjectURL(url);
-      document.body.removeChild(a);
-      
-      toast.success('Order printed successfully');
-    } catch (error) {
-      console.error('Error printing order:', error);
-      toast.error('Failed to print order');
-    }
+    setSelectedOrder(order);
+    setShowPrintModal(true);
   };
 
 
@@ -271,6 +440,15 @@ const KitchenOrders = ({ cart, setCart }) => {
       // First filter by tab (today vs history vs cancelled)
       if (activeTab === 'today') {
         if (!isToday(order.created_at)) return false;
+        
+        // Then filter by today's sub-tab
+        if (todaySubTab === 'active') {
+          // Show only pending and preparing orders
+          if (!['pending', 'preparing'].includes(order.status)) return false;
+        } else if (todaySubTab === 'completed') {
+          // Show only completed orders
+          if (order.status !== 'completed') return false;
+        }
       } else if (activeTab === 'history') {
         if (isToday(order.created_at) || order.status === 'cancelled') return false;
       } else if (activeTab === 'cancelled') {
@@ -279,8 +457,42 @@ const KitchenOrders = ({ cart, setCart }) => {
 
       // Then filter by status (only for today and history tabs)
       if (activeTab === 'cancelled') return true; // Show all cancelled orders regardless of status filter
-      if (filterStatus === 'all') return true;
-      return order.status === filterStatus;
+      if (filterStatus !== 'all') {
+        if (activeTab === 'today' && todaySubTab === 'active') {
+          // For today's active tab, only show pending and preparing
+          if (!['pending', 'preparing'].includes(order.status)) return false;
+        } else if (activeTab === 'today' && todaySubTab === 'completed') {
+          // For today's completed tab, only show completed
+          if (order.status !== 'completed') return false;
+        } else {
+          // For other tabs, use the filterStatus
+          if (order.status !== filterStatus) return false;
+        }
+      }
+
+      // Finally filter by search query
+      if (searchQuery.trim()) {
+        const query = searchQuery.toLowerCase();
+        const orderNumber = order.order_number?.toString().toLowerCase() || '';
+        const customerName = order.customer_name?.toLowerCase() || '';
+        const customerPhone = order.customer_phone?.toLowerCase() || '';
+        const customerEmail = order.customer_email?.toLowerCase() || '';
+        const notes = order.notes?.toLowerCase() || '';
+        
+        // Check if any item names match the search
+        const itemNames = order.items?.map(item => item.name?.toLowerCase() || '').join(' ') || '';
+        
+        if (!orderNumber.includes(query) && 
+            !customerName.includes(query) && 
+            !customerPhone.includes(query) && 
+            !customerEmail.includes(query) && 
+            !notes.includes(query) && 
+            !itemNames.includes(query)) {
+          return false;
+        }
+      }
+
+      return true;
     });
   };
 
@@ -308,12 +520,7 @@ const KitchenOrders = ({ cart, setCart }) => {
   };
 
   const handleShowMore = () => {
-    const filteredOrders = orders.filter(order => {
-      if (filterStatus !== 'all' && order.status !== filterStatus) return false;
-      if (activeTab === 'today' && !isToday(order.created_at)) return false;
-      if (activeTab === 'yesterday' && !isYesterday(order.created_at)) return false;
-      return true;
-    });
+    const filteredOrders = getFilteredOrders();
 
     const sortedOrders = filteredOrders.sort((a, b) => {
       const dateA = new Date(a.created_at || 0);
@@ -420,7 +627,9 @@ const KitchenOrders = ({ cart, setCart }) => {
               <Clock className={`h-6 w-6 ${isDarkMode ? 'text-yellow-400' : 'text-yellow-600'}`} />
             </div>
             <div className="ml-4">
-              <p className={`text-sm font-medium ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Pending</p>
+              <p className={`text-sm font-medium ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                {activeTab === 'today' && todaySubTab === 'active' ? 'Pending' : 'Pending'}
+              </p>
               <p className={`text-2xl font-bold ${isDarkMode ? 'text-yellow-400' : 'text-yellow-600'}`}>
                 {todayOrders.filter(o => o.status === 'pending').length}
               </p>
@@ -433,7 +642,9 @@ const KitchenOrders = ({ cart, setCart }) => {
               <Utensils className={`h-6 w-6 ${isDarkMode ? 'text-blue-400' : 'text-blue-600'}`} />
             </div>
             <div className="ml-4">
-              <p className={`text-sm font-medium ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Preparing</p>
+              <p className={`text-sm font-medium ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                {activeTab === 'today' && todaySubTab === 'active' ? 'Preparing' : 'Preparing'}
+              </p>
               <p className={`text-2xl font-bold ${isDarkMode ? 'text-blue-400' : 'text-blue-600'}`}>
                 {todayOrders.filter(o => o.status === 'preparing').length}
               </p>
@@ -446,9 +657,14 @@ const KitchenOrders = ({ cart, setCart }) => {
               <CheckCircle className={`h-6 w-6 ${isDarkMode ? 'text-green-400' : 'text-green-600'}`} />
             </div>
             <div className="ml-4">
-              <p className={`text-sm font-medium ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Ready</p>
+              <p className={`text-sm font-medium ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                {activeTab === 'today' && todaySubTab === 'completed' ? 'Completed' : 'Ready'}
+              </p>
               <p className={`text-2xl font-bold ${isDarkMode ? 'text-green-400' : 'text-green-600'}`}>
-                {todayOrders.filter(o => o.status === 'ready').length}
+                {activeTab === 'today' && todaySubTab === 'completed' 
+                  ? todayOrders.filter(o => o.status === 'completed').length
+                  : todayOrders.filter(o => o.status === 'ready').length
+                }
               </p>
             </div>
           </div>
@@ -459,9 +675,17 @@ const KitchenOrders = ({ cart, setCart }) => {
               <Coffee className={`h-6 w-6 ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`} />
             </div>
             <div className="ml-4">
-              <p className={`text-sm font-medium ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Total Active</p>
+              <p className={`text-sm font-medium ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                {activeTab === 'today' && todaySubTab === 'active' ? 'Total Active' : 
+                 activeTab === 'today' && todaySubTab === 'completed' ? 'Total Completed' : 'Total Active'}
+              </p>
               <p className={`text-2xl font-bold ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
-                {pendingOrders.length}
+                {activeTab === 'today' && todaySubTab === 'active' 
+                  ? pendingOrders.length
+                  : activeTab === 'today' && todaySubTab === 'completed'
+                  ? todayOrders.filter(o => o.status === 'completed').length
+                  : pendingOrders.length
+                }
               </p>
             </div>
           </div>
@@ -474,6 +698,9 @@ const KitchenOrders = ({ cart, setCart }) => {
           <button
             onClick={() => {
               setActiveTab('today');
+              setTodaySubTab('active'); // Reset to active sub-tab
+              setFilterStatus('all'); // Reset filter
+              setSearchQuery(''); // Clear search
               setCurrentPage(1); // Reset pagination when tab changes
             }}
             className={`py-2 px-1 border-b-2 font-medium text-sm ${
@@ -487,6 +714,8 @@ const KitchenOrders = ({ cart, setCart }) => {
           <button
             onClick={() => {
               setActiveTab('history');
+              setFilterStatus('all'); // Reset filter
+              setSearchQuery(''); // Clear search
               setCurrentPage(1); // Reset pagination when tab changes
             }}
             className={`py-2 px-1 border-b-2 font-medium text-sm ${
@@ -500,6 +729,8 @@ const KitchenOrders = ({ cart, setCart }) => {
           <button
             onClick={() => {
               setActiveTab('cancelled');
+              setFilterStatus('all'); // Reset filter
+              setSearchQuery(''); // Clear search
               setCurrentPage(1); // Reset pagination when tab changes
             }}
             className={`py-2 px-1 border-b-2 font-medium text-sm ${
@@ -512,6 +743,44 @@ const KitchenOrders = ({ cart, setCart }) => {
           </button>
         </nav>
       </div>
+
+      {/* Today's Orders Sub-tabs */}
+      {activeTab === 'today' && (
+        <div className="border-b border-gray-200 dark:border-gray-700">
+          <nav className="-mb-px flex space-x-8">
+            <button
+              onClick={() => {
+                setTodaySubTab('active');
+                setFilterStatus('all'); // Reset filter when switching sub-tabs
+                setSearchQuery(''); // Clear search when switching sub-tabs
+                setCurrentPage(1); // Reset pagination when sub-tab changes
+              }}
+              className={`py-2 px-1 border-b-2 font-medium text-sm ${
+                todaySubTab === 'active'
+                  ? 'border-secondary-500 text-secondary-600 dark:text-secondary-400'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'
+              }`}
+            >
+              Pending & Preparing ({todayOrders.filter(o => ['pending', 'preparing'].includes(o.status)).length})
+            </button>
+            <button
+              onClick={() => {
+                setTodaySubTab('completed');
+                setFilterStatus('all'); // Reset filter when switching sub-tabs
+                setSearchQuery(''); // Clear search when switching sub-tabs
+                setCurrentPage(1); // Reset pagination when sub-tab changes
+              }}
+              className={`py-2 px-1 border-b-2 font-medium text-sm ${
+                todaySubTab === 'completed'
+                  ? 'border-secondary-500 text-secondary-600 dark:text-secondary-400'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'
+              }`}
+            >
+              Completed ({todayOrders.filter(o => o.status === 'completed').length})
+            </button>
+          </nav>
+        </div>
+      )}
 
       {/* Filters */}
       <div className="flex items-center justify-between">
@@ -530,17 +799,67 @@ const KitchenOrders = ({ cart, setCart }) => {
               }`}
             >
               <option value="all">All Orders</option>
-              <option value="pending">Pending</option>
-              <option value="preparing">Preparing</option>
-              <option value="ready">Ready</option>
-              <option value="completed">Completed</option>
-              <option value="cancelled">Cancelled</option>
+              {activeTab === 'today' && todaySubTab === 'active' ? (
+                <>
+                  <option value="pending">Pending</option>
+                  <option value="preparing">Preparing</option>
+                </>
+              ) : activeTab === 'today' && todaySubTab === 'completed' ? (
+                <option value="completed">Completed</option>
+              ) : (
+                <>
+                  <option value="pending">Pending</option>
+                  <option value="preparing">Preparing</option>
+                  <option value="ready">Ready</option>
+                  <option value="completed">Completed</option>
+                  <option value="cancelled">Cancelled</option>
+                </>
+              )}
             </select>
           )}
+          
+          {/* Search Bar */}
+          <div className="relative">
+            <input
+              type="text"
+              placeholder="Search orders..."
+              value={searchQuery}
+              onChange={(e) => {
+                setSearchQuery(e.target.value);
+                setCurrentPage(1); // Reset pagination when search changes
+              }}
+              className={`px-3 py-2 pl-10 pr-10 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 w-64 ${
+                isDarkMode 
+                  ? 'bg-gray-800 border-gray-600 text-gray-100 placeholder-gray-400' 
+                  : 'border-gray-300 bg-white text-gray-900 placeholder-gray-500'
+              }`}
+            />
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+            </div>
+            {searchQuery && (
+              <button
+                onClick={() => {
+                  setSearchQuery('');
+                  setCurrentPage(1);
+                }}
+                className="absolute inset-y-0 right-0 pr-3 flex items-center hover:text-gray-600 dark:hover:text-gray-300"
+              >
+                <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            )}
+          </div>
         </div>
         <div className="text-sm text-gray-600 dark:text-gray-400">
-          {activeTab === 'today' && (
-            <span>Showing today's orders ({displayedOrders.length} of {getFilteredOrders().length})</span>
+          {activeTab === 'today' && todaySubTab === 'active' && (
+            <span>Showing pending & preparing orders ({displayedOrders.length} of {getFilteredOrders().length})</span>
+          )}
+          {activeTab === 'today' && todaySubTab === 'completed' && (
+            <span>Showing completed orders ({displayedOrders.length} of {getFilteredOrders().length})</span>
           )}
           {activeTab === 'history' && (
             <span>Showing historical orders ({displayedOrders.length} of {getFilteredOrders().length})</span>
@@ -613,93 +932,372 @@ const KitchenOrders = ({ cart, setCart }) => {
                 {/* Show full details only if not history/cancelled card or if card is expanded */}
                 {(!isHistoryCard && !isCancelledCard || isExpanded) && (
                   <>
-                    {/* Customer Info */}
-                    <div className="mb-4 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                      <p className="font-medium text-gray-900 dark:text-gray-100">
-                        {order.customer_name || 'Walk-in Customer'}
-                      </p>
-                      {order.customer_phone && order.customer_phone.trim() !== '' && (
-                        <p className="text-sm text-gray-600 dark:text-gray-400">
-                          📞 {order.customer_phone}
-                        </p>
-                      )}
-                      {order.payment_method && (
-                        <p className="text-sm text-gray-600 dark:text-gray-400">
-                          💳 {order.payment_method.toUpperCase()}
-                        </p>
-                      )}
-                      {order.split_payment && (
-                        <div className="mt-2 p-2 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded">
-                          <p className="text-xs font-medium text-blue-800 dark:text-blue-200">
-                            Split Payment
-                          </p>
-                          <p className="text-xs text-blue-700 dark:text-blue-300">
-                            ₹{order.split_amount} via {order.split_payment_method?.toUpperCase() || 'SPLIT'}
-                          </p>
-                          <p className="text-xs text-blue-700 dark:text-blue-300">
-                            ₹{(order.final_amount - order.split_amount).toFixed(2)} via {order.payment_method?.toUpperCase() || 'PRIMARY'}
-                          </p>
-                        </div>
-                      )}
-                      {order.extra_charge > 0 && (
-                        <div className="mt-2 p-2 bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800 rounded">
-                          <p className="text-xs font-medium text-orange-800 dark:text-orange-200">
-                            Extra Charge: ₹{order.extra_charge}
-                          </p>
-                          {order.extra_charge_note && (
-                            <p className="text-xs text-orange-700 dark:text-orange-300">
-                              Note: {order.extra_charge_note}
-                            </p>
-                          )}
-                        </div>
-                      )}
+                                    {/* Customer Info */}
+                {editingOrder === order.id ? (
+                  <div className="mb-4 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg space-y-3">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                        Customer Name
+                      </label>
+                      <input
+                        type="text"
+                        value={editFormData.customer_name || ''}
+                        onChange={(e) => updateEditFormData('customer_name', e.target.value)}
+                        className="input-field w-full"
+                        placeholder="Customer name"
+                      />
                     </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                        Phone Number
+                      </label>
+                      <input
+                        type="text"
+                        value={editFormData.customer_phone || ''}
+                        onChange={(e) => updateEditFormData('customer_phone', e.target.value)}
+                        className="input-field w-full"
+                        placeholder="Phone number"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                        Email
+                      </label>
+                      <input
+                        type="email"
+                        value={editFormData.customer_email || ''}
+                        onChange={(e) => updateEditFormData('customer_email', e.target.value)}
+                        className="input-field w-full"
+                        placeholder="Email address"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                        Payment Method
+                      </label>
+                      <select
+                        value={editFormData.payment_method || ''}
+                        onChange={(e) => updateEditFormData('payment_method', e.target.value)}
+                        className="input-field w-full"
+                      >
+                        <option value="">Select payment method</option>
+                        <option value="cash">Cash</option>
+                        <option value="card">Card</option>
+                        <option value="upi">UPI</option>
+                        <option value="online">Online</option>
+                      </select>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <input
+                        type="checkbox"
+                        checked={editFormData.split_payment || false}
+                        onChange={(e) => updateEditFormData('split_payment', e.target.checked)}
+                        className="rounded"
+                      />
+                      <label className="text-sm text-gray-700 dark:text-gray-300">
+                        Split Payment
+                      </label>
+                    </div>
+                    {editFormData.split_payment && (
+                      <>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                            Split Payment Method
+                          </label>
+                          <select
+                            value={editFormData.split_payment_method || ''}
+                            onChange={(e) => updateEditFormData('split_payment_method', e.target.value)}
+                            className="input-field w-full"
+                          >
+                            <option value="">Select split payment method</option>
+                            <option value="cash">Cash</option>
+                            <option value="card">Card</option>
+                            <option value="upi">UPI</option>
+                            <option value="online">Online</option>
+                          </select>
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                            Split Amount
+                          </label>
+                          <input
+                            type="number"
+                            step="0.01"
+                            value={editFormData.split_amount || 0}
+                            onChange={(e) => updateEditFormData('split_amount', parseFloat(e.target.value) || 0)}
+                            className="input-field w-full"
+                            placeholder="Split amount"
+                          />
+                        </div>
+                      </>
+                    )}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                        Extra Charge
+                      </label>
+                      <input
+                        type="number"
+                        step="0.01"
+                        value={editFormData.extra_charge || 0}
+                        onChange={(e) => updateEditFormData('extra_charge', parseFloat(e.target.value) || 0)}
+                        className="input-field w-full"
+                        placeholder="Extra charge amount"
+                      />
+                    </div>
+                    {editFormData.extra_charge > 0 && (
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                          Extra Charge Note
+                        </label>
+                        <input
+                          type="text"
+                          value={editFormData.extra_charge_note || ''}
+                          onChange={(e) => updateEditFormData('extra_charge_note', e.target.value)}
+                          className="input-field w-full"
+                          placeholder="Reason for extra charge"
+                        />
+                      </div>
+                    )}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                        Notes
+                      </label>
+                      <textarea
+                        value={editFormData.notes || ''}
+                        onChange={(e) => updateEditFormData('notes', e.target.value)}
+                        className="input-field w-full"
+                        rows="2"
+                        placeholder="Order notes"
+                      />
+                    </div>
+                  </div>
+                ) : (
+                  <div className="mb-4 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                    <p className="font-medium text-gray-900 dark:text-gray-100">
+                      {order.customer_name || 'Walk-in Customer'}
+                    </p>
+                    {(user?.role === 'admin' || (user?.role === 'chef' && cafeSettings?.chef_can_view_customers) || (user?.role === 'reception' && cafeSettings?.reception_can_view_customers)) && order.customer_phone && order.customer_phone.trim() !== '' && (
+                      <p className="text-sm text-gray-600 dark:text-gray-400">
+                        📞 {order.customer_phone}
+                      </p>
+                    )}
+                    {(user?.role === 'admin' || (user?.role === 'chef' && cafeSettings?.chef_can_view_payments) || (user?.role === 'reception' && cafeSettings?.reception_can_view_payments)) && order.payment_method && (
+                      <p className="text-sm text-gray-600 dark:text-gray-400">
+                        💳 {order.payment_method.toUpperCase()}
+                      </p>
+                    )}
+                    {(user?.role === 'admin' || (user?.role === 'chef' && cafeSettings?.chef_can_view_payments) || (user?.role === 'reception' && cafeSettings?.reception_can_view_payments)) && order.split_payment && (
+                      <div className="mt-2 p-2 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded">
+                        <p className="text-xs font-medium text-blue-800 dark:text-blue-200">
+                          Split Payment
+                        </p>
+                        <p className="text-xs text-blue-700 dark:text-blue-300">
+                          ₹{order.split_amount} via {order.split_payment_method?.toUpperCase() || 'SPLIT'}
+                        </p>
+                        <p className="text-xs text-blue-700 dark:text-blue-300">
+                          ₹{(order.final_amount - order.split_amount).toFixed(2)} via {order.payment_method?.toUpperCase() || 'PRIMARY'}
+                        </p>
+                      </div>
+                    )}
+                    {(user?.role === 'admin' || (user?.role === 'chef' && cafeSettings?.chef_can_view_payments) || (user?.role === 'reception' && cafeSettings?.reception_can_view_payments)) && order.extra_charge > 0 && (
+                      <div className="mt-2 p-2 bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800 rounded">
+                        <p className="text-xs font-medium text-orange-800 dark:text-orange-200">
+                          Extra Charge: ₹{order.extra_charge}
+                        </p>
+                        {order.extra_charge_note && (
+                          <p className="text-xs text-orange-700 dark:text-orange-300">
+                            Note: {order.extra_charge_note}
+                          </p>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                )}
 
                     {/* Order Items */}
                     <div className="mb-4">
-                      <h4 className="font-medium text-gray-900 dark:text-gray-100 mb-2">Items:</h4>
-                      {order.items && order.items.length > 0 ? (
-                        <div className="space-y-2">
-                          {order.items.map((item, index) => (
-                            <div key={index} className="flex justify-between items-center">
-                              <div className="flex items-center space-x-2">
-                                <span className="text-sm font-medium text-gray-900 dark:text-gray-100">
-                                  {item.quantity}x
-                                </span>
-                                <span className="text-sm text-gray-700 dark:text-gray-300">
-                                  {item.name || 'Unknown Item'}
-                                </span>
+                      <div className="flex items-center justify-between mb-2">
+                        <h4 className="font-medium text-gray-900 dark:text-gray-100">Items:</h4>
+                        {editingOrder === order.id && (
+                          <button
+                            onClick={addItemToOrder}
+                            className="text-sm px-2 py-1 bg-green-600 text-white rounded hover:bg-green-700 flex items-center"
+                          >
+                            <Plus className="h-3 w-3 mr-1" />
+                            Add Item
+                          </button>
+                        )}
+                      </div>
+                      {editingOrder === order.id ? (
+                        <div className="space-y-3">
+                          {editFormData.items && editFormData.items.length > 0 ? (
+                            editFormData.items.map((item, index) => (
+                              <div key={index} className="p-3 bg-gray-50 dark:bg-gray-700 rounded-lg space-y-2">
+                                <div className="flex items-center justify-between">
+                                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                                    Item {index + 1}
+                                  </span>
+                                  <button
+                                    onClick={() => removeOrderItem(index)}
+                                    className="text-red-600 hover:text-red-800 p-1"
+                                  >
+                                    <Trash2 className="h-4 w-4" />
+                                  </button>
+                                </div>
+                                <div className="grid grid-cols-2 gap-2">
+                                  <div>
+                                    <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">
+                                      Menu Item
+                                    </label>
+                                    <select
+                                      value={item.menu_item_id || ''}
+                                      onChange={(e) => updateOrderItem(index, 'menu_item_id', e.target.value)}
+                                      className="input-field text-sm"
+                                    >
+                                      {menuItems.map(menuItem => (
+                                        <option key={menuItem.id} value={menuItem.id}>
+                                          {menuItem.name} - ₹{menuItem.price}
+                                        </option>
+                                      ))}
+                                    </select>
+                                  </div>
+                                  <div>
+                                    <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">
+                                      Quantity
+                                    </label>
+                                    <input
+                                      type="number"
+                                      min="1"
+                                      value={item.quantity || 1}
+                                      onChange={(e) => updateOrderItem(index, 'quantity', parseInt(e.target.value) || 1)}
+                                      className="input-field text-sm"
+                                    />
+                                  </div>
+                                </div>
+                                <div className="grid grid-cols-2 gap-2">
+                                  <div>
+                                    <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">
+                                      Unit Price
+                                    </label>
+                                    <input
+                                      type="number"
+                                      step="0.01"
+                                      value={item.price || 0}
+                                      onChange={(e) => updateOrderItem(index, 'price', parseFloat(e.target.value) || 0)}
+                                      className="input-field text-sm"
+                                    />
+                                  </div>
+                                  <div>
+                                    <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">
+                                      Total
+                                    </label>
+                                    <input
+                                      type="number"
+                                      step="0.01"
+                                      value={item.total || 0}
+                                      readOnly
+                                      className="input-field text-sm bg-gray-100 dark:bg-gray-600"
+                                    />
+                                  </div>
+                                </div>
                               </div>
-                              <span className="text-sm text-gray-600 dark:text-gray-400">
-                                ₹{item.price || 0}
-                              </span>
-                            </div>
-                          ))}
+                            ))
+                          ) : (
+                            <p className="text-sm text-gray-500 dark:text-gray-400 italic">
+                              No items added
+                            </p>
+                          )}
                         </div>
                       ) : (
-                        <p className="text-sm text-gray-500 dark:text-gray-400 italic">
-                          No items found
-                        </p>
+                        order.items && order.items.length > 0 ? (
+                          <div className="space-y-2">
+                            {order.items.map((item, index) => (
+                              <div key={index} className="flex justify-between items-center">
+                                <div className="flex items-center space-x-2">
+                                  <span className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                                    {item.quantity}x
+                                  </span>
+                                  <span className="text-sm text-gray-700 dark:text-gray-300">
+                                    {item.name || 'Unknown Item'}
+                                  </span>
+                                </div>
+                                <span className="text-sm text-gray-600 dark:text-gray-400">
+                                  ₹{item.price || 0}
+                                </span>
+                              </div>
+                            ))}
+                          </div>
+                        ) : (
+                          <p className="text-sm text-gray-500 dark:text-gray-400 italic">
+                            No items found
+                          </p>
+                        )
                       )}
                     </div>
 
                     {/* Order Total */}
                     <div className="border-t pt-3 mb-4">
-                      <div className="flex justify-between items-center">
-                        <span className="font-medium text-gray-900 dark:text-gray-100">Total:</span>
-                        <span className="font-bold text-lg text-gray-900 dark:text-gray-100">
-                          ₹{order.final_amount}
-                        </span>
-                      </div>
+                      {editingOrder === order.id ? (
+                        <div className="space-y-2">
+                          <div className="flex justify-between items-center">
+                            <span className="text-sm text-gray-600 dark:text-gray-400">Subtotal:</span>
+                            <span className="text-sm text-gray-900 dark:text-gray-100">
+                              ₹{editFormData.items ? editFormData.items.reduce((sum, item) => sum + (item.total || 0), 0).toFixed(2) : '0.00'}
+                            </span>
+                          </div>
+                          <div className="flex justify-between items-center">
+                            <span className="text-sm text-gray-600 dark:text-gray-400">Tax (8.5%):</span>
+                            <span className="text-sm text-gray-900 dark:text-gray-100">
+                              ₹{((editFormData.items ? editFormData.items.reduce((sum, item) => sum + (item.total || 0), 0) : 0) * 0.085).toFixed(2)}
+                            </span>
+                          </div>
+                          {editFormData.extra_charge > 0 && (
+                            <div className="flex justify-between items-center">
+                              <span className="text-sm text-gray-600 dark:text-gray-400">Extra Charge:</span>
+                              <span className="text-sm text-gray-900 dark:text-gray-100">
+                                ₹{editFormData.extra_charge.toFixed(2)}
+                              </span>
+                            </div>
+                          )}
+                          <div className="flex justify-between items-center border-t pt-2">
+                            <span className="font-medium text-gray-900 dark:text-gray-100">Final Total:</span>
+                            <span className="font-bold text-lg text-gray-900 dark:text-gray-100">
+                              ₹{((editFormData.items ? editFormData.items.reduce((sum, item) => sum + (item.total || 0), 0) : 0) * 1.085 + (editFormData.extra_charge || 0)).toFixed(2)}
+                            </span>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="flex justify-between items-center">
+                          <span className="font-medium text-gray-900 dark:text-gray-100">Total:</span>
+                          <span className="font-bold text-lg text-gray-900 dark:text-gray-100">
+                            ₹{order.final_amount}
+                          </span>
+                        </div>
+                      )}
                     </div>
 
                     {/* Notes */}
-                    {order.notes && (
+                    {editingOrder === order.id ? (
                       <div className="mb-4 p-3 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
-                        <p className="text-sm text-yellow-800 dark:text-yellow-200">
-                          <strong>Notes:</strong> {order.notes}
-                        </p>
+                        <label className="block text-sm font-medium text-yellow-800 dark:text-yellow-200 mb-1">
+                          Notes:
+                        </label>
+                        <textarea
+                          value={editFormData.notes || ''}
+                          onChange={(e) => updateEditFormData('notes', e.target.value)}
+                          className="input-field w-full text-sm"
+                          rows="2"
+                          placeholder="Order notes"
+                        />
                       </div>
+                    ) : (
+                      order.notes && (
+                        <div className="mb-4 p-3 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
+                          <p className="text-sm text-yellow-800 dark:text-yellow-200">
+                            <strong>Notes:</strong> {order.notes}
+                          </p>
+                        </div>
+                      )
                     )}
                   </>
                 )}
@@ -707,53 +1305,94 @@ const KitchenOrders = ({ cart, setCart }) => {
                 {/* Actions */}
                 <div className="flex items-center justify-between pt-3 border-t">
                   <div className="flex space-x-2">
-                    {/* Show update buttons for today's orders and for admin/chef in history/cancelled tabs */}
-                    {(activeTab === 'today' || (user?.role === 'admin' || user?.role === 'chef')) && (
-                      <div className="flex flex-wrap gap-1">
-                        {getStatusOptions(order.status).map((status) => (
-                          <button
-                            key={status}
-                            onClick={() => updateOrderStatus(order.id, status)}
-                            className={`text-xs px-2 py-1 rounded border ${
-                              status === 'cancelled' 
-                                ? isDarkMode 
-                                  ? 'text-red-400 border-red-600 hover:bg-red-900' 
-                                  : 'text-red-600 border-red-300 hover:bg-red-50'
-                                : status === 'completed'
-                                ? isDarkMode
-                                  ? 'text-green-400 border-green-600 hover:bg-green-900'
-                                  : 'text-green-600 border-green-300 hover:bg-green-50'
-                                : isDarkMode
-                                  ? 'text-blue-400 border-blue-600 hover:bg-blue-900'
-                                  : 'text-blue-600 border-blue-300 hover:bg-blue-50'
-                            }`}
-                          >
-                            {status.charAt(0).toUpperCase() + status.slice(1)}
-                          </button>
-                        ))}
+                    {editingOrder === order.id ? (
+                      // Editing mode actions
+                      <div className="flex space-x-2">
+                        <button
+                          onClick={saveOrder}
+                          className="text-sm px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700 flex items-center"
+                        >
+                          <Save className="h-3 w-3 mr-1" />
+                          Save
+                        </button>
+                        <button
+                          onClick={cancelEditing}
+                          className="text-sm px-3 py-1 bg-gray-600 text-white rounded hover:bg-gray-700 flex items-center"
+                        >
+                          <X className="h-3 w-3 mr-1" />
+                          Cancel
+                        </button>
                       </div>
+                    ) : (
+                      // Normal mode actions
+                      <>
+                        {/* Show update buttons for today's orders and for admin/chef in history/cancelled tabs */}
+                        {(activeTab === 'today' || (user?.role === 'admin' || user?.role === 'chef')) && (
+                          <div className="flex flex-wrap gap-1">
+                            {getStatusOptions(order.status).map((status) => (
+                              <button
+                                key={status}
+                                onClick={() => updateOrderStatus(order.id, status)}
+                                className={`text-xs px-2 py-1 rounded border ${
+                                  status === 'cancelled' 
+                                    ? isDarkMode 
+                                      ? 'text-red-400 border-red-600 hover:bg-red-900' 
+                                      : 'text-red-600 border-red-300 hover:bg-red-50'
+                                    : status === 'completed'
+                                    ? isDarkMode
+                                      ? 'text-green-400 border-green-600 hover:bg-green-900'
+                                      : 'text-green-600 border-green-300 hover:bg-green-50'
+                                    : isDarkMode
+                                      ? 'text-blue-400 border-blue-600 hover:bg-blue-900'
+                                      : 'text-blue-600 border-blue-300 hover:bg-blue-50'
+                                }`}
+                              >
+                                {status.charAt(0).toUpperCase() + status.slice(1)}
+                              </button>
+                            ))}
+                          </div>
+                        )}
+                      </>
                     )}
                   </div>
                   <div className="flex items-center space-x-2">
-                    <button
-                      onClick={() => addOrderToCart(order)}
-                      className={`text-sm px-3 py-1 rounded border flex items-center ${
-                        isDarkMode 
-                          ? 'text-green-400 border-green-600 hover:bg-green-900' 
-                          : 'text-green-600 border-green-300 hover:bg-green-50'
-                      }`}
-                      title="Add to Cart"
-                    >
-                      <ShoppingCart className="h-3 w-3 mr-1" />
-                      Add to Cart
-                    </button>
-                    <button
-                      onClick={() => printOrder(order)}
-                      className="btn-secondary text-sm px-3 py-1"
-                      title="Print Order"
-                    >
-                      <Printer className="h-4 w-4" />
-                    </button>
+                    {editingOrder !== order.id && (
+                      <>
+                        {(user?.role === 'admin' || (user?.role === 'chef' && cafeSettings?.chef_can_edit_orders) || (user?.role === 'reception' && cafeSettings?.reception_can_edit_orders)) && (
+                          <button
+                            onClick={() => startEditing(order)}
+                            className={`text-sm px-3 py-1 rounded border flex items-center ${
+                              isDarkMode 
+                                ? 'text-blue-400 border-blue-600 hover:bg-blue-900' 
+                                : 'text-blue-600 border-blue-300 hover:bg-blue-50'
+                            }`}
+                            title="Edit Order"
+                          >
+                            <Edit className="h-3 w-3 mr-1" />
+                            Edit
+                          </button>
+                        )}
+                        <button
+                          onClick={() => addOrderToCart(order)}
+                          className={`text-sm px-3 py-1 rounded border flex items-center ${
+                            isDarkMode 
+                              ? 'text-green-400 border-green-600 hover:bg-green-900' 
+                              : 'text-green-600 border-green-300 hover:bg-green-50'
+                          }`}
+                          title="Add to Cart"
+                        >
+                          <ShoppingCart className="h-3 w-3 mr-1" />
+                          Add to Cart
+                        </button>
+                        <button
+                          onClick={() => printOrder(order)}
+                          className="btn-secondary text-sm px-3 py-1"
+                          title="Print Order"
+                        >
+                          <Printer className="h-4 w-4" />
+                        </button>
+                      </>
+                    )}
                   </div>
                 </div>
               </div>
@@ -775,6 +1414,17 @@ const KitchenOrders = ({ cart, setCart }) => {
           )}
         </div>
       )}
+
+      {/* Print Modal */}
+      <PrintModal
+        isOpen={showPrintModal}
+        onClose={() => setShowPrintModal(false)}
+        order={selectedOrder}
+        onPrintSuccess={() => {
+          setShowPrintModal(false);
+          setSelectedOrder(null);
+        }}
+      />
     </div>
   );
 };

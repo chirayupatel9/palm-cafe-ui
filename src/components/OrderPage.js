@@ -3,11 +3,14 @@ import { Plus, Minus, Trash2, Receipt, ShoppingCart, FolderOpen, X, Star } from 
 import axios from 'axios';
 import toast from 'react-hot-toast';
 import { useCurrency } from '../contexts/CurrencyContext';
-import { getCategoryColor } from '../utils/categoryColors';
+import { useCafeSettings } from '../contexts/CafeSettingsContext';
+import { useDarkMode } from '../contexts/DarkModeContext';
 import { useAuth } from '../contexts/AuthContext';
+import { getImageUrl } from '../utils/imageUtils';
 
 const OrderPage = ({ menuItems, cart: externalCart, setCart: setExternalCart }) => {
   const { formatCurrency } = useCurrency();
+  const { cafeSettings } = useCafeSettings();
   const { user } = useAuth();
   const [cart, setCart] = useState([]);
   const [customerName, setCustomerName] = useState('');
@@ -362,30 +365,40 @@ const OrderPage = ({ menuItems, cart: externalCart, setCart: setExternalCart }) 
           ) : (
             <div className="space-y-4 sm:space-y-6">
               {Object.entries(groupedMenuItems).map(([categoryName, items], index) => {
-                const categoryColor = getCategoryColor(categoryName, index);
                 return (
-                <div key={categoryName} className={`border ${categoryColor.border} rounded-xl p-4 sm:p-6 ${categoryColor.bg} shadow-sm`}>
-                  <h3 className={`text-xl font-bold ${categoryColor.text} mb-4 sm:mb-6 flex items-center`}>
-                    <FolderOpen className={`h-6 w-6 mr-3 ${categoryColor.text}`} />
+                <div key={categoryName} className={`border border-gray-200 dark:border-gray-700 rounded-xl p-4 sm:p-6 bg-gray-50 dark:bg-gray-800 shadow-sm`}>
+                  <h3 className={`text-xl font-bold text-gray-900 dark:text-gray-100 mb-4 sm:mb-6 flex items-center`}>
+                    <FolderOpen className={`h-6 w-6 mr-3 text-gray-600 dark:text-gray-400`} />
                     {categoryName}
                   </h3>
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
                     {items.map((item) => (
                       <div
                         key={item.id}
-                        className={`group relative border ${categoryColor.border} rounded-xl p-4 sm:p-5 hover:shadow-lg transition-all duration-300 cursor-pointer ${categoryColor.bg} hover:${categoryColor.hover} hover:scale-105 transform`}
+                        className={`group relative border border-gray-200 dark:border-gray-700 rounded-xl p-4 sm:p-5 hover:shadow-lg transition-all duration-300 cursor-pointer bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 hover:scale-105 transform overflow-hidden`}
                         onClick={() => addToCart(item)}
                       >
                         {/* Add to cart indicator */}
-                        <div className={`absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-white dark:bg-gray-800 rounded-full p-2 shadow-md ${categoryColor.border}`}>
-                          <Plus className={`h-4 w-4 ${categoryColor.text}`} />
+                        <div className={`absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-white dark:bg-gray-800 rounded-full p-2 shadow-md border border-gray-200 dark:border-gray-600 z-10`}>
+                          <Plus className={`h-4 w-4 text-gray-600 dark:text-gray-400`} />
                         </div>
                         
+                        {/* Menu Item Image */}
+                        {cafeSettings?.show_menu_images && item.image_url && (
+                          <div className="w-full h-32 mb-3 overflow-hidden rounded-lg">
+                            <img
+                              src={getImageUrl(item.image_url)}
+                              alt={item.name}
+                              className="w-full h-full object-cover"
+                            />
+                          </div>
+                        )}
+                        
                         <div className="flex justify-between items-start mb-3">
-                          <h4 className={`font-semibold ${categoryColor.text} text-sm sm:text-base leading-tight`}>
+                          <h4 className={`font-semibold text-gray-900 dark:text-gray-100 text-sm sm:text-base leading-tight`}>
                             {item.name}
                           </h4>
-                          <span className={`text-lg sm:text-xl font-bold ${categoryColor.text} ml-2`}>
+                          <span className={`text-lg sm:text-xl font-bold text-gray-700 dark:text-gray-300 ml-2`}>
                             {formatCurrency(ensureNumber(item.price))}
                           </span>
                         </div>
@@ -690,7 +703,7 @@ const OrderPage = ({ menuItems, cart: externalCart, setCart: setExternalCart }) 
                       </div>
                     </div>
                     
-                    <div className="text-sm font-medium text-gray-700">The Palm Cafe</div>
+                    <div className="text-sm font-medium text-gray-700">{cafeSettings?.cafe_name || 'Our Cafe'}</div>
                     
                     <div className="bg-purple-600 h-2 -mx-4 -mb-4 rounded-b-lg"></div>
                   </div>
@@ -708,9 +721,21 @@ const OrderPage = ({ menuItems, cart: externalCart, setCart: setExternalCart }) 
                 <div className="space-y-3 mb-4">
                   {currentCart.map((item) => (
                     <div key={item.id} className="flex items-center justify-between p-3 bg-accent-50 dark:bg-gray-700 rounded-lg border border-accent-200 dark:border-gray-600">
-                      <div className="flex-1">
-                        <h4 className="font-medium text-secondary-700 dark:text-secondary-300 text-sm">{item.name}</h4>
-                        <p className="text-xs text-gray-600 dark:text-gray-400">{formatCurrency(ensureNumber(item.price))} each</p>
+                      <div className="flex items-center space-x-3 flex-1">
+                        {/* Cart Item Image */}
+                        {cafeSettings?.show_menu_images && item.image_url && (
+                          <div className="w-12 h-12 overflow-hidden rounded-lg flex-shrink-0">
+                            <img
+                              src={getImageUrl(item.image_url)}
+                              alt={item.name}
+                              className="w-full h-full object-cover"
+                            />
+                          </div>
+                        )}
+                        <div className="flex-1">
+                          <h4 className="font-medium text-secondary-700 dark:text-secondary-300 text-sm">{item.name}</h4>
+                          <p className="text-xs text-gray-600 dark:text-gray-400">{formatCurrency(ensureNumber(item.price))} each</p>
+                        </div>
                       </div>
                       <div className="flex items-center space-x-2">
                         <button
@@ -1099,7 +1124,7 @@ const OrderPage = ({ menuItems, cart: externalCart, setCart: setExternalCart }) 
                     </div>
                   </div>
                   
-                  <div className="text-sm font-medium text-gray-700">The Palm Cafe</div>
+                  <div className="text-sm font-medium text-gray-700">{cafeSettings?.cafe_name || 'Our Cafe'}</div>
                   
                   <div className="bg-purple-600 h-2 -mx-4 -mb-4 rounded-b-lg"></div>
                 </div>
@@ -1118,9 +1143,21 @@ const OrderPage = ({ menuItems, cart: externalCart, setCart: setExternalCart }) 
             <div className="space-y-3 mb-4">
               {currentCart.map((item) => (
                 <div key={item.id} className="flex items-center justify-between p-3 bg-accent-50 dark:bg-gray-700 rounded-lg border border-accent-200 dark:border-gray-600">
-                  <div className="flex-1">
-                    <h4 className="font-medium text-secondary-700 dark:text-secondary-300">{item.name}</h4>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">{formatCurrency(ensureNumber(item.price))} each</p>
+                  <div className="flex items-center space-x-3 flex-1">
+                    {/* Cart Item Image */}
+                    {cafeSettings?.show_menu_images && item.image_url && (
+                      <div className="w-12 h-12 overflow-hidden rounded-lg flex-shrink-0">
+                        <img
+                          src={getImageUrl(item.image_url)}
+                          alt={item.name}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                    )}
+                    <div className="flex-1">
+                      <h4 className="font-medium text-secondary-700 dark:text-secondary-300">{item.name}</h4>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">{formatCurrency(ensureNumber(item.price))} each</p>
+                    </div>
                   </div>
                   <div className="flex items-center space-x-2">
                     <button
