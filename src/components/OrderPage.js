@@ -15,6 +15,7 @@ const OrderPage = ({ menuItems, cart: externalCart, setCart: setExternalCart }) 
   const [cart, setCart] = useState([]);
   const [customerName, setCustomerName] = useState('');
   const [customerPhone, setCustomerPhone] = useState('');
+  const [tableNumber, setTableNumber] = useState('');
   const [customerInfo, setCustomerInfo] = useState(null);
   const [paymentMethod, setPaymentMethod] = useState('cash');
   const [taxInfo, setTaxInfo] = useState({ taxRate: 0, taxName: 'Tax', taxAmount: 0 });
@@ -254,6 +255,7 @@ const OrderPage = ({ menuItems, cart: externalCart, setCart: setExternalCart }) 
       const orderData = {
         customerName: customerName.trim(),
         customerPhone: customerPhone.trim(),
+        tableNumber: tableNumber.trim(),
         paymentMethod: paymentMethod,
         pickupOption: pickupOption,
         items: currentCart.map(item => ({
@@ -295,6 +297,7 @@ const OrderPage = ({ menuItems, cart: externalCart, setCart: setExternalCart }) 
       setCurrentCart([]);
       setCustomerName('');
       setCustomerPhone('');
+      setTableNumber('');
       setCustomerInfo(null);
       setTipAmount(0);
       setTipPercentage(0);
@@ -476,6 +479,13 @@ const OrderPage = ({ menuItems, cart: externalCart, setCart: setExternalCart }) 
                     setCustomerPhone(e.target.value);
                     searchCustomer(e.target.value);
                   }}
+                  className="input-field mb-2"
+                />
+                <input
+                  type="text"
+                  placeholder="Table Number/Character (optional)"
+                  value={tableNumber}
+                  onChange={(e) => setTableNumber(e.target.value)}
                   className="input-field mb-2"
                 />
                 {customerInfo && (
@@ -900,6 +910,13 @@ const OrderPage = ({ menuItems, cart: externalCart, setCart: setExternalCart }) 
                 setCustomerPhone(e.target.value);
                 searchCustomer(e.target.value);
               }}
+              className="input-field mb-2"
+            />
+            <input
+              type="text"
+              placeholder="Table Number/Character (optional)"
+              value={tableNumber}
+              onChange={(e) => setTableNumber(e.target.value)}
               className="input-field mb-2"
             />
             {customerInfo && (

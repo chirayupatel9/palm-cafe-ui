@@ -87,6 +87,7 @@ const KitchenOrders = ({ cart, setCart }) => {
         const customerName = order.customer_name?.toLowerCase() || '';
         const customerPhone = order.customer_phone?.toLowerCase() || '';
         const customerEmail = order.customer_email?.toLowerCase() || '';
+        const tableNumber = order.table_number?.toLowerCase() || '';
         const notes = order.notes?.toLowerCase() || '';
         
         // Check if any item names match the search
@@ -96,6 +97,7 @@ const KitchenOrders = ({ cart, setCart }) => {
             !customerName.includes(query) && 
             !customerPhone.includes(query) && 
             !customerEmail.includes(query) && 
+            !tableNumber.includes(query) &&
             !notes.includes(query) && 
             !itemNames.includes(query)) {
           return false;
@@ -158,6 +160,7 @@ const KitchenOrders = ({ cart, setCart }) => {
       customer_name: order.customer_name || '',
       customer_email: order.customer_email || '',
       customer_phone: order.customer_phone || '',
+      table_number: order.table_number || '',
       payment_method: order.payment_method || '',
       split_payment: order.split_payment || false,
       split_payment_method: order.split_payment_method || '',
@@ -477,6 +480,7 @@ const KitchenOrders = ({ cart, setCart }) => {
         const customerName = order.customer_name?.toLowerCase() || '';
         const customerPhone = order.customer_phone?.toLowerCase() || '';
         const customerEmail = order.customer_email?.toLowerCase() || '';
+        const tableNumber = order.table_number?.toLowerCase() || '';
         const notes = order.notes?.toLowerCase() || '';
         
         // Check if any item names match the search
@@ -486,6 +490,7 @@ const KitchenOrders = ({ cart, setCart }) => {
             !customerName.includes(query) && 
             !customerPhone.includes(query) && 
             !customerEmail.includes(query) && 
+            !tableNumber.includes(query) &&
             !notes.includes(query) && 
             !itemNames.includes(query)) {
           return false;
@@ -973,6 +978,18 @@ const KitchenOrders = ({ cart, setCart }) => {
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                        Table Number
+                      </label>
+                      <input
+                        type="text"
+                        value={editFormData.table_number || ''}
+                        onChange={(e) => updateEditFormData('table_number', e.target.value)}
+                        className="input-field w-full"
+                        placeholder="Table number/character"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                         Payment Method
                       </label>
                       <select
@@ -1079,6 +1096,11 @@ const KitchenOrders = ({ cart, setCart }) => {
                     {(user?.role === 'admin' || (user?.role === 'chef' && cafeSettings?.chef_can_view_customers) || (user?.role === 'reception' && cafeSettings?.reception_can_view_customers)) && order.customer_phone && order.customer_phone.trim() !== '' && (
                       <p className="text-sm text-gray-600 dark:text-gray-400">
                         📞 {order.customer_phone}
+                      </p>
+                    )}
+                    {order.table_number && (
+                      <p className="text-sm text-gray-600 dark:text-gray-400">
+                        🍽️ Table: {order.table_number}
                       </p>
                     )}
                     {(user?.role === 'admin' || (user?.role === 'chef' && cafeSettings?.chef_can_view_payments) || (user?.role === 'reception' && cafeSettings?.reception_can_view_payments)) && order.payment_method && (

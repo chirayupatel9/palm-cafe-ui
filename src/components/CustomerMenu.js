@@ -43,6 +43,7 @@ const CustomerMenu = ({
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredMenuItems, setFilteredMenuItems] = useState({});
   const [pickupOption, setPickupOption] = useState('pickup');
+  const [tableNumber, setTableNumber] = useState('');
 
   // Helper function to ensure price is a number
   const ensureNumber = (value) => {
@@ -277,6 +278,7 @@ const CustomerMenu = ({
         customerName: customer.name,
         customerPhone: customer.phone || '',
         customerEmail: customer.email || '',
+        tableNumber: tableNumber,
         paymentMethod: paymentMethod,
         pickupOption: pickupOption,
         items: cart.map(item => ({
@@ -350,6 +352,7 @@ const CustomerMenu = ({
     setTipAmount(0);
     setTipPercentage(0);
     setPickupOption('pickup');
+    setTableNumber('');
     toast.success('Cart cleared');
   };
 
@@ -851,7 +854,22 @@ const CustomerMenu = ({
                     </p>
                   </div>
 
-                  
+                  {/* Table Number */}
+                  {pickupOption === 'dine-in' && (
+                    <div className="mb-6">
+                      <h3 className="font-medium text-secondary-700 dark:text-secondary-300 mb-3">Table Information</h3>
+                      <input
+                        type="text"
+                        placeholder="Table Number/Character (optional)"
+                        value={tableNumber}
+                        onChange={(e) => setTableNumber(e.target.value)}
+                        className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-secondary-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                      />
+                      <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">
+                        Enter your table number or character to help us serve your order correctly
+                      </p>
+                    </div>
+                  )}
 
                   {/* Points Redemption */}
                   {cart.length > 0 && customer?.loyalty_points > 0 && (
