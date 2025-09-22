@@ -25,7 +25,7 @@ const CustomerLogin = ({ onLogin, onRegister }) => {
     setLoading(true);
 
     try {
-      const response = await axios.get(`/customer/login/${phone}`);
+      const response = await axios.post('/customer/login', { phone });
       
       if (response.data) {
         const customer = response.data;

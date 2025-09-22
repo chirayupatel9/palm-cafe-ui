@@ -41,7 +41,7 @@ const CustomerOrderHistory = ({ customerPhone, setActiveTab, cart, setCart }) =>
 
   const fetchCustomerInfo = async () => {
     try {
-      const response = await axios.get(`/customer/login/${customerPhone}`);
+      const response = await axios.post('/customer/login', { phone: customerPhone });
       if (response.data) {
         setCustomerInfo(response.data);
       }

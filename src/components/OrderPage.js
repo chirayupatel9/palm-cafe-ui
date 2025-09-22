@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Plus, Minus, Trash2, Receipt, ShoppingCart, FolderOpen, X, Star } from 'lucide-react';
 import axios from 'axios';
 import toast from 'react-hot-toast';
@@ -7,6 +7,23 @@ import { useCafeSettings } from '../contexts/CafeSettingsContext';
 import { useDarkMode } from '../contexts/DarkModeContext';
 import { useAuth } from '../contexts/AuthContext';
 import { getImageUrl } from '../utils/imageUtils';
+
+// Custom debounce hook
+const useDebounce = (value, delay) => {
+  const [debouncedValue, setDebouncedValue] = useState(value);
+  
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedValue(value);
+    }, delay);
+    
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [value, delay]);
+  
+  return debouncedValue;
+};
 
 const OrderPage = ({ menuItems, cart: externalCart, setCart: setExternalCart }) => {
   const { formatCurrency } = useCurrency();
@@ -34,6 +51,9 @@ const OrderPage = ({ menuItems, cart: externalCart, setCart: setExternalCart }) 
   const [extraCharge, setExtraCharge] = useState(0);
   const [extraChargeNote, setExtraChargeNote] = useState('');
   const [extraChargeEnabled, setExtraChargeEnabled] = useState(false);
+
+  // Debounced phone number to reduce API calls
+  const debouncedPhone = useDebounce(customerPhone, 500);
 
   // Use external cart if provided, otherwise use internal cart
   const currentCart = externalCart || cart;
@@ -118,6 +138,15 @@ const OrderPage = ({ menuItems, cart: externalCart, setCart: setExternalCart }) 
     }
   }, [currentCart, customerInfo?.loyalty_points, pointsToRedeem, getSubtotal]);
 
+  // Search customer when debounced phone number changes
+  useEffect(() => {
+    if (debouncedPhone && debouncedPhone.length >= 5) {
+      searchCustomer(debouncedPhone);
+    } else if (debouncedPhone.length === 0) {
+      setCustomerInfo(null);
+    }
+  }, [debouncedPhone]);
+
   // Fetch payment methods
   const fetchPaymentMethods = async () => {
     try {
@@ -173,7 +202,7 @@ const OrderPage = ({ menuItems, cart: externalCart, setCart: setExternalCart }) 
     }
 
     try {
-      const response = await axios.get(`/customer/login/${phone}`);
+      const response = await axios.post('/customer/login', { phone });
       if (response.data) {
         const customer = response.data;
         setCustomerInfo(customer);
@@ -183,7 +212,10 @@ const OrderPage = ({ menuItems, cart: externalCart, setCart: setExternalCart }) 
         setCustomerInfo(null);
       }
     } catch (error) {
-      console.error('Error searching customer:', error);
+      // Only log unexpected errors, not 404s (customer not found)
+      if (error.response?.status !== 404) {
+        console.error('Unexpected error searching customer:', error);
+      }
       setCustomerInfo(null);
     }
   };
@@ -475,10 +507,7 @@ const OrderPage = ({ menuItems, cart: externalCart, setCart: setExternalCart }) 
                   type="tel"
                   placeholder="Phone Number (optional)"
                   value={customerPhone}
-                  onChange={(e) => {
-                    setCustomerPhone(e.target.value);
-                    searchCustomer(e.target.value);
-                  }}
+                  onChange={(e) => setCustomerPhone(e.target.value)}
                   className="input-field mb-2"
                 />
                 <input
@@ -906,10 +935,7 @@ const OrderPage = ({ menuItems, cart: externalCart, setCart: setExternalCart }) 
               type="tel"
               placeholder="Phone Number (optional)"
               value={customerPhone}
-              onChange={(e) => {
-                setCustomerPhone(e.target.value);
-                searchCustomer(e.target.value);
-              }}
+              onChange={(e) => setCustomerPhone(e.target.value)}
               className="input-field mb-2"
             />
             <input
