@@ -1079,7 +1079,7 @@ const CustomerMenu = ({
                         </div>
                       </div>
                       <div className="text-center mt-3 text-sm text-gray-600">
-                        1 point = ₹0.10 discount
+                        1 point = {formatCurrency(0.10)} discount
                       </div>
                     </div>
                     <input

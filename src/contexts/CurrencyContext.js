@@ -42,13 +42,21 @@ export const CurrencyProvider = ({ children }) => {
 
   const formatCurrency = (amount) => {
     const { currency_symbol } = currencySettings;
-    if (!amount || isNaN(amount) || amount === null || amount === undefined) {
+    
+    // Handle null, undefined, empty string, or non-numeric values
+    if (amount === null || amount === undefined || amount === '' || isNaN(amount)) {
       return `${currency_symbol}0.00`;
     }
+    
+    // Parse the amount to ensure it's a number
     const parsedAmount = parseFloat(amount);
+    
+    // Handle NaN after parsing
     if (isNaN(parsedAmount)) {
       return `${currency_symbol}0.00`;
     }
+    
+    // Format with exactly 2 decimal places
     return `${currency_symbol}${parsedAmount.toFixed(2)}`;
   };
 

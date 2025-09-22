@@ -533,7 +533,7 @@ const OrderPage = ({ menuItems, cart: externalCart, setCart: setExternalCart }) 
                       <Star className="h-4 w-4 mr-2 text-yellow-500" />
                       Redeem Points
                       <span className="ml-2 text-sm text-gray-500">
-                        (1 point = ₹0.10)
+                        (1 point = {formatCurrency(0.10)})
                       </span>
                     </label>
                     
@@ -658,7 +658,7 @@ const OrderPage = ({ menuItems, cart: externalCart, setCart: setExternalCart }) 
                             placeholder="Enter amount"
                           />
                           <p className="text-xs text-gray-500 mt-1">
-                            Remaining amount: ₹{(getTotal() - splitAmount).toFixed(2)} via {paymentMethods.find(m => m.code === paymentMethod)?.name || 'primary method'}
+                            Remaining amount: {formatCurrency(getTotal() - splitAmount)} via {paymentMethods.find(m => m.code === paymentMethod)?.name || 'primary method'}
                           </p>
                         </div>
                       </div>
@@ -961,7 +961,7 @@ const OrderPage = ({ menuItems, cart: externalCart, setCart: setExternalCart }) 
                   <Star className="h-4 w-4 mr-2 text-yellow-500" />
                   Redeem Points
                   <span className="ml-2 text-sm text-gray-500">
-                    (1 point = ₹0.10)
+                    (1 point = {formatCurrency(0.10)})
                   </span>
                 </label>
                 
@@ -1084,7 +1084,7 @@ const OrderPage = ({ menuItems, cart: externalCart, setCart: setExternalCart }) 
                         placeholder="Enter amount"
                       />
                       <p className="text-xs text-gray-500 mt-1">
-                        Remaining amount: ₹{(getTotal() - splitAmount).toFixed(2)} via {paymentMethods.find(m => m.code === paymentMethod)?.name || 'primary method'}
+                        Remaining amount: {formatCurrency(getTotal() - splitAmount)} via {paymentMethods.find(m => m.code === paymentMethod)?.name || 'primary method'}
                       </p>
                     </div>
                   </div>

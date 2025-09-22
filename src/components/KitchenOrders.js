@@ -5,6 +5,7 @@ import toast from 'react-hot-toast';
 import { useAuth } from '../contexts/AuthContext';
 import { useDarkMode } from '../contexts/DarkModeContext';
 import { useCafeSettings } from '../contexts/CafeSettingsContext';
+import { useCurrency } from '../contexts/CurrencyContext';
 import useOrders from '../hooks/useOrders';
 import PrintModal from './PrintModal';
 
@@ -12,6 +13,7 @@ const KitchenOrders = ({ cart, setCart }) => {
   const { isAuthenticated, user, loading: authLoading } = useAuth();
   const { isDarkMode } = useDarkMode();
   const { cafeSettings } = useCafeSettings();
+  const { formatCurrency } = useCurrency();
   
   // Use the custom orders hook with auto-refresh and WebSocket
   const { 
@@ -178,7 +180,7 @@ const KitchenOrders = ({ cart, setCart }) => {
       toast.success('Order updated successfully');
       
       // Update order in cache instead of refetching
-      updateOrderInCache(orderId, { ...editFormData, status: 'preparing' });
+      updateOrderInCache(editingOrder, { ...editFormData, status: 'preparing' });
       cancelEditing();
     } catch (error) {
       console.error('Error updating order:', error);
@@ -1107,10 +1109,10 @@ const KitchenOrders = ({ cart, setCart }) => {
                           Split Payment
                         </p>
                         <p className="text-xs text-blue-700 dark:text-blue-300">
-                          ₹{order.split_amount} via {order.split_payment_method?.toUpperCase() || 'SPLIT'}
+                          {formatCurrency(order.split_amount)} via {order.split_payment_method?.toUpperCase() || 'SPLIT'}
                         </p>
                         <p className="text-xs text-blue-700 dark:text-blue-300">
-                          ₹{(order.final_amount - order.split_amount).toFixed(2)} via {order.payment_method?.toUpperCase() || 'PRIMARY'}
+                          {formatCurrency(order.final_amount - order.split_amount)} via {order.payment_method?.toUpperCase() || 'PRIMARY'}
                         </p>
                       </div>
                     )}
@@ -1171,7 +1173,7 @@ const KitchenOrders = ({ cart, setCart }) => {
                                     >
                                       {menuItems.map(menuItem => (
                                         <option key={menuItem.id} value={menuItem.id}>
-                                          {menuItem.name} - ₹{menuItem.price}
+                                          {menuItem.name} - {formatCurrency(menuItem.price)}
                                         </option>
                                       ))}
                                     </select>
@@ -1237,7 +1239,7 @@ const KitchenOrders = ({ cart, setCart }) => {
                                   </span>
                                 </div>
                                 <span className="text-sm text-gray-600 dark:text-gray-400">
-                                  ₹{item.price || 0}
+                                  {formatCurrency(item.price || 0)}
                                 </span>
                               </div>
                             ))}

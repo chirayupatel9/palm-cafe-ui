@@ -509,10 +509,10 @@ const CustomerOrderHistory = ({ customerPhone, setActiveTab, cart, setCart }) =>
                           Split Payment
                         </p>
                         <p className="text-xs text-blue-700 dark:text-blue-300">
-                          ₹{order.split_amount} via {order.split_payment_method?.toUpperCase() || 'SPLIT'}
+                          {formatCurrency(order.split_amount)} via {order.split_payment_method?.toUpperCase() || 'SPLIT'}
                         </p>
                         <p className="text-xs text-blue-700 dark:text-blue-300">
-                          ₹{(order.final_amount - order.split_amount).toFixed(2)} via {order.payment_method?.toUpperCase() || 'PRIMARY'}
+                          {formatCurrency(order.final_amount - order.split_amount)} via {order.payment_method?.toUpperCase() || 'PRIMARY'}
                         </p>
                       </div>
                     )}
