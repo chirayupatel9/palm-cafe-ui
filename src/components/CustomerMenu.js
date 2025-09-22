@@ -466,18 +466,69 @@ const CustomerMenu = ({
                 </div>
               )}
 
-              {/* Cart Button */}
-              <button
-                onClick={() => setShowCart(true)}
-                className="relative bg-gradient-to-r from-blue-600 to-purple-700 text-white p-3 rounded-xl hover:shadow-xl hover:scale-105 transition-all duration-300 group"
-              >
-                <ShoppingCart className="h-5 w-5" />
+              {/* Enhanced Cart Button with Summary */}
+              <div className="relative group">
+                {/* Cart Summary Preview - Shows on hover */}
                 {cart.length > 0 && (
-                  <span className="absolute -top-2 -right-2 bg-yellow-400 text-black text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center animate-bounce">
-                    {cart.length}
-                  </span>
+                  <div className="absolute bottom-full right-0 mb-2 w-72 bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-200 dark:border-gray-700 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-2 group-hover:translate-y-0 pointer-events-none group-hover:pointer-events-auto z-50">
+                    <div className="p-3">
+                      <div className="flex items-center justify-between mb-2">
+                        <h4 className="font-semibold text-gray-900 dark:text-white text-sm">Quick Preview</h4>
+                        <span className="bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 px-2 py-1 rounded-full text-xs font-medium">
+                          {cart.reduce((total, item) => total + item.quantity, 0)} items
+                        </span>
+                      </div>
+                      
+                      <div className="space-y-1 max-h-32 overflow-y-auto">
+                        {cart.slice(0, 2).map((item, index) => (
+                          <div key={index} className="flex items-center justify-between py-1">
+                            <div className="flex items-center space-x-2">
+                              <span className="w-5 h-5 bg-gradient-to-r from-blue-500 to-purple-600 rounded text-white text-xs font-bold flex items-center justify-center">
+                                {item.quantity}
+                              </span>
+                              <span className="text-gray-900 dark:text-white text-xs font-medium truncate max-w-32">
+                                {item.name}
+                              </span>
+                            </div>
+                            <span className="font-bold text-gray-900 dark:text-white text-xs">
+                              {formatCurrency(item.price * item.quantity)}
+                            </span>
+                          </div>
+                        ))}
+                        {cart.length > 2 && (
+                          <p className="text-center text-gray-500 dark:text-gray-400 text-xs py-1">
+                            +{cart.length - 2} more items
+                          </p>
+                        )}
+                      </div>
+                      
+                      <div className="mt-2 pt-2 border-t border-gray-200 dark:border-gray-700">
+                        <div className="flex items-center justify-between">
+                          <span className="font-bold text-gray-900 dark:text-white text-sm">Total:</span>
+                          <span className="font-bold text-lg text-blue-600 dark:text-blue-400">
+                            {formatCurrency(cart.reduce((total, item) => total + (item.price * item.quantity), 0))}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 )}
-              </button>
+                
+                <button
+                  onClick={() => setShowCart(true)}
+                  className="relative bg-gradient-to-r from-blue-600 to-purple-700 text-white p-3 rounded-xl hover:shadow-xl hover:scale-105 transition-all duration-300 group"
+                >
+                  <ShoppingCart className="h-5 w-5" />
+                  {cart.length > 0 && (
+                    <>
+                      <span className="absolute -top-2 -right-2 bg-gradient-to-r from-yellow-400 to-orange-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center animate-pulse shadow-lg">
+                        {cart.reduce((total, item) => total + item.quantity, 0)}
+                      </span>
+                      <span className="absolute -top-2 -right-2 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full h-5 w-5 animate-ping opacity-75"></span>
+                    </>
+                  )}
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -1202,21 +1253,94 @@ const CustomerMenu = ({
   )
 }
 
-{/* Modern Floating Cart Button */ }
-<div className="fixed bottom-8 right-8 z-40">
-  <button
-    onClick={() => setShowCart(true)}
-    className="bg-gradient-to-r from-blue-600 to-purple-700 text-white p-5 rounded-2xl shadow-2xl hover:shadow-blue-500/50 transition-all duration-300 hover:scale-110 group backdrop-blur-sm border border-white/20"
-  >
-    <div className="relative">
-      <ShoppingCart className="h-7 w-7" />
+{/* Enhanced Floating Cart with Summary Preview */}
+<div className="fixed bottom-6 right-6 z-50">
+  <div className="relative group">
+    {/* Cart Summary Preview - Shows on hover */}
+    {cart.length > 0 && (
+      <div className="absolute bottom-full right-0 mb-4 w-80 bg-white dark:bg-gray-800 rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-700 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-2 group-hover:translate-y-0 pointer-events-none group-hover:pointer-events-auto">
+        <div className="p-4">
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="font-bold text-gray-900 dark:text-white text-lg">Cart Summary</h3>
+            <span className="bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 px-2 py-1 rounded-full text-xs font-medium">
+              {cart.reduce((total, item) => total + item.quantity, 0)} items
+            </span>
+          </div>
+          
+          <div className="space-y-2 max-h-48 overflow-y-auto">
+            {cart.slice(0, 3).map((item, index) => (
+              <div key={index} className="flex items-center justify-between py-2 border-b border-gray-100 dark:border-gray-700 last:border-b-0">
+                <div className="flex items-center space-x-3">
+                  <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+                    <span className="text-white text-xs font-bold">{item.quantity}</span>
+                  </div>
+                  <div>
+                    <p className="font-medium text-gray-900 dark:text-white text-sm">{item.name}</p>
+                    <p className="text-gray-500 dark:text-gray-400 text-xs">{formatCurrency(item.price)} each</p>
+                  </div>
+                </div>
+                <p className="font-bold text-gray-900 dark:text-white text-sm">
+                  {formatCurrency(item.price * item.quantity)}
+                </p>
+              </div>
+            ))}
+            {cart.length > 3 && (
+              <p className="text-center text-gray-500 dark:text-gray-400 text-xs py-2">
+                +{cart.length - 3} more items
+              </p>
+            )}
+          </div>
+          
+          <div className="mt-4 pt-3 border-t border-gray-200 dark:border-gray-700">
+            <div className="flex items-center justify-between">
+              <span className="font-bold text-gray-900 dark:text-white">Total:</span>
+              <span className="font-bold text-xl text-blue-600 dark:text-blue-400">
+                {formatCurrency(cart.reduce((total, item) => total + (item.price * item.quantity), 0))}
+              </span>
+            </div>
+            <button
+              onClick={() => setShowCart(true)}
+              className="w-full mt-3 bg-gradient-to-r from-blue-600 to-purple-700 text-white py-2 rounded-lg font-medium hover:shadow-lg transition-all duration-200"
+            >
+              View Cart & Checkout
+            </button>
+          </div>
+        </div>
+      </div>
+    )}
+    
+    {/* Main Floating Cart Button */}
+    <button
+      onClick={() => setShowCart(true)}
+      className="relative bg-gradient-to-r from-blue-600 to-purple-700 text-white p-4 rounded-2xl shadow-2xl hover:shadow-blue-500/50 transition-all duration-300 hover:scale-105 group backdrop-blur-sm border border-white/20"
+    >
+      <div className="relative">
+        <ShoppingCart className="h-6 w-6" />
+        {cart.length > 0 && (
+          <>
+            {/* Item count badge */}
+            <span className="absolute -top-3 -right-3 bg-gradient-to-r from-yellow-400 to-orange-500 text-white text-sm font-bold rounded-full h-6 w-6 flex items-center justify-center animate-pulse shadow-lg">
+              {cart.reduce((total, item) => total + item.quantity, 0)}
+            </span>
+            {/* Pulse ring animation */}
+            <span className="absolute -top-3 -right-3 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full h-6 w-6 animate-ping opacity-75"></span>
+          </>
+        )}
+      </div>
+      
+      {/* Cart summary text - shows when cart has items */}
       {cart.length > 0 && (
-        <span className="absolute -top-4 -right-4 bg-gradient-to-r from-yellow-400 to-orange-500 text-white text-sm font-bold rounded-full h-7 w-7 flex items-center justify-center animate-bounce shadow-lg">
-          {cart.reduce((total, item) => total + item.quantity, 0)}
-        </span>
+        <div className="absolute -left-32 top-1/2 transform -translate-y-1/2 bg-white dark:bg-gray-800 text-gray-900 dark:text-white px-3 py-2 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 whitespace-nowrap">
+          <div className="text-sm font-medium">
+            {formatCurrency(cart.reduce((total, item) => total + (item.price * item.quantity), 0))}
+          </div>
+          <div className="text-xs text-gray-500 dark:text-gray-400">
+            {cart.reduce((total, item) => total + item.quantity, 0)} items
+          </div>
+        </div>
       )}
-    </div>
-  </button>
+    </button>
+  </div>
 </div>
     </div >
   );

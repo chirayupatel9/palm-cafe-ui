@@ -73,19 +73,65 @@ const CustomerApp = () => {
             </div>
             
             <div className="flex items-center space-x-4">
-                             {/* Cart Button */}
-               <button
-                 onClick={() => setShowCart(true)}
-                 className="relative p-3 bg-secondary-500 text-white rounded-full hover:bg-secondary-600 transition-colors"
-                 title="View Cart"
-               >
-                <ShoppingCart className="h-6 w-6" />
+              {/* Enhanced Cart Button */}
+              <div className="relative group">
+                {/* Cart Summary Preview - Shows on hover */}
                 {cart.length > 0 && (
-                  <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-6 w-6 flex items-center justify-center">
-                    {cart.length}
-                  </span>
+                  <div className="absolute bottom-full right-0 mb-2 w-64 bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-2 group-hover:translate-y-0 pointer-events-none group-hover:pointer-events-auto z-50">
+                    <div className="p-3">
+                      <div className="flex items-center justify-between mb-2">
+                        <h4 className="font-semibold text-gray-900 dark:text-white text-sm">Cart Preview</h4>
+                        <span className="bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 px-2 py-1 rounded-full text-xs font-medium">
+                          {cart.length} items
+                        </span>
+                      </div>
+                      
+                      <div className="space-y-1 max-h-24 overflow-y-auto">
+                        {cart.slice(0, 2).map((item, index) => (
+                          <div key={index} className="flex items-center justify-between py-1">
+                            <span className="text-gray-900 dark:text-white text-xs font-medium truncate max-w-24">
+                              {item.name} x{item.quantity}
+                            </span>
+                            <span className="font-bold text-gray-900 dark:text-white text-xs">
+                              ₹{(item.price * item.quantity).toFixed(2)}
+                            </span>
+                          </div>
+                        ))}
+                        {cart.length > 2 && (
+                          <p className="text-center text-gray-500 dark:text-gray-400 text-xs py-1">
+                            +{cart.length - 2} more items
+                          </p>
+                        )}
+                      </div>
+                      
+                      <div className="mt-2 pt-2 border-t border-gray-200 dark:border-gray-700">
+                        <div className="flex items-center justify-between">
+                          <span className="font-bold text-gray-900 dark:text-white text-sm">Total:</span>
+                          <span className="font-bold text-lg text-blue-600 dark:text-blue-400">
+                            ₹{cart.reduce((total, item) => total + (item.price * item.quantity), 0).toFixed(2)}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 )}
-              </button>
+                
+                <button
+                  onClick={() => setShowCart(true)}
+                  className="relative p-3 bg-gradient-to-r from-blue-600 to-purple-700 text-white rounded-full hover:shadow-xl hover:scale-105 transition-all duration-300"
+                  title="View Cart"
+                >
+                  <ShoppingCart className="h-6 w-6" />
+                  {cart.length > 0 && (
+                    <>
+                      <span className="absolute -top-2 -right-2 bg-gradient-to-r from-yellow-400 to-orange-500 text-white text-xs font-bold rounded-full h-6 w-6 flex items-center justify-center animate-pulse shadow-lg">
+                        {cart.length}
+                      </span>
+                      <span className="absolute -top-2 -right-2 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full h-6 w-6 animate-ping opacity-75"></span>
+                    </>
+                  )}
+                </button>
+              </div>
 
               {/* Order History Button - Only show if logged in */}
               {customer && (
