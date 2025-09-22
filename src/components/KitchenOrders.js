@@ -5,14 +5,24 @@ import toast from 'react-hot-toast';
 import { useAuth } from '../contexts/AuthContext';
 import { useDarkMode } from '../contexts/DarkModeContext';
 import { useCafeSettings } from '../contexts/CafeSettingsContext';
+import useOrders from '../hooks/useOrders';
 import PrintModal from './PrintModal';
 
 const KitchenOrders = ({ cart, setCart }) => {
   const { isAuthenticated, user, loading: authLoading } = useAuth();
   const { isDarkMode } = useDarkMode();
   const { cafeSettings } = useCafeSettings();
-  const [orders, setOrders] = useState([]);
-  const [loading, setLoading] = useState(true);
+  
+  // Use the custom orders hook with auto-refresh and WebSocket
+  const { 
+    orders, 
+    loading, 
+    isConnected,
+    fetchOrders, 
+    updateOrderInCache, 
+    addOrderToCache, 
+    removeOrderFromCache 
+  } = useOrders(true, 30000, true);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [showPrintModal, setShowPrintModal] = useState(false);
   const [autoRefresh, setAutoRefresh] = useState(true);
@@ -35,14 +45,9 @@ const KitchenOrders = ({ cart, setCart }) => {
 
   useEffect(() => {
     if (isAuthenticated && !authLoading) {
-      fetchOrders();
       fetchMenuItems();
-      if (autoRefresh) {
-        const interval = setInterval(fetchOrders, 30000); // Refresh every 30 seconds
-        return () => clearInterval(interval);
-      }
     }
-  }, [isAuthenticated, authLoading, autoRefresh]);
+  }, [isAuthenticated, authLoading]);
 
   // Update displayed orders when orders or filters change
   useEffect(() => {
@@ -121,28 +126,6 @@ const KitchenOrders = ({ cart, setCart }) => {
     setHasMore(sortedOrders.length > itemsPerPage);
   }, [orders, filterStatus, activeTab, todaySubTab, searchQuery, itemsPerPage]);
 
-  const fetchOrders = async () => {
-    try {
-      const response = await axios.get('/orders');
-      
-      // Check for new pending orders (auto-print removed)
-      const newOrders = response.data.filter(newOrder => 
-        newOrder.status === 'pending' && 
-        !orders.some(oldOrder => oldOrder.id === newOrder.id)
-      );
-      
-      if (newOrders.length > 0) {
-        toast.success(`${newOrders.length} new order(s) received!`);
-      }
-      
-      setOrders(response.data);
-    } catch (error) {
-      console.error('Error fetching orders:', error);
-      toast.error('Failed to load orders');
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const fetchMenuItems = async () => {
     try {
@@ -194,8 +177,8 @@ const KitchenOrders = ({ cart, setCart }) => {
       await axios.put(`/orders/${editingOrder}`, orderData);
       toast.success('Order updated successfully');
       
-      // Refresh orders
-      fetchOrders();
+      // Update order in cache instead of refetching
+      updateOrderInCache(orderId, { ...editFormData, status: 'preparing' });
       cancelEditing();
     } catch (error) {
       console.error('Error updating order:', error);
@@ -275,7 +258,8 @@ const KitchenOrders = ({ cart, setCart }) => {
       await axios.patch(`/orders/${orderId}/status`, { status });
       toast.success(`Order ${status} successfully`);
       
-      fetchOrders();
+      // Update order status in cache
+      updateOrderInCache(orderId, { status });
     } catch (error) {
       console.error('Error updating order status:', error);
       toast.error('Failed to update order status');
@@ -588,6 +572,14 @@ const KitchenOrders = ({ cart, setCart }) => {
           </div>
         </div>
         <div className="flex items-center space-x-2">
+          {/* WebSocket Status Indicator */}
+          <div className="flex items-center space-x-2">
+            <div className={`w-2 h-2 rounded-full ${isConnected ? 'bg-green-500' : 'bg-red-500'}`}></div>
+            <span className="text-sm text-gray-600 dark:text-gray-400">
+              {isConnected ? 'Live Updates' : 'Offline'}
+            </span>
+          </div>
+          
           <button
             onClick={fetchOrders}
             className="btn-secondary flex items-center"
@@ -599,9 +591,10 @@ const KitchenOrders = ({ cart, setCart }) => {
                      <button
              onClick={async () => {
                try {
-                 await axios.post('/orders/test');
+                 const response = await axios.post('/orders/test');
                  toast.success('Test order created!');
-                 fetchOrders();
+                 // Add new order to cache
+                 addOrderToCache(response.data);
                } catch (error) {
                  console.error('Error creating test order:', error);
                  toast.error('Failed to create test order');
