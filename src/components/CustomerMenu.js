@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Minus, Trash2, ShoppingCart, X, Search, User, Phone, Mail, MapPin, Clock, CheckCircle, XCircle, AlertCircle, CreditCard, Gift, Star, ChevronDown, ChevronUp, Utensils, Coffee, Pizza, Sandwich, Salad, Cake, Wine, Heart, Sparkles, TrendingUp, Award, Zap, LogOut } from 'lucide-react';
+import { Plus, Minus, Trash2, ShoppingCart, X, Search, User, Phone, Mail, MapPin, Clock, CheckCircle, XCircle, AlertCircle, CreditCard, Gift, Star, ChevronDown, ChevronUp, Utensils, Coffee, Pizza, Sandwich, Salad, Cake, Wine, Heart, Sparkles, TrendingUp, Award, Zap, LogOut, Edit3, Save, Calendar } from 'lucide-react';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 import { useCurrency } from '../contexts/CurrencyContext';
@@ -46,6 +46,16 @@ const CustomerMenu = ({
   const [filteredMenuItems, setFilteredMenuItems] = useState({});
   const [pickupOption, setPickupOption] = useState('pickup');
   const [tableNumber, setTableNumber] = useState('');
+  
+  // Edit profile state
+  const [showEditProfile, setShowEditProfile] = useState(false);
+  const [editProfileData, setEditProfileData] = useState({
+    name: '',
+    email: '',
+    address: '',
+    date_of_birth: ''
+  });
+  const [profileLoading, setProfileLoading] = useState(false);
 
   // Helper function to ensure price is a number
   const ensureNumber = (value) => {
@@ -386,6 +396,52 @@ const CustomerMenu = ({
     }
   }, [recentOrder, orderStatus]);
 
+  // Profile editing functions
+  const openEditProfile = () => {
+    if (customer) {
+      setEditProfileData({
+        name: customer.name || '',
+        email: customer.email || '',
+        address: customer.address || '',
+        date_of_birth: customer.date_of_birth || ''
+      });
+      setShowEditProfile(true);
+    }
+  };
+
+  const handleProfileUpdate = async (e) => {
+    e.preventDefault();
+    if (!customer) return;
+
+    setProfileLoading(true);
+    try {
+      const response = await axios.put('/customer/profile', {
+        id: customer.id,
+        ...editProfileData
+      });
+
+      // Update customer data in parent component
+      if (onCustomerUpdate) {
+        onCustomerUpdate(response.data);
+      }
+
+      toast.success('Profile updated successfully!');
+      setShowEditProfile(false);
+    } catch (error) {
+      console.error('Error updating profile:', error);
+      toast.error('Failed to update profile. Please try again.');
+    } finally {
+      setProfileLoading(false);
+    }
+  };
+
+  const handleProfileInputChange = (field, value) => {
+    setEditProfileData(prev => ({
+      ...prev,
+      [field]: value
+    }));
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-orange-50 via-white to-red-50 relative overflow-hidden">
@@ -411,160 +467,39 @@ const CustomerMenu = ({
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50">
-      {/* Modern Floating Header */}
-      <header className="fixed top-4 left-4 right-4 z-50 backdrop-blur-2xl bg-white/90 border border-white/20 shadow-2xl rounded-2xl">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="flex items-center justify-between h-16">
-            <div className="flex items-center space-x-3">
-              <div className="relative">
-                <div className="w-12 h-12 bg-gradient-to-br from-blue-600 to-purple-700 rounded-xl flex items-center justify-center shadow-lg">
-                  {cafeSettings?.cafe_logo ? (
-                    <img
-                      src="/images/palm-cafe-logo.png"
-                      alt="Palm Cafe"
-                      className="h-6 w-6"
-                    />
-                  ) : (
-                    <Utensils className="h-6 w-6 text-white" />
-                  )}
-                </div>
-                <div className="absolute -top-1 -right-1 w-4 h-4 bg-emerald-500 rounded-full border-2 border-white animate-pulse"></div>
-              </div>
-              <div>
-                <h1 className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-700 bg-clip-text text-transparent">
-                  {cafeSettings?.cafe_name || 'Palm Cafe'}
-                </h1>
-                <p className="text-xs text-gray-500">Culinary Excellence</p>
-              </div>
-            </div>
-
-            <div className="flex items-center space-x-3">
-              {/* Customer Info */}
-              {customer && (
-                <div className="hidden md:flex items-center space-x-2 bg-gradient-to-r from-blue-50 to-purple-50 rounded-full px-4 py-2 border border-blue-100">
-                  <div className="w-7 h-7 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
-                    <User className="h-3 w-3 text-white" />
-                  </div>
-                  <div className="text-xs">
-                    <p className="font-semibold text-gray-800">{customer.name}</p>
-                    <p className="text-gray-600 flex items-center">
-                      <Star className="h-2 w-2 text-yellow-500 mr-1" />
-                      {customer.loyalty_points || 0} pts
-                    </p>
-                  </div>
-                  {/* Logout Button */}
-                  {onLogout && (
-                    <button
-                      onClick={onLogout}
-                      className="ml-2 p-1.5 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-full transition-colors"
-                      title="Logout"
-                    >
-                      <LogOut className="h-3 w-3" />
-                    </button>
-                  )}
-                </div>
-              )}
-
-              {/* Enhanced Cart Button with Summary */}
-              <div className="relative group">
-                {/* Cart Summary Preview - Shows on hover */}
-                {cart.length > 0 && (
-                  <div className="absolute bottom-full right-0 mb-2 w-72 bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-200 dark:border-gray-700 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-2 group-hover:translate-y-0 pointer-events-none group-hover:pointer-events-auto z-50">
-                    <div className="p-3">
-                      <div className="flex items-center justify-between mb-2">
-                        <h4 className="font-semibold text-gray-900 dark:text-white text-sm">Quick Preview</h4>
-                        <span className="bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 px-2 py-1 rounded-full text-xs font-medium">
-                          {cart.reduce((total, item) => total + item.quantity, 0)} items
-                        </span>
-                      </div>
-                      
-                      <div className="space-y-1 max-h-32 overflow-y-auto">
-                        {cart.slice(0, 2).map((item, index) => (
-                          <div key={index} className="flex items-center justify-between py-1">
-                            <div className="flex items-center space-x-2">
-                              <span className="w-5 h-5 bg-gradient-to-r from-blue-500 to-purple-600 rounded text-white text-xs font-bold flex items-center justify-center">
-                                {item.quantity}
-                              </span>
-                              <span className="text-gray-900 dark:text-white text-xs font-medium truncate max-w-32">
-                                {item.name}
-                              </span>
-                            </div>
-                            <span className="font-bold text-gray-900 dark:text-white text-xs">
-                              {formatCurrency(item.price * item.quantity)}
-                            </span>
-                          </div>
-                        ))}
-                        {cart.length > 2 && (
-                          <p className="text-center text-gray-500 dark:text-gray-400 text-xs py-1">
-                            +{cart.length - 2} more items
-                          </p>
-                        )}
-                      </div>
-                      
-                      <div className="mt-2 pt-2 border-t border-gray-200 dark:border-gray-700">
-                        <div className="flex items-center justify-between">
-                          <span className="font-bold text-gray-900 dark:text-white text-sm">Total:</span>
-                          <span className="font-bold text-lg text-blue-600 dark:text-blue-400">
-                            {formatCurrency(cart.reduce((total, item) => total + (item.price * item.quantity), 0))}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                )}
-                
-                <button
-                  onClick={() => setShowCart(true)}
-                  className="relative bg-gradient-to-r from-blue-600 to-purple-700 text-white p-3 rounded-xl hover:shadow-xl hover:scale-105 transition-all duration-300 group"
-                >
-                  <ShoppingCart className="h-5 w-5" />
-                  {cart.length > 0 && (
-                    <>
-                      <span className="absolute -top-2 -right-2 bg-gradient-to-r from-yellow-400 to-orange-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center animate-pulse shadow-lg">
-                        {cart.reduce((total, item) => total + item.quantity, 0)}
-                      </span>
-                      <span className="absolute -top-2 -right-2 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full h-5 w-5 animate-ping opacity-75"></span>
-                    </>
-                  )}
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </header>
-
+    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-cyan-50 pt-20">
       {/* Hero Landing Section */}
       <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
         {/* Animated Background */}
         <div className="absolute inset-0">
-          <div className="absolute top-20 left-20 w-96 h-96 bg-blue-200/30 rounded-full blur-3xl animate-pulse"></div>
-          <div className="absolute bottom-20 right-20 w-80 h-80 bg-purple-200/40 rounded-full blur-3xl animate-pulse delay-1000"></div>
-          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-gradient-to-r from-blue-100/20 to-purple-100/20 rounded-full blur-3xl animate-pulse delay-500"></div>
+          <div className="absolute top-20 left-20 w-96 h-96 bg-gradient-to-r from-indigo-300/40 to-purple-300/40 rounded-full blur-3xl animate-pulse"></div>
+          <div className="absolute bottom-20 right-20 w-80 h-80 bg-gradient-to-r from-cyan-300/40 to-teal-300/40 rounded-full blur-3xl animate-pulse delay-1000"></div>
+          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-gradient-to-r from-violet-200/30 to-rose-200/30 rounded-full blur-3xl animate-pulse delay-500"></div>
+          <div className="absolute top-1/4 right-1/4 w-64 h-64 bg-gradient-to-r from-amber-200/30 to-orange-200/30 rounded-full blur-3xl animate-pulse delay-700"></div>
         </div>
 
-        <div className="relative z-10 text-center px-4 pt-20">
+        <div className="relative z-10 text-center px-4">
           {/* Welcome Badge */}
-          <div className="inline-flex items-center bg-white/80 backdrop-blur-sm rounded-full px-6 py-3 border border-white/30 shadow-lg mb-8">
-            <Sparkles className="h-5 w-5 mr-2 text-blue-600" />
-            <span className="text-sm font-semibold text-gray-700">Welcome to Culinary Excellence</span>
+          <div className="inline-flex items-center bg-gradient-to-r from-indigo-500/10 to-purple-500/10 backdrop-blur-sm rounded-full px-6 py-3 border border-indigo-200/30 shadow-lg mb-8">
+            <Sparkles className="h-5 w-5 mr-2 text-indigo-600" />
+            <span className="text-sm font-semibold text-indigo-700">Welcome to Culinary Excellence</span>
           </div>
 
           {/* Main Heading */}
           <h1 className="text-5xl md:text-7xl font-bold mb-8 leading-tight">
-            <span className="bg-gradient-to-r from-blue-600 via-purple-600 to-blue-800 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-indigo-600 via-purple-600 to-rose-600 bg-clip-text text-transparent">
               Discover
             </span>
             <br />
             <span className="text-gray-800">Extraordinary</span>
             <br />
-            <span className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-purple-600 via-rose-600 to-pink-600 bg-clip-text text-transparent">
               Flavors
             </span>
           </h1>
 
           {/* Subtitle */}
-          <p className="text-xl text-gray-600 mb-12 max-w-3xl mx-auto leading-relaxed">
+          <p className="text-xl text-gray-700 mb-12 max-w-3xl mx-auto leading-relaxed font-medium">
             Embark on a culinary journey where every dish tells a story of passion,
             creativity, and the finest ingredients crafted to perfection.
           </p>
@@ -577,7 +512,7 @@ const CustomerMenu = ({
                   behavior: 'smooth'
                 });
               }}
-              className="bg-gradient-to-r from-blue-600 to-purple-700 text-white px-8 py-4 rounded-2xl font-semibold hover:shadow-2xl hover:scale-105 transition-all duration-300 flex items-center justify-center group"
+              className="bg-gradient-to-r from-indigo-600 via-purple-600 to-rose-600 text-white px-8 py-4 rounded-2xl font-semibold hover:shadow-2xl hover:scale-105 transition-all duration-300 flex items-center justify-center group"
             >
               <span>Explore Menu</span>
               <ChevronDown className="ml-2 h-5 w-5 group-hover:translate-y-1 transition-transform" />
@@ -585,7 +520,7 @@ const CustomerMenu = ({
             {customer && (
               <button
                 onClick={() => setActiveTab('history')}
-                className="bg-white/80 backdrop-blur-sm text-gray-700 px-8 py-4 rounded-2xl font-semibold border border-white/30 hover:shadow-xl hover:scale-105 transition-all duration-300"
+                className="bg-gradient-to-r from-indigo-500/10 to-purple-500/10 backdrop-blur-sm text-indigo-700 px-8 py-4 rounded-2xl font-semibold border border-indigo-200/30 hover:shadow-xl hover:scale-105 transition-all duration-300"
               >
                 Order History
               </button>
@@ -595,10 +530,10 @@ const CustomerMenu = ({
           {/* Stats */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-4xl mx-auto">
             {[
-              { icon: <TrendingUp className="h-6 w-6" />, title: `${Object.values(groupedMenuItems).flat().length}+`, subtitle: "Dishes", color: "from-blue-500 to-cyan-500" },
-              { icon: <Award className="h-6 w-6" />, title: "4.9★", subtitle: "Rating", color: "from-yellow-500 to-orange-500" },
-              { icon: <Clock className="h-6 w-6" />, title: "15 min", subtitle: "Prep Time", color: "from-green-500 to-emerald-500" },
-              { icon: <Zap className="h-6 w-6" />, title: "Fresh", subtitle: "Daily", color: "from-purple-500 to-pink-500" }
+              { icon: <TrendingUp className="h-6 w-6" />, title: `${Object.values(groupedMenuItems).flat().length}+`, subtitle: "Dishes", color: "from-indigo-500 to-cyan-500" },
+              { icon: <Award className="h-6 w-6" />, title: "4.9★", subtitle: "Rating", color: "from-amber-500 to-orange-500" },
+              { icon: <Clock className="h-6 w-6" />, title: "15 min", subtitle: "Prep Time", color: "from-emerald-500 to-teal-500" },
+              { icon: <Zap className="h-6 w-6" />, title: "Fresh", subtitle: "Daily", color: "from-rose-500 to-pink-500" }
             ].map((stat, index) => (
               <div key={index} className="bg-white/60 backdrop-blur-sm rounded-2xl p-6 border border-white/20 hover:scale-105 transition-transform duration-300 text-center">
                 <div className={`w-12 h-12 bg-gradient-to-br ${stat.color} rounded-xl flex items-center justify-center text-white mb-4 mx-auto`}>
@@ -671,28 +606,28 @@ const CustomerMenu = ({
               <div className="text-center mb-8">
                 <h2 className="text-4xl font-bold text-gray-800 mb-4">
                   Find Your Perfect
-                  <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent"> Dish</span>
+                  <span className="bg-gradient-to-r from-indigo-600 via-purple-600 to-rose-600 bg-clip-text text-transparent"> Dish</span>
                 </h2>
-                <p className="text-gray-600 text-lg">Discover flavors that speak to your soul</p>
+                <p className="text-gray-700 text-lg font-medium">Discover flavors that speak to your soul</p>
               </div>
 
               <div className="relative max-w-3xl mx-auto">
-                <div className="bg-white/90 backdrop-blur-xl rounded-3xl shadow-2xl p-3 border border-white/30">
+                <div className="bg-gradient-to-r from-white/90 to-indigo-50/90 backdrop-blur-xl rounded-3xl shadow-2xl p-3 border border-indigo-200/30">
                   <div className="relative">
-                    <Search className="absolute left-8 top-1/2 transform -translate-y-1/2 h-6 w-6 text-gray-400" />
+                    <Search className="absolute left-8 top-1/2 transform -translate-y-1/2 h-6 w-6 text-indigo-500" />
                     <input
                       type="text"
                       placeholder="What are you craving today?"
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      className="w-full pl-16 pr-16 py-6 bg-transparent border-0 text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-0 text-xl font-medium rounded-3xl"
+                      className="w-full pl-16 pr-16 py-6 bg-transparent border-0 text-gray-800 placeholder-gray-600 focus:outline-none focus:ring-0 text-xl font-medium rounded-3xl"
                     />
                     {searchQuery && (
                       <button
                         onClick={() => setSearchQuery('')}
-                        className="absolute right-6 top-1/2 transform -translate-y-1/2 p-3 hover:bg-gray-100 rounded-full transition-colors"
+                        className="absolute right-6 top-1/2 transform -translate-y-1/2 p-3 hover:bg-indigo-100 rounded-full transition-colors"
                       >
-                        <X className="h-5 w-5 text-gray-400" />
+                        <X className="h-5 w-5 text-indigo-500" />
                       </button>
                     )}
                   </div>
@@ -835,10 +770,11 @@ const CustomerMenu = ({
             </div>
 
   {/* Features Section */}
-  <section className="mt-20 py-16 bg-gradient-to-r from-orange-600 via-red-600 to-pink-600 rounded-3xl text-white relative overflow-hidden">
+  <section className="mt-20 py-16 bg-gradient-to-r from-indigo-600 via-purple-600 to-rose-600 rounded-3xl text-white relative overflow-hidden">
               <div className="absolute inset-0">
                 <div className="absolute top-0 left-0 w-64 h-64 bg-white/10 rounded-full blur-3xl"></div>
-                <div className="absolute bottom-0 right-0 w-80 h-80 bg-yellow-300/10 rounded-full blur-3xl"></div>
+                <div className="absolute bottom-0 right-0 w-80 h-80 bg-amber-300/10 rounded-full blur-3xl"></div>
+                <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-violet-300/10 rounded-full blur-3xl"></div>
               </div>
               <div className="relative z-10 text-center max-w-4xl mx-auto px-6">
                 <h2 className="text-4xl font-bold mb-8">Why Choose Palm Cafe?</h2>
@@ -1037,17 +973,28 @@ const CustomerMenu = ({
                       </div>
                       Customer Information
                     </h3>
-                    {/* Logout Button */}
-                    {onLogout && (
+                    <div className="flex items-center space-x-2">
+                      {/* Edit Profile Button */}
                       <button
-                        onClick={onLogout}
-                        className="flex items-center space-x-2 px-3 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors text-sm"
-                        title="Logout"
+                        onClick={openEditProfile}
+                        className="flex items-center space-x-2 px-3 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-sm"
+                        title="Edit Profile"
                       >
-                        <LogOut className="h-4 w-4" />
-                        <span>Logout</span>
+                        <Edit3 className="h-4 w-4" />
+                        <span>Edit</span>
                       </button>
-                    )}
+                      {/* Logout Button */}
+                      {onLogout && (
+                        <button
+                          onClick={onLogout}
+                          className="flex items-center space-x-2 px-3 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors text-sm"
+                          title="Logout"
+                        >
+                          <LogOut className="h-4 w-4" />
+                          <span>Logout</span>
+                        </button>
+                      )}
+                    </div>
                   </div>
                   <div className="space-y-3">
                     <div className="flex justify-between items-center">
@@ -1294,13 +1241,13 @@ const CustomerMenu = ({
           <div className="mt-4 pt-3 border-t border-gray-200 dark:border-gray-700">
             <div className="flex items-center justify-between">
               <span className="font-bold text-gray-900 dark:text-white">Total:</span>
-              <span className="font-bold text-xl text-blue-600 dark:text-blue-400">
+              <span className="font-bold text-xl text-indigo-600 dark:text-indigo-400">
                 {formatCurrency(cart.reduce((total, item) => total + (item.price * item.quantity), 0))}
               </span>
             </div>
             <button
               onClick={() => setShowCart(true)}
-              className="w-full mt-3 bg-gradient-to-r from-blue-600 to-purple-700 text-white py-2 rounded-lg font-medium hover:shadow-lg transition-all duration-200"
+              className="w-full mt-3 bg-gradient-to-r from-indigo-600 via-purple-600 to-rose-600 text-white py-2 rounded-lg font-medium hover:shadow-lg transition-all duration-200"
             >
               View Cart & Checkout
             </button>
@@ -1312,7 +1259,7 @@ const CustomerMenu = ({
     {/* Main Floating Cart Button */}
     <button
       onClick={() => setShowCart(true)}
-      className="relative bg-gradient-to-r from-blue-600 to-purple-700 text-white p-4 rounded-2xl shadow-2xl hover:shadow-blue-500/50 transition-all duration-300 hover:scale-105 group backdrop-blur-sm border border-white/20"
+      className="relative bg-gradient-to-r from-indigo-600 via-purple-600 to-rose-600 text-white p-4 rounded-2xl shadow-2xl hover:shadow-indigo-500/50 transition-all duration-300 hover:scale-105 group backdrop-blur-sm border border-white/20"
     >
       <div className="relative">
         <ShoppingCart className="h-6 w-6" />
@@ -1342,6 +1289,111 @@ const CustomerMenu = ({
     </button>
   </div>
 </div>
+
+      {/* Edit Profile Modal */}
+      {showEditProfile && (
+        <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4 animate-fadeIn backdrop-blur-sm">
+          <div className={`${isDarkMode ? 'bg-gray-800' : 'bg-white'} rounded-2xl shadow-material-5 max-w-md w-full mx-4 transform transition-all duration-300 animate-slideIn hover-lift`}>
+            <div className="p-6">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center">
+                  <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-700 rounded-xl flex items-center justify-center mr-3">
+                    <Edit3 className="h-4 w-4 text-white" />
+                  </div>
+                  Edit Profile
+                </h2>
+                <button
+                  onClick={() => setShowEditProfile(false)}
+                  className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+                >
+                  <X className="h-6 w-6" />
+                </button>
+              </div>
+
+              <form onSubmit={handleProfileUpdate} className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Full Name *
+                  </label>
+                  <input
+                    type="text"
+                    value={editProfileData.name}
+                    onChange={(e) => handleProfileInputChange('name', e.target.value)}
+                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                    placeholder="Enter your full name"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Email Address
+                  </label>
+                  <input
+                    type="email"
+                    value={editProfileData.email}
+                    onChange={(e) => handleProfileInputChange('email', e.target.value)}
+                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                    placeholder="Enter your email address"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Address
+                  </label>
+                  <textarea
+                    value={editProfileData.address}
+                    onChange={(e) => handleProfileInputChange('address', e.target.value)}
+                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white dark:bg-gray-700 text-gray-900 dark:text-white resize-none"
+                    placeholder="Enter your address"
+                    rows={3}
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Date of Birth
+                  </label>
+                  <input
+                    type="date"
+                    value={editProfileData.date_of_birth}
+                    onChange={(e) => handleProfileInputChange('date_of_birth', e.target.value)}
+                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  />
+                </div>
+
+                <div className="flex space-x-3 pt-4">
+                  <button
+                    type="button"
+                    onClick={() => setShowEditProfile(false)}
+                    className="flex-1 px-4 py-3 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-xl font-medium hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors duration-200"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={profileLoading}
+                    className="flex-1 px-4 py-3 bg-gradient-to-r from-blue-600 to-purple-700 text-white rounded-xl font-medium hover:shadow-lg hover:scale-105 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
+                  >
+                    {profileLoading ? (
+                      <>
+                        <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
+                        <span>Updating...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Save className="h-4 w-4" />
+                        <span>Save Changes</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      )}
     </div >
   );
 };
