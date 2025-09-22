@@ -140,10 +140,11 @@ const CustomerApp = () => {
               {customer && (
                 <button
                   onClick={handleLogout}
-                  className="p-2 rounded-md text-secondary-600 hover:text-secondary-700 hover:bg-accent-100 dark:text-gray-400 dark:hover:text-gray-300 dark:hover:bg-gray-700"
+                  className="flex items-center space-x-2 px-3 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
                   title="Logout"
                 >
-                  <LogOut className="h-5 w-5" />
+                  <LogOut className="h-4 w-4" />
+                  <span className="hidden sm:inline text-sm font-medium">Logout</span>
                 </button>
               )}
             </div>
@@ -165,6 +166,7 @@ const CustomerApp = () => {
         showLoginModal={showLoginModal}
         setShowLoginModal={setShowLoginModal}
         onCustomerUpdate={handleCustomerUpdate}
+        onLogout={handleLogout}
       />
 
              {/* Login Modal */}

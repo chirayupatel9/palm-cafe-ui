@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Minus, Trash2, ShoppingCart, X, Search, User, Phone, Mail, MapPin, Clock, CheckCircle, XCircle, AlertCircle, CreditCard, Gift, Star, ChevronDown, ChevronUp, Utensils, Coffee, Pizza, Sandwich, Salad, Cake, Wine, Heart, Sparkles, TrendingUp, Award, Zap } from 'lucide-react';
+import { Plus, Minus, Trash2, ShoppingCart, X, Search, User, Phone, Mail, MapPin, Clock, CheckCircle, XCircle, AlertCircle, CreditCard, Gift, Star, ChevronDown, ChevronUp, Utensils, Coffee, Pizza, Sandwich, Salad, Cake, Wine, Heart, Sparkles, TrendingUp, Award, Zap, LogOut } from 'lucide-react';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 import { useCurrency } from '../contexts/CurrencyContext';
@@ -8,19 +8,20 @@ import { useDarkMode } from '../contexts/DarkModeContext';
 import CustomerOrderHistory from './CustomerOrderHistory';
 import { getImageUrl, getPlaceholderImage, getCategoryBackground } from '../utils/imageUtils';
 
-const CustomerMenu = ({
-  customer,
-  cart,
-  setCart,
-  activeTab,
-  setActiveTab,
-  showCart,
-  setShowCart,
-  onAddToCart,
-  onPlaceOrder,
-  showLoginModal,
-  setShowLoginModal,
-  onCustomerUpdate
+const CustomerMenu = ({ 
+  customer, 
+  cart, 
+  setCart, 
+  activeTab, 
+  setActiveTab, 
+  showCart, 
+  setShowCart, 
+  onAddToCart, 
+  onPlaceOrder, 
+  showLoginModal, 
+  setShowLoginModal, 
+  onCustomerUpdate,
+  onLogout 
 }) => {
   const { formatCurrency } = useCurrency();
   const { cafeSettings } = useCafeSettings();
@@ -452,6 +453,16 @@ const CustomerMenu = ({
                       {customer.loyalty_points || 0} pts
                     </p>
                   </div>
+                  {/* Logout Button */}
+                  {onLogout && (
+                    <button
+                      onClick={onLogout}
+                      className="ml-2 p-1.5 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-full transition-colors"
+                      title="Logout"
+                    >
+                      <LogOut className="h-3 w-3" />
+                    </button>
+                  )}
                 </div>
               )}
 
@@ -968,12 +979,25 @@ const CustomerMenu = ({
               <>
                 {/* Customer Information */}
                 <div className="mb-8 p-6 bg-gradient-to-r from-blue-50/80 to-purple-50/80 backdrop-blur-sm rounded-3xl border border-blue-200/50 shadow-lg">
-                  <h3 className="font-bold text-gray-900 mb-4 flex items-center text-lg">
-                    <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-700 rounded-xl flex items-center justify-center mr-3">
-                      <User className="h-4 w-4 text-white" />
-                    </div>
-                    Customer Information
-                  </h3>
+                  <div className="flex justify-between items-center mb-4">
+                    <h3 className="font-bold text-gray-900 flex items-center text-lg">
+                      <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-700 rounded-xl flex items-center justify-center mr-3">
+                        <User className="h-4 w-4 text-white" />
+                      </div>
+                      Customer Information
+                    </h3>
+                    {/* Logout Button */}
+                    {onLogout && (
+                      <button
+                        onClick={onLogout}
+                        className="flex items-center space-x-2 px-3 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors text-sm"
+                        title="Logout"
+                      >
+                        <LogOut className="h-4 w-4" />
+                        <span>Logout</span>
+                      </button>
+                    )}
+                  </div>
                   <div className="space-y-3">
                     <div className="flex justify-between items-center">
                       <span className="text-gray-600 font-medium">Name:</span>
