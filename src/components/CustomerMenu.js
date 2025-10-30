@@ -6,6 +6,7 @@ import { useCurrency } from '../contexts/CurrencyContext';
 import { useCafeSettings } from '../contexts/CafeSettingsContext';
 import { useDarkMode } from '../contexts/DarkModeContext';
 import CustomerOrderHistory from './CustomerOrderHistory';
+import CustomerProfile from './CustomerProfile';
 import { getImageUrl, getPlaceholderImage, getCategoryBackground } from '../utils/imageUtils';
 
 const CustomerMenu = ({ 
@@ -48,6 +49,7 @@ const CustomerMenu = ({
   const [tableNumber, setTableNumber] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [searchExpanded, setSearchExpanded] = useState(false);
+  const [showProfile, setShowProfile] = useState(false);
   const categoryScrollRef = useRef(null);
   const searchInputRef = useRef(null);
 
@@ -491,16 +493,19 @@ const CustomerMenu = ({
               >
                 Menu
               </button>
-              <button
-                onClick={() => setActiveTab('history')}
-                className={`text-sm font-medium hover:text-[#6F4E37] transition-colors ${activeTab === 'history' ? 'text-[#6F4E37]' : ''}`}
-              >
-                My Orders
-              </button>
+              {customer && (
+                <button
+                  onClick={() => setActiveTab('history')}
+                  className={`text-sm font-medium hover:text-[#6F4E37] transition-colors ${activeTab === 'history' ? 'text-[#6F4E37]' : ''}`}
+                >
+                  My Orders
+                </button>
+              )}
             </nav>
 
-            {/* Search Bar - Expandable */}
+            {/* Right Side Icons */}
             <div className="flex items-center gap-3">
+              {/* Search */}
               <div className="relative">
                 <button
                   onClick={() => setSearchExpanded(true)}
@@ -543,6 +548,7 @@ const CustomerMenu = ({
                 )}
               </div>
 
+              {/* Cart */}
               <button
                 onClick={() => setShowCart(true)}
                 className="relative flex cursor-pointer items-center justify-center rounded-full h-10 w-10 text-text-light dark:text-text-dark hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
@@ -554,6 +560,17 @@ const CustomerMenu = ({
                   </span>
                 )}
               </button>
+
+              {/* User Profile - Only show when logged in */}
+              {customer && (
+                <button
+                  onClick={() => setShowProfile(true)}
+                  className="flex items-center justify-center h-10 w-10 rounded-full bg-[#6F4E37] text-white hover:bg-[#6F4E37]/90 transition-colors"
+                  title={customer.name}
+                >
+                  <User className="h-5 w-5" />
+                </button>
+              )}
             </div>
           </div>
         </div>
@@ -1187,6 +1204,21 @@ const CustomerMenu = ({
               </form>
             </div>
           </div>
+        </div>
+      )}
+
+      {/* Customer Profile - Full Page View */}
+      {showProfile && customer && (
+        <div className="fixed inset-0 z-50 bg-[#F5F5DC] dark:bg-[#1a1612]">
+          <CustomerProfile
+            customer={customer}
+            onCustomerUpdate={onCustomerUpdate}
+            onLogout={() => {
+              setShowProfile(false);
+              onLogout();
+            }}
+            onClose={() => setShowProfile(false)}
+          />
         </div>
       )}
     </div >
