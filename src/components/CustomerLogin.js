@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Phone, ArrowRight, UserPlus } from 'lucide-react';
+import { Phone, ArrowRight, UserPlus, User, Mail, MapPin } from 'lucide-react';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 
@@ -71,153 +71,207 @@ const CustomerLogin = ({ onLogin, onRegister }) => {
   };
 
   return (
-    <div className="w-full space-y-6">
-      {!showRegister ? (
-        // Login Form
-        <form onSubmit={handleLogin} className="space-y-4">
-          <div>
-            <label htmlFor="phone" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Phone Number
-            </label>
-            <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <Phone className="h-5 w-5 text-gray-400" />
-              </div>
-              <input
-                id="phone"
-                type="tel"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                placeholder="Enter your phone number"
-                className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary-500 focus:border-transparent transition-material"
-                required
-              />
+    <div className="relative w-full max-w-md bg-white dark:bg-[#221a10] rounded-xl shadow-lg p-8 sm:p-10">
+      <div className="flex flex-col w-full">
+        {!showRegister ? (
+          // Login Form
+          <>
+            <div className="text-center mb-6">
+              <h1 className="text-text-light dark:text-[#F5F5DC] tracking-tight text-3xl font-bold leading-tight">
+                Welcome Back!
+              </h1>
+              <p className="text-text-light/70 dark:text-[#F5F5DC]/70 text-base font-normal leading-normal pt-2">
+                Login to your account to continue
+              </p>
             </div>
-          </div>
-
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-lg shadow-material-2 text-sm font-medium text-white bg-secondary-500 hover:bg-secondary-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-secondary-500 disabled:opacity-50 transition-material ripple hover-lift"
-          >
-            {loading ? (
-              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-            ) : (
-              <>
-                Continue
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </>
-            )}
-          </button>
-
-          <div className="text-center">
-            <button
-              type="button"
-              onClick={() => setShowRegister(true)}
-              className="text-secondary-200 hover:text-secondary-400 text-sm flex items-center justify-center mx-auto transition-material"
-            >
-              <UserPlus className="h-4 w-4 mr-1" />
-              New customer? Register here
-            </button>
-          </div>
-        </form>
-      ) : (
-        // Register Form
-        <form onSubmit={handleRegister} className="space-y-4">
-          <div>
-            <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Full Name *
-            </label>
-            <input
-              id="name"
-              type="text"
-              value={registerData.name}
-              onChange={(e) => setRegisterData({...registerData, name: e.target.value})}
-              placeholder="Enter your full name"
-              className="block w-full px-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary-500 focus:border-transparent transition-material"
-              required
-            />
-          </div>
-
-          <div>
-            <label htmlFor="registerPhone" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Phone Number *
-            </label>
-            <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <Phone className="h-5 w-5 text-gray-400" />
+            <form onSubmit={handleLogin} className="flex flex-col gap-4">
+              <div className="flex flex-col">
+                <label
+                  className="text-text-light dark:text-[#F5F5DC] text-base font-medium leading-normal pb-2"
+                  htmlFor="phone"
+                >
+                  Phone Number
+                </label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                    <Phone className="h-5 w-5 text-[#9a794c] dark:text-[#8a6d4c]" />
+                  </div>
+                  <input
+                    className="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-text-light dark:text-[#F5F5DC] focus:outline-0 focus:ring-2 focus:ring-[#6F4E37]/50 border border-[#e7ddcf] dark:border-[#443d34] bg-transparent dark:bg-[#221a10] h-14 placeholder:text-[#9a794c] dark:placeholder:text-[#8a6d4c] pl-12 pr-4 text-base font-normal leading-normal"
+                    id="phone"
+                    placeholder="Enter your phone number"
+                    type="tel"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    required
+                  />
+                </div>
               </div>
-              <input
-                id="registerPhone"
-                type="tel"
-                value={registerData.phone}
-                onChange={(e) => setRegisterData({...registerData, phone: e.target.value})}
-                placeholder="Enter your phone number"
-                className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary-500 focus:border-transparent transition-material"
-                required
-              />
+              <button
+                className="flex items-center justify-center text-center w-full h-14 px-6 py-2 mt-4 text-base font-bold leading-normal text-white bg-[#6F4E37] rounded-lg hover:bg-[#6F4E37]/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#6F4E37] dark:focus:ring-offset-[#1a1612] transition-colors disabled:opacity-50"
+                type="submit"
+                disabled={loading}
+              >
+                {loading ? (
+                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                ) : (
+                  <>
+                    Login
+                    <ArrowRight className="ml-2 h-4 w-4" />
+                  </>
+                )}
+              </button>
+            </form>
+            <div className="flex items-center my-8">
+              <hr className="flex-grow border-t border-[#e7ddcf] dark:border-[#443d34]" />
+              <span className="px-4 text-sm text-text-light/60 dark:text-[#F5F5DC]/60">Or</span>
+              <hr className="flex-grow border-t border-[#e7ddcf] dark:border-[#443d34]" />
             </div>
-          </div>
-
-          <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Email Address
-            </label>
-            <input
-              id="email"
-              type="email"
-              value={registerData.email}
-              onChange={(e) => setRegisterData({...registerData, email: e.target.value})}
-              placeholder="Enter your email address"
-              className="block w-full px-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary-500 focus:border-transparent transition-material"
-            />
-          </div>
-
-          <div>
-            <label htmlFor="address" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Address
-            </label>
-            <textarea
-              id="address"
-              value={registerData.address}
-              onChange={(e) => setRegisterData({...registerData, address: e.target.value})}
-              placeholder="Enter your address"
-              rows="3"
-              className="block w-full px-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary-500 focus:border-transparent transition-material"
-            />
-          </div>
-
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-lg shadow-material-2 text-sm font-medium text-white bg-secondary-500 hover:bg-secondary-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-secondary-500 disabled:opacity-50 transition-material ripple hover-lift"
-          >
-            {loading ? (
-              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-            ) : (
-              <>
+            <div className="text-center">
+              <p className="text-text-light dark:text-[#F5F5DC] text-base font-normal leading-normal">
+                Don't have an account?{' '}
+                <button
+                  type="button"
+                  onClick={() => setShowRegister(true)}
+                  className="font-bold text-[#C8A165] hover:underline"
+                >
+                  Sign Up
+                </button>
+              </p>
+            </div>
+          </>
+        ) : (
+          // Register Form
+          <>
+            <div className="text-center mb-6">
+              <h1 className="text-text-light dark:text-[#F5F5DC] tracking-tight text-3xl font-bold leading-tight">
                 Create Account
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </>
-            )}
-          </button>
-
-          <div className="text-center">
-            <button
-              type="button"
-              onClick={() => setShowRegister(false)}
-              className="text-secondary-600 hover:text-secondary-500 text-sm transition-material"
-            >
-              Already have an account? Login here
-            </button>
-          </div>
-        </form>
-      )}
-
-      <div className="text-center space-y-2">
-        <p className="text-xs text-gray-500 dark:text-gray-400">
-          By continuing, you agree to our terms of service and privacy policy
-        </p>
+              </h1>
+              <p className="text-text-light/70 dark:text-[#F5F5DC]/70 text-base font-normal leading-normal pt-2">
+                Join us to start ordering
+              </p>
+            </div>
+            <form onSubmit={handleRegister} className="flex flex-col gap-4">
+              <div className="flex flex-col">
+                <label
+                  className="text-text-light dark:text-[#F5F5DC] text-base font-medium leading-normal pb-2"
+                  htmlFor="name"
+                >
+                  Full Name *
+                </label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                    <User className="h-5 w-5 text-[#9a794c] dark:text-[#8a6d4c]" />
+                  </div>
+                  <input
+                    className="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-text-light dark:text-[#F5F5DC] focus:outline-0 focus:ring-2 focus:ring-[#6F4E37]/50 border border-[#e7ddcf] dark:border-[#443d34] bg-transparent dark:bg-[#221a10] h-14 placeholder:text-[#9a794c] dark:placeholder:text-[#8a6d4c] pl-12 pr-4 text-base font-normal leading-normal"
+                    id="name"
+                    placeholder="Enter your full name"
+                    type="text"
+                    value={registerData.name}
+                    onChange={(e) => setRegisterData({...registerData, name: e.target.value})}
+                    required
+                  />
+                </div>
+              </div>
+              <div className="flex flex-col">
+                <label
+                  className="text-text-light dark:text-[#F5F5DC] text-base font-medium leading-normal pb-2"
+                  htmlFor="registerPhone"
+                >
+                  Phone Number *
+                </label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                    <Phone className="h-5 w-5 text-[#9a794c] dark:text-[#8a6d4c]" />
+                  </div>
+                  <input
+                    className="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-text-light dark:text-[#F5F5DC] focus:outline-0 focus:ring-2 focus:ring-[#6F4E37]/50 border border-[#e7ddcf] dark:border-[#443d34] bg-transparent dark:bg-[#221a10] h-14 placeholder:text-[#9a794c] dark:placeholder:text-[#8a6d4c] pl-12 pr-4 text-base font-normal leading-normal"
+                    id="registerPhone"
+                    placeholder="Enter your phone number"
+                    type="tel"
+                    value={registerData.phone}
+                    onChange={(e) => setRegisterData({...registerData, phone: e.target.value})}
+                    required
+                  />
+                </div>
+              </div>
+              <div className="flex flex-col">
+                <label
+                  className="text-text-light dark:text-[#F5F5DC] text-base font-medium leading-normal pb-2"
+                  htmlFor="email"
+                >
+                  Email Address
+                </label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                    <Mail className="h-5 w-5 text-[#9a794c] dark:text-[#8a6d4c]" />
+                  </div>
+                  <input
+                    className="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-text-light dark:text-[#F5F5DC] focus:outline-0 focus:ring-2 focus:ring-[#6F4E37]/50 border border-[#e7ddcf] dark:border-[#443d34] bg-transparent dark:bg-[#221a10] h-14 placeholder:text-[#9a794c] dark:placeholder:text-[#8a6d4c] pl-12 pr-4 text-base font-normal leading-normal"
+                    id="email"
+                    placeholder="Enter your email address"
+                    type="email"
+                    value={registerData.email}
+                    onChange={(e) => setRegisterData({...registerData, email: e.target.value})}
+                  />
+                </div>
+              </div>
+              <div className="flex flex-col">
+                <label
+                  className="text-text-light dark:text-[#F5F5DC] text-base font-medium leading-normal pb-2"
+                  htmlFor="address"
+                >
+                  Address
+                </label>
+                <div className="relative">
+                  <div className="absolute top-4 left-0 pl-4 flex items-start pointer-events-none">
+                    <MapPin className="h-5 w-5 text-[#9a794c] dark:text-[#8a6d4c]" />
+                  </div>
+                  <textarea
+                    className="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-text-light dark:text-[#F5F5DC] focus:outline-0 focus:ring-2 focus:ring-[#6F4E37]/50 border border-[#e7ddcf] dark:border-[#443d34] bg-transparent dark:bg-[#221a10] placeholder:text-[#9a794c] dark:placeholder:text-[#8a6d4c] pl-12 pr-4 py-4 text-base font-normal leading-normal"
+                    id="address"
+                    placeholder="Enter your address"
+                    rows="3"
+                    value={registerData.address}
+                    onChange={(e) => setRegisterData({...registerData, address: e.target.value})}
+                  />
+                </div>
+              </div>
+              <button
+                className="flex items-center justify-center text-center w-full h-14 px-6 py-2 mt-4 text-base font-bold leading-normal text-white bg-[#6F4E37] rounded-lg hover:bg-[#6F4E37]/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#6F4E37] dark:focus:ring-offset-[#1a1612] transition-colors disabled:opacity-50"
+                type="submit"
+                disabled={loading}
+              >
+                {loading ? (
+                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                ) : (
+                  <>
+                    Create Account
+                    <ArrowRight className="ml-2 h-4 w-4" />
+                  </>
+                )}
+              </button>
+            </form>
+            <div className="flex items-center my-8">
+              <hr className="flex-grow border-t border-[#e7ddcf] dark:border-[#443d34]" />
+              <span className="px-4 text-sm text-text-light/60 dark:text-[#F5F5DC]/60">Or</span>
+              <hr className="flex-grow border-t border-[#e7ddcf] dark:border-[#443d34]" />
+            </div>
+            <div className="text-center">
+              <p className="text-text-light dark:text-[#F5F5DC] text-base font-normal leading-normal">
+                Already have an account?{' '}
+                <button
+                  type="button"
+                  onClick={() => setShowRegister(false)}
+                  className="font-bold text-[#C8A165] hover:underline"
+                >
+                  Login
+                </button>
+              </p>
+            </div>
+          </>
+        )}
       </div>
     </div>
   );

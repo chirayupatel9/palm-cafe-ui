@@ -1109,6 +1109,16 @@ button:focus, input:focus, select:focus, textarea:focus {
   @apply bg-accent-400;
 }
 
+/* Hide scrollbar utility class */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
 /* Modal Animations */
 @keyframes fadeIn {
   from {

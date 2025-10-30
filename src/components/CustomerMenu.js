@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Plus, Minus, Trash2, ShoppingCart, X, Search, User, Phone, Mail, MapPin, Clock, CheckCircle, XCircle, AlertCircle, CreditCard, Gift, Star, ChevronDown, ChevronUp, Utensils, Coffee, Pizza, Sandwich, Salad, Cake, Wine, Heart, Sparkles, TrendingUp, Award, Zap, LogOut, Edit3, Save, Calendar } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { Plus, Minus, Trash2, ShoppingCart, X, Search, User, Phone, Mail, MapPin, Clock, CheckCircle, XCircle, AlertCircle, CreditCard, Gift, Star, ChevronDown, ChevronUp, Utensils, Coffee, Pizza, Sandwich, Salad, Cake, Wine, Heart, Sparkles, TrendingUp, Award, Zap, LogOut, Edit3, Save, Calendar, Menu } from 'lucide-react';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 import { useCurrency } from '../contexts/CurrencyContext';
@@ -46,7 +46,11 @@ const CustomerMenu = ({
   const [filteredMenuItems, setFilteredMenuItems] = useState({});
   const [pickupOption, setPickupOption] = useState('pickup');
   const [tableNumber, setTableNumber] = useState('');
-  
+  const [selectedCategory, setSelectedCategory] = useState('All');
+  const [searchExpanded, setSearchExpanded] = useState(false);
+  const categoryScrollRef = useRef(null);
+  const searchInputRef = useRef(null);
+
   // Edit profile state
   const [showEditProfile, setShowEditProfile] = useState(false);
   const [editProfileData, setEditProfileData] = useState({
@@ -105,6 +109,13 @@ const CustomerMenu = ({
 
     setFilteredMenuItems(filtered);
   }, [searchQuery, groupedMenuItems]);
+
+  // Focus search input when expanded
+  useEffect(() => {
+    if (searchExpanded && searchInputRef.current) {
+      searchInputRef.current.focus();
+    }
+  }, [searchExpanded]);
 
   const fetchMenuItems = async () => {
     try {
@@ -444,937 +455,721 @@ const CustomerMenu = ({
 
   if (loading) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-orange-50 via-white to-red-50 relative overflow-hidden">
-        {/* Animated background elements */}
-        <div className="absolute inset-0">
-          <div className="absolute top-20 left-20 w-72 h-72 bg-orange-200/30 rounded-full blur-3xl animate-pulse"></div>
-          <div className="absolute bottom-20 right-20 w-96 h-96 bg-red-200/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
-        </div>
-
+      <div className="min-h-screen flex flex-col items-center justify-center bg-background-light dark:bg-background-dark">
         <div className="relative z-10 flex flex-col items-center">
-          <div className="w-20 h-20 bg-gradient-to-br from-orange-500 to-red-600 rounded-2xl flex items-center justify-center mb-6 shadow-2xl">
+          <div className="w-20 h-20 bg-primary rounded-2xl flex items-center justify-center mb-6 shadow-2xl">
             <Utensils className="h-10 w-10 text-white animate-pulse" />
           </div>
           <div className="relative">
-            <div className="animate-spin rounded-full h-16 w-16 border-4 border-orange-200 border-t-orange-600"></div>
-            <div className="absolute inset-0 animate-ping rounded-full h-16 w-16 border-4 border-orange-300 opacity-20"></div>
+            <div className="animate-spin rounded-full h-16 w-16 border-4 border-primary/20 border-t-primary"></div>
           </div>
-          <p className="mt-6 text-xl font-medium text-gray-700">Loading delicious menu...</p>
-          <p className="text-sm text-gray-500 mt-2">Preparing something amazing for you</p>
+          <p className="mt-6 text-xl font-medium text-text-light dark:text-text-dark">Loading menu...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-cyan-50 pt-20">
-      {/* Hero Landing Section */}
-      <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
-        {/* Animated Background */}
-        <div className="absolute inset-0">
-          <div className="absolute top-20 left-20 w-96 h-96 bg-gradient-to-r from-indigo-300/40 to-purple-300/40 rounded-full blur-3xl animate-pulse"></div>
-          <div className="absolute bottom-20 right-20 w-80 h-80 bg-gradient-to-r from-cyan-300/40 to-teal-300/40 rounded-full blur-3xl animate-pulse delay-1000"></div>
-          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-gradient-to-r from-violet-200/30 to-rose-200/30 rounded-full blur-3xl animate-pulse delay-500"></div>
-          <div className="absolute top-1/4 right-1/4 w-64 h-64 bg-gradient-to-r from-amber-200/30 to-orange-200/30 rounded-full blur-3xl animate-pulse delay-700"></div>
-        </div>
+    <div className="relative w-full flex flex-col min-h-screen bg-[#F5F5DC] dark:bg-[#1a1612]">
+      {/* Sticky Header / Top App Bar */}
+      <header className="sticky top-0 z-20 w-full border-b border-black/10 dark:border-white/10 bg-[#F5F5DC]/80 dark:bg-[#1a1612]/80 backdrop-blur-sm">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16">
+            {/* Logo and Title */}
+            <div className="flex items-center gap-4">
+              <Coffee className="text-[#6F4E37] text-3xl h-8 w-8" />
+              <h1 className="text-xl font-bold tracking-tight text-text-light dark:text-text-dark">
+                {cafeSettings?.cafe_name || 'Palm Cafe'}
+              </h1>
+            </div>
 
-        <div className="relative z-10 text-center px-4">
-          {/* Welcome Badge */}
-          <div className="inline-flex items-center bg-gradient-to-r from-indigo-500/10 to-purple-500/10 backdrop-blur-sm rounded-full px-6 py-3 border border-indigo-200/30 shadow-lg mb-8">
-            <Sparkles className="h-5 w-5 mr-2 text-indigo-600" />
-            <span className="text-sm font-semibold text-indigo-700">Welcome to Culinary Excellence</span>
-          </div>
-
-          {/* Main Heading */}
-          <h1 className="text-5xl md:text-7xl font-bold mb-8 leading-tight">
-            <span className="bg-gradient-to-r from-indigo-600 via-purple-600 to-rose-600 bg-clip-text text-transparent">
-              Discover
-            </span>
-            <br />
-            <span className="text-gray-800">Extraordinary</span>
-            <br />
-            <span className="bg-gradient-to-r from-purple-600 via-rose-600 to-pink-600 bg-clip-text text-transparent">
-              Flavors
-            </span>
-          </h1>
-
-          {/* Subtitle */}
-          <p className="text-xl text-gray-700 mb-12 max-w-3xl mx-auto leading-relaxed font-medium">
-            Embark on a culinary journey where every dish tells a story of passion,
-            creativity, and the finest ingredients crafted to perfection.
-          </p>
-
-          {/* CTA Buttons */}
-          <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16">
-            <button
-              onClick={() => {
-                document.getElementById('menu-section').scrollIntoView({
-                  behavior: 'smooth'
-                });
-              }}
-              className="bg-gradient-to-r from-indigo-600 via-purple-600 to-rose-600 text-white px-8 py-4 rounded-2xl font-semibold hover:shadow-2xl hover:scale-105 transition-all duration-300 flex items-center justify-center group"
-            >
-              <span>Explore Menu</span>
-              <ChevronDown className="ml-2 h-5 w-5 group-hover:translate-y-1 transition-transform" />
-            </button>
-            {customer && (
+            {/* Navigation */}
+            <nav className="hidden md:flex items-center gap-8">
+              <button
+                onClick={() => setActiveTab('menu')}
+                className={`text-sm font-medium hover:text-[#6F4E37] transition-colors ${activeTab === 'menu' ? 'text-[#6F4E37]' : ''}`}
+              >
+                Menu
+              </button>
               <button
                 onClick={() => setActiveTab('history')}
-                className="bg-gradient-to-r from-indigo-500/10 to-purple-500/10 backdrop-blur-sm text-indigo-700 px-8 py-4 rounded-2xl font-semibold border border-indigo-200/30 hover:shadow-xl hover:scale-105 transition-all duration-300"
+                className={`text-sm font-medium hover:text-[#6F4E37] transition-colors ${activeTab === 'history' ? 'text-[#6F4E37]' : ''}`}
               >
-                Order History
+                My Orders
               </button>
-            )}
-          </div>
+            </nav>
 
-          {/* Stats */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-4xl mx-auto">
-            {[
-              { icon: <TrendingUp className="h-6 w-6" />, title: `${Object.values(groupedMenuItems).flat().length}+`, subtitle: "Dishes", color: "from-indigo-500 to-cyan-500" },
-              { icon: <Award className="h-6 w-6" />, title: "4.9★", subtitle: "Rating", color: "from-amber-500 to-orange-500" },
-              { icon: <Clock className="h-6 w-6" />, title: "15 min", subtitle: "Prep Time", color: "from-emerald-500 to-teal-500" },
-              { icon: <Zap className="h-6 w-6" />, title: "Fresh", subtitle: "Daily", color: "from-rose-500 to-pink-500" }
-            ].map((stat, index) => (
-              <div key={index} className="bg-white/60 backdrop-blur-sm rounded-2xl p-6 border border-white/20 hover:scale-105 transition-transform duration-300 text-center">
-                <div className={`w-12 h-12 bg-gradient-to-br ${stat.color} rounded-xl flex items-center justify-center text-white mb-4 mx-auto`}>
-                  {stat.icon}
-                </div>
-                <h3 className="text-2xl font-bold text-gray-800">{stat.title}</h3>
-                <p className="text-sm text-gray-600">{stat.subtitle}</p>
-              </div>
-            ))}
-          </div>
-        </div>
+            {/* Search Bar - Expandable */}
+            <div className="flex items-center gap-3">
+              <div className="relative">
+                <button
+                  onClick={() => setSearchExpanded(true)}
+                  className="flex items-center justify-center h-10 w-10 hover:bg-black/5 dark:hover:bg-white/5 rounded-full transition-colors"
+                >
+                  <Search className="h-5 w-5 text-text-light dark:text-text-dark" />
+                </button>
 
-        {/* Scroll Indicator */}
-        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
-          <div className="w-6 h-10 border-2 border-gray-400 rounded-full flex justify-center">
-            <div className="w-1 h-3 bg-gray-400 rounded-full mt-2 animate-pulse"></div>
-          </div>
-        </div>
-      </section>
-
-      {/* Main Content */}
-      <main id="menu-section" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-
-        {/* Order Status Display */}
-        {activeTab === 'menu' && recentOrder && (
-          <div
-            className="mb-12 p-8 bg-gradient-to-r from-blue-50 to-purple-50 backdrop-blur-sm rounded-3xl shadow-2xl border border-blue-100 cursor-pointer hover:shadow-3xl transition-all duration-500 hover:scale-[1.02] relative overflow-hidden group"
-            onClick={() => {
-              setActiveTab('history');
-              window.scrollTo({ top: 0, behavior: 'smooth' });
-            }}
-          >
-            <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-blue-200/30 to-purple-200/30 rounded-full blur-2xl group-hover:scale-110 transition-transform duration-500"></div>
-            <div className="relative z-10 flex items-center justify-between">
-              <div className="flex items-center space-x-4">
-                <div className="w-16 h-16 bg-gradient-to-br from-blue-600 to-purple-700 rounded-2xl flex items-center justify-center shadow-lg">
-                  <CheckCircle className="h-8 w-8 text-white" />
-                </div>
-                <div>
-                  <h3 className="text-2xl font-bold text-gray-800 mb-1">
-                    Order #{recentOrder.orderNumber}
-                  </h3>
-                  <p className="text-gray-600 text-sm">
-                    Placed on {recentOrder.timestamp.toLocaleString()}
-                  </p>
-                </div>
-              </div>
-              <div className="text-right">
-                <span className={`px-6 py-3 rounded-2xl text-sm font-bold shadow-lg ${orderStatus === 'pending' ? 'bg-gradient-to-r from-yellow-400 to-orange-400 text-white' :
-                    orderStatus === 'preparing' ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white' :
-                      orderStatus === 'ready' ? 'bg-gradient-to-r from-green-500 to-emerald-600 text-white' :
-                        orderStatus === 'completed' ? 'bg-gradient-to-r from-gray-500 to-gray-600 text-white' :
-                          'bg-gradient-to-r from-red-500 to-red-600 text-white'
-                  }`}>
-                  {orderStatus?.charAt(0).toUpperCase() + orderStatus?.slice(1) || 'Pending'}
-                </span>
-                <p className="text-2xl font-bold text-gray-800 mt-3">
-                  {formatCurrency(recentOrder.total)}
-                </p>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Content based on active tab */}
-        {activeTab === 'menu' ? (
-          <>
-            {/* Modern Search Section */}
-            <div className="mb-16">
-              <div className="text-center mb-8">
-                <h2 className="text-4xl font-bold text-gray-800 mb-4">
-                  Find Your Perfect
-                  <span className="bg-gradient-to-r from-indigo-600 via-purple-600 to-rose-600 bg-clip-text text-transparent"> Dish</span>
-                </h2>
-                <p className="text-gray-700 text-lg font-medium">Discover flavors that speak to your soul</p>
-              </div>
-
-              <div className="relative max-w-3xl mx-auto">
-                <div className="bg-gradient-to-r from-white/90 to-indigo-50/90 backdrop-blur-xl rounded-3xl shadow-2xl p-3 border border-indigo-200/30">
-                  <div className="relative">
-                    <Search className="absolute left-8 top-1/2 transform -translate-y-1/2 h-6 w-6 text-indigo-500" />
-                    <input
-                      type="text"
-                      placeholder="What are you craving today?"
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      className="w-full pl-16 pr-16 py-6 bg-transparent border-0 text-gray-800 placeholder-gray-600 focus:outline-none focus:ring-0 text-xl font-medium rounded-3xl"
-                    />
-                    {searchQuery && (
+                {/* Expanded Search Bar - Absolute positioned overlay */}
+                {searchExpanded && (
+                  <div className="absolute right-0 top-1/2 -translate-y-1/2 w-64 md:w-80 z-30">
+                    <div className="relative">
+                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-[#9a794c]" />
+                      <input
+                        ref={searchInputRef}
+                        type="text"
+                        placeholder="Search menu..."
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        onBlur={(e) => {
+                          // Don't close if clicking on the clear button
+                          if (!e.relatedTarget?.closest('.search-clear-btn') && !searchQuery) {
+                            setSearchExpanded(false);
+                          }
+                        }}
+                        className="w-full pl-10 pr-10 py-2 rounded-lg bg-white dark:bg-[#2c2216] border-2 border-[#6F4E37] dark:border-[#6F4E37] text-text-light dark:text-text-dark placeholder:text-[#9a794c] focus:outline-none focus:ring-2 focus:ring-[#6F4E37]/50 shadow-lg transition-all"
+                      />
                       <button
-                        onClick={() => setSearchQuery('')}
-                        className="absolute right-6 top-1/2 transform -translate-y-1/2 p-3 hover:bg-indigo-100 rounded-full transition-colors"
+                        onMouseDown={(e) => e.preventDefault()}
+                        onClick={() => {
+                          setSearchQuery('');
+                          setSearchExpanded(false);
+                        }}
+                        className="search-clear-btn absolute right-3 top-1/2 transform -translate-y-1/2 text-text-light/60 dark:text-text-dark/60 hover:text-text-light dark:hover:text-text-dark"
                       >
-                        <X className="h-5 w-5 text-indigo-500" />
+                        <X className="h-4 w-4" />
                       </button>
-                    )}
-                  </div>
-                </div>
-                {searchQuery && (
-                  <div className="text-center mt-6">
-                    <div className="inline-flex items-center bg-blue-50 rounded-full px-6 py-3 border border-blue-100">
-                      <span className="text-blue-700 font-semibold">
-                        {Object.values(filteredMenuItems).flat().length} delicious matches found
-                      </span>
                     </div>
                   </div>
                 )}
               </div>
-            </div>
 
-            {/* Tax Information */}
-            {taxRate > 0 && (
-              <div className="mb-12 text-center">
-                <div className="inline-flex items-center bg-gradient-to-r from-blue-50 to-purple-50 rounded-2xl px-6 py-3 border border-blue-100">
-                  <span className="text-gray-700 font-medium">
-                    All prices include {taxRate}% tax
+              <button
+                onClick={() => setShowCart(true)}
+                className="relative flex cursor-pointer items-center justify-center rounded-full h-10 w-10 text-text-light dark:text-text-dark hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
+              >
+                <ShoppingCart className="h-5 w-5" />
+                {cart.length > 0 && (
+                  <span className="absolute top-1 right-1 flex h-5 w-5 items-center justify-center rounded-full bg-[#6F4E37] text-xs font-bold text-white">
+                    {cart.reduce((total, item) => total + item.quantity, 0)}
                   </span>
-                </div>
-              </div>
-            )}
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      </header>
 
-            {/* Menu Items */}
-            <div className="space-y-20">
-              {Object.keys(filteredMenuItems).length === 0 && searchQuery ? (
-                <div className="text-center py-20 bg-gradient-to-br from-white/80 to-blue-50/80 backdrop-blur-sm rounded-3xl border border-white/30 shadow-2xl">
-                  <div className="w-24 h-24 bg-gradient-to-br from-gray-200 to-gray-300 rounded-full flex items-center justify-center mx-auto mb-6">
-                    <Search className="h-12 w-12 text-gray-400" />
-                  </div>
-                  <h3 className="text-3xl font-bold text-gray-800 mb-4">
-                    No culinary matches found
-                  </h3>
-                  <p className="text-gray-600 mb-8 text-lg max-w-md mx-auto">
-                    Let's explore other delicious possibilities from our menu
-                  </p>
+      {/* Main Content */}
+      <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-12">
+        <div className="flex flex-col lg:flex-row gap-8 lg:gap-12">
+          {/* Left Column: Category Navigation (Desktop) */}
+          {activeTab === 'menu' && (
+            <aside className="hidden lg:block w-1/4 xl:w-1/5">
+              <div className="sticky top-24">
+                <h2 className="text-lg font-bold mb-4 px-3 text-text-light dark:text-text-dark">Categories</h2>
+                <nav className="flex flex-col gap-1">
                   <button
-                    onClick={() => setSearchQuery('')}
-                    className="bg-gradient-to-r from-blue-600 to-purple-700 text-white px-8 py-4 rounded-2xl font-semibold hover:shadow-xl hover:scale-105 transition-all duration-300"
+                    onClick={() => setSelectedCategory('All')}
+                    className={`flex items-center gap-3 px-3 py-2 rounded-lg text-left transition-colors font-medium ${
+                      selectedCategory === 'All'
+                        ? 'bg-[#6F4E37]/20 text-[#6F4E37] font-semibold'
+                        : 'hover:bg-black/5 dark:hover:bg-white/5 text-text-light/70 dark:text-text-dark/70 hover:text-text-light dark:hover:text-text-dark'
+                    }`}
                   >
-                    Explore All Dishes
+                    <Utensils className="h-5 w-5" />
+                    <span>All Items</span>
                   </button>
-                </div>
-              ) : (
-                Object.entries(filteredMenuItems).map(([categoryName, items], index) => (
-                  <section key={categoryName} className="space-y-8">
-                    {/* Category Header */}
-                    <div className="text-center mb-12">
-                      <div className="inline-flex items-center space-x-4 bg-white/80 backdrop-blur-sm rounded-3xl px-8 py-6 border border-white/30 shadow-xl">
-                        <div className="w-16 h-16 bg-gradient-to-br from-blue-600 to-purple-700 rounded-2xl flex items-center justify-center text-white shadow-lg">
-                          {getCategoryIcon(categoryName)}
-                        </div>
-                        <div className="text-left">
-                          <h2 className="text-4xl font-bold text-gray-800">{categoryName}</h2>
-                          <p className="text-gray-600 text-lg">{items.length} handcrafted specialties</p>
-                        </div>
-                      </div>
-                    </div>
+                  {Object.keys(groupedMenuItems).map((categoryName) => (
+                    <button
+                      key={categoryName}
+                      onClick={() => setSelectedCategory(categoryName)}
+                      className={`flex items-center gap-3 px-3 py-2 rounded-lg text-left transition-colors font-medium ${
+                        selectedCategory === categoryName
+                          ? 'bg-[#6F4E37]/20 text-[#6F4E37] font-semibold'
+                          : 'hover:bg-black/5 dark:hover:bg-white/5 text-text-light/70 dark:text-text-dark/70 hover:text-text-light dark:hover:text-text-dark'
+                      }`}
+                    >
+                      {getCategoryIcon(categoryName)}
+                      <span>{categoryName}</span>
+                    </button>
+                  ))}
+                </nav>
+              </div>
+            </aside>
+          )}
 
-                    {/* Menu Grid */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                      {items.map((item, itemIndex) => (
-                        <div
-                          key={item.id}
-                          className="group bg-white/90 backdrop-blur-sm rounded-3xl overflow-hidden shadow-xl hover:shadow-3xl transition-all duration-500 hover:scale-[1.02] border border-white/30 relative"
-                          style={{ animationDelay: `${itemIndex * 100}ms` }}
-                        >
-                          {/* Image Section */}
-                          <div className="relative overflow-hidden h-56">
+          {/* Mobile Category Scroller */}
+          {activeTab === 'menu' && (
+            <div className="lg:hidden sticky top-16 z-10 bg-[#F5F5DC]/80 dark:bg-[#1a1612]/80 backdrop-blur-sm py-3 -mx-4 px-4">
+              <div
+                ref={categoryScrollRef}
+                className="flex gap-3 overflow-x-auto whitespace-nowrap scrollbar-hide"
+                style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+              >
+                <button
+                  onClick={() => setSelectedCategory('All')}
+                  className={`flex h-10 shrink-0 items-center justify-center gap-x-2 rounded-full pl-5 pr-5 cursor-pointer ${
+                    selectedCategory === 'All'
+                      ? 'bg-[#6F4E37] text-white'
+                      : 'bg-white/80 dark:bg-[#2c241d] text-text-light dark:text-text-dark'
+                  }`}
+                >
+                  <p className={`text-sm ${selectedCategory === 'All' ? 'font-bold' : 'font-medium'}`}>
+                    All
+                  </p>
+                </button>
+                {Object.keys(groupedMenuItems).map((categoryName) => (
+                  <button
+                    key={categoryName}
+                    onClick={() => setSelectedCategory(categoryName)}
+                    className={`flex h-10 shrink-0 items-center justify-center gap-x-2 rounded-full pl-5 pr-5 cursor-pointer ${
+                      selectedCategory === categoryName
+                        ? 'bg-[#6F4E37] text-white'
+                        : 'bg-white/80 dark:bg-[#2c241d] text-text-light dark:text-text-dark'
+                    }`}
+                  >
+                    <p className={`text-sm ${selectedCategory === categoryName ? 'font-bold' : 'font-medium'}`}>
+                      {categoryName}
+                    </p>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Center/Main Column: Menu Items or Order History */}
+          <div className="w-full lg:flex-1">
+            {activeTab === 'menu' ? (
+              <div className="flex flex-col gap-10">
+                {/* Menu Items by Category */}
+                {Object.entries(groupedMenuItems)
+                  .filter(([categoryName]) => selectedCategory === 'All' || categoryName === selectedCategory)
+                  .map(([categoryName, items]) => (
+                    <section key={categoryName} id={categoryName.toLowerCase().replace(/\s+/g, '-')}>
+                      <h2 className="text-3xl font-extrabold tracking-tight mb-6 text-text-light dark:text-text-dark">
+                        {categoryName}
+                      </h2>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                        {items.map((item) => (
+                          <div
+                            key={item.id}
+                            className="flex flex-col rounded-xl bg-white dark:bg-[#2c241d] shadow-sm overflow-hidden border border-black/5 dark:border-white/5 hover:shadow-md transition-shadow"
+                          >
                             {cafeSettings?.show_menu_images && item.image_url ? (
-                              <img
-                                src={getImageUrl(item.image_url)}
-                                alt={item.name}
-                                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                              <div
+                                className="w-full h-48 bg-cover bg-center"
+                                style={{ backgroundImage: `url('${getImageUrl(item.image_url)}')` }}
                               />
                             ) : (
-                              <div className={`w-full h-full bg-gradient-to-br ${getCategoryBackground(categoryName)} flex items-center justify-center relative`}>
-                                <div className="text-center">
-                                  <div className="w-20 h-20 mx-auto mb-3 text-white/80">
-                                    {getCategoryIcon(categoryName)}
-                                  </div>
-                                  <div className="text-sm text-white/70 font-medium">
-                                    {categoryName}
-                                  </div>
-                                </div>
-                                <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
+                              <div className="w-full h-48 bg-gradient-to-br from-[#6F4E37]/20 to-[#6F4E37]/40 flex items-center justify-center">
+                                {getCategoryIcon(categoryName)}
                               </div>
                             )}
-
-                            {/* Overlay */}
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-
-                            {/* Quick Add Button */}
-                            <button
-                              onClick={() => addToCart(item)}
-                              className="absolute bottom-4 right-4 bg-gradient-to-r from-blue-600 to-purple-700 text-white p-4 rounded-2xl opacity-0 group-hover:opacity-100 hover:scale-110 transition-all duration-300 shadow-2xl"
-                            >
-                              <Plus className="h-5 w-5" />
-                            </button>
-
-                            {/* Price Badge */}
-                            <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm rounded-2xl px-4 py-2 shadow-lg">
-                              <span className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-700 bg-clip-text text-transparent">
+                            <div className="p-4 flex flex-col flex-grow">
+                              <h3 className="text-lg font-bold text-text-light dark:text-text-dark">{item.name}</h3>
+                              {item.description && (
+                                <p className="text-sm text-text-light/60 dark:text-text-dark/60 mt-1 flex-grow line-clamp-2">
+                                  {item.description}
+                                </p>
+                              )}
+                              <p className="text-lg font-semibold mt-3 text-text-light dark:text-text-dark">
                                 {formatCurrency(item.price)}
-                              </span>
+                              </p>
+                              <div className="flex items-center justify-end mt-4">
+                                <button
+                                  onClick={() => addToCart(item)}
+                                  className="flex items-center justify-center gap-2 h-10 px-4 rounded-lg bg-[#6F4E37] text-white text-sm font-bold hover:bg-[#6F4E37]/90 transition-colors"
+                                >
+                                  <Plus className="h-4 w-4" />
+                                  <span>Add</span>
+                                </button>
+                              </div>
                             </div>
                           </div>
-
-                          {/* Content Section */}
-                          <div className="p-6">
-                            <h3 className="text-2xl font-bold text-gray-800 mb-3 group-hover:text-blue-600 transition-colors duration-300">
-                              {item.name}
-                            </h3>
-
-                            {item.description && (
-                              <p className="text-gray-600 text-sm mb-6 line-clamp-3 leading-relaxed">
-                                {item.description}
-                              </p>
-                            )}
-
-                            {/* Action Button */}
-                            <button
-                              onClick={() => addToCart(item)}
-                              className="w-full bg-gradient-to-r from-blue-600 to-purple-700 text-white py-3 rounded-2xl font-semibold hover:shadow-xl hover:scale-105 transition-all duration-300 flex items-center justify-center space-x-2"
-                            >
-                              <Plus className="h-5 w-5" />
-                              <span>Add to Cart</span>
-                            </button>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </section>
-                ))
-              )}
-            </div>
-
-  {/* Features Section */}
-  <section className="mt-20 py-16 bg-gradient-to-r from-indigo-600 via-purple-600 to-rose-600 rounded-3xl text-white relative overflow-hidden">
-              <div className="absolute inset-0">
-                <div className="absolute top-0 left-0 w-64 h-64 bg-white/10 rounded-full blur-3xl"></div>
-                <div className="absolute bottom-0 right-0 w-80 h-80 bg-amber-300/10 rounded-full blur-3xl"></div>
-                <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-violet-300/10 rounded-full blur-3xl"></div>
-              </div>
-              <div className="relative z-10 text-center max-w-4xl mx-auto px-6">
-                <h2 className="text-4xl font-bold mb-8">Why Choose Palm Cafe?</h2>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                  {[
-                    {
-                      icon: <Utensils className="h-12 w-12" />,
-                      title: "Fresh Ingredients",
-                      description: "Locally sourced, fresh ingredients prepared daily"
-                    },
-                    {
-                      icon: <Clock className="h-12 w-12" />,
-                      title: "Quick Service",
-                      description: "Fast preparation without compromising quality"
-                    },
-                    {
-                      icon: <Heart className="h-12 w-12" />,
-                      title: "Made with Love",
-                      description: "Every dish crafted with passion and care"
-                    }
-                  ].map((feature, index) => (
-                    <div key={index} className="text-center group">
-                      <div className="w-20 h-20 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
-                        {feature.icon}
+                        ))}
                       </div>
-                      <h3 className="text-xl font-bold mb-2">{feature.title}</h3>
-                      <p className="text-orange-100">{feature.description}</p>
-                    </div>
+                    </section>
                   ))}
-                </div>
               </div>
-            </section >
-          </>
-        ) : (
-  /* Order History Tab */
-  <CustomerOrderHistory
-    customerPhone={customer?.phone}
-    setActiveTab={setActiveTab}
-    cart={cart}
-    setCart={setCart}
-  />
-)}
-      </main >
+            ) : (
+              /* Order History Tab */
+              <CustomerOrderHistory
+                customerPhone={customer?.phone}
+                setActiveTab={setActiveTab}
+                cart={cart}
+                setCart={setCart}
+              />
+            )}
+          </div>
+        </div>
+      </main>
 
-  {/* Modern Cart Modal */ }
+  {/* Cart Modal */ }
 {
   showCart && (
     <div className="fixed inset-0 bg-black/70 backdrop-blur-md flex items-center justify-center z-50 p-4">
-      <div className="bg-white/95 backdrop-blur-2xl rounded-3xl w-full max-w-2xl max-h-[90vh] overflow-hidden shadow-3xl border border-white/30">
+      <div className="bg-[#FFF8E1] dark:bg-[#221a10] rounded-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden shadow-2xl">
         {/* Cart Header */}
-        <div className="bg-gradient-to-r from-blue-600 via-purple-600 to-blue-800 text-white p-8">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <div className="w-14 h-14 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center">
-                <ShoppingCart className="h-7 w-7" />
-              </div>
-              <div>
-                <h2 className="text-2xl font-bold">Your Culinary Selection</h2>
-                <p className="text-blue-100 text-sm">{cart.length} handpicked items</p>
-              </div>
-            </div>
-            <button
-              onClick={() => setShowCart(false)}
-              className="text-white/80 hover:text-white hover:bg-white/20 p-3 rounded-2xl transition-all duration-300 hover:scale-105"
-            >
-              <X className="h-6 w-6" />
-            </button>
+        <div className="flex w-full items-center justify-between border-b border-[#f3eee7] dark:border-[#4a2c2a] bg-[#fcfaf8] dark:bg-[#2c2216] px-6 py-4">
+          <div class="flex items-center gap-4">
+            <ShoppingCart className="h-6 w-6 text-[#6F4E37]" />
+            <h2 className="text-2xl font-bold tracking-tight text-text-light dark:text-text-dark">Your Order</h2>
           </div>
+          <button
+            onClick={() => setShowCart(false)}
+            className="text-text-light dark:text-text-dark hover:bg-black/5 dark:hover:bg-white/5 p-2 rounded-lg transition-colors"
+          >
+            <X className="h-6 w-6" />
+          </button>
         </div>
 
-        {/* Cart Content */}
-        <div className="p-8 max-h-96 overflow-y-auto">
-          {cart.length === 0 ? (
-            <div className="text-center py-16">
-              <div className="w-24 h-24 bg-gradient-to-br from-gray-100 to-gray-200 rounded-full flex items-center justify-center mx-auto mb-6">
-                <ShoppingCart className="h-12 w-12 text-gray-400" />
+        {/* Cart Content - Two Column Layout */}
+        <div className="flex flex-col lg:grid lg:grid-cols-3 gap-8 p-6 max-h-[calc(90vh-180px)] overflow-y-auto">
+          {/* Left Column: Cart Items */}
+          <div className="lg:col-span-2 flex flex-col gap-4">
+            {cart.length === 0 ? (
+              <div className="flex flex-col items-center justify-center gap-6 rounded-lg bg-[#fcfaf8] dark:bg-[#2c2216] p-12 text-center shadow-sm">
+                <div className="text-[#6F4E37]">
+                  <ShoppingCart className="h-24 w-24" />
+                </div>
+                <h3 className="text-2xl font-bold text-text-light dark:text-text-dark">Your cart is empty</h3>
+                <p className="max-w-sm text-text-light/60 dark:text-text-dark/60">Looks like you haven't added anything to your order yet. Let's fix that!</p>
               </div>
-              <h3 className="text-2xl font-bold text-gray-800 mb-2">Your cart awaits</h3>
-              <p className="text-gray-600">Discover amazing dishes to fill your culinary journey</p>
-            </div>
-          ) : (
-            <div className="space-y-6">
-              {cart.map((item) => (
-                <div key={item.id} className="flex items-center space-x-4 bg-gradient-to-r from-blue-50/80 to-purple-50/80 backdrop-blur-sm rounded-3xl p-6 border border-blue-100/50 hover:shadow-lg transition-all duration-300">
-                  {cafeSettings?.show_menu_images && item.image_url ? (
-                    <img
-                      src={getImageUrl(item.image_url)}
-                      alt={item.name}
-                      className="w-20 h-20 object-cover rounded-2xl shadow-lg"
-                    />
-                  ) : (
-                    <div className="w-20 h-20 bg-gradient-to-br from-blue-100 to-purple-100 rounded-2xl flex items-center justify-center shadow-lg">
-                      <Utensils className="h-10 w-10 text-blue-600" />
+            ) : (
+              <>
+                {cart.map((item) => (
+                  <div key={item.id} className="flex items-center gap-4 rounded-lg bg-[#fcfaf8] dark:bg-[#2c2216] p-4 shadow-sm">
+                    {cafeSettings?.show_menu_images && item.image_url ? (
+                      <div
+                        className="bg-center bg-no-repeat aspect-square bg-cover rounded-lg size-16"
+                        style={{ backgroundImage: `url('${getImageUrl(item.image_url)}')` }}
+                      />
+                    ) : (
+                      <div className="size-16 bg-gradient-to-br from-[#6F4E37]/20 to-[#6F4E37]/40 rounded-lg flex items-center justify-center">
+                        <Utensils className="h-8 w-8 text-[#6F4E37]" />
+                      </div>
+                    )}
+                    <div className="flex flex-1 flex-col justify-center">
+                      <p className="text-base font-bold text-text-light dark:text-text-dark">{item.name}</p>
+                      <p className="text-sm text-text-light/60 dark:text-text-dark/60">{formatCurrency(item.price)}</p>
+                    </div>
+                    <div className="flex items-center gap-6">
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                          className="flex h-8 w-8 items-center justify-center rounded-full bg-[#f3eee7] dark:bg-[#443d34] transition-colors hover:bg-[#6F4E37]/20 dark:hover:bg-[#6F4E37]/30 cursor-pointer"
+                        >
+                          <Minus className="h-4 w-4" />
+                        </button>
+                        <input
+                          className="w-8 border-none bg-transparent p-0 text-center text-base font-medium focus:outline-0 focus:ring-0"
+                          type="number"
+                          value={item.quantity}
+                          readOnly
+                        />
+                        <button
+                          onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                          className="flex h-8 w-8 items-center justify-center rounded-full bg-[#f3eee7] dark:bg-[#443d34] transition-colors hover:bg-[#6F4E37]/20 dark:hover:bg-[#6F4E37]/30 cursor-pointer"
+                        >
+                          <Plus className="h-4 w-4" />
+                        </button>
+                      </div>
+                      <p className="w-16 text-right font-semibold text-text-light dark:text-text-dark">{formatCurrency(item.price * item.quantity)}</p>
+                      <button
+                        onClick={() => removeFromCart(item.id)}
+                        className="text-text-light/60 dark:text-text-dark/60 transition-colors hover:text-red-500"
+                      >
+                        <Trash2 className="h-5 w-5" />
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </>
+            )}
+          </div>
+
+          {/* Right Column: Order Summary */}
+          {cart.length > 0 && (
+            <div className="lg:col-span-1">
+              <div className="sticky top-6 flex flex-col gap-6 rounded-xl bg-[#fcfaf8] dark:bg-[#2c2216] p-6 shadow-sm">
+                <h2 className="text-2xl font-bold tracking-tight text-text-light dark:text-text-dark">Order Summary</h2>
+
+                <div className="flex flex-col gap-3 border-b border-[#f3eee7] dark:border-[#4a2c2a] pb-4">
+                  <div className="flex justify-between">
+                    <p className="text-text-light/60 dark:text-text-dark/60">Subtotal</p>
+                    <p className="font-medium text-text-light dark:text-text-dark">{formatCurrency(getSubtotal())}</p>
+                  </div>
+                  {showTaxInMenu && taxAmount > 0 && (
+                    <div className="flex justify-between">
+                      <p className="text-text-light/60 dark:text-text-dark/60">Taxes ({taxRate}%)</p>
+                      <p className="font-medium text-text-light dark:text-text-dark">{formatCurrency(taxAmount)}</p>
                     </div>
                   )}
-                  <div className="flex-1">
-                    <h4 className="font-bold text-gray-900 text-lg">{item.name}</h4>
-                    <p className="text-gray-600">{formatCurrency(item.price)} each</p>
-                  </div>
-                  <div className="flex items-center space-x-3">
-                    <button
-                      onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                      className="w-10 h-10 bg-white/80 hover:bg-white rounded-2xl flex items-center justify-center transition-all duration-300 hover:scale-105 shadow-md"
-                    >
-                      <Minus className="h-5 w-5 text-gray-600" />
-                    </button>
-                    <span className="w-12 text-center font-bold text-lg text-gray-800">{item.quantity}</span>
-                    <button
-                      onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                      className="w-10 h-10 bg-gradient-to-r from-blue-600 to-purple-700 text-white rounded-2xl flex items-center justify-center hover:scale-105 transition-all duration-300 shadow-lg"
-                    >
-                      <Plus className="h-5 w-5" />
-                    </button>
-                    <button
-                      onClick={() => removeFromCart(item.id)}
-                      className="p-2 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-xl transition-all duration-300"
-                    >
-                      <Trash2 className="h-5 w-5" />
-                    </button>
-                  </div>
+                  {tipAmount > 0 && (
+                    <div className="flex justify-between">
+                      <p className="text-text-light/60 dark:text-text-dark/60">Tip</p>
+                      <p className="font-medium text-text-light dark:text-text-dark">{formatCurrency(tipAmount)}</p>
+                    </div>
+                  )}
+                  {pointsToRedeem > 0 && (
+                    <div className="flex justify-between text-green-600 dark:text-green-400">
+                      <p>Points Redeemed ({pointsToRedeem} pts)</p>
+                      <p className="font-medium">-{formatCurrency(pointsToRedeem * 0.1)}</p>
+                    </div>
+                  )}
                 </div>
-              ))}
+
+                <div className="flex justify-between">
+                  <p className="text-lg font-bold text-text-light dark:text-text-dark">Total</p>
+                  <p className="text-xl font-extrabold text-text-light dark:text-text-dark">{formatCurrency(getTotal())}</p>
+                </div>
+
+                {/* Login Required Message */}
+                {!customer && (
+                  <div className="p-6 bg-[#6F4E37]/10 dark:bg-[#6F4E37]/20 border border-[#6F4E37]/30 rounded-lg">
+                    <div className="text-center">
+                      <div className="w-12 h-12 bg-[#6F4E37] rounded-full flex items-center justify-center mx-auto mb-4">
+                        <User className="h-6 w-6 text-white" />
+                      </div>
+                      <h3 className="text-lg font-bold text-text-light dark:text-text-dark mb-2">
+                        Login Required
+                      </h3>
+                      <p className="text-text-light/60 dark:text-text-dark/60 mb-4 text-sm">
+                        Please login to place your order
+                      </p>
+                      <button
+                        onClick={() => {
+                          setShowCart(false);
+                          setShowLoginModal(true);
+                        }}
+                        className="w-full bg-[#6F4E37] text-white px-6 py-3 rounded-lg font-bold hover:bg-[#6F4E37]/90 transition-colors"
+                      >
+                        Login & Continue
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {/* Customer sections only show when logged in */}
+                {customer && (
+                  <div className="flex flex-col gap-4">
+                    {/* Customer Information */}
+                    <div className="p-4 bg-[#6F4E37]/10 dark:bg-[#6F4E37]/20 border border-[#6F4E37]/30 rounded-lg">
+                      <div className="flex justify-between items-center mb-3">
+                        <h3 className="font-bold text-text-light dark:text-text-dark flex items-center text-base">
+                          <User className="h-4 w-4 mr-2 text-[#6F4E37]" />
+                          Customer Info
+                        </h3>
+                        <div className="flex items-center gap-2">
+                          <button
+                            onClick={openEditProfile}
+                            className="flex items-center gap-1 px-2 py-1 bg-[#6F4E37] text-white rounded-lg hover:bg-[#6F4E37]/90 transition-colors text-xs"
+                          >
+                            <Edit3 className="h-3 w-3" />
+                            <span>Edit</span>
+                          </button>
+                          {onLogout && (
+                            <button
+                              onClick={onLogout}
+                              className="flex items-center gap-1 px-2 py-1 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors text-xs"
+                            >
+                              <LogOut className="h-3 w-3" />
+                              <span>Logout</span>
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                      <div className="space-y-2 text-sm">
+                        <div className="flex justify-between">
+                          <span className="text-text-light/60 dark:text-text-dark/60">Name:</span>
+                          <span className="font-semibold text-text-light dark:text-text-dark">{customer.name}</span>
+                        </div>
+                        {customer.phone && (
+                          <div className="flex justify-between">
+                            <span className="text-text-light/60 dark:text-text-dark/60">Phone:</span>
+                            <span className="font-semibold text-text-light dark:text-text-dark">{customer.phone}</span>
+                          </div>
+                        )}
+                        {customer.loyalty_points > 0 && (
+                          <div className="flex justify-between">
+                            <span className="text-text-light/60 dark:text-text-dark/60">Points:</span>
+                            <span className="flex items-center text-[#ec9213] font-semibold">
+                              <Star className="h-3 w-3 mr-1" />
+                              {customer.loyalty_points}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Payment Method */}
+                    <div>
+                      <h3 className="font-bold text-text-light dark:text-text-dark mb-3 text-sm">Payment Method</h3>
+                      <div className="grid grid-cols-2 gap-2">
+                        {paymentMethods.map((method) => (
+                          <button
+                            key={method.code}
+                            type="button"
+                            onClick={() => setPaymentMethod(method.code)}
+                            className={`flex items-center justify-center p-3 rounded-lg border-2 transition-colors ${
+                              paymentMethod === method.code
+                                ? 'bg-[#6F4E37] text-white border-[#6F4E37]'
+                                : 'bg-white dark:bg-[#2c2216] text-text-light dark:text-text-dark border-[#f3eee7] dark:border-[#4a2c2a] hover:border-[#6F4E37]'
+                            }`}
+                          >
+                            <span className="mr-2">{method.icon}</span>
+                            <span className="font-semibold text-sm">{method.name}</span>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Pickup Option */}
+                    <div>
+                      <h3 className="font-bold text-text-light dark:text-text-dark mb-3 text-sm">Dining Preference</h3>
+                      <div className="grid grid-cols-2 gap-2">
+                        {[
+                          { value: 'pickup', label: 'Pickup', icon: '🥡' },
+                          { value: 'dine-in', label: 'Dine-in', icon: '🍽️' }
+                        ].map((option) => (
+                          <button
+                            key={option.value}
+                            onClick={() => setPickupOption(option.value)}
+                            className={`p-3 rounded-lg border-2 transition-colors ${
+                              pickupOption === option.value
+                                ? 'bg-[#6F4E37] text-white border-[#6F4E37]'
+                                : 'bg-white dark:bg-[#2c2216] text-text-light dark:text-text-dark border-[#f3eee7] dark:border-[#4a2c2a] hover:border-[#6F4E37]'
+                            }`}
+                          >
+                            <div className="flex items-center justify-center gap-2">
+                              <span className="text-lg">{option.icon}</span>
+                              <span className="font-semibold text-sm">{option.label}</span>
+                            </div>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Table Number for Dine-in */}
+                    {pickupOption === 'dine-in' && (
+                      <div>
+                        <label className="block font-bold text-text-light dark:text-text-dark mb-2 text-sm">Table Number</label>
+                        <input
+                          type="text"
+                          placeholder="Enter table number (optional)"
+                          value={tableNumber}
+                          onChange={(e) => setTableNumber(e.target.value)}
+                          className="w-full p-3 border-2 border-[#f3eee7] dark:border-[#4a2c2a] rounded-lg focus:ring-2 focus:ring-[#6F4E37]/50 focus:border-[#6F4E37] bg-white dark:bg-[#2c2216] text-text-light dark:text-text-dark transition-colors"
+                        />
+                      </div>
+                    )}
+
+                    {/* Points Redemption */}
+                    {customer?.loyalty_points > 0 && (
+                      <div>
+                        <h3 className="font-bold text-text-light dark:text-text-dark mb-3 text-sm flex items-center">
+                          <Star className="h-4 w-4 mr-2 text-[#ec9213]" />
+                          Redeem Points
+                        </h3>
+                        <div className="bg-[#ec9213]/10 dark:bg-[#ec9213]/20 rounded-lg p-4 mb-3 border border-[#ec9213]/30">
+                          <div className="grid grid-cols-2 gap-3 text-xs">
+                            <div className="text-center">
+                              <div className="text-lg font-bold text-text-light dark:text-text-dark">{customer.loyalty_points}</div>
+                              <div className="text-text-light/60 dark:text-text-dark/60">Available</div>
+                            </div>
+                            <div className="text-center">
+                              <div className="text-lg font-bold text-text-light dark:text-text-dark">{maxRedeemablePoints}</div>
+                              <div className="text-text-light/60 dark:text-text-dark/60">Max Redeemable</div>
+                            </div>
+                          </div>
+                          <div className="text-center mt-2 text-xs text-text-light/60 dark:text-text-dark/60">
+                            1 point = {formatCurrency(0.10)}
+                          </div>
+                        </div>
+                        <input
+                          type="number"
+                          value={pointsToRedeem}
+                          onChange={(e) => handlePointsRedemption(parseInt(e.target.value) || 0)}
+                          min="0"
+                          max={maxRedeemablePoints}
+                          className="w-full p-3 border-2 border-[#f3eee7] dark:border-[#4a2c2a] rounded-lg focus:ring-2 focus:ring-[#ec9213]/50 focus:border-[#ec9213] bg-white dark:bg-[#2c2216] text-text-light dark:text-text-dark transition-colors"
+                          placeholder="Enter points"
+                        />
+                      </div>
+                    )}
+
+                    {/* Tip Selection */}
+                    <div>
+                      <h3 className="font-bold text-text-light dark:text-text-dark mb-3 text-sm">Add Tip</h3>
+                      <div className="grid grid-cols-3 gap-2 mb-3">
+                        {[0, 10, 15, 18, 20, 25].map((percentage) => (
+                          <button
+                            key={percentage}
+                            onClick={() => handleTipPercentageChange(percentage)}
+                            className={`py-2 px-3 text-xs rounded-lg border-2 transition-colors font-semibold ${
+                              tipPercentage === percentage
+                                ? 'bg-[#6F4E37] text-white border-[#6F4E37]'
+                                : 'bg-white dark:bg-[#2c2216] text-text-light dark:text-text-dark border-[#f3eee7] dark:border-[#4a2c2a] hover:border-[#6F4E37]'
+                            }`}
+                          >
+                            {percentage === 0 ? 'No Tip' : `${percentage}%`}
+                          </button>
+                        ))}
+                      </div>
+                      <input
+                        type="number"
+                        value={tipAmount.toFixed(2)}
+                        onChange={(e) => handleTipAmountChange(e.target.value)}
+                        className="w-full p-3 border-2 border-[#f3eee7] dark:border-[#4a2c2a] rounded-lg focus:ring-2 focus:ring-[#6F4E37]/50 focus:border-[#6F4E37] bg-white dark:bg-[#2c2216] text-text-light dark:text-text-dark transition-colors"
+                        placeholder="Custom tip"
+                      />
+                    </div>
+                  </div>
+                )}
+
+                {/* Action Buttons */}
+                <button
+                  onClick={placeOrder}
+                  disabled={orderLoading || !customer}
+                  className="w-full rounded-lg bg-[#6F4E37] py-3 text-lg font-bold text-white transition-opacity hover:bg-[#6F4E37]/90 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                >
+                  {orderLoading ? (
+                    <>
+                      <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent"></div>
+                      <span>Placing Order...</span>
+                    </>
+                  ) : (
+                    <>
+                      <CheckCircle className="h-5 w-5" />
+                      <span>Proceed to Checkout</span>
+                    </>
+                  )}
+                </button>
+
+                <button
+                  onClick={clearCart}
+                  className="w-full rounded-lg bg-white dark:bg-[#2c2216] border-2 border-[#f3eee7] dark:border-[#4a2c2a] py-3 text-base font-semibold text-text-light dark:text-text-dark hover:border-[#6F4E37] transition-colors"
+                >
+                  Clear Cart
+                </button>
+              </div>
             </div>
           )}
         </div>
-
-        {/* Cart Footer */}
-        {cart.length > 0 && (
-          <div className="border-t border-blue-100/50 p-8 bg-gradient-to-r from-blue-50/30 to-purple-50/30 backdrop-blur-sm">
-            <div className="space-y-4 mb-8">
-              <div className="flex justify-between text-gray-700 text-lg">
-                <span>Subtotal:</span>
-                <span className="font-semibold">{formatCurrency(getSubtotal())}</span>
-              </div>
-              {showTaxInMenu && taxAmount > 0 && (
-                <div className="flex justify-between text-gray-700">
-                  <span>Tax ({taxRate}%):</span>
-                  <span className="font-semibold">{formatCurrency(taxAmount)}</span>
-                </div>
-              )}
-              {tipAmount > 0 && (
-                <div className="flex justify-between text-gray-700">
-                  <span>Tip:</span>
-                  <span className="font-semibold">{formatCurrency(tipAmount)}</span>
-                </div>
-              )}
-              {pointsToRedeem > 0 && (
-                <div className="flex justify-between text-green-600">
-                  <span>Points Redeemed ({pointsToRedeem} pts):</span>
-                  <span className="font-semibold">-{formatCurrency(pointsToRedeem * 0.1)}</span>
-                </div>
-              )}
-              <div className="flex justify-between text-2xl font-bold text-gray-900 border-t border-blue-200 pt-4">
-                <span>Total:</span>
-                <span className="bg-gradient-to-r from-blue-600 to-purple-700 bg-clip-text text-transparent">
-                  {formatCurrency(getTotal())}
-                </span>
-              </div>
-            </div>
-
-            {/* Login Required Message */}
-            {!customer && cart.length > 0 && (
-              <div className="mb-8 p-6 bg-gradient-to-r from-yellow-50 to-orange-50 border border-yellow-200 rounded-3xl shadow-lg">
-                <div className="text-center">
-                  <div className="w-16 h-16 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <User className="h-8 w-8 text-white" />
-                  </div>
-                  <h3 className="text-xl font-bold text-gray-800 mb-2">
-                    Join Our Culinary Community
-                  </h3>
-                  <p className="text-gray-600 mb-6">
-                    Login to place your order and start earning delicious loyalty rewards.
-                  </p>
-                  <button
-                    onClick={() => {
-                      setShowCart(false);
-                      setShowLoginModal(true);
-                    }}
-                    className="bg-gradient-to-r from-blue-600 to-purple-700 text-white px-8 py-3 rounded-2xl font-semibold hover:shadow-xl hover:scale-105 transition-all duration-300"
-                  >
-                    Login & Continue
-                  </button>
-                </div>
-              </div>
-            )}
-
-            {/* Customer sections only show when logged in */}
-            {customer && (
-              <>
-                {/* Customer Information */}
-                <div className="mb-8 p-6 bg-gradient-to-r from-blue-50/80 to-purple-50/80 backdrop-blur-sm rounded-3xl border border-blue-200/50 shadow-lg">
-                  <div className="flex justify-between items-center mb-4">
-                    <h3 className="font-bold text-gray-900 flex items-center text-lg">
-                      <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-700 rounded-xl flex items-center justify-center mr-3">
-                        <User className="h-4 w-4 text-white" />
-                      </div>
-                      Customer Information
-                    </h3>
-                    <div className="flex items-center space-x-2">
-                      {/* Edit Profile Button */}
-                      <button
-                        onClick={openEditProfile}
-                        className="flex items-center space-x-2 px-3 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-sm"
-                        title="Edit Profile"
-                      >
-                        <Edit3 className="h-4 w-4" />
-                        <span>Edit</span>
-                      </button>
-                      {/* Logout Button */}
-                      {onLogout && (
-                        <button
-                          onClick={onLogout}
-                          className="flex items-center space-x-2 px-3 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors text-sm"
-                          title="Logout"
-                        >
-                          <LogOut className="h-4 w-4" />
-                          <span>Logout</span>
-                        </button>
-                      )}
-                    </div>
-                  </div>
-                  <div className="space-y-3">
-                    <div className="flex justify-between items-center">
-                      <span className="text-gray-600 font-medium">Name:</span>
-                      <span className="font-bold text-gray-900">{customer.name}</span>
-                    </div>
-                    {customer.phone && (
-                      <div className="flex justify-between items-center">
-                        <span className="text-gray-600 font-medium">Phone:</span>
-                        <span className="font-bold text-gray-900">{customer.phone}</span>
-                      </div>
-                    )}
-                    {customer.loyalty_points > 0 && (
-                      <div className="flex justify-between items-center">
-                        <span className="text-gray-600 font-medium">Loyalty Points:</span>
-                        <span className="flex items-center text-yellow-600 font-bold">
-                          <Star className="h-5 w-5 mr-1" />
-                          {customer.loyalty_points}
-                        </span>
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                {/* Payment Method */}
-                <div className="mb-8">
-                  <h3 className="font-bold text-gray-900 mb-4 text-lg">Payment Method</h3>
-                  <div className="grid grid-cols-2 gap-3">
-                    {paymentMethods.map((method) => (
-                      <button
-                        key={method.code}
-                        type="button"
-                        onClick={() => setPaymentMethod(method.code)}
-                        className={`flex items-center justify-center p-4 rounded-2xl border-2 transition-all duration-300 ${paymentMethod === method.code
-                            ? 'bg-gradient-to-r from-blue-600 to-purple-700 text-white border-transparent shadow-xl scale-105'
-                            : 'bg-white/80 text-gray-700 border-gray-200 hover:bg-white hover:shadow-lg hover:scale-102'
-                          }`}
-                      >
-                        <span className="mr-2 text-lg">{method.icon}</span>
-                        <span className="font-semibold">{method.name}</span>
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Pickup Option */}
-                <div className="mb-8">
-                  <h3 className="font-bold text-gray-900 mb-4 text-lg">Dining Preference</h3>
-                  <div className="grid grid-cols-2 gap-3">
-                    {[
-                      { value: 'pickup', label: 'Pickup', desc: 'Collect from counter', icon: '🥡' },
-                      { value: 'dine-in', label: 'Dine-in', desc: 'Serve at table', icon: '🍽️' }
-                    ].map((option) => (
-                      <button
-                        key={option.value}
-                        onClick={() => setPickupOption(option.value)}
-                        className={`p-4 rounded-2xl border-2 transition-all duration-300 text-left ${pickupOption === option.value
-                            ? 'bg-gradient-to-r from-blue-600 to-purple-700 text-white border-transparent shadow-xl scale-105'
-                            : 'bg-white/80 text-gray-700 border-gray-200 hover:bg-white hover:shadow-lg hover:scale-102'
-                          }`}
-                      >
-                        <div className="flex items-center mb-2">
-                          <span className="text-2xl mr-2">{option.icon}</span>
-                          <div className="font-bold">{option.label}</div>
-                        </div>
-                        <div className="text-sm opacity-80">{option.desc}</div>
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Table Number for Dine-in */}
-                {pickupOption === 'dine-in' && (
-                  <div className="mb-8">
-                    <h3 className="font-bold text-gray-900 mb-4 text-lg">Table Number</h3>
-                    <input
-                      type="text"
-                      placeholder="Enter your table number (optional)"
-                      value={tableNumber}
-                      onChange={(e) => setTableNumber(e.target.value)}
-                      className="w-full p-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 bg-white/90 backdrop-blur-sm transition-all duration-300 text-lg font-medium"
-                    />
-                  </div>
-                )}
-
-                {/* Points Redemption */}
-                {customer?.loyalty_points > 0 && (
-                  <div className="mb-8">
-                    <h3 className="font-bold text-gray-900 mb-4 flex items-center text-lg">
-                      <div className="w-8 h-8 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-xl flex items-center justify-center mr-3">
-                        <Star className="h-4 w-4 text-white" />
-                      </div>
-                      Redeem Loyalty Points
-                    </h3>
-                    <div className="bg-gradient-to-r from-yellow-50 to-orange-50 rounded-2xl p-6 mb-4 border border-yellow-200">
-                      <div className="grid grid-cols-2 gap-4 text-sm">
-                        <div className="text-center">
-                          <div className="text-2xl font-bold text-gray-800">{customer.loyalty_points}</div>
-                          <div className="text-gray-600">Available Points</div>
-                        </div>
-                        <div className="text-center">
-                          <div className="text-2xl font-bold text-gray-800">{maxRedeemablePoints}</div>
-                          <div className="text-gray-600">Max Redeemable</div>
-                        </div>
-                      </div>
-                      <div className="text-center mt-3 text-sm text-gray-600">
-                        1 point = {formatCurrency(0.10)} discount
-                      </div>
-                    </div>
-                    <input
-                      type="number"
-                      value={pointsToRedeem}
-                      onChange={(e) => handlePointsRedemption(parseInt(e.target.value) || 0)}
-                      min="0"
-                      max={maxRedeemablePoints}
-                      className="w-full p-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-yellow-500/20 focus:border-yellow-500 bg-white/90 backdrop-blur-sm transition-all duration-300 text-lg font-medium"
-                      placeholder="Enter points to redeem"
-                    />
-                  </div>
-                )}
-
-                {/* Tip Selection */}
-                <div className="mb-8">
-                  <h3 className="font-bold text-gray-900 mb-4 text-lg">Show Your Appreciation</h3>
-                  <div className="grid grid-cols-3 gap-2 mb-4">
-                    {[0, 10, 15, 18, 20, 25].map((percentage) => (
-                      <button
-                        key={percentage}
-                        onClick={() => handleTipPercentageChange(percentage)}
-                        className={`py-3 px-4 text-sm rounded-2xl border-2 transition-all duration-300 font-semibold ${tipPercentage === percentage
-                            ? 'bg-gradient-to-r from-blue-600 to-purple-700 text-white border-transparent shadow-lg scale-105'
-                            : 'bg-white/80 text-gray-700 border-gray-200 hover:bg-white hover:shadow-md hover:scale-102'
-                          }`}
-                      >
-                        {percentage === 0 ? 'No Tip' : `${percentage}%`}
-                      </button>
-                    ))}
-                  </div>
-                  <input
-                    type="number"
-                    value={tipAmount.toFixed(2)}
-                    onChange={(e) => handleTipAmountChange(e.target.value)}
-                    className="w-full p-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 bg-white/90 backdrop-blur-sm transition-all duration-300 text-lg font-medium"
-                    placeholder="Custom tip amount"
-                  />
-                </div>
-              </>
-            )}
-
-            {/* Action Buttons */}
-            <div className="space-y-4">
-              {customer ? (
-                <>
-                  <button
-                    onClick={placeOrder}
-                    disabled={orderLoading}
-                    className="w-full bg-gradient-to-r from-blue-600 to-purple-700 text-white py-5 rounded-3xl font-bold text-xl hover:shadow-2xl hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
-                  >
-                    {orderLoading ? (
-                      <>
-                        <div className="animate-spin rounded-full h-6 w-6 border-2 border-white border-t-transparent"></div>
-                        <span>Creating Your Order...</span>
-                      </>
-                    ) : (
-                      <>
-                        <CheckCircle className="h-6 w-6" />
-                        <span>Place Order</span>
-                      </>
-                    )}
-                  </button>
-                  <button
-                    onClick={clearCart}
-                    className="w-full bg-white/80 text-gray-700 py-4 rounded-3xl font-semibold hover:bg-white hover:shadow-lg transition-all duration-300 border border-gray-200"
-                  >
-                    Clear Cart
-                  </button>
-                </>
-              ) : (
-                <>
-                  <button
-                    onClick={() => {
-                      setShowCart(false);
-                      setShowLoginModal(true);
-                    }}
-                    className="w-full bg-gradient-to-r from-blue-600 to-purple-700 text-white py-5 rounded-3xl font-bold text-xl hover:shadow-2xl hover:scale-105 transition-all duration-300 flex items-center justify-center space-x-2"
-                  >
-                    <User className="h-6 w-6" />
-                    <span>Login to Place Order</span>
-                  </button>
-                  <button
-                    onClick={clearCart}
-                    className="w-full bg-white/80 text-gray-700 py-4 rounded-3xl font-semibold hover:bg-white hover:shadow-lg transition-all duration-300 border border-gray-200"
-                  >
-                    Clear Cart
-                  </button>
-                </>
-              )}
-            </div>
-          </div>
-        )}
       </div>
     </div>
   )
 }
 
-{/* Enhanced Floating Cart with Summary Preview */}
-<div className="fixed bottom-6 right-6 z-50">
-  <div className="relative group">
-    {/* Cart Summary Preview - Shows on hover */}
-    {cart.length > 0 && (
-      <div className="absolute bottom-full right-0 mb-4 w-80 bg-white dark:bg-gray-800 rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-700 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-2 group-hover:translate-y-0 pointer-events-none group-hover:pointer-events-auto">
-        <div className="p-4">
-          <div className="flex items-center justify-between mb-3">
-            <h3 className="font-bold text-gray-900 dark:text-white text-lg">Cart Summary</h3>
-            <span className="bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 px-2 py-1 rounded-full text-xs font-medium">
-              {cart.reduce((total, item) => total + item.quantity, 0)} items
-            </span>
-          </div>
-          
-          <div className="space-y-2 max-h-48 overflow-y-auto">
-            {cart.slice(0, 3).map((item, index) => (
-              <div key={index} className="flex items-center justify-between py-2 border-b border-gray-100 dark:border-gray-700 last:border-b-0">
-                <div className="flex items-center space-x-3">
-                  <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
-                    <span className="text-white text-xs font-bold">{item.quantity}</span>
-                  </div>
-                  <div>
-                    <p className="font-medium text-gray-900 dark:text-white text-sm">{item.name}</p>
-                    <p className="text-gray-500 dark:text-gray-400 text-xs">{formatCurrency(item.price)} each</p>
-                  </div>
-                </div>
-                <p className="font-bold text-gray-900 dark:text-white text-sm">
-                  {formatCurrency(item.price * item.quantity)}
+      {/* Floating Cart Summary Bar - Mobile Only */}
+      {cart.length > 0 && (
+        <footer className="lg:hidden fixed bottom-0 left-0 right-0 z-20 bg-white dark:bg-[#2c241d] border-t border-black/10 dark:border-white/10 shadow-lg">
+          <div className="container mx-auto px-4 py-4">
+            <div className="flex items-center justify-between gap-4">
+              <div className="flex flex-col">
+                <p className="text-text-light/70 dark:text-text-dark/70 text-sm font-medium">
+                  {cart.reduce((total, item) => total + item.quantity, 0)} items
+                </p>
+                <p className="text-text-light dark:text-text-dark text-lg font-bold">
+                  {formatCurrency(getSubtotal())}
                 </p>
               </div>
-            ))}
-            {cart.length > 3 && (
-              <p className="text-center text-gray-500 dark:text-gray-400 text-xs py-2">
-                +{cart.length - 3} more items
-              </p>
-            )}
-          </div>
-          
-          <div className="mt-4 pt-3 border-t border-gray-200 dark:border-gray-700">
-            <div className="flex items-center justify-between">
-              <span className="font-bold text-gray-900 dark:text-white">Total:</span>
-              <span className="font-bold text-xl text-indigo-600 dark:text-indigo-400">
-                {formatCurrency(cart.reduce((total, item) => total + (item.price * item.quantity), 0))}
-              </span>
+              <button
+                onClick={() => setShowCart(true)}
+                className="flex items-center justify-center gap-2 rounded-lg bg-[#6F4E37] h-12 px-6 hover:bg-[#6F4E37]/90 transition-colors"
+              >
+                <ShoppingCart className="h-5 w-5 text-white" />
+                <span className="text-white text-base font-bold">View Cart</span>
+              </button>
             </div>
-            <button
-              onClick={() => setShowCart(true)}
-              className="w-full mt-3 bg-gradient-to-r from-indigo-600 via-purple-600 to-rose-600 text-white py-2 rounded-lg font-medium hover:shadow-lg transition-all duration-200"
-            >
-              View Cart & Checkout
-            </button>
           </div>
-        </div>
-      </div>
-    )}
-    
-    {/* Main Floating Cart Button */}
-    <button
-      onClick={() => setShowCart(true)}
-      className="relative bg-gradient-to-r from-indigo-600 via-purple-600 to-rose-600 text-white p-4 rounded-2xl shadow-2xl hover:shadow-indigo-500/50 transition-all duration-300 hover:scale-105 group backdrop-blur-sm border border-white/20"
-    >
-      <div className="relative">
-        <ShoppingCart className="h-6 w-6" />
-        {cart.length > 0 && (
-          <>
-            {/* Item count badge */}
-            <span className="absolute -top-3 -right-3 bg-gradient-to-r from-yellow-400 to-orange-500 text-white text-sm font-bold rounded-full h-6 w-6 flex items-center justify-center animate-pulse shadow-lg">
-              {cart.reduce((total, item) => total + item.quantity, 0)}
-            </span>
-            {/* Pulse ring animation */}
-            <span className="absolute -top-3 -right-3 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full h-6 w-6 animate-ping opacity-75"></span>
-          </>
-        )}
-      </div>
-      
-      {/* Cart summary text - shows when cart has items */}
-      {cart.length > 0 && (
-        <div className="absolute -left-32 top-1/2 transform -translate-y-1/2 bg-white dark:bg-gray-800 text-gray-900 dark:text-white px-3 py-2 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 whitespace-nowrap">
-          <div className="text-sm font-medium">
-            {formatCurrency(cart.reduce((total, item) => total + (item.price * item.quantity), 0))}
-          </div>
-          <div className="text-xs text-gray-500 dark:text-gray-400">
-            {cart.reduce((total, item) => total + item.quantity, 0)} items
-          </div>
-        </div>
+        </footer>
       )}
-    </button>
-  </div>
-</div>
+
 
       {/* Edit Profile Modal */}
       {showEditProfile && (
-        <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4 animate-fadeIn backdrop-blur-sm">
-          <div className={`${isDarkMode ? 'bg-gray-800' : 'bg-white'} rounded-2xl shadow-material-5 max-w-md w-full mx-4 transform transition-all duration-300 animate-slideIn hover-lift`}>
-            <div className="p-6">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center">
-                  <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-700 rounded-xl flex items-center justify-center mr-3">
-                    <Edit3 className="h-4 w-4 text-white" />
-                  </div>
-                  Edit Profile
-                </h2>
-                <button
-                  onClick={() => setShowEditProfile(false)}
-                  className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
-                >
-                  <X className="h-6 w-6" />
-                </button>
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-md flex items-center justify-center z-50 p-4">
+          <div className="bg-[#FFF8E1] dark:bg-[#221a10] rounded-2xl shadow-2xl max-w-md w-full">
+            <div className="flex items-center justify-between border-b border-[#f3eee7] dark:border-[#4a2c2a] bg-[#fcfaf8] dark:bg-[#2c2216] px-6 py-4">
+              <div className="flex items-center gap-4">
+                <Edit3 className="h-6 w-6 text-[#6F4E37]" />
+                <h2 className="text-2xl font-bold tracking-tight text-text-light dark:text-text-dark">Edit Profile</h2>
               </div>
+              <button
+                onClick={() => setShowEditProfile(false)}
+                className="text-text-light dark:text-text-dark hover:bg-black/5 dark:hover:bg-white/5 p-2 rounded-lg transition-colors"
+              >
+                <X className="h-6 w-6" />
+              </button>
+            </div>
 
+            <div className="p-6">
               <form onSubmit={handleProfileUpdate} className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label className="block text-sm font-medium text-text-light dark:text-text-dark mb-2">
                     Full Name *
                   </label>
                   <input
                     type="text"
                     value={editProfileData.name}
                     onChange={(e) => handleProfileInputChange('name', e.target.value)}
-                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                    className="w-full px-4 py-3 border-2 border-[#f3eee7] dark:border-[#4a2c2a] rounded-lg focus:ring-2 focus:ring-[#6F4E37]/50 focus:border-[#6F4E37] transition-colors bg-white dark:bg-[#2c2216] text-text-light dark:text-text-dark"
                     placeholder="Enter your full name"
                     required
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label className="block text-sm font-medium text-text-light dark:text-text-dark mb-2">
                     Email Address
                   </label>
                   <input
                     type="email"
                     value={editProfileData.email}
                     onChange={(e) => handleProfileInputChange('email', e.target.value)}
-                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                    className="w-full px-4 py-3 border-2 border-[#f3eee7] dark:border-[#4a2c2a] rounded-lg focus:ring-2 focus:ring-[#6F4E37]/50 focus:border-[#6F4E37] transition-colors bg-white dark:bg-[#2c2216] text-text-light dark:text-text-dark"
                     placeholder="Enter your email address"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label className="block text-sm font-medium text-text-light dark:text-text-dark mb-2">
                     Address
                   </label>
                   <textarea
                     value={editProfileData.address}
                     onChange={(e) => handleProfileInputChange('address', e.target.value)}
-                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white dark:bg-gray-700 text-gray-900 dark:text-white resize-none"
+                    className="w-full px-4 py-3 border-2 border-[#f3eee7] dark:border-[#4a2c2a] rounded-lg focus:ring-2 focus:ring-[#6F4E37]/50 focus:border-[#6F4E37] transition-colors bg-white dark:bg-[#2c2216] text-text-light dark:text-text-dark resize-none"
                     placeholder="Enter your address"
                     rows={3}
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label className="block text-sm font-medium text-text-light dark:text-text-dark mb-2">
                     Date of Birth
                   </label>
                   <input
                     type="date"
                     value={editProfileData.date_of_birth}
                     onChange={(e) => handleProfileInputChange('date_of_birth', e.target.value)}
-                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                    className="w-full px-4 py-3 border-2 border-[#f3eee7] dark:border-[#4a2c2a] rounded-lg focus:ring-2 focus:ring-[#6F4E37]/50 focus:border-[#6F4E37] transition-colors bg-white dark:bg-[#2c2216] text-text-light dark:text-text-dark"
                   />
                 </div>
 
-                <div className="flex space-x-3 pt-4">
+                <div className="flex gap-3 pt-4">
                   <button
                     type="button"
                     onClick={() => setShowEditProfile(false)}
-                    className="flex-1 px-4 py-3 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-xl font-medium hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors duration-200"
+                    className="flex-1 px-4 py-3 bg-white dark:bg-[#2c2216] border-2 border-[#f3eee7] dark:border-[#4a2c2a] text-text-light dark:text-text-dark rounded-lg font-medium hover:border-[#6F4E37] transition-colors"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
                     disabled={profileLoading}
-                    className="flex-1 px-4 py-3 bg-gradient-to-r from-blue-600 to-purple-700 text-white rounded-xl font-medium hover:shadow-lg hover:scale-105 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
+                    className="flex-1 px-4 py-3 bg-[#6F4E37] text-white rounded-lg font-medium hover:bg-[#6F4E37]/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                   >
                     {profileLoading ? (
                       <>

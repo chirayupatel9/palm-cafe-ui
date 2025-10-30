@@ -12,6 +12,7 @@ const CustomerOrderHistory = ({ customerPhone, setActiveTab, cart, setCart }) =>
   const [customerInfo, setCustomerInfo] = useState(null);
   const [downloadingInvoices, setDownloadingInvoices] = useState(new Set());
   const [ordersWithInvoices, setOrdersWithInvoices] = useState(new Set());
+  const [filterStatus, setFilterStatus] = useState('All');
 
   useEffect(() => {
     if (customerPhone) {
@@ -294,30 +295,45 @@ const CustomerOrderHistory = ({ customerPhone, setActiveTab, cart, setCart }) =>
     );
   }
 
+  // Filter orders based on selected status
+  const filteredOrders = filterStatus === 'All'
+    ? orders
+    : orders.filter(order => order.status === filterStatus.toLowerCase());
+
   return (
-    <div className="space-y-6">
+    <div className="container mx-auto flex flex-1 flex-col px-4 py-8 sm:py-12 max-w-5xl">
+      {/* Page Heading */}
+      <div className="mb-6">
+        <h1 className="text-4xl font-black tracking-tighter text-text-light dark:text-text-dark">
+          My Orders
+        </h1>
+        <p className="mt-2 text-base text-text-light/60 dark:text-text-dark/60">
+          View your past orders and easily re-order your favorites.
+        </p>
+      </div>
+
       {/* Customer Points Display */}
       {customerInfo && (
-        <div className="bg-gradient-to-r from-yellow-50 to-orange-50 dark:from-yellow-900/20 dark:to-orange-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4">
+        <div className="mb-6 bg-gradient-to-r from-[#ec9213]/10 to-[#ec9213]/20 dark:from-[#ec9213]/20 dark:to-[#ec9213]/30 border border-[#ec9213]/30 dark:border-[#ec9213]/40 rounded-lg p-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
-              <div className="bg-yellow-100 dark:bg-yellow-900 p-2 rounded-full">
-                <Star className="h-6 w-6 text-yellow-600 dark:text-yellow-400" />
+              <div className="bg-[#ec9213]/20 dark:bg-[#ec9213]/30 p-2 rounded-full">
+                <Star className="h-6 w-6 text-[#ec9213]" />
               </div>
               <div>
-                <h3 className="text-lg font-semibold text-yellow-800 dark:text-yellow-200">
+                <h3 className="text-lg font-semibold text-text-light dark:text-text-dark">
                   Loyalty Points
                 </h3>
-                <p className="text-sm text-yellow-700 dark:text-yellow-300">
+                <p className="text-sm text-text-light/70 dark:text-text-dark/70">
                   Total points earned from all orders
                 </p>
               </div>
             </div>
             <div className="text-right">
-              <div className="text-2xl font-bold text-yellow-800 dark:text-yellow-200">
+              <div className="text-2xl font-bold text-text-light dark:text-text-dark">
                 {customerInfo.loyalty_points || 0}
               </div>
-              <div className="text-sm text-yellow-700 dark:text-yellow-300">
+              <div className="text-sm text-text-light/70 dark:text-text-dark/70">
                 points
               </div>
             </div>
@@ -325,222 +341,97 @@ const CustomerOrderHistory = ({ customerPhone, setActiveTab, cart, setCart }) =>
         </div>
       )}
 
-      <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold text-secondary-700 dark:text-secondary-300">
-          Order History
-        </h2>
-        <div className="flex items-center space-x-3">
+      {/* Filter Chips */}
+      <div className="mb-6 flex gap-3 overflow-x-auto pb-2">
+        {['All', 'Completed', 'Preparing', 'Pending', 'Cancelled'].map((status) => (
           <button
-            onClick={() => setActiveTab('menu')}
-            className="flex items-center space-x-2 px-4 py-2 bg-secondary-500 text-white rounded-lg hover:bg-secondary-600 transition-colors"
+            key={status}
+            onClick={() => setFilterStatus(status)}
+            className={`flex h-9 shrink-0 cursor-pointer items-center justify-center gap-x-2 rounded-full px-4 transition-colors ${
+              filterStatus === status
+                ? 'bg-[#ec9213] text-[#1b160d] dark:text-[#1b160d]'
+                : 'bg-[#f3eee7] dark:bg-[#382d20] text-text-light dark:text-text-dark hover:bg-[#f3eee7]/80 dark:hover:bg-[#382d20]/80'
+            }`}
           >
-            <Menu className="h-4 w-4" />
-            <span>Back to Menu</span>
+            <p className={`text-sm ${filterStatus === status ? 'font-bold' : 'font-medium'}`}>
+              {status}
+            </p>
           </button>
-          <button
-            onClick={fetchOrderHistory}
-            className="text-sm text-secondary-600 hover:text-secondary-700 dark:text-secondary-400 dark:hover:text-secondary-300"
-          >
-            Refresh
-          </button>
-        </div>
+        ))}
       </div>
 
-      <div className="space-y-4">
-        {orders.map((order) => (
+      {/* Order Cards List */}
+      <div className="flex flex-col gap-4">
+        {filteredOrders.map((order) => (
           <div
             key={order.id}
-            className="bg-white dark:bg-gray-800 rounded-lg shadow-md border border-accent-200 dark:border-gray-700 overflow-hidden"
+            className="flex flex-col sm:flex-row items-stretch justify-between gap-4 rounded-lg bg-white dark:bg-[#2a2218] p-4 shadow-sm border border-[#f3eee7] dark:border-[#382d20] hover:shadow-md transition-shadow cursor-pointer"
           >
-            {/* Order Header */}
-            <div className="p-4 border-b border-accent-200 dark:border-gray-700">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-3">
-                  {getStatusIcon(order.status)}
-                  <div>
-                    <div className="flex items-center space-x-2">
-                      <h3 className="font-semibold text-secondary-700 dark:text-secondary-300">
-                        Order #{order.order_number}
-                      </h3>
-                      {ordersWithInvoices.has(order.order_number) && (
-                        <Receipt className="h-4 w-4 text-green-500" title="Invoice available" />
-                      )}
-                    </div>
-                    <div className="flex items-center space-x-4 text-sm text-gray-600 dark:text-gray-400">
-                      <div className="flex items-center">
-                        <Calendar className="h-3 w-3 mr-1" />
-                        {formatDate(order.created_at)}
-                      </div>
-                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(order.status)}`}>
-                        {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
-                      </span>
-                    </div>
-                  </div>
+            <div className="flex flex-[2_2_0px] flex-col gap-4 justify-between">
+              <div className="flex flex-col gap-1">
+                <div className="flex items-center justify-between">
+                  <p className="text-sm text-text-light/60 dark:text-text-dark/60">
+                    {formatDate(order.created_at)} - #{order.order_number}
+                  </p>
+                  {ordersWithInvoices.has(order.order_number) && (
+                    <Receipt className="h-4 w-4 text-green-500" title="Invoice available" />
+                  )}
                 </div>
-                <div className="text-right">
-                  <div className="font-semibold text-secondary-700 dark:text-secondary-300">
-                    {formatCurrency(order.final_amount)}
-                  </div>
-                  <div className="flex items-center justify-end space-x-2 mt-1">
-                    <div className="flex items-center text-xs text-yellow-600 dark:text-yellow-400">
-                      <Star className="h-3 w-3 mr-1" />
-                      <span>+{calculatePointsEarned(order.final_amount)} pts</span>
-                    </div>
-                    <button
-                      onClick={() => addOrderToCart(order)}
-                                              className="btn-materialize text-xs px-2 py-1 flex items-center"
-                        title="Add to Cart"
-                      >
-                        <Plus className="h-3 w-3 mr-1" />
-                        Add to Cart
-                    </button>
-                    <button
-                      onClick={() => downloadInvoice(order.order_number)}
-                      disabled={downloadingInvoices.has(order.order_number)}
-                      className={`text-xs px-2 py-1 rounded flex items-center transition-colors ${
-                        downloadingInvoices.has(order.order_number)
-                          ? 'bg-gray-400 text-white cursor-not-allowed'
-                          : ordersWithInvoices.has(order.order_number)
-                          ? 'bg-secondary-500 text-white hover:bg-secondary-600'
-                          : ['completed', 'ready', 'cancelled'].includes(order.status)
-                          ? 'bg-orange-500 text-white hover:bg-orange-600'
-                          : 'bg-gray-400 text-white cursor-not-allowed'
-                      }`}
-                      title={
-                        downloadingInvoices.has(order.order_number) 
-                          ? "Downloading..." 
-                          : ordersWithInvoices.has(order.order_number)
-                          ? "Download Invoice"
-                          : ['completed', 'ready', 'cancelled'].includes(order.status)
-                          ? "Invoice can be generated"
-                          : "No invoice available for pending orders"
-                      }
-                    >
-                      {downloadingInvoices.has(order.order_number) ? (
-                        <>
-                          <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-white mr-1"></div>
-                          Downloading...
-                        </>
-                      ) : ordersWithInvoices.has(order.order_number) ? (
-                        <>
-                          <Download className="h-3 w-3 mr-1" />
-                          Download
-                        </>
-                      ) : ['completed', 'ready', 'cancelled'].includes(order.status) ? (
-                        <>
-                          <Receipt className="h-3 w-3 mr-1" />
-                          Generate
-                        </>
-                      ) : (
-                        <>
-                          <Receipt className="h-3 w-3 mr-1" />
-                          No Invoice
-                        </>
-                      )}
-                    </button>
-                  </div>
+                <p className="text-base font-bold text-text-light dark:text-text-dark">
+                  {order.items && order.items.slice(0, 3).map(item => `${item.quantity}x ${item.name}`).join(', ')}
+                  {order.items && order.items.length > 3 && '...'}
+                </p>
+                <div className="flex items-center gap-2">
+                  <p className="text-sm text-text-light/60 dark:text-text-dark/60">Status:</p>
+                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(order.status)}`}>
+                    {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
+                  </span>
                 </div>
+                <p className="text-lg font-bold text-text-light dark:text-text-dark mt-2">
+                  {formatCurrency(order.final_amount)}
+                </p>
               </div>
-            </div>
-
-            {/* Order Items */}
-            <div className="p-4">
-              <div className="space-y-2">
-                {order.items && order.items.map((item, index) => (
-                  <div key={index} className="flex justify-between items-center py-1">
-                    <div className="flex items-center space-x-3">
-                      <span className="text-sm font-medium text-gray-900 dark:text-gray-100">
-                        {item.quantity}x
-                      </span>
-                      <span className="text-sm text-gray-700 dark:text-gray-300">
-                        {item.name}
-                      </span>
-                    </div>
-                    <span className="text-sm text-gray-600 dark:text-gray-400">
-                      {formatCurrency(item.total)}
-                    </span>
-                  </div>
-                ))}
-              </div>
-
-              {/* Order Summary */}
-              <div className="mt-4 pt-4 border-t border-accent-200 dark:border-gray-700">
-                <div className="space-y-1 text-sm">
-                  <div className="flex justify-between">
-                    <span className="text-gray-600 dark:text-gray-400">Subtotal:</span>
-                    <span>{formatCurrency(order.total_amount)}</span>
-                  </div>
-                  {order.tax_amount > 0 && (
-                    <div className="flex justify-between">
-                      <span className="text-gray-600 dark:text-gray-400">Tax:</span>
-                      <span>{formatCurrency(order.tax_amount)}</span>
-                    </div>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => addOrderToCart(order)}
+                  className="flex w-fit cursor-pointer items-center justify-center gap-2 overflow-hidden rounded-lg h-9 bg-[#f3eee7] dark:bg-[#382d20] px-4 text-sm font-bold text-text-light dark:text-text-dark hover:bg-[#f3eee7]/80 dark:hover:bg-[#382d20]/80 transition-colors"
+                  title="Re-order"
+                >
+                  <Plus className="h-4 w-4" />
+                  <span className="truncate">Re-order</span>
+                </button>
+                <button
+                  onClick={() => downloadInvoice(order.order_number)}
+                  disabled={downloadingInvoices.has(order.order_number) || !['completed', 'ready', 'cancelled'].includes(order.status)}
+                  className={`flex w-fit cursor-pointer items-center justify-center gap-2 overflow-hidden rounded-lg h-9 px-4 text-sm font-bold transition-colors ${
+                    downloadingInvoices.has(order.order_number)
+                      ? 'bg-gray-400 text-white cursor-not-allowed'
+                      : ordersWithInvoices.has(order.order_number) || ['completed', 'ready', 'cancelled'].includes(order.status)
+                      ? 'bg-[#6F4E37] text-white hover:bg-[#6F4E37]/90'
+                      : 'bg-gray-400 text-white cursor-not-allowed'
+                  }`}
+                  title={
+                    downloadingInvoices.has(order.order_number)
+                      ? "Downloading..."
+                      : ordersWithInvoices.has(order.order_number)
+                      ? "Download Invoice"
+                      : ['completed', 'ready', 'cancelled'].includes(order.status)
+                      ? "Generate Invoice"
+                      : "No invoice for pending orders"
+                  }
+                >
+                  {downloadingInvoices.has(order.order_number) ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                      <span className="truncate">Downloading...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Download className="h-4 w-4" />
+                      <span className="truncate">Invoice</span>
+                    </>
                   )}
-                  {order.tip_amount > 0 && (
-                    <div className="flex justify-between">
-                      <span className="text-gray-600 dark:text-gray-400">Tip:</span>
-                      <span>{formatCurrency(order.tip_amount)}</span>
-                    </div>
-                  )}
-                  {order.points_redeemed > 0 && (
-                    <div className="flex justify-between text-green-600 dark:text-green-400">
-                      <span>Points Redeemed ({order.points_redeemed} pts):</span>
-                      <span>-{formatCurrency(order.points_redeemed * 0.1)}</span>
-                    </div>
-                  )}
-                  <div className="flex justify-between font-semibold text-secondary-700 dark:text-secondary-300">
-                    <span>Total:</span>
-                    <span>{formatCurrency(order.final_amount)}</span>
-                  </div>
-                </div>
-
-                {/* Payment Method */}
-                {order.payment_method && (
-                  <div className="mt-3 pt-3 border-t border-accent-200 dark:border-gray-700">
-                    <div className="flex justify-between items-center text-sm">
-                      <span className="text-gray-600 dark:text-gray-400">Payment Method:</span>
-                      <span className="font-medium text-gray-900 dark:text-gray-100 capitalize">
-                        {order.payment_method}
-                      </span>
-                    </div>
-                    {order.split_payment && (
-                      <div className="mt-2 p-2 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded">
-                        <p className="text-xs font-medium text-blue-800 dark:text-blue-200">
-                          Split Payment
-                        </p>
-                        <p className="text-xs text-blue-700 dark:text-blue-300">
-                          {formatCurrency(order.split_amount)} via {order.split_payment_method?.toUpperCase() || 'SPLIT'}
-                        </p>
-                        <p className="text-xs text-blue-700 dark:text-blue-300">
-                          {formatCurrency(order.final_amount - order.split_amount)} via {order.payment_method?.toUpperCase() || 'PRIMARY'}
-                        </p>
-                      </div>
-                    )}
-                    {order.extra_charge > 0 && (
-                      <div className="mt-2 p-2 bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800 rounded">
-                        <p className="text-xs font-medium text-orange-800 dark:text-orange-200">
-                          Extra Charge: ₹{order.extra_charge}
-                        </p>
-                        {order.extra_charge_note && (
-                          <p className="text-xs text-orange-700 dark:text-orange-300">
-                            Note: {order.extra_charge_note}
-                          </p>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                )}
-
-                {/* Points Earned */}
-                <div className="mt-3 pt-3 border-t border-accent-200 dark:border-gray-700">
-                  <div className="flex justify-between items-center text-sm">
-                    <span className="text-gray-600 dark:text-gray-400">Points Earned:</span>
-                    <div className="flex items-center text-yellow-600 dark:text-yellow-400 font-medium">
-                      <Star className="h-3 w-3 mr-1" />
-                      <span>+{calculatePointsEarned(order.final_amount)} points</span>
-                    </div>
-                  </div>
-                </div>
+                </button>
               </div>
             </div>
           </div>
