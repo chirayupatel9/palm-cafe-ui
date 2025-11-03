@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm run build:*)",
+      "Read(//mnt/z/code/palm-cafe/templates/web/**)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

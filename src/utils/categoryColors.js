@@ -43,12 +43,12 @@ const categoryColors = [
     hover: 'hover:bg-blue-100 dark:hover:bg-blue-800/40'
   },
   {
-    name: 'purple',
-    bg: 'bg-purple-50 dark:bg-purple-900/20',
-    border: 'border-purple-200 dark:border-purple-700',
-    text: 'text-purple-700 dark:text-purple-300',
-    header: 'bg-purple-100 dark:bg-purple-800/30',
-    hover: 'hover:bg-purple-100 dark:hover:bg-purple-800/40'
+    name: 'amber',
+    bg: 'bg-amber-50 dark:bg-amber-900/20',
+    border: 'border-amber-200 dark:border-amber-700',
+    text: 'text-amber-700 dark:text-amber-300',
+    header: 'bg-amber-100 dark:bg-amber-800/30',
+    hover: 'hover:bg-amber-100 dark:hover:bg-amber-800/40'
   },
   {
     name: 'orange',

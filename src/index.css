@@ -4,24 +4,24 @@
 
 /* Custom CSS for Cafe Management System */
 
-/* CSS Custom Properties for Dynamic Color Scheme */
+/* CSS Custom Properties for Dynamic Color Scheme - Cafe Theme */
 :root {
-  --color-primary: #3B82F6;
-  --color-secondary: #6B7280;
-  --color-accent: #10B981;
-  --color-background: #FFFFFF;
-  --color-text: #1F2937;
-  --color-surface: #F9FAFB;
+  --color-primary: #6F4E37;
+  --color-secondary: #8B6F47;
+  --color-accent: #D4A574;
+  --color-background: #F5F5DC;
+  --color-text: #2C1810;
+  --color-surface: #FFFFFF;
 }
 
-/* Dark mode custom properties - Improved for better contrast and readability */
+/* Dark mode custom properties - Cafe Theme */
 .dark {
-  --color-primary: #60A5FA;
-  --color-secondary: #E5E7EB;
-  --color-accent: #34D399;
-  --color-background: #0F172A;
-  --color-text: #F8FAFC;
-  --color-surface: #1E293B;
+  --color-primary: #8B6F47;
+  --color-secondary: #A0826D;
+  --color-accent: #D4A574;
+  --color-background: #1a1612;
+  --color-text: #F5F5DC;
+  --color-surface: #2c241d;
 }
 
 /* Dynamic Color Overrides - These will override Tailwind classes */
@@ -295,7 +295,7 @@
 }
 
 .dark .btn-primary:hover {
-  background-color: #3B82F6 !important;
+  background-color: #8B6F47 !important;
   filter: brightness(0.9);
 }
 
@@ -310,12 +310,12 @@
 }
 
 .dark .btn-materialize {
-  background: linear-gradient(to right, #059669, #047857) !important;
+  background: linear-gradient(to right, #8B6F47, #A0826D) !important;
   color: white !important;
 }
 
 .dark .btn-materialize:hover {
-  background: linear-gradient(to right, #047857, #065F46) !important;
+  background: linear-gradient(to right, #6F4E37, #8B6F47) !important;
 }
 
 .dark .input-field {
@@ -336,7 +336,7 @@
 .dark .nav-active {
   border-color: var(--color-primary) !important;
   color: var(--color-primary) !important;
-  background-color: rgba(96, 165, 250, 0.1) !important;
+  background-color: rgba(139, 111, 71, 0.1) !important;
 }
 
 .dark .nav-inactive {
@@ -365,13 +365,13 @@
 }
 
 .dark .mobile-action-btn-edit {
-  color: #60A5FA !important;
-  background-color: rgba(96, 165, 250, 0.1) !important;
+  color: #A0826D !important;
+  background-color: rgba(139, 111, 71, 0.1) !important;
 }
 
 .dark .mobile-action-btn-edit:hover {
-  color: #93C5FD !important;
-  background-color: rgba(96, 165, 250, 0.2) !important;
+  color: #D4A574 !important;
+  background-color: rgba(139, 111, 71, 0.2) !important;
 }
 
 .dark .mobile-action-btn-delete {
@@ -453,7 +453,7 @@
 }
 
 .dark .mobile-fab:hover {
-  background-color: #3B82F6 !important;
+  background-color: #8B6F47 !important;
   filter: brightness(0.9);
 }
 
@@ -608,7 +608,7 @@
 
 .dark input:focus, .dark textarea:focus, .dark select:focus {
   border-color: var(--color-primary) !important;
-  box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.1) !important;
+  box-shadow: 0 0 0 3px rgba(139, 111, 71, 0.1) !important;
 }
 
 .dark input::placeholder, .dark textarea::placeholder {
@@ -624,7 +624,7 @@ input, textarea, select {
 
 input:focus, textarea:focus, select:focus {
   border-color: var(--color-primary) !important;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1) !important;
+  box-shadow: 0 0 0 3px rgba(111, 78, 55, 0.1) !important;
 }
 
 input::placeholder, textarea::placeholder {
@@ -664,14 +664,14 @@ input::placeholder, textarea::placeholder {
 .nav-inactive:hover {
   color: var(--color-primary) !important;
   border-color: var(--color-primary) !important;
-  background-color: rgba(59, 130, 246, 0.1) !important;
+  background-color: rgba(111, 78, 55, 0.1) !important;
   transform: translateY(-1px) !important;
 }
 
 .dark .nav-inactive:hover {
   color: var(--color-primary) !important;
   border-color: var(--color-primary) !important;
-  background-color: rgba(96, 165, 250, 0.1) !important;
+  background-color: rgba(139, 111, 71, 0.1) !important;
   transform: translateY(-1px) !important;
 }
 
@@ -698,7 +698,7 @@ input::placeholder, textarea::placeholder {
 
 .input-field:focus {
   border-color: var(--color-primary) !important;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1) !important;
+  box-shadow: 0 0 0 3px rgba(111, 78, 55, 0.1) !important;
   transform: translateY(-1px) !important;
 }
 
@@ -710,26 +710,26 @@ input::placeholder, textarea::placeholder {
 
 .dark .input-field:focus {
   border-color: var(--color-primary) !important;
-  box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.1) !important;
+  box-shadow: 0 0 0 3px rgba(139, 111, 71, 0.1) !important;
   transform: translateY(-1px) !important;
 }
 
 /* Table row hover effects */
 tbody tr:hover {
-  background-color: rgba(59, 130, 246, 0.05) !important;
+  background-color: rgba(111, 78, 55, 0.05) !important;
   transform: scale(1.01) !important;
   transition: all 0.2s ease !important;
 }
 
 .dark tbody tr:hover {
-  background-color: rgba(96, 165, 250, 0.1) !important;
+  background-color: rgba(139, 111, 71, 0.1) !important;
   transform: scale(1.01) !important;
   transition: all 0.2s ease !important;
 }
 
 /* Mobile action button hover states */
 .mobile-action-btn-edit:hover {
-  background-color: rgba(59, 130, 246, 0.2) !important;
+  background-color: rgba(111, 78, 55, 0.2) !important;
   transform: scale(1.05) !important;
 }
 
@@ -744,7 +744,7 @@ tbody tr:hover {
 }
 
 .dark .mobile-action-btn-edit:hover {
-  background-color: rgba(96, 165, 250, 0.2) !important;
+  background-color: rgba(139, 111, 71, 0.2) !important;
   transform: scale(1.05) !important;
 }
 
@@ -809,7 +809,7 @@ tbody tr:hover {
 
   /* Materialize button style */
   .btn-materialize {
-    @apply bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white px-4 py-2 rounded-full shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 font-medium border-0;
+    @apply bg-gradient-to-r from-[#6F4E37] to-[#8B6F47] hover:from-[#5d4230] hover:to-[#6F4E37] text-white px-4 py-2 rounded-full shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 font-medium border-0;
   }
 
                 /* Input field styles */
@@ -823,7 +823,7 @@ tbody tr:hover {
               .input-field:focus {
                 @apply focus:ring-2 focus:ring-secondary-500 focus:border-transparent;
                 border-color: var(--color-primary) !important;
-                box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1) !important;
+                box-shadow: 0 0 0 3px rgba(111, 78, 55, 0.1) !important;
                 transform: translateY(-1px) !important;
               }
 
@@ -934,7 +934,7 @@ tbody tr:hover {
   }
 
   .mobile-action-btn-edit {
-    @apply text-blue-600 hover:text-blue-900 bg-blue-50;
+    @apply text-[#6F4E37] hover:text-[#5d4230] bg-amber-50;
   }
 
   .mobile-action-btn-delete {

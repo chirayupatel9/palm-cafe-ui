@@ -672,16 +672,16 @@ const CustomerMenu = ({
                             key={item.id}
                             className="flex flex-col rounded-xl bg-white dark:bg-[#2c241d] shadow-sm overflow-hidden border border-black/5 dark:border-white/5 hover:shadow-md transition-shadow"
                           >
-                            {cafeSettings?.show_menu_images && item.image_url ? (
-                              <div
-                                className="w-full h-48 bg-cover bg-center"
-                                style={{ backgroundImage: `url('${getImageUrl(item.image_url)}')` }}
-                              />
-                            ) : (
-                              <div className="w-full h-48 bg-gradient-to-br from-[#6F4E37]/20 to-[#6F4E37]/40 flex items-center justify-center">
-                                {getCategoryIcon(categoryName)}
-                              </div>
-                            )}
+                            <div
+                              className="w-full h-48 bg-cover bg-center"
+                              style={{
+                                backgroundImage: `url('${
+                                  cafeSettings?.show_menu_images && item.image_url
+                                    ? getImageUrl(item.image_url)
+                                    : getPlaceholderImage(categoryName, item.name)
+                                }')`
+                              }}
+                            />
                             <div className="p-4 flex flex-col flex-grow">
                               <h3 className="text-lg font-bold text-text-light dark:text-text-dark">{item.name}</h3>
                               {item.description && (
@@ -756,16 +756,16 @@ const CustomerMenu = ({
               <>
                 {cart.map((item) => (
                   <div key={item.id} className="flex items-center gap-4 rounded-lg bg-[#fcfaf8] dark:bg-[#2c2216] p-4 shadow-sm">
-                    {cafeSettings?.show_menu_images && item.image_url ? (
-                      <div
-                        className="bg-center bg-no-repeat aspect-square bg-cover rounded-lg size-16"
-                        style={{ backgroundImage: `url('${getImageUrl(item.image_url)}')` }}
-                      />
-                    ) : (
-                      <div className="size-16 bg-gradient-to-br from-[#6F4E37]/20 to-[#6F4E37]/40 rounded-lg flex items-center justify-center">
-                        <Utensils className="h-8 w-8 text-[#6F4E37]" />
-                      </div>
-                    )}
+                    <div
+                      className="bg-center bg-no-repeat aspect-square bg-cover rounded-lg size-16"
+                      style={{
+                        backgroundImage: `url('${
+                          cafeSettings?.show_menu_images && item.image_url
+                            ? getImageUrl(item.image_url)
+                            : getPlaceholderImage(item.category_name, item.name)
+                        }')`
+                      }}
+                    />
                     <div className="flex flex-1 flex-col justify-center">
                       <p className="text-base font-bold text-text-light dark:text-text-dark">{item.name}</p>
                       <p className="text-sm text-text-light/60 dark:text-text-dark/60">{formatCurrency(item.price)}</p>

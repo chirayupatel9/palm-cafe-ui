@@ -297,8 +297,8 @@ const DailyReports = () => {
 
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 border border-accent-200 dark:border-gray-700">
           <div className="flex items-center">
-            <div className="p-2 bg-purple-100 dark:bg-purple-900 rounded-lg">
-              <TrendingUp className="h-6 w-6 text-purple-600 dark:text-purple-400" />
+            <div className="p-2 bg-amber-100 dark:bg-amber-900 rounded-lg">
+              <TrendingUp className="h-6 w-6 text-amber-600 dark:text-amber-400" />
             </div>
             <div className="ml-4">
               <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Avg Order Value</p>

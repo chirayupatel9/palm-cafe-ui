@@ -4,7 +4,7 @@ import toast from 'react-hot-toast';
 import axios from 'axios';
 import { useCurrency } from '../contexts/CurrencyContext';
 import { useDarkMode } from '../contexts/DarkModeContext';
-import { getImageUrl } from '../utils/imageUtils';
+import { getImageUrl, getPlaceholderImage } from '../utils/imageUtils';
 
 const MenuManagement = ({ menuItems, onUpdate, onAdd, onDelete }) => {
   const { formatCurrency } = useCurrency();
@@ -721,17 +721,11 @@ const MenuManagement = ({ menuItems, onUpdate, onAdd, onDelete }) => {
                             // View Mode
                             <>
                               <td className="px-6 py-4 whitespace-nowrap">
-                                {item.image_url ? (
-                                  <img
-                                    src={getImageUrl(item.image_url)}
-                                    alt={item.name}
-                                    className="w-12 h-12 object-cover rounded-lg border"
-                                  />
-                                ) : (
-                                  <div className="w-12 h-12 bg-gray-200 dark:bg-gray-700 rounded-lg flex items-center justify-center">
-                                    <span className="text-gray-500 dark:text-gray-400 text-xs">No Image</span>
-                                  </div>
-                                )}
+                                <img
+                                  src={item.image_url ? getImageUrl(item.image_url) : getPlaceholderImage(item.category_name, item.name)}
+                                  alt={item.name}
+                                  className="w-12 h-12 object-cover rounded-lg border"
+                                />
                               </td>
                               <td className="px-6 py-4 whitespace-nowrap">
                                 <div className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
@@ -863,17 +857,11 @@ const MenuManagement = ({ menuItems, onUpdate, onAdd, onDelete }) => {
                         // View Mode Mobile
                         <div>
                           <div className="flex items-start space-x-3 mb-3">
-                            {item.image_url ? (
-                              <img
-                                src={getImageUrl(item.image_url)}
-                                alt={item.name}
-                                className="w-16 h-16 object-cover rounded-lg border flex-shrink-0"
-                              />
-                            ) : (
-                              <div className="w-16 h-16 bg-gray-200 dark:bg-gray-700 rounded-lg flex items-center justify-center flex-shrink-0">
-                                <span className="text-gray-500 dark:text-gray-400 text-xs">No Image</span>
-                              </div>
-                            )}
+                            <img
+                              src={item.image_url ? getImageUrl(item.image_url) : getPlaceholderImage(item.category_name, item.name)}
+                              alt={item.name}
+                              className="w-16 h-16 object-cover rounded-lg border flex-shrink-0"
+                            />
                             <div className="flex-1">
                               <div className="flex justify-between items-start mb-2">
                                 <h4 className={`font-medium ${isDarkMode ? 'text-secondary-300' : 'text-secondary-700'}`}>{item.name}</h4>

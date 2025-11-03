@@ -711,9 +711,9 @@ const OrderPage = ({ menuItems, cart: externalCart, setCart: setExternalCart }) 
               {paymentMethod === 'upi' && (
                 <div className="mb-4 p-4 bg-white border border-accent-200 rounded-lg">
                   <div className="text-center">
-                    <div className="bg-purple-600 text-white p-3 rounded-t-lg -mt-4 -mx-4 mb-4 flex items-center">
+                    <div className="bg-[#6F4E37] text-white p-3 rounded-t-lg -mt-4 -mx-4 mb-4 flex items-center">
                       <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center mr-2">
-                        <span className="text-purple-600 font-bold text-sm">पे</span>
+                        <span className="text-[#6F4E37] font-bold text-sm">पे</span>
                       </div>
                       <span className="font-semibold">PhonePe</span>
                     </div>
@@ -744,7 +744,7 @@ const OrderPage = ({ menuItems, cart: externalCart, setCart: setExternalCart }) 
                     
                     <div className="text-sm font-medium text-gray-700">{cafeSettings?.cafe_name || 'Our Cafe'}</div>
                     
-                    <div className="bg-purple-600 h-2 -mx-4 -mb-4 rounded-b-lg"></div>
+                    <div className="bg-[#6F4E37] h-2 -mx-4 -mb-4 rounded-b-lg"></div>
                   </div>
                 </div>
               )}
@@ -1136,9 +1136,9 @@ const OrderPage = ({ menuItems, cart: externalCart, setCart: setExternalCart }) 
             {paymentMethod === 'upi' && (
               <div className="mb-4 p-4 bg-white border border-accent-200 rounded-lg">
                 <div className="text-center">
-                  <div className="bg-purple-600 text-white p-3 rounded-t-lg -mt-4 -mx-4 mb-4 flex items-center">
+                  <div className="bg-[#6F4E37] text-white p-3 rounded-t-lg -mt-4 -mx-4 mb-4 flex items-center">
                     <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center mr-2">
-                      <span className="text-purple-600 font-bold text-sm">पे</span>
+                      <span className="text-[#6F4E37] font-bold text-sm">पे</span>
                     </div>
                     <span className="font-semibold">PhonePe</span>
                   </div>
@@ -1169,7 +1169,7 @@ const OrderPage = ({ menuItems, cart: externalCart, setCart: setExternalCart }) 
                   
                   <div className="text-sm font-medium text-gray-700">{cafeSettings?.cafe_name || 'Our Cafe'}</div>
                   
-                  <div className="bg-purple-600 h-2 -mx-4 -mb-4 rounded-b-lg"></div>
+                  <div className="bg-[#6F4E37] h-2 -mx-4 -mb-4 rounded-b-lg"></div>
                 </div>
               </div>
             )}

@@ -312,7 +312,7 @@ const CustomerManagement = () => {
             </div>
           </div>
           
-          <div className="card bg-gradient-to-r from-purple-500 to-purple-600 text-white">
+          <div className="card bg-gradient-to-r from-[#6F4E37] to-[#8B6F47] text-white">
             <div className="flex items-center">
               <TrendingUp className="h-8 w-8 mr-3" />
               <div>
