@@ -472,15 +472,15 @@ const CustomerMenu = ({
   }
 
   return (
-    <div className="relative w-full flex flex-col min-h-screen bg-[#F5F5DC] dark:bg-[#1a1612]">
+    <div className="relative w-full flex flex-col min-h-screen bg-accent-50 dark:bg-gray-900">
       {/* Sticky Header / Top App Bar */}
-      <header className="sticky top-0 z-20 w-full border-b border-black/10 dark:border-white/10 bg-[#F5F5DC]/80 dark:bg-[#1a1612]/80 backdrop-blur-sm">
+      <header className="sticky top-0 z-20 w-full bg-white dark:bg-gray-800 shadow-sm border-b border-accent-200 dark:border-gray-700">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             {/* Logo and Title */}
             <div className="flex items-center gap-4">
-              <Coffee className="text-[#6F4E37] text-3xl h-8 w-8" />
-              <h1 className="text-xl font-bold tracking-tight text-text-light dark:text-text-dark">
+              <Coffee className="text-secondary-600 dark:text-secondary-400 text-3xl h-8 w-8" />
+              <h1 className="text-xl font-bold tracking-tight text-secondary-700 dark:text-gray-100">
                 {cafeSettings?.cafe_name || 'Palm Cafe'}
               </h1>
             </div>
@@ -489,14 +489,22 @@ const CustomerMenu = ({
             <nav className="hidden md:flex items-center gap-8">
               <button
                 onClick={() => setActiveTab('menu')}
-                className={`text-sm font-medium hover:text-[#6F4E37] transition-colors ${activeTab === 'menu' ? 'text-[#6F4E37]' : ''}`}
+                className={`text-sm font-medium transition-colors ${
+                  activeTab === 'menu'
+                    ? 'text-secondary-600 dark:text-secondary-400 font-semibold'
+                    : 'text-secondary-500 dark:text-gray-400 hover:text-secondary-600 dark:hover:text-secondary-300'
+                }`}
               >
                 Menu
               </button>
               {customer && (
                 <button
                   onClick={() => setActiveTab('history')}
-                  className={`text-sm font-medium hover:text-[#6F4E37] transition-colors ${activeTab === 'history' ? 'text-[#6F4E37]' : ''}`}
+                  className={`text-sm font-medium transition-colors ${
+                    activeTab === 'history'
+                      ? 'text-secondary-600 dark:text-secondary-400 font-semibold'
+                      : 'text-secondary-500 dark:text-gray-400 hover:text-secondary-600 dark:hover:text-secondary-300'
+                  }`}
                 >
                   My Orders
                 </button>
@@ -509,16 +517,16 @@ const CustomerMenu = ({
               <div className="relative">
                 <button
                   onClick={() => setSearchExpanded(true)}
-                  className="flex items-center justify-center h-10 w-10 hover:bg-black/5 dark:hover:bg-white/5 rounded-full transition-colors"
+                  className="flex items-center justify-center h-10 w-10 hover:bg-accent-100 dark:hover:bg-gray-700 rounded-full transition-colors"
                 >
-                  <Search className="h-5 w-5 text-text-light dark:text-text-dark" />
+                  <Search className="h-5 w-5 text-secondary-600 dark:text-gray-300" />
                 </button>
 
                 {/* Expanded Search Bar - Absolute positioned overlay */}
                 {searchExpanded && (
                   <div className="absolute right-0 top-1/2 -translate-y-1/2 w-64 md:w-80 z-30">
                     <div className="relative">
-                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-[#9a794c]" />
+                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-secondary-400" />
                       <input
                         ref={searchInputRef}
                         type="text"
@@ -531,7 +539,7 @@ const CustomerMenu = ({
                             setSearchExpanded(false);
                           }
                         }}
-                        className="w-full pl-10 pr-10 py-2 rounded-lg bg-white dark:bg-[#2c2216] border-2 border-[#6F4E37] dark:border-[#6F4E37] text-text-light dark:text-text-dark placeholder:text-[#9a794c] focus:outline-none focus:ring-2 focus:ring-[#6F4E37]/50 shadow-lg transition-all"
+                        className="w-full pl-10 pr-10 py-2 rounded-lg bg-white dark:bg-gray-800 border-2 border-secondary-300 dark:border-gray-600 text-secondary-900 dark:text-white placeholder:text-secondary-400 focus:outline-none focus:ring-2 focus:ring-secondary-500 focus:border-secondary-500 shadow-lg transition-all"
                       />
                       <button
                         onMouseDown={(e) => e.preventDefault()}
@@ -539,7 +547,7 @@ const CustomerMenu = ({
                           setSearchQuery('');
                           setSearchExpanded(false);
                         }}
-                        className="search-clear-btn absolute right-3 top-1/2 transform -translate-y-1/2 text-text-light/60 dark:text-text-dark/60 hover:text-text-light dark:hover:text-text-dark"
+                        className="search-clear-btn absolute right-3 top-1/2 transform -translate-y-1/2 text-secondary-400 dark:text-gray-400 hover:text-secondary-600 dark:hover:text-gray-200"
                       >
                         <X className="h-4 w-4" />
                       </button>
@@ -551,11 +559,11 @@ const CustomerMenu = ({
               {/* Cart */}
               <button
                 onClick={() => setShowCart(true)}
-                className="relative flex cursor-pointer items-center justify-center rounded-full h-10 w-10 text-text-light dark:text-text-dark hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
+                className="relative flex cursor-pointer items-center justify-center rounded-full h-10 w-10 text-secondary-600 dark:text-gray-300 hover:bg-accent-100 dark:hover:bg-gray-700 transition-colors"
               >
                 <ShoppingCart className="h-5 w-5" />
                 {cart.length > 0 && (
-                  <span className="absolute top-1 right-1 flex h-5 w-5 items-center justify-center rounded-full bg-[#6F4E37] text-xs font-bold text-white">
+                  <span className="absolute top-1 right-1 flex h-5 w-5 items-center justify-center rounded-full bg-secondary-500 text-xs font-bold text-white">
                     {cart.reduce((total, item) => total + item.quantity, 0)}
                   </span>
                 )}
@@ -565,7 +573,7 @@ const CustomerMenu = ({
               {customer && (
                 <button
                   onClick={() => setShowProfile(true)}
-                  className="flex items-center justify-center h-10 w-10 rounded-full bg-[#6F4E37] text-white hover:bg-[#6F4E37]/90 transition-colors"
+                  className="flex items-center justify-center h-10 w-10 rounded-full bg-secondary-500 text-white hover:bg-secondary-600 transition-colors"
                   title={customer.name}
                 >
                   <User className="h-5 w-5" />
@@ -583,14 +591,14 @@ const CustomerMenu = ({
           {activeTab === 'menu' && (
             <aside className="hidden lg:block w-1/4 xl:w-1/5">
               <div className="sticky top-24">
-                <h2 className="text-lg font-bold mb-4 px-3 text-text-light dark:text-text-dark">Categories</h2>
+                <h2 className="text-lg font-bold mb-4 px-3 text-secondary-700 dark:text-gray-100">Categories</h2>
                 <nav className="flex flex-col gap-1">
                   <button
                     onClick={() => setSelectedCategory('All')}
                     className={`flex items-center gap-3 px-3 py-2 rounded-lg text-left transition-colors font-medium ${
                       selectedCategory === 'All'
-                        ? 'bg-[#6F4E37]/20 text-[#6F4E37] font-semibold'
-                        : 'hover:bg-black/5 dark:hover:bg-white/5 text-text-light/70 dark:text-text-dark/70 hover:text-text-light dark:hover:text-text-dark'
+                        ? 'bg-secondary-100 dark:bg-secondary-900 text-secondary-700 dark:text-secondary-300 font-semibold'
+                        : 'hover:bg-accent-100 dark:hover:bg-gray-700 text-secondary-600 dark:text-gray-400 hover:text-secondary-700 dark:hover:text-gray-200'
                     }`}
                   >
                     <Utensils className="h-5 w-5" />
@@ -602,8 +610,8 @@ const CustomerMenu = ({
                       onClick={() => setSelectedCategory(categoryName)}
                       className={`flex items-center gap-3 px-3 py-2 rounded-lg text-left transition-colors font-medium ${
                         selectedCategory === categoryName
-                          ? 'bg-[#6F4E37]/20 text-[#6F4E37] font-semibold'
-                          : 'hover:bg-black/5 dark:hover:bg-white/5 text-text-light/70 dark:text-text-dark/70 hover:text-text-light dark:hover:text-text-dark'
+                          ? 'bg-secondary-100 dark:bg-secondary-900 text-secondary-700 dark:text-secondary-300 font-semibold'
+                          : 'hover:bg-accent-100 dark:hover:bg-gray-700 text-secondary-600 dark:text-gray-400 hover:text-secondary-700 dark:hover:text-gray-200'
                       }`}
                     >
                       {getCategoryIcon(categoryName)}
@@ -617,7 +625,7 @@ const CustomerMenu = ({
 
           {/* Mobile Category Scroller */}
           {activeTab === 'menu' && (
-            <div className="lg:hidden sticky top-16 z-10 bg-[#F5F5DC]/80 dark:bg-[#1a1612]/80 backdrop-blur-sm py-3 -mx-4 px-4">
+            <div className="lg:hidden sticky top-16 z-10 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm py-3 -mx-4 px-4 border-b border-accent-200 dark:border-gray-700">
               <div
                 ref={categoryScrollRef}
                 className="flex gap-3 overflow-x-auto whitespace-nowrap scrollbar-hide"
@@ -625,10 +633,10 @@ const CustomerMenu = ({
               >
                 <button
                   onClick={() => setSelectedCategory('All')}
-                  className={`flex h-10 shrink-0 items-center justify-center gap-x-2 rounded-full pl-5 pr-5 cursor-pointer ${
+                  className={`flex h-10 shrink-0 items-center justify-center gap-x-2 rounded-full pl-5 pr-5 cursor-pointer transition-colors ${
                     selectedCategory === 'All'
-                      ? 'bg-[#6F4E37] text-white'
-                      : 'bg-white/80 dark:bg-[#2c241d] text-text-light dark:text-text-dark'
+                      ? 'bg-secondary-500 text-white'
+                      : 'bg-accent-100 dark:bg-gray-700 text-secondary-700 dark:text-gray-200'
                   }`}
                 >
                   <p className={`text-sm ${selectedCategory === 'All' ? 'font-bold' : 'font-medium'}`}>
@@ -639,10 +647,10 @@ const CustomerMenu = ({
                   <button
                     key={categoryName}
                     onClick={() => setSelectedCategory(categoryName)}
-                    className={`flex h-10 shrink-0 items-center justify-center gap-x-2 rounded-full pl-5 pr-5 cursor-pointer ${
+                    className={`flex h-10 shrink-0 items-center justify-center gap-x-2 rounded-full pl-5 pr-5 cursor-pointer transition-colors ${
                       selectedCategory === categoryName
-                        ? 'bg-[#6F4E37] text-white'
-                        : 'bg-white/80 dark:bg-[#2c241d] text-text-light dark:text-text-dark'
+                        ? 'bg-secondary-500 text-white'
+                        : 'bg-accent-100 dark:bg-gray-700 text-secondary-700 dark:text-gray-200'
                     }`}
                   >
                     <p className={`text-sm ${selectedCategory === categoryName ? 'font-bold' : 'font-medium'}`}>
@@ -663,39 +671,39 @@ const CustomerMenu = ({
                   .filter(([categoryName]) => selectedCategory === 'All' || categoryName === selectedCategory)
                   .map(([categoryName, items]) => (
                     <section key={categoryName} id={categoryName.toLowerCase().replace(/\s+/g, '-')}>
-                      <h2 className="text-3xl font-extrabold tracking-tight mb-6 text-text-light dark:text-text-dark">
+                      <h2 className="text-3xl font-extrabold tracking-tight mb-6 text-secondary-700 dark:text-gray-100">
                         {categoryName}
                       </h2>
                       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                         {items.map((item) => (
                           <div
                             key={item.id}
-                            className="flex flex-col rounded-xl bg-white dark:bg-[#2c241d] shadow-sm overflow-hidden border border-black/5 dark:border-white/5 hover:shadow-md transition-shadow"
+                            className="flex flex-col rounded-xl bg-white dark:bg-gray-800 shadow-sm overflow-hidden border border-accent-200 dark:border-gray-700 hover:shadow-md transition-shadow"
                           >
                             <div
                               className="w-full h-48 bg-cover bg-center"
                               style={{
                                 backgroundImage: `url('${
-                                  cafeSettings?.show_menu_images && item.image_url
+                                  item.image_url
                                     ? getImageUrl(item.image_url)
                                     : getPlaceholderImage(categoryName, item.name)
                                 }')`
                               }}
                             />
                             <div className="p-4 flex flex-col flex-grow">
-                              <h3 className="text-lg font-bold text-text-light dark:text-text-dark">{item.name}</h3>
+                              <h3 className="text-lg font-bold text-secondary-700 dark:text-gray-100">{item.name}</h3>
                               {item.description && (
-                                <p className="text-sm text-text-light/60 dark:text-text-dark/60 mt-1 flex-grow line-clamp-2">
+                                <p className="text-sm text-secondary-600 dark:text-gray-400 mt-1 flex-grow line-clamp-2">
                                   {item.description}
                                 </p>
                               )}
-                              <p className="text-lg font-semibold mt-3 text-text-light dark:text-text-dark">
+                              <p className="text-lg font-semibold mt-3 text-secondary-700 dark:text-gray-100">
                                 {formatCurrency(item.price)}
                               </p>
                               <div className="flex items-center justify-end mt-4">
                                 <button
                                   onClick={() => addToCart(item)}
-                                  className="flex items-center justify-center gap-2 h-10 px-4 rounded-lg bg-[#6F4E37] text-white text-sm font-bold hover:bg-[#6F4E37]/90 transition-colors"
+                                  className="flex items-center justify-center gap-2 h-10 px-4 rounded-lg bg-secondary-500 text-white text-sm font-bold hover:bg-secondary-600 transition-colors"
                                 >
                                   <Plus className="h-4 w-4" />
                                   <span>Add</span>
@@ -725,16 +733,16 @@ const CustomerMenu = ({
 {
   showCart && (
     <div className="fixed inset-0 bg-black/70 backdrop-blur-md flex items-center justify-center z-50 p-4">
-      <div className="bg-[#FFF8E1] dark:bg-[#221a10] rounded-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden shadow-2xl">
+      <div className="bg-white dark:bg-gray-800 rounded-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden shadow-2xl">
         {/* Cart Header */}
-        <div className="flex w-full items-center justify-between border-b border-[#f3eee7] dark:border-[#4a2c2a] bg-[#fcfaf8] dark:bg-[#2c2216] px-6 py-4">
+        <div className="flex w-full items-center justify-between border-b border-accent-200 dark:border-gray-700 bg-accent-50 dark:bg-gray-900 px-6 py-4">
           <div class="flex items-center gap-4">
-            <ShoppingCart className="h-6 w-6 text-[#6F4E37]" />
-            <h2 className="text-2xl font-bold tracking-tight text-text-light dark:text-text-dark">Your Order</h2>
+            <ShoppingCart className="h-6 w-6 text-secondary-600 dark:text-secondary-400" />
+            <h2 className="text-2xl font-bold tracking-tight text-secondary-700 dark:text-gray-100">Your Order</h2>
           </div>
           <button
             onClick={() => setShowCart(false)}
-            className="text-text-light dark:text-text-dark hover:bg-black/5 dark:hover:bg-white/5 p-2 rounded-lg transition-colors"
+            className="text-secondary-600 dark:text-gray-300 hover:bg-accent-100 dark:hover:bg-gray-700 p-2 rounded-lg transition-colors"
           >
             <X className="h-6 w-6" />
           </button>
@@ -745,56 +753,56 @@ const CustomerMenu = ({
           {/* Left Column: Cart Items */}
           <div className="lg:col-span-2 flex flex-col gap-4">
             {cart.length === 0 ? (
-              <div className="flex flex-col items-center justify-center gap-6 rounded-lg bg-[#fcfaf8] dark:bg-[#2c2216] p-12 text-center shadow-sm">
-                <div className="text-[#6F4E37]">
+              <div className="flex flex-col items-center justify-center gap-6 rounded-lg bg-accent-50 dark:bg-gray-900 p-12 text-center shadow-sm">
+                <div className="text-secondary-600 dark:text-secondary-400">
                   <ShoppingCart className="h-24 w-24" />
                 </div>
-                <h3 className="text-2xl font-bold text-text-light dark:text-text-dark">Your cart is empty</h3>
-                <p className="max-w-sm text-text-light/60 dark:text-text-dark/60">Looks like you haven't added anything to your order yet. Let's fix that!</p>
+                <h3 className="text-2xl font-bold text-secondary-700 dark:text-gray-100">Your cart is empty</h3>
+                <p className="max-w-sm text-secondary-600 dark:text-gray-400">Looks like you haven't added anything to your order yet. Let's fix that!</p>
               </div>
             ) : (
               <>
                 {cart.map((item) => (
-                  <div key={item.id} className="flex items-center gap-4 rounded-lg bg-[#fcfaf8] dark:bg-[#2c2216] p-4 shadow-sm">
+                  <div key={item.id} className="flex items-center gap-4 rounded-lg bg-accent-50 dark:bg-gray-900 p-4 shadow-sm border border-accent-200 dark:border-gray-700">
                     <div
                       className="bg-center bg-no-repeat aspect-square bg-cover rounded-lg size-16"
                       style={{
                         backgroundImage: `url('${
-                          cafeSettings?.show_menu_images && item.image_url
+                          item.image_url
                             ? getImageUrl(item.image_url)
                             : getPlaceholderImage(item.category_name, item.name)
                         }')`
                       }}
                     />
                     <div className="flex flex-1 flex-col justify-center">
-                      <p className="text-base font-bold text-text-light dark:text-text-dark">{item.name}</p>
-                      <p className="text-sm text-text-light/60 dark:text-text-dark/60">{formatCurrency(item.price)}</p>
+                      <p className="text-base font-bold text-secondary-700 dark:text-gray-100">{item.name}</p>
+                      <p className="text-sm text-secondary-600 dark:text-gray-400">{formatCurrency(item.price)}</p>
                     </div>
                     <div className="flex items-center gap-6">
                       <div className="flex items-center gap-2">
                         <button
                           onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                          className="flex h-8 w-8 items-center justify-center rounded-full bg-[#f3eee7] dark:bg-[#443d34] transition-colors hover:bg-[#6F4E37]/20 dark:hover:bg-[#6F4E37]/30 cursor-pointer"
+                          className="flex h-8 w-8 items-center justify-center rounded-full bg-accent-100 dark:bg-gray-700 transition-colors hover:bg-secondary-100 dark:hover:bg-secondary-900 cursor-pointer"
                         >
                           <Minus className="h-4 w-4" />
                         </button>
                         <input
-                          className="w-8 border-none bg-transparent p-0 text-center text-base font-medium focus:outline-0 focus:ring-0"
+                          className="w-8 border-none bg-transparent p-0 text-center text-base font-medium focus:outline-0 focus:ring-0 text-secondary-700 dark:text-gray-100"
                           type="number"
                           value={item.quantity}
                           readOnly
                         />
                         <button
                           onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                          className="flex h-8 w-8 items-center justify-center rounded-full bg-[#f3eee7] dark:bg-[#443d34] transition-colors hover:bg-[#6F4E37]/20 dark:hover:bg-[#6F4E37]/30 cursor-pointer"
+                          className="flex h-8 w-8 items-center justify-center rounded-full bg-accent-100 dark:bg-gray-700 transition-colors hover:bg-secondary-100 dark:hover:bg-secondary-900 cursor-pointer"
                         >
                           <Plus className="h-4 w-4" />
                         </button>
                       </div>
-                      <p className="w-16 text-right font-semibold text-text-light dark:text-text-dark">{formatCurrency(item.price * item.quantity)}</p>
+                      <p className="w-16 text-right font-semibold text-secondary-700 dark:text-gray-100">{formatCurrency(item.price * item.quantity)}</p>
                       <button
                         onClick={() => removeFromCart(item.id)}
-                        className="text-text-light/60 dark:text-text-dark/60 transition-colors hover:text-red-500"
+                        className="text-secondary-600 dark:text-gray-400 transition-colors hover:text-red-500"
                       >
                         <Trash2 className="h-5 w-5" />
                       </button>
@@ -807,25 +815,25 @@ const CustomerMenu = ({
 
           {/* Right Column: Order Summary */}
           {cart.length > 0 && (
-            <div className="lg:col-span-1">
-              <div className="sticky top-6 flex flex-col gap-6 rounded-xl bg-[#fcfaf8] dark:bg-[#2c2216] p-6 shadow-sm">
-                <h2 className="text-2xl font-bold tracking-tight text-text-light dark:text-text-dark">Order Summary</h2>
+            <div className="lg:col-span-1 flex flex-col max-h-full">
+              <div className="flex flex-col gap-6 rounded-xl bg-accent-50 dark:bg-gray-900 p-6 shadow-sm border border-accent-200 dark:border-gray-700 flex-1 overflow-y-auto">
+                <h2 className="text-2xl font-bold tracking-tight text-secondary-700 dark:text-gray-100">Order Summary</h2>
 
-                <div className="flex flex-col gap-3 border-b border-[#f3eee7] dark:border-[#4a2c2a] pb-4">
+                <div className="flex flex-col gap-3 border-b border-accent-200 dark:border-gray-700 pb-4">
                   <div className="flex justify-between">
-                    <p className="text-text-light/60 dark:text-text-dark/60">Subtotal</p>
-                    <p className="font-medium text-text-light dark:text-text-dark">{formatCurrency(getSubtotal())}</p>
+                    <p className="text-secondary-600 dark:text-gray-400">Subtotal</p>
+                    <p className="font-medium text-secondary-700 dark:text-gray-100">{formatCurrency(getSubtotal())}</p>
                   </div>
                   {showTaxInMenu && taxAmount > 0 && (
                     <div className="flex justify-between">
-                      <p className="text-text-light/60 dark:text-text-dark/60">Taxes ({taxRate}%)</p>
-                      <p className="font-medium text-text-light dark:text-text-dark">{formatCurrency(taxAmount)}</p>
+                      <p className="text-secondary-600 dark:text-gray-400">Taxes ({taxRate}%)</p>
+                      <p className="font-medium text-secondary-700 dark:text-gray-100">{formatCurrency(taxAmount)}</p>
                     </div>
                   )}
                   {tipAmount > 0 && (
                     <div className="flex justify-between">
-                      <p className="text-text-light/60 dark:text-text-dark/60">Tip</p>
-                      <p className="font-medium text-text-light dark:text-text-dark">{formatCurrency(tipAmount)}</p>
+                      <p className="text-secondary-600 dark:text-gray-400">Tip</p>
+                      <p className="font-medium text-secondary-700 dark:text-gray-100">{formatCurrency(tipAmount)}</p>
                     </div>
                   )}
                   {pointsToRedeem > 0 && (
@@ -837,21 +845,21 @@ const CustomerMenu = ({
                 </div>
 
                 <div className="flex justify-between">
-                  <p className="text-lg font-bold text-text-light dark:text-text-dark">Total</p>
-                  <p className="text-xl font-extrabold text-text-light dark:text-text-dark">{formatCurrency(getTotal())}</p>
+                  <p className="text-lg font-bold text-secondary-700 dark:text-gray-100">Total</p>
+                  <p className="text-xl font-extrabold text-secondary-700 dark:text-gray-100">{formatCurrency(getTotal())}</p>
                 </div>
 
                 {/* Login Required Message */}
                 {!customer && (
-                  <div className="p-6 bg-[#6F4E37]/10 dark:bg-[#6F4E37]/20 border border-[#6F4E37]/30 rounded-lg">
+                  <div className="p-6 bg-secondary-50 dark:bg-secondary-900/20 border border-secondary-200 dark:border-secondary-800 rounded-lg">
                     <div className="text-center">
-                      <div className="w-12 h-12 bg-[#6F4E37] rounded-full flex items-center justify-center mx-auto mb-4">
+                      <div className="w-12 h-12 bg-secondary-500 rounded-full flex items-center justify-center mx-auto mb-4">
                         <User className="h-6 w-6 text-white" />
                       </div>
-                      <h3 className="text-lg font-bold text-text-light dark:text-text-dark mb-2">
+                      <h3 className="text-lg font-bold text-secondary-700 dark:text-gray-100 mb-2">
                         Login Required
                       </h3>
-                      <p className="text-text-light/60 dark:text-text-dark/60 mb-4 text-sm">
+                      <p className="text-secondary-600 dark:text-gray-400 mb-4 text-sm">
                         Please login to place your order
                       </p>
                       <button
@@ -859,7 +867,7 @@ const CustomerMenu = ({
                           setShowCart(false);
                           setShowLoginModal(true);
                         }}
-                        className="w-full bg-[#6F4E37] text-white px-6 py-3 rounded-lg font-bold hover:bg-[#6F4E37]/90 transition-colors"
+                        className="w-full bg-secondary-500 text-white px-6 py-3 rounded-lg font-bold hover:bg-secondary-600 transition-colors"
                       >
                         Login & Continue
                       </button>
@@ -871,24 +879,26 @@ const CustomerMenu = ({
                 {customer && (
                   <div className="flex flex-col gap-4">
                     {/* Customer Information */}
-                    <div className="p-4 bg-[#6F4E37]/10 dark:bg-[#6F4E37]/20 border border-[#6F4E37]/30 rounded-lg">
-                      <div className="flex justify-between items-center mb-3">
-                        <h3 className="font-bold text-text-light dark:text-text-dark flex items-center text-base">
-                          <User className="h-4 w-4 mr-2 text-[#6F4E37]" />
-                          Customer Info
-                        </h3>
+                    <div className="p-4 bg-secondary-50 dark:bg-secondary-900/20 border border-secondary-200 dark:border-secondary-800 rounded-lg">
+                      <div className="flex flex-col gap-2 mb-3">
+                        <div className="flex items-center justify-between">
+                          <h3 className="font-bold text-secondary-700 dark:text-gray-100 flex items-center text-base">
+                            <User className="h-4 w-4 mr-2 text-secondary-600 dark:text-secondary-400" />
+                            Customer Info
+                          </h3>
+                        </div>
                         <div className="flex items-center gap-2">
                           <button
                             onClick={openEditProfile}
-                            className="flex items-center gap-1 px-2 py-1 bg-[#6F4E37] text-white rounded-lg hover:bg-[#6F4E37]/90 transition-colors text-xs"
+                            className="flex items-center justify-center gap-1 px-3 py-1.5 bg-secondary-500 text-white rounded-lg hover:bg-secondary-600 transition-colors text-xs flex-1"
                           >
                             <Edit3 className="h-3 w-3" />
-                            <span>Edit</span>
+                            <span>Edit Profile</span>
                           </button>
                           {onLogout && (
                             <button
                               onClick={onLogout}
-                              className="flex items-center gap-1 px-2 py-1 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors text-xs"
+                              className="flex items-center justify-center gap-1 px-3 py-1.5 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors text-xs flex-1"
                             >
                               <LogOut className="h-3 w-3" />
                               <span>Logout</span>
@@ -898,19 +908,19 @@ const CustomerMenu = ({
                       </div>
                       <div className="space-y-2 text-sm">
                         <div className="flex justify-between">
-                          <span className="text-text-light/60 dark:text-text-dark/60">Name:</span>
-                          <span className="font-semibold text-text-light dark:text-text-dark">{customer.name}</span>
+                          <span className="text-secondary-600 dark:text-gray-400">Name:</span>
+                          <span className="font-semibold text-secondary-700 dark:text-gray-100">{customer.name}</span>
                         </div>
                         {customer.phone && (
                           <div className="flex justify-between">
-                            <span className="text-text-light/60 dark:text-text-dark/60">Phone:</span>
-                            <span className="font-semibold text-text-light dark:text-text-dark">{customer.phone}</span>
+                            <span className="text-secondary-600 dark:text-gray-400">Phone:</span>
+                            <span className="font-semibold text-secondary-700 dark:text-gray-100">{customer.phone}</span>
                           </div>
                         )}
                         {customer.loyalty_points > 0 && (
                           <div className="flex justify-between">
-                            <span className="text-text-light/60 dark:text-text-dark/60">Points:</span>
-                            <span className="flex items-center text-[#ec9213] font-semibold">
+                            <span className="text-secondary-600 dark:text-gray-400">Points:</span>
+                            <span className="flex items-center text-yellow-600 dark:text-yellow-400 font-semibold">
                               <Star className="h-3 w-3 mr-1" />
                               {customer.loyalty_points}
                             </span>
@@ -921,7 +931,7 @@ const CustomerMenu = ({
 
                     {/* Payment Method */}
                     <div>
-                      <h3 className="font-bold text-text-light dark:text-text-dark mb-3 text-sm">Payment Method</h3>
+                      <h3 className="font-bold text-secondary-700 dark:text-gray-100 mb-3 text-sm">Payment Method</h3>
                       <div className="grid grid-cols-2 gap-2">
                         {paymentMethods.map((method) => (
                           <button
@@ -930,8 +940,8 @@ const CustomerMenu = ({
                             onClick={() => setPaymentMethod(method.code)}
                             className={`flex items-center justify-center p-3 rounded-lg border-2 transition-colors ${
                               paymentMethod === method.code
-                                ? 'bg-[#6F4E37] text-white border-[#6F4E37]'
-                                : 'bg-white dark:bg-[#2c2216] text-text-light dark:text-text-dark border-[#f3eee7] dark:border-[#4a2c2a] hover:border-[#6F4E37]'
+                                ? 'bg-secondary-500 text-white border-secondary-500'
+                                : 'bg-white dark:bg-gray-800 text-secondary-700 dark:text-gray-100 border-accent-200 dark:border-gray-700 hover:border-secondary-500'
                             }`}
                           >
                             <span className="mr-2">{method.icon}</span>
@@ -943,7 +953,7 @@ const CustomerMenu = ({
 
                     {/* Pickup Option */}
                     <div>
-                      <h3 className="font-bold text-text-light dark:text-text-dark mb-3 text-sm">Dining Preference</h3>
+                      <h3 className="font-bold text-secondary-700 dark:text-gray-100 mb-3 text-sm">Dining Preference</h3>
                       <div className="grid grid-cols-2 gap-2">
                         {[
                           { value: 'pickup', label: 'Pickup', icon: '🥡' },
@@ -954,8 +964,8 @@ const CustomerMenu = ({
                             onClick={() => setPickupOption(option.value)}
                             className={`p-3 rounded-lg border-2 transition-colors ${
                               pickupOption === option.value
-                                ? 'bg-[#6F4E37] text-white border-[#6F4E37]'
-                                : 'bg-white dark:bg-[#2c2216] text-text-light dark:text-text-dark border-[#f3eee7] dark:border-[#4a2c2a] hover:border-[#6F4E37]'
+                                ? 'bg-secondary-500 text-white border-secondary-500'
+                                : 'bg-white dark:bg-gray-800 text-secondary-700 dark:text-gray-100 border-accent-200 dark:border-gray-700 hover:border-secondary-500'
                             }`}
                           >
                             <div className="flex items-center justify-center gap-2">
@@ -970,13 +980,13 @@ const CustomerMenu = ({
                     {/* Table Number for Dine-in */}
                     {pickupOption === 'dine-in' && (
                       <div>
-                        <label className="block font-bold text-text-light dark:text-text-dark mb-2 text-sm">Table Number</label>
+                        <label className="block font-bold text-secondary-700 dark:text-gray-100 mb-2 text-sm">Table Number</label>
                         <input
                           type="text"
                           placeholder="Enter table number (optional)"
                           value={tableNumber}
                           onChange={(e) => setTableNumber(e.target.value)}
-                          className="w-full p-3 border-2 border-[#f3eee7] dark:border-[#4a2c2a] rounded-lg focus:ring-2 focus:ring-[#6F4E37]/50 focus:border-[#6F4E37] bg-white dark:bg-[#2c2216] text-text-light dark:text-text-dark transition-colors"
+                          className="w-full p-3 border-2 border-accent-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-secondary-500 focus:border-secondary-500 bg-white dark:bg-gray-800 text-secondary-700 dark:text-gray-100 transition-colors"
                         />
                       </div>
                     )}
@@ -984,22 +994,22 @@ const CustomerMenu = ({
                     {/* Points Redemption */}
                     {customer?.loyalty_points > 0 && (
                       <div>
-                        <h3 className="font-bold text-text-light dark:text-text-dark mb-3 text-sm flex items-center">
-                          <Star className="h-4 w-4 mr-2 text-[#ec9213]" />
+                        <h3 className="font-bold text-secondary-700 dark:text-gray-100 mb-3 text-sm flex items-center">
+                          <Star className="h-4 w-4 mr-2 text-yellow-600 dark:text-yellow-400" />
                           Redeem Points
                         </h3>
-                        <div className="bg-[#ec9213]/10 dark:bg-[#ec9213]/20 rounded-lg p-4 mb-3 border border-[#ec9213]/30">
+                        <div className="bg-yellow-50 dark:bg-yellow-900/20 rounded-lg p-4 mb-3 border border-yellow-200 dark:border-yellow-800">
                           <div className="grid grid-cols-2 gap-3 text-xs">
                             <div className="text-center">
-                              <div className="text-lg font-bold text-text-light dark:text-text-dark">{customer.loyalty_points}</div>
-                              <div className="text-text-light/60 dark:text-text-dark/60">Available</div>
+                              <div className="text-lg font-bold text-secondary-700 dark:text-gray-100">{customer.loyalty_points}</div>
+                              <div className="text-secondary-600 dark:text-gray-400">Available</div>
                             </div>
                             <div className="text-center">
-                              <div className="text-lg font-bold text-text-light dark:text-text-dark">{maxRedeemablePoints}</div>
-                              <div className="text-text-light/60 dark:text-text-dark/60">Max Redeemable</div>
+                              <div className="text-lg font-bold text-secondary-700 dark:text-gray-100">{maxRedeemablePoints}</div>
+                              <div className="text-secondary-600 dark:text-gray-400">Max Redeemable</div>
                             </div>
                           </div>
-                          <div className="text-center mt-2 text-xs text-text-light/60 dark:text-text-dark/60">
+                          <div className="text-center mt-2 text-xs text-secondary-600 dark:text-gray-400">
                             1 point = {formatCurrency(0.10)}
                           </div>
                         </div>
@@ -1009,7 +1019,7 @@ const CustomerMenu = ({
                           onChange={(e) => handlePointsRedemption(parseInt(e.target.value) || 0)}
                           min="0"
                           max={maxRedeemablePoints}
-                          className="w-full p-3 border-2 border-[#f3eee7] dark:border-[#4a2c2a] rounded-lg focus:ring-2 focus:ring-[#ec9213]/50 focus:border-[#ec9213] bg-white dark:bg-[#2c2216] text-text-light dark:text-text-dark transition-colors"
+                          className="w-full p-3 border-2 border-accent-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 bg-white dark:bg-gray-800 text-secondary-700 dark:text-gray-100 transition-colors"
                           placeholder="Enter points"
                         />
                       </div>
@@ -1017,7 +1027,7 @@ const CustomerMenu = ({
 
                     {/* Tip Selection */}
                     <div>
-                      <h3 className="font-bold text-text-light dark:text-text-dark mb-3 text-sm">Add Tip</h3>
+                      <h3 className="font-bold text-secondary-700 dark:text-gray-100 mb-3 text-sm">Add Tip</h3>
                       <div className="grid grid-cols-3 gap-2 mb-3">
                         {[0, 10, 15, 18, 20, 25].map((percentage) => (
                           <button
@@ -1025,8 +1035,8 @@ const CustomerMenu = ({
                             onClick={() => handleTipPercentageChange(percentage)}
                             className={`py-2 px-3 text-xs rounded-lg border-2 transition-colors font-semibold ${
                               tipPercentage === percentage
-                                ? 'bg-[#6F4E37] text-white border-[#6F4E37]'
-                                : 'bg-white dark:bg-[#2c2216] text-text-light dark:text-text-dark border-[#f3eee7] dark:border-[#4a2c2a] hover:border-[#6F4E37]'
+                                ? 'bg-secondary-500 text-white border-secondary-500'
+                                : 'bg-white dark:bg-gray-800 text-secondary-700 dark:text-gray-100 border-accent-200 dark:border-gray-700 hover:border-secondary-500'
                             }`}
                           >
                             {percentage === 0 ? 'No Tip' : `${percentage}%`}
@@ -1037,18 +1047,20 @@ const CustomerMenu = ({
                         type="number"
                         value={tipAmount.toFixed(2)}
                         onChange={(e) => handleTipAmountChange(e.target.value)}
-                        className="w-full p-3 border-2 border-[#f3eee7] dark:border-[#4a2c2a] rounded-lg focus:ring-2 focus:ring-[#6F4E37]/50 focus:border-[#6F4E37] bg-white dark:bg-[#2c2216] text-text-light dark:text-text-dark transition-colors"
+                        className="w-full p-3 border-2 border-accent-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-secondary-500 focus:border-secondary-500 bg-white dark:bg-gray-800 text-secondary-700 dark:text-gray-100 transition-colors"
                         placeholder="Custom tip"
                       />
                     </div>
                   </div>
                 )}
+              </div>
 
-                {/* Action Buttons */}
+              {/* Action Buttons - Sticky at bottom */}
+              <div className="flex flex-col gap-3 p-4 bg-accent-50 dark:bg-gray-900 border-t border-accent-200 dark:border-gray-700 rounded-b-xl">
                 <button
                   onClick={placeOrder}
                   disabled={orderLoading || !customer}
-                  className="w-full rounded-lg bg-[#6F4E37] py-3 text-lg font-bold text-white transition-opacity hover:bg-[#6F4E37]/90 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                  className="w-full rounded-lg bg-secondary-500 py-3 text-base font-bold text-white transition-opacity hover:bg-secondary-600 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                 >
                   {orderLoading ? (
                     <>
@@ -1065,7 +1077,7 @@ const CustomerMenu = ({
 
                 <button
                   onClick={clearCart}
-                  className="w-full rounded-lg bg-white dark:bg-[#2c2216] border-2 border-[#f3eee7] dark:border-[#4a2c2a] py-3 text-base font-semibold text-text-light dark:text-text-dark hover:border-[#6F4E37] transition-colors"
+                  className="w-full rounded-lg bg-white dark:bg-gray-800 border-2 border-accent-200 dark:border-gray-700 py-2.5 text-sm font-semibold text-secondary-700 dark:text-gray-100 hover:border-secondary-500 transition-colors"
                 >
                   Clear Cart
                 </button>
@@ -1080,20 +1092,20 @@ const CustomerMenu = ({
 
       {/* Floating Cart Summary Bar - Mobile Only */}
       {cart.length > 0 && (
-        <footer className="lg:hidden fixed bottom-0 left-0 right-0 z-20 bg-white dark:bg-[#2c241d] border-t border-black/10 dark:border-white/10 shadow-lg">
+        <footer className="lg:hidden fixed bottom-0 left-0 right-0 z-20 bg-white dark:bg-gray-800 border-t border-accent-200 dark:border-gray-700 shadow-lg">
           <div className="container mx-auto px-4 py-4">
             <div className="flex items-center justify-between gap-4">
               <div className="flex flex-col">
-                <p className="text-text-light/70 dark:text-text-dark/70 text-sm font-medium">
+                <p className="text-secondary-600 dark:text-gray-400 text-sm font-medium">
                   {cart.reduce((total, item) => total + item.quantity, 0)} items
                 </p>
-                <p className="text-text-light dark:text-text-dark text-lg font-bold">
+                <p className="text-secondary-700 dark:text-gray-100 text-lg font-bold">
                   {formatCurrency(getSubtotal())}
                 </p>
               </div>
               <button
                 onClick={() => setShowCart(true)}
-                className="flex items-center justify-center gap-2 rounded-lg bg-[#6F4E37] h-12 px-6 hover:bg-[#6F4E37]/90 transition-colors"
+                className="flex items-center justify-center gap-2 rounded-lg bg-secondary-500 h-12 px-6 hover:bg-secondary-600 transition-colors"
               >
                 <ShoppingCart className="h-5 w-5 text-white" />
                 <span className="text-white text-base font-bold">View Cart</span>
@@ -1107,15 +1119,15 @@ const CustomerMenu = ({
       {/* Edit Profile Modal */}
       {showEditProfile && (
         <div className="fixed inset-0 bg-black/70 backdrop-blur-md flex items-center justify-center z-50 p-4">
-          <div className="bg-[#FFF8E1] dark:bg-[#221a10] rounded-2xl shadow-2xl max-w-md w-full">
-            <div className="flex items-center justify-between border-b border-[#f3eee7] dark:border-[#4a2c2a] bg-[#fcfaf8] dark:bg-[#2c2216] px-6 py-4">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-md w-full">
+            <div className="flex items-center justify-between border-b border-accent-200 dark:border-gray-700 bg-accent-50 dark:bg-gray-900 px-6 py-4">
               <div className="flex items-center gap-4">
-                <Edit3 className="h-6 w-6 text-[#6F4E37]" />
-                <h2 className="text-2xl font-bold tracking-tight text-text-light dark:text-text-dark">Edit Profile</h2>
+                <Edit3 className="h-6 w-6 text-secondary-600 dark:text-secondary-400" />
+                <h2 className="text-2xl font-bold tracking-tight text-secondary-700 dark:text-gray-100">Edit Profile</h2>
               </div>
               <button
                 onClick={() => setShowEditProfile(false)}
-                className="text-text-light dark:text-text-dark hover:bg-black/5 dark:hover:bg-white/5 p-2 rounded-lg transition-colors"
+                className="text-secondary-600 dark:text-gray-300 hover:bg-accent-100 dark:hover:bg-gray-700 p-2 rounded-lg transition-colors"
               >
                 <X className="h-6 w-6" />
               </button>
@@ -1124,54 +1136,54 @@ const CustomerMenu = ({
             <div className="p-6">
               <form onSubmit={handleProfileUpdate} className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-text-light dark:text-text-dark mb-2">
+                  <label className="block text-sm font-medium text-secondary-700 dark:text-gray-100 mb-2">
                     Full Name *
                   </label>
                   <input
                     type="text"
                     value={editProfileData.name}
                     onChange={(e) => handleProfileInputChange('name', e.target.value)}
-                    className="w-full px-4 py-3 border-2 border-[#f3eee7] dark:border-[#4a2c2a] rounded-lg focus:ring-2 focus:ring-[#6F4E37]/50 focus:border-[#6F4E37] transition-colors bg-white dark:bg-[#2c2216] text-text-light dark:text-text-dark"
+                    className="w-full px-4 py-3 border-2 border-accent-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-secondary-500 focus:border-secondary-500 transition-colors bg-white dark:bg-gray-800 text-secondary-700 dark:text-gray-100"
                     placeholder="Enter your full name"
                     required
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-text-light dark:text-text-dark mb-2">
+                  <label className="block text-sm font-medium text-secondary-700 dark:text-gray-100 mb-2">
                     Email Address
                   </label>
                   <input
                     type="email"
                     value={editProfileData.email}
                     onChange={(e) => handleProfileInputChange('email', e.target.value)}
-                    className="w-full px-4 py-3 border-2 border-[#f3eee7] dark:border-[#4a2c2a] rounded-lg focus:ring-2 focus:ring-[#6F4E37]/50 focus:border-[#6F4E37] transition-colors bg-white dark:bg-[#2c2216] text-text-light dark:text-text-dark"
+                    className="w-full px-4 py-3 border-2 border-accent-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-secondary-500 focus:border-secondary-500 transition-colors bg-white dark:bg-gray-800 text-secondary-700 dark:text-gray-100"
                     placeholder="Enter your email address"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-text-light dark:text-text-dark mb-2">
+                  <label className="block text-sm font-medium text-secondary-700 dark:text-gray-100 mb-2">
                     Address
                   </label>
                   <textarea
                     value={editProfileData.address}
                     onChange={(e) => handleProfileInputChange('address', e.target.value)}
-                    className="w-full px-4 py-3 border-2 border-[#f3eee7] dark:border-[#4a2c2a] rounded-lg focus:ring-2 focus:ring-[#6F4E37]/50 focus:border-[#6F4E37] transition-colors bg-white dark:bg-[#2c2216] text-text-light dark:text-text-dark resize-none"
+                    className="w-full px-4 py-3 border-2 border-accent-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-secondary-500 focus:border-secondary-500 transition-colors bg-white dark:bg-gray-800 text-secondary-700 dark:text-gray-100 resize-none"
                     placeholder="Enter your address"
                     rows={3}
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-text-light dark:text-text-dark mb-2">
+                  <label className="block text-sm font-medium text-secondary-700 dark:text-gray-100 mb-2">
                     Date of Birth
                   </label>
                   <input
                     type="date"
                     value={editProfileData.date_of_birth}
                     onChange={(e) => handleProfileInputChange('date_of_birth', e.target.value)}
-                    className="w-full px-4 py-3 border-2 border-[#f3eee7] dark:border-[#4a2c2a] rounded-lg focus:ring-2 focus:ring-[#6F4E37]/50 focus:border-[#6F4E37] transition-colors bg-white dark:bg-[#2c2216] text-text-light dark:text-text-dark"
+                    className="w-full px-4 py-3 border-2 border-accent-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-secondary-500 focus:border-secondary-500 transition-colors bg-white dark:bg-gray-800 text-secondary-700 dark:text-gray-100"
                   />
                 </div>
 
@@ -1179,14 +1191,14 @@ const CustomerMenu = ({
                   <button
                     type="button"
                     onClick={() => setShowEditProfile(false)}
-                    className="flex-1 px-4 py-3 bg-white dark:bg-[#2c2216] border-2 border-[#f3eee7] dark:border-[#4a2c2a] text-text-light dark:text-text-dark rounded-lg font-medium hover:border-[#6F4E37] transition-colors"
+                    className="flex-1 px-4 py-3 bg-white dark:bg-gray-800 border-2 border-accent-200 dark:border-gray-700 text-secondary-700 dark:text-gray-100 rounded-lg font-medium hover:border-secondary-500 transition-colors"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
                     disabled={profileLoading}
-                    className="flex-1 px-4 py-3 bg-[#6F4E37] text-white rounded-lg font-medium hover:bg-[#6F4E37]/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                    className="flex-1 px-4 py-3 bg-secondary-500 text-white rounded-lg font-medium hover:bg-secondary-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                   >
                     {profileLoading ? (
                       <>

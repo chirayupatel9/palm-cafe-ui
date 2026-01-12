@@ -39,98 +39,72 @@ export const getLogoUrl = (logoUrl) => {
 
 // Utility function to get placeholder images for different food categories
 export const getPlaceholderImage = (categoryName, itemName = '') => {
-  // Create beautiful SVG placeholders with food emojis
   const name = (categoryName || itemName || 'food').toLowerCase();
 
-  // Determine emoji and colors based on category
-  let emoji = '🍽️';
-  let gradientStart = '#D4A574';
-  let gradientEnd = '#8B6F47';
+  // Determine colors and icon based on category
+  let bgColor = '#F3E5D8';
+  let accentColor = '#8B7355';
+  let icon = 'utensils';
 
-  if (name.includes('burger')) {
-    emoji = '🍔';
-    gradientStart = '#FED7AA';
-    gradientEnd = '#FDBA74';
+  if (name.includes('burger') || name.includes('sandwich')) {
+    bgColor = '#FFF4E6';
+    accentColor = '#F97316';
+    icon = 'burger';
   } else if (name.includes('pizza')) {
-    emoji = '🍕';
-    gradientStart = '#FECACA';
-    gradientEnd = '#FCA5A5';
+    bgColor = '#FFF1F2';
+    accentColor = '#EF4444';
+    icon = 'pizza';
   } else if (name.includes('pasta')) {
-    emoji = '🍝';
-    gradientStart = '#FEF08A';
-    gradientEnd = '#FDE047';
+    bgColor = '#FFFBEB';
+    accentColor = '#F59E0B';
+    icon = 'pasta';
   } else if (name.includes('salad')) {
-    emoji = '🥗';
-    gradientStart = '#BBF7D0';
-    gradientEnd = '#86EFAC';
+    bgColor = '#F0FDF4';
+    accentColor = '#22C55E';
+    icon = 'salad';
   } else if (name.includes('dessert') || name.includes('cake')) {
-    emoji = '🍰';
-    gradientStart = '#FBCFE8';
-    gradientEnd = '#F9A8D4';
+    bgColor = '#FCE7F3';
+    accentColor = '#EC4899';
+    icon = 'cake';
   } else if (name.includes('coffee')) {
-    emoji = '☕';
-    gradientStart = '#D4A574';
-    gradientEnd = '#92400E';
+    bgColor = '#FEF3C7';
+    accentColor = '#92400E';
+    icon = 'coffee';
   } else if (name.includes('tea')) {
-    emoji = '🍵';
-    gradientStart = '#BBF7D0';
-    gradientEnd = '#86EFAC';
-  } else if (name.includes('sandwich')) {
-    emoji = '🥪';
-    gradientStart = '#FED7AA';
-    gradientEnd = '#FDBA74';
-  } else if (name.includes('rice') || name.includes('biryani')) {
-    emoji = '🍚';
-    gradientStart = '#FEF3C7';
-    gradientEnd = '#FDE68A';
-  } else if (name.includes('noodles') || name.includes('ramen')) {
-    emoji = '🍜';
-    gradientStart = '#FEF08A';
-    gradientEnd = '#FDE047';
-  } else if (name.includes('seafood') || name.includes('fish')) {
-    emoji = '🐟';
-    gradientStart = '#BAE6FD';
-    gradientEnd = '#7DD3FC';
-  } else if (name.includes('chicken')) {
-    emoji = '🍗';
-    gradientStart = '#FED7AA';
-    gradientEnd = '#FDBA74';
-  } else if (name.includes('vegetable') || name.includes('veg')) {
-    emoji = '🥬';
-    gradientStart = '#BBF7D0';
-    gradientEnd = '#86EFAC';
-  } else if (name.includes('fruit')) {
-    emoji = '🍎';
-    gradientStart = '#FECACA';
-    gradientEnd = '#FCA5A5';
+    bgColor = '#F0FDF4';
+    accentColor = '#059669';
+    icon = 'tea';
   } else if (name.includes('drink') || name.includes('juice')) {
-    emoji = '🥤';
-    gradientStart = '#DBEAFE';
-    gradientEnd = '#BFDBFE';
-  } else if (name.includes('ice cream')) {
-    emoji = '🍦';
-    gradientStart = '#E0E7FF';
-    gradientEnd = '#C7D2FE';
-  } else if (name.includes('taco')) {
-    emoji = '🌮';
-    gradientStart = '#FED7AA';
-    gradientEnd = '#FDBA74';
-  } else if (name.includes('sushi')) {
-    emoji = '🍣';
-    gradientStart = '#FECACA';
-    gradientEnd = '#FCA5A5';
+    bgColor = '#EFF6FF';
+    accentColor = '#3B82F6';
+    icon = 'drink';
   }
 
-  // Create a beautiful gradient SVG with emoji
+  // Icon paths for different food types
+  const icons = {
+    utensils: 'M16,3 L16,16 M16,3 C14,3 12,4 12,6 L12,10 M8,3 L8,10 C8,12 10,14 12,14 L12,21 M4,3 L4,10 C4,12 6,14 8,14 L8,21',
+    burger: 'M3,12 L21,12 M3,8 C3,6 4,4 12,4 C20,4 21,6 21,8 M3,16 C3,18 4,20 12,20 C20,20 21,18 21,16',
+    pizza: 'M12,2 L22,22 L2,22 Z M12,8 C13,8 14,9 14,10 M8,14 C9,14 10,15 10,16 M16,14 C17,14 18,15 18,16',
+    pasta: 'M6,12 C6,8 8,4 12,4 C16,4 18,8 18,12 M12,4 L12,20 M8,10 L8,20 M16,10 L16,20',
+    salad: 'M12,3 C8,3 5,6 5,10 C5,13 7,15 10,16 M12,3 C16,3 19,6 19,10 C19,13 17,15 14,16 M7,15 L17,15 C17,18 15,21 12,21 C9,21 7,18 7,15',
+    cake: 'M4,20 L20,20 L20,12 L4,12 Z M6,12 L6,8 M12,12 L12,6 M18,12 L18,8 M6,6 L6,4 M12,4 L12,2 M18,6 L18,4',
+    coffee: 'M6,8 L18,8 L17,16 C17,18 15,20 12,20 C9,20 7,18 7,16 Z M18,10 C20,10 21,11 21,12 C21,13 20,14 18,14',
+    tea: 'M6,8 L16,8 L15,16 C15,18 13,20 11,20 C9,20 7,18 7,16 Z M16,10 C18,10 19,11 19,12 C19,13 18,14 16,14 M8,4 L10,8 M12,3 L12,8',
+    drink: 'M8,2 L16,2 L14,22 L10,22 Z M7,8 L17,8'
+  };
+
+  const iconPath = icons[icon] || icons.utensils;
+
+  // Create a modern, minimal SVG placeholder
   const svg = `<svg width="400" height="400" xmlns="http://www.w3.org/2000/svg">
-    <defs>
-      <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" style="stop-color:${gradientStart};stop-opacity:1" />
-        <stop offset="100%" style="stop-color:${gradientEnd};stop-opacity:1" />
-      </linearGradient>
-    </defs>
-    <rect width="400" height="400" fill="url(#grad)"/>
-    <text x="50%" y="50%" font-size="120" text-anchor="middle" dy=".3em">${emoji}</text>
+    <rect width="400" height="400" fill="${bgColor}"/>
+    <g transform="translate(200, 200)">
+      <circle cx="0" cy="0" r="80" fill="white" opacity="0.9"/>
+      <g transform="translate(-12, -12) scale(1.5)" stroke="${accentColor}" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+        <path d="${iconPath}"/>
+      </g>
+    </g>
+    <text x="200" y="320" font-family="Arial, sans-serif" font-size="16" fill="${accentColor}" text-anchor="middle" opacity="0.6">No Image Available</text>
   </svg>`;
 
   return `data:image/svg+xml,${encodeURIComponent(svg)}`;

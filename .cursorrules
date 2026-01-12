@@ -1,0 +1,153 @@
+# ========================
+# Palm Cafe UI — Cursor Rules
+# ========================
+
+project:
+  name: "palm-cafe-ui"
+  description: |
+    A React UI for Palm Cafe using Create React App (or similar setup),
+    Tailwind CSS, and modern JavaScript/JSX conventions.
+
+# ========================
+# Language & framework
+# ========================
+
+rules:
+  - id: "language.enforced"
+    description: "Generate React/JavaScript code only; no TypeScript unless explicitly requested."
+    match: "*.js"
+    apply:
+      - ensure_language: "javascript"
+      - ensure_syntax: "jsx"
+
+  - id: "no_typescript"
+    description: "Disallow TypeScript (`.ts`/`.tsx`) unless user explicitly wants it."
+    match: "**/*"
+    apply:
+      - disallow: ["typescript", ".ts", ".tsx", "type annotations"]
+
+# ========================
+# React rules
+# ========================
+
+  - id: "react.function.components"
+    description: "Use modern React function components and hooks; avoid class components."
+    match: "src/**/*.js"
+    apply:
+      - enforce_component_style: "function"
+      - prefer_hooks: true
+
+  - id: "jsx.import.react"
+    description: "Ensure React is imported when JSX is used."
+    match: "src/**/*.js"
+    apply:
+      - require_import: "React from 'react'"
+
+# ========================
+# Project structure
+# ========================
+
+  - id: "components.folder.structure"
+    description: "Place reusable UI components under `src/components/` and pages/views under `src/pages/`."
+    match: "src/**/*.js"
+    apply:
+      - enforce_directory: ["components", "pages"]
+
+  - id: "assets.folder"
+    description: "Put images, icons, and static assets under `public/` or `src/assets/`."
+    match: "**/*"
+    apply:
+      - enforce_directory: ["public", "src/assets"]
+
+# ========================
+# Styling (Tailwind)
+# ========================
+
+  - id: "tailwind.classes"
+    description: "Use Tailwind CSS class names in JSX; avoid inline styles unless necessary."
+    match: "src/**/*.js"
+    apply:
+      - allow: ["tailwind css classes"]
+      - disallow: ["style={{"]  
+
+  - id: "tailwind.config"
+    description: "Keep Tailwind config in `tailwind.config.js` and DO NOT override core plugins without reason."
+    match: "tailwind.config.js"
+    apply:
+      - enforce_structure: true
+
+# ========================
+# Formatting & linting
+# ========================
+
+  - id: "format.rules"
+    description: "Apply consistent formatting (Prettier/ESLint style): single quotes, semicolons, 2-space indent."
+    match: "src/**/*.js"
+    apply:
+      - enforce_semi: true
+      - indent: 2
+      - quotation: "single"
+      - trailing_commas: false
+
+  - id: "eslint.rules"
+    description: "Generated React code should adhere to ESLint rules defined in the project."
+    match: "src/**/*.js"
+    apply:
+      - enforce_lint: true
+
+# ========================
+# State & hooks
+# ========================
+
+  - id: "react.hooks"
+    description: "Require correct usage of React hooks (only call at top level, include dependency arrays)."
+    match: "src/**/*.js"
+    apply:
+      - enforce_hooks_rules: true
+
+# ========================
+# API interactions
+# ========================
+
+  - id: "fetch.requests"
+    description: "Use `fetch` or Axios for API calls to the Palm Cafe API; handle loading & error states."
+    match: "src/**/*.js"
+    apply:
+      - require_loading_state: true
+      - require_error_handling: true
+
+# ========================
+# Accessibility & labels
+# ========================
+
+  - id: "a11y.labels"
+    description: "Interactive elements must include accessible labels/aria attributes."
+    match: "src/**/*.js"
+    apply:
+      - enforce_accessibility: true
+
+# ========================
+# Documentation
+# ========================
+
+  - id: "doc.comments"
+    description: "Complex components and utility functions should have JSDoc comments."
+    match: "src/**/*.js"
+    apply:
+      - require_jsdoc: true
+
+  - id: "readme.update"
+    description: "When major UI features are added, update README with usage, components overview, and UI routes."
+    match: "**/*"
+    apply:
+      - remind_update_readme: true
+
+# ========================
+# Tests
+# ========================
+
+  - id: "tests"
+    description: "Add/expand unit tests with Jest and React Testing Library for critical components."
+    match: "src/**/*.test.js"
+    apply:
+      - require_test_structures: ["describe", "it/test blocks"]
