@@ -8,7 +8,7 @@ export const getImageUrl = (imageUrl) => {
   }
   
   // Get the API base URL from App.js (hardcoded since env vars not working)
-  const API_BASE_URL = "https://api.cafe.nevyaa.com" || "http://localhost:5000";
+  const API_BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
   
   // If it's a relative path starting with /images/, construct the full URL
   if (imageUrl.startsWith('/images/')) {

@@ -13,7 +13,7 @@ const useOrders = (autoRefresh = true, refreshInterval = 30000, enableWebSocket 
 
   // WebSocket connection for real-time updates
   const { sendMessage, isConnected } = useWebSocket(
-    enableWebSocket ? `ws://localhost:5000/ws/orders` : null,
+    enableWebSocket ? `${process.env.REACT_APP_WS_URL || process.env.REACT_APP_API_URL?.replace('http', 'ws') || 'ws://localhost:5000'}/ws/orders` : null,
     {
       onMessage: (data) => {
         console.log('WebSocket order update received:', data);
