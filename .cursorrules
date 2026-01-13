@@ -130,17 +130,7 @@ rules:
 # Documentation
 # ========================
 
-  - id: "doc.comments"
-    description: "Complex components and utility functions should have JSDoc comments."
-    match: "src/**/*.js"
-    apply:
-      - require_jsdoc: true
-
-  - id: "readme.update"
-    description: "When major UI features are added, update README with usage, components overview, and UI routes."
-    match: "**/*"
-    apply:
-      - remind_update_readme: true
+- No documentation is needed for this project. No Creating useless documentation. Only if asked by the user.
 
 # ========================
 # Tests
