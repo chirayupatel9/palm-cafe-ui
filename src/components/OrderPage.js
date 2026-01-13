@@ -375,16 +375,9 @@ const OrderPage = ({ menuItems, cart: externalCart, setCart: setExternalCart }) 
       {/* Menu Items */}
       <div className="lg:col-span-2 mb-6 lg:mb-0">
         <div className="card">
-          <div className="flex items-center justify-center mb-8">
-            <img 
-              src="/images/palm-cafe-logo.png" 
-              alt="Palm Cafe Logo" 
-              className="h-20 w-20 mr-6"
-            />
-            <div className="text-center">
-              <h2 className="text-3xl font-bold text-secondary-700 dark:text-secondary-300 mb-2">Menu Items</h2>
-              <p className="text-base text-gray-600 dark:text-gray-400">Click on any item to add it to your cart</p>
-            </div>
+          <div className="mb-6">
+            <h2 className="text-2xl font-bold text-secondary-700 dark:text-secondary-300 mb-1">Dashboard</h2>
+            <p className="text-sm text-gray-600 dark:text-gray-400">Create new orders and manage your cafe operations</p>
           </div>
           
           {Object.keys(groupedMenuItems).length === 0 ? (

@@ -19,6 +19,7 @@ import {
   UserCheck,
   UserX
 } from 'lucide-react';
+import PageHeader from './PageHeader';
 
 const CustomerManagement = () => {
   const { isAuthenticated, user, loading: authLoading } = useAuth();
@@ -255,29 +256,13 @@ const CustomerManagement = () => {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center space-y-2 sm:space-y-0">
-        <div className="flex items-center">
-          <img 
-            src="/images/palm-cafe-logo.png" 
-            alt="Palm Cafe Logo" 
-            className="h-10 w-10 mr-3"
-          />
-          <div>
-            <h2 className="text-xl sm:text-2xl font-bold text-secondary-700 dark:text-secondary-300">Customer Management</h2>
-            <div className="text-sm text-gray-500 dark:text-gray-400">
-              Total Customers: {customers.length}
-            </div>
-          </div>
-        </div>
-        
-        <button
-          onClick={() => setShowAddModal(true)}
-          className="btn-primary flex items-center"
-        >
-          <Plus className="h-4 w-4 mr-2" />
-          Add Customer
-        </button>
-      </div>
+      <PageHeader
+        title="Users"
+        description={`Manage customers and loyalty program. Total: ${customers.length}`}
+        primaryAction={() => setShowAddModal(true)}
+        primaryActionLabel="Add Customer"
+        primaryActionIcon={Plus}
+      />
 
       {/* Statistics Cards */}
       {statistics && (

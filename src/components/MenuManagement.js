@@ -381,13 +381,13 @@ const MenuManagement = ({ menuItems, onUpdate, onAdd, onDelete }) => {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-6">
         <div>
           <h2 className={`text-2xl font-bold ${isDarkMode ? 'text-secondary-300' : 'text-secondary-700'}`}>
-            Menu & Category Management
+            Menu
           </h2>
-          <p className={`${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-            Manage your cafe's menu items and categories
+          <p className={`text-sm mt-1 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+            Manage menu items and categories
           </p>
         </div>
       </div>

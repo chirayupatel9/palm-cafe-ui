@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster, toast } from 'react-hot-toast';
-import { Receipt, Settings, Plus, Menu, X, LogOut, User, Package, Utensils, Users, CreditCard, ShoppingCart, Building } from 'lucide-react';
+import { Receipt, Settings, Plus, Menu, X, LogOut, User, Package, Utensils, Users, CreditCard, ShoppingCart, Building, BarChart3 } from 'lucide-react';
 import axios from 'axios';
 import { CurrencyProvider } from './contexts/CurrencyContext';
 import { DarkModeProvider } from './contexts/DarkModeContext';
@@ -192,6 +192,8 @@ function MainApp() {
     switch (currentPage) {
       case 'order':
         return <OrderPage menuItems={menuItems} cart={cart} setCart={setCart} />;
+      case 'kitchen':
+        return <KitchenOrders cart={cart} setCart={setCart} />;
       case 'menu':
         return (
           <MenuManagement
@@ -201,35 +203,30 @@ function MainApp() {
             onDelete={deleteMenuItem}
           />
         );
-
-      case 'history':
-        return <InvoiceHistory cart={cart} setCart={setCart} setCurrentPage={setCurrentPage} />;
-
-      case 'inventory':
-        return <InventoryManagement />;
-      case 'kitchen':
-        return <KitchenOrders cart={cart} setCart={setCart} />;
       case 'customers':
         return <CustomerManagement />;
-      case 'payment-methods':
-        return <PaymentMethodManagement />;
       case 'cafe-settings':
         return cafeSettings?.admin_can_access_settings ? <CafeSettings /> : <div>Access denied</div>;
+      // Legacy routes - redirect to appropriate new routes
+      case 'history':
+        return <InvoiceHistory cart={cart} setCart={setCart} setCurrentPage={setCurrentPage} />;
+      case 'inventory':
+        return <InventoryManagement />;
+      case 'payment-methods':
+        return <PaymentMethodManagement />;
       default:
         return <OrderPage menuItems={menuItems} />;
     }
   };
 
+  // Reorganized navigation structure: Dashboard, Orders, Menu, Users, Settings
   const navigationItems = [
-    { id: 'order', label: 'New Order', icon: Plus, module: 'orders' },
-    ...(cafeSettings?.show_kitchen_tab && checkFeatureAccess('orders') ? [{ id: 'kitchen', label: 'Kitchen Orders', icon: Utensils, module: 'orders' }] : []),
-    ...(cafeSettings?.show_customers_tab && checkFeatureAccess('customers') ? [{ id: 'customers', label: 'Customers', icon: Users, module: 'customers' }] : []),
-    ...(cafeSettings?.show_payment_methods_tab && checkFeatureAccess('payment_methods') ? [{ id: 'payment-methods', label: 'Payment, Currency & Tax', icon: CreditCard, module: 'payment_methods' }] : []),
-    ...(cafeSettings?.admin_can_access_settings && checkFeatureAccess('settings') ? [{ id: 'cafe-settings', label: 'Cafe Settings', icon: Building, module: 'settings' }] : []),
-    ...(cafeSettings?.admin_can_manage_menu && checkFeatureAccess('menu_management') ? [{ id: 'menu', label: 'Menu Management', icon: Settings, module: 'menu_management' }] : []),
-    ...(cafeSettings?.admin_can_manage_inventory && checkFeatureAccess('inventory') ? [{ id: 'inventory', label: 'Inventory', icon: Package, module: 'inventory' }] : []),
-    ...(cafeSettings?.admin_can_view_reports && checkFeatureAccess('advanced_reports') ? [{ id: 'history', label: 'Invoice History', icon: Receipt, module: 'advanced_reports' }] : []),
-  ];
+    { id: 'order', label: 'Dashboard', icon: BarChart3, module: 'orders', primary: true },
+    { id: 'kitchen', label: 'Orders', icon: Receipt, module: 'orders', show: cafeSettings?.show_kitchen_tab && checkFeatureAccess('orders') },
+    { id: 'menu', label: 'Menu', icon: Utensils, module: 'menu_management', show: cafeSettings?.admin_can_manage_menu && checkFeatureAccess('menu_management') },
+    { id: 'customers', label: 'Users', icon: Users, module: 'customers', show: cafeSettings?.show_customers_tab && checkFeatureAccess('customers') },
+    { id: 'cafe-settings', label: 'Settings', icon: Settings, module: 'settings', show: cafeSettings?.admin_can_access_settings && checkFeatureAccess('settings') },
+  ].filter(item => item.show !== false); // Filter out items that should be hidden
 
   if (loading || cafeSettingsLoading || subscriptionLoading || featuresLoading) {
     return (
@@ -267,60 +264,6 @@ function MainApp() {
                 <User className="h-4 w-4" />
                 <span>{user?.username}</span>
               </div>
-              
-              {/* Customer Interface Link */}
-              <a
-                href="/customer"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="hidden sm:flex items-center space-x-1 text-sm text-secondary-600 hover:text-secondary-700 dark:text-gray-400 dark:hover:text-gray-300 px-2 py-1 rounded hover:bg-accent-100"
-                title="Open Customer Interface"
-              >
-                <span>👥</span>
-                <span>Customer View</span>
-              </a>
-
-              {/* Chef Interface Link */}
-              <a
-                href="/chef"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="hidden sm:flex items-center space-x-1 text-sm text-secondary-600 hover:text-secondary-700 dark:text-gray-400 dark:hover:text-gray-300 px-2 py-1 rounded hover:bg-accent-100"
-                title="Open Chef Interface"
-              >
-                <span>👨‍🍳</span>
-                <span>Chef View</span>
-              </a>
-
-              {/* Admin Registration Link */}
-              <a
-                href="/admin/register"
-                className="hidden sm:flex items-center space-x-1 text-sm text-secondary-600 hover:text-secondary-700 dark:text-gray-400 dark:hover:text-gray-300 px-2 py-1 rounded hover:bg-accent-100"
-                title="Register New Admin"
-              >
-                <span>👑</span>
-                <span>Add Admin</span>
-              </a>
-
-              {/* Chef Registration Link */}
-              <a
-                href="/chef/register"
-                className="hidden sm:flex items-center space-x-1 text-sm text-secondary-600 hover:text-secondary-700 dark:text-gray-400 dark:hover:text-gray-300 px-2 py-1 rounded hover:bg-accent-100"
-                title="Register New Chef"
-              >
-                <span>👨‍🍳</span>
-                <span>Add Chef</span>
-              </a>
-
-              {/* Reception Registration Link */}
-              <a
-                href="/reception/register"
-                className="hidden sm:flex items-center space-x-1 text-sm text-secondary-600 hover:text-secondary-700 dark:text-gray-400 dark:hover:text-gray-300 px-2 py-1 rounded hover:bg-accent-100"
-                title="Register New Reception"
-              >
-                <span>📞</span>
-                <span>Add Reception</span>
-              </a>
             
             {/* Dark mode toggle */}
             <DarkModeToggle />
@@ -372,48 +315,6 @@ function MainApp() {
             );
           })}
           
-          {/* Additional mobile menu items */}
-          <div className="border-t border-gray-200 dark:border-gray-700 pt-2 mt-2">
-            <a
-              href="/customer"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="w-full flex items-center px-3 py-3 text-sm font-medium text-secondary-600 hover:bg-accent-100 rounded-lg transition-colors"
-            >
-              <span className="mr-3">👥</span>
-              Customer View
-            </a>
-            <a
-              href="/chef"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="w-full flex items-center px-3 py-3 text-sm font-medium text-secondary-600 hover:bg-accent-100 rounded-lg transition-colors"
-            >
-              <span className="mr-3">👨‍🍳</span>
-              Chef View
-            </a>
-            <a
-              href="/admin/register"
-              className="w-full flex items-center px-3 py-3 text-sm font-medium text-secondary-600 hover:bg-accent-100 rounded-lg transition-colors"
-            >
-              <span className="mr-3">👑</span>
-              Add Admin
-            </a>
-            <a
-              href="/chef/register"
-              className="w-full flex items-center px-3 py-3 text-sm font-medium text-secondary-600 hover:bg-accent-100 rounded-lg transition-colors"
-            >
-              <span className="mr-3">👨‍🍳</span>
-              Add Chef
-            </a>
-            <a
-              href="/reception/register"
-              className="w-full flex items-center px-3 py-3 text-sm font-medium text-secondary-600 hover:bg-accent-100 rounded-lg transition-colors"
-            >
-              <span className="mr-3">📞</span>
-              Add Reception
-            </a>
-          </div>
         </div>
       </div>
     )}
@@ -519,6 +420,13 @@ function App() {
                     </ProtectedRoute>
                   } />
                   <Route path="/superadmin" element={
+                    <ProtectedRoute>
+                      <RoleBasedRedirect>
+                        <SuperadminApp />
+                      </RoleBasedRedirect>
+                    </ProtectedRoute>
+                  } />
+                  <Route path="/superadmin/cafes" element={
                     <ProtectedRoute>
                       <RoleBasedRedirect>
                         <SuperadminApp />

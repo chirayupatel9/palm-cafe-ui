@@ -37,7 +37,7 @@ const SuperadminApp = () => {
         navigate('/superadmin');
         break;
       case 'cafe-management':
-        navigate('/superadmin?page=cafe-management');
+        navigate('/superadmin/cafes');
         break;
       case 'user-management':
         navigate('/superadmin/users');
@@ -70,17 +70,13 @@ const SuperadminApp = () => {
       return <SuperAdminUserManagement />;
     }
     
+    // Check for /superadmin/cafes
+    if (path === '/superadmin/cafes') {
+      return <CafeManagement />;
+    }
+    
     // Default to dashboard for /superadmin
-    // Check if we should show cafe-management or dashboard
     if (path === '/superadmin' || path === '/superadmin/') {
-      // Check URL params for cafe-management
-      const searchParams = new URLSearchParams(location.search);
-      const page = searchParams.get('page');
-      
-      if (page === 'cafe-management') {
-        return <CafeManagement />;
-      }
-      
       return <SuperAdminDashboard />;
     }
     
@@ -100,12 +96,11 @@ const SuperadminApp = () => {
       return 'user-management';
     }
     
+    if (path === '/superadmin/cafes') {
+      return 'cafe-management';
+    }
+    
     if (path === '/superadmin' || path === '/superadmin/') {
-      const searchParams = new URLSearchParams(location.search);
-      const page = searchParams.get('page');
-      if (page === 'cafe-management') {
-        return 'cafe-management';
-      }
       return 'dashboard';
     }
     
@@ -116,9 +111,10 @@ const SuperadminApp = () => {
 
 
   const navigationItems = [
-    { id: 'dashboard', label: 'Dashboard', icon: BarChart3 },
-    { id: 'cafe-management', label: 'Cafe Management', icon: Building },
-    { id: 'user-management', label: 'User Management', icon: Shield },
+    { id: 'dashboard', label: 'Overview', icon: BarChart3 },
+    { id: 'cafe-management', label: 'Cafes', icon: Building },
+    { id: 'user-management', label: 'Users', icon: Shield },
+    // Features/Subscriptions and System Settings will be added as separate pages
   ];
 
   if (loading) {

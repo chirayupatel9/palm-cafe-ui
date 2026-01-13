@@ -69,15 +69,13 @@ const SuperAdminDashboard = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <div>
-          <h2 className="text-2xl font-bold text-secondary-700 dark:text-gray-100">
-            Super Admin Dashboard
-          </h2>
-          <p className="text-sm text-secondary-600 dark:text-gray-400 mt-1">
-            System-wide overview and cafe management
-          </p>
-        </div>
+      <div>
+        <h2 className="text-2xl font-bold text-secondary-700 dark:text-gray-100">
+          Overview
+        </h2>
+        <p className="text-sm text-secondary-600 dark:text-gray-400 mt-1">
+          System-wide metrics and cafe performance
+        </p>
       </div>
 
       {/* System Overview Cards */}

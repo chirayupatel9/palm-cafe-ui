@@ -137,14 +137,19 @@ const CafeManagement = () => {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold text-secondary-700 dark:text-gray-100">
-          Cafe Management
-        </h2>
+        <div>
+          <h2 className="text-2xl font-bold text-secondary-700 dark:text-gray-100">
+            Cafes
+          </h2>
+          <p className="text-sm text-secondary-600 dark:text-gray-400 mt-1">
+            Manage all cafes in the system
+          </p>
+        </div>
         <button
           onClick={handleNewCafe}
-          className="flex items-center space-x-2 bg-secondary-600 hover:bg-secondary-700 text-white px-4 py-2 rounded-lg transition-colors"
+          className="flex items-center space-x-2 bg-secondary-600 hover:bg-secondary-700 text-white px-4 py-2 rounded-lg transition-colors font-medium"
         >
-          <Plus className="h-5 w-5" />
+          <Plus className="h-4 w-4" />
           <span>Add New Cafe</span>
         </button>
       </div>
