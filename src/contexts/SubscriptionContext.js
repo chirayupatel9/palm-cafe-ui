@@ -39,8 +39,18 @@ export const SubscriptionProvider = ({ children }) => {
       const data = response.data;
       
       setSubscription(data.subscription);
-      setAvailableModules(data.available_modules);
-      setPlanFeatures(data.plan_features);
+      
+      // Handle both old and new API response formats
+      if (data.available_modules) {
+        setAvailableModules(data.available_modules);
+      }
+      if (data.plan_features) {
+        setPlanFeatures(data.plan_features);
+      } else {
+        // New format: features are returned directly, not plan_features
+        // Initialize planFeatures as empty object to prevent errors
+        setPlanFeatures({});
+      }
     } catch (error) {
       console.error('Error fetching subscription:', error);
       // Default to FREE plan if subscription fetch fails
@@ -49,6 +59,8 @@ export const SubscriptionProvider = ({ children }) => {
         status: 'active',
         enabledModules: null
       });
+      setPlanFeatures({});
+      setAvailableModules([]);
     } finally {
       setLoading(false);
     }
@@ -56,6 +68,7 @@ export const SubscriptionProvider = ({ children }) => {
 
   /**
    * Check if a module is accessible
+   * DEPRECATED: Use FeatureContext.hasFeature() instead
    */
   const hasModuleAccess = (module) => {
     // Super Admin always has access
@@ -80,7 +93,13 @@ export const SubscriptionProvider = ({ children }) => {
       }
     }
 
-    // Check plan-based access
+    // Check plan-based access (safely handle undefined planFeatures)
+    if (!planFeatures || typeof planFeatures !== 'object') {
+      // If planFeatures is not available, default to denying access
+      // This prevents the error but should use FeatureContext instead
+      return false;
+    }
+
     const planFeaturesList = planFeatures[subscription.plan] || [];
     return planFeaturesList.includes(module);
   };

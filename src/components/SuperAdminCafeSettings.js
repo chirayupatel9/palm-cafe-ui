@@ -26,14 +26,13 @@ const SuperAdminCafeSettings = () => {
   });
   const [subscription, setSubscription] = useState(null);
   const [availablePlans, setAvailablePlans] = useState([]);
-  const [availableModules, setAvailableModules] = useState([]);
-  const [planFeatures, setPlanFeatures] = useState({});
+  const [featureDetails, setFeatureDetails] = useState(null);
   const [subscriptionFormData, setSubscriptionFormData] = useState({
     plan: 'FREE',
-    status: 'active',
-    enabled_modules: {}
+    status: 'active'
   });
   const [savingSubscription, setSavingSubscription] = useState(false);
+  const [togglingFeature, setTogglingFeature] = useState(null);
 
   useEffect(() => {
     fetchCafe();
@@ -68,17 +67,21 @@ const SuperAdminCafeSettings = () => {
 
   const fetchSubscription = async () => {
     try {
-      const response = await axios.get(`/superadmin/cafes/${cafeId}/subscription`);
-      const data = response.data;
-      setSubscription(data.subscription);
-      setAvailablePlans(data.available_plans);
-      setAvailableModules(data.available_modules);
-      setPlanFeatures(data.plan_features);
+      const [subscriptionResponse, featuresResponse] = await Promise.all([
+        axios.get(`/superadmin/cafes/${cafeId}/subscription`),
+        axios.get(`/superadmin/cafes/${cafeId}/features`)
+      ]);
+      
+      const subscriptionData = subscriptionResponse.data;
+      const featuresData = featuresResponse.data;
+      
+      setSubscription(subscriptionData.subscription);
+      setAvailablePlans(subscriptionData.available_plans || ['FREE', 'PRO']);
+      setFeatureDetails(featuresData);
       
       setSubscriptionFormData({
-        plan: data.subscription.plan || 'FREE',
-        status: data.subscription.status || 'active',
-        enabled_modules: data.subscription.enabledModules || {}
+        plan: subscriptionData.subscription.plan || 'FREE',
+        status: subscriptionData.subscription.status || 'active'
       });
     } catch (error) {
       console.error('Error fetching subscription:', error);
@@ -117,8 +120,7 @@ const SuperAdminCafeSettings = () => {
       setSavingSubscription(true);
       await axios.put(`/superadmin/cafes/${cafeId}/subscription`, {
         plan: subscriptionFormData.plan,
-        status: subscriptionFormData.status,
-        enabled_modules: subscriptionFormData.enabled_modules
+        status: subscriptionFormData.status
       });
       toast.success('Subscription updated successfully');
       fetchSubscription();
@@ -130,23 +132,33 @@ const SuperAdminCafeSettings = () => {
     }
   };
 
-  const toggleModule = async (module, enabled) => {
+  const toggleFeature = async (featureKey, enabled) => {
     try {
-      await axios.post(`/superadmin/cafes/${cafeId}/subscription/modules/${module}/toggle`, {
+      setTogglingFeature(featureKey);
+      await axios.post(`/superadmin/cafes/${cafeId}/features/${featureKey}/toggle`, {
         enabled
       });
-      setSubscriptionFormData(prev => ({
-        ...prev,
-        enabled_modules: {
-          ...prev.enabled_modules,
-          [module]: enabled
-        }
-      }));
-      toast.success(`Module ${module} ${enabled ? 'enabled' : 'disabled'}`);
+      toast.success(`Feature ${featureKey} ${enabled ? 'enabled' : 'disabled'}`);
       fetchSubscription();
     } catch (error) {
-      console.error('Error toggling module:', error);
-      toast.error(error.response?.data?.error || 'Failed to toggle module');
+      console.error('Error toggling feature:', error);
+      toast.error(error.response?.data?.error || 'Failed to toggle feature');
+    } finally {
+      setTogglingFeature(null);
+    }
+  };
+
+  const removeFeatureOverride = async (featureKey) => {
+    try {
+      setTogglingFeature(featureKey);
+      await axios.delete(`/superadmin/cafes/${cafeId}/features/${featureKey}`);
+      toast.success(`Feature override removed, reverted to plan default`);
+      fetchSubscription();
+    } catch (error) {
+      console.error('Error removing feature override:', error);
+      toast.error(error.response?.data?.error || 'Failed to remove feature override');
+    } finally {
+      setTogglingFeature(null);
     }
   };
 
@@ -407,86 +419,115 @@ const SuperAdminCafeSettings = () => {
               </div>
             </div>
 
-            {/* Plan Features Display */}
-            <div>
-              <label className="block text-sm font-medium text-secondary-700 dark:text-gray-300 mb-3">
-                Features Available on {subscriptionFormData.plan} Plan
-              </label>
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                {planFeatures[subscriptionFormData.plan]?.map(module => (
-                  <div key={module} className="flex items-center space-x-2 p-2 bg-accent-50 dark:bg-gray-700 rounded">
-                    <CheckCircle className="h-4 w-4 text-green-600" />
-                    <span className="text-sm text-secondary-700 dark:text-gray-300 capitalize">
-                      {module.replace('_', ' ')}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Module Overrides (Super Admin) */}
-            <div>
-              <label className="block text-sm font-medium text-secondary-700 dark:text-gray-300 mb-3">
-                Module Overrides (Super Admin Control)
-              </label>
-              <p className="text-xs text-secondary-500 dark:text-gray-400 mb-3">
-                Override plan defaults for specific modules. These settings take precedence over plan features.
-              </p>
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                {availableModules.map(module => {
-                  const isEnabled = subscriptionFormData.enabled_modules[module] === true;
-                  const isDisabled = subscriptionFormData.enabled_modules[module] === false;
-                  const planHasIt = planFeatures[subscriptionFormData.plan]?.includes(module);
-                  
-                  return (
-                    <div
-                      key={module}
-                      className={`p-3 border rounded-lg ${
-                        isEnabled ? 'border-green-500 bg-green-50 dark:bg-green-900/20' :
-                        isDisabled ? 'border-red-500 bg-red-50 dark:bg-red-900/20' :
-                        planHasIt ? 'border-accent-300 dark:border-gray-600 bg-accent-50 dark:bg-gray-700' :
-                        'border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-800'
-                      }`}
-                    >
-                      <div className="flex items-center justify-between mb-2">
-                        <span className="text-sm font-medium text-secondary-700 dark:text-gray-300 capitalize">
-                          {module.replace('_', ' ')}
-                        </span>
-                        {planHasIt && !isDisabled && (
-                          <Crown className="h-4 w-4 text-yellow-500" />
-                        )}
+            {/* Feature Management */}
+            {featureDetails && (
+              <div>
+                <label className="block text-sm font-medium text-secondary-700 dark:text-gray-300 mb-3">
+                  Feature Management
+                </label>
+                <p className="text-xs text-secondary-500 dark:text-gray-400 mb-3">
+                  Override plan defaults for specific features. Overrides take precedence over plan defaults.
+                </p>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  {featureDetails.features?.map(feature => {
+                    const hasOverride = feature.override !== null;
+                    const isEnabled = feature.resolved.enabled;
+                    const planDefault = subscriptionFormData.plan === 'PRO' 
+                      ? feature.planDefaults.pro 
+                      : feature.planDefaults.free;
+                    
+                    return (
+                      <div
+                        key={feature.key}
+                        className={`p-4 border rounded-lg ${
+                          hasOverride && isEnabled ? 'border-green-500 bg-green-50 dark:bg-green-900/20' :
+                          hasOverride && !isEnabled ? 'border-red-500 bg-red-50 dark:bg-red-900/20' :
+                          planDefault ? 'border-accent-300 dark:border-gray-600 bg-accent-50 dark:bg-gray-700' :
+                          'border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-800'
+                        }`}
+                      >
+                        <div className="flex items-start justify-between mb-3">
+                          <div className="flex-1">
+                            <div className="flex items-center space-x-2 mb-1">
+                              <span className="text-sm font-semibold text-secondary-700 dark:text-gray-300">
+                                {feature.name}
+                              </span>
+                              {planDefault && !hasOverride && (
+                                <Crown className="h-4 w-4 text-yellow-500" />
+                              )}
+                              {hasOverride && (
+                                <span className="text-xs px-2 py-0.5 rounded bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300">
+                                  Override
+                                </span>
+                              )}
+                            </div>
+                            <p className="text-xs text-secondary-500 dark:text-gray-400">
+                              {feature.description}
+                            </p>
+                            <div className="mt-2 text-xs text-secondary-600 dark:text-gray-400">
+                              <span>Plan Default: </span>
+                              <span className={planDefault ? 'text-green-600' : 'text-gray-500'}>
+                                {planDefault ? 'Enabled' : 'Disabled'}
+                              </span>
+                              {hasOverride && (
+                                <>
+                                  <span className="mx-2">•</span>
+                                  <span>Current: </span>
+                                  <span className={isEnabled ? 'text-green-600' : 'text-red-600'}>
+                                    {isEnabled ? 'Enabled' : 'Disabled'}
+                                  </span>
+                                </>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                        <div className="flex space-x-2">
+                          {hasOverride ? (
+                            <button
+                              type="button"
+                              onClick={() => removeFeatureOverride(feature.key)}
+                              disabled={togglingFeature === feature.key}
+                              className="flex-1 px-3 py-1.5 text-xs rounded bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-500 transition-colors disabled:opacity-50"
+                            >
+                              {togglingFeature === feature.key ? '...' : 'Revert to Plan Default'}
+                            </button>
+                          ) : (
+                            <>
+                              <button
+                                type="button"
+                                onClick={() => toggleFeature(feature.key, true)}
+                                disabled={togglingFeature === feature.key || isEnabled}
+                                className={`flex-1 px-3 py-1.5 text-xs rounded transition-colors disabled:opacity-50 ${
+                                  isEnabled
+                                    ? 'bg-green-600 text-white cursor-not-allowed'
+                                    : 'bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-300 hover:bg-green-100 dark:hover:bg-green-900/30'
+                                }`}
+                              >
+                                <Unlock className="h-3 w-3 inline mr-1" />
+                                Enable
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => toggleFeature(feature.key, false)}
+                                disabled={togglingFeature === feature.key || !isEnabled}
+                                className={`flex-1 px-3 py-1.5 text-xs rounded transition-colors disabled:opacity-50 ${
+                                  !isEnabled
+                                    ? 'bg-red-600 text-white cursor-not-allowed'
+                                    : 'bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-300 hover:bg-red-100 dark:hover:bg-red-900/30'
+                                }`}
+                              >
+                                <Lock className="h-3 w-3 inline mr-1" />
+                                Disable
+                              </button>
+                            </>
+                          )}
+                        </div>
                       </div>
-                      <div className="flex space-x-2">
-                        <button
-                          type="button"
-                          onClick={() => toggleModule(module, true)}
-                          className={`flex-1 px-2 py-1 text-xs rounded ${
-                            isEnabled
-                              ? 'bg-green-600 text-white'
-                              : 'bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-300 hover:bg-green-100 dark:hover:bg-green-900/30'
-                          }`}
-                        >
-                          <Unlock className="h-3 w-3 inline mr-1" />
-                          Enable
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => toggleModule(module, false)}
-                          className={`flex-1 px-2 py-1 text-xs rounded ${
-                            isDisabled
-                              ? 'bg-red-600 text-white'
-                              : 'bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-300 hover:bg-red-100 dark:hover:bg-red-900/30'
-                          }`}
-                        >
-                          <Lock className="h-3 w-3 inline mr-1" />
-                          Disable
-                        </button>
-                      </div>
-                    </div>
-                  );
-                })}
+                    );
+                  })}
+                </div>
               </div>
-            </div>
+            )}
 
             <div className="flex justify-end space-x-3 pt-4 border-t border-accent-200 dark:border-gray-700">
               <button

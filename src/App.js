@@ -9,6 +9,7 @@ import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { CafeSettingsProvider, useCafeSettings } from './contexts/CafeSettingsContext';
 import { ColorSchemeProvider } from './contexts/ColorSchemeContext';
 import { SubscriptionProvider, useSubscription } from './contexts/SubscriptionContext';
+import { FeatureProvider, useFeatures } from './contexts/FeatureContext';
 import OrderPage from './components/OrderPage';
 import MenuManagement from './components/MenuManagement';
 
@@ -68,6 +69,16 @@ function MainApp() {
   const { user, logout } = useAuth();
   const { cafeSettings, loading: cafeSettingsLoading } = useCafeSettings();
   const { hasModuleAccess, loading: subscriptionLoading } = useSubscription();
+  const { hasFeature, loading: featuresLoading } = useFeatures();
+  
+  // Use FeatureContext for feature checks (preferred), fallback to SubscriptionContext for backward compatibility
+  const checkFeatureAccess = (featureKey) => {
+    if (hasFeature) {
+      return hasFeature(featureKey);
+    }
+    // Fallback to old method
+    return hasModuleAccess(featureKey);
+  };
 
   useEffect(() => {
     fetchMenuItems();
@@ -156,16 +167,16 @@ function MainApp() {
 
   const navigationItems = [
     { id: 'order', label: 'New Order', icon: Plus, module: 'orders' },
-    ...(cafeSettings?.show_kitchen_tab && hasModuleAccess('orders') ? [{ id: 'kitchen', label: 'Kitchen Orders', icon: Utensils, module: 'orders' }] : []),
-    ...(cafeSettings?.show_customers_tab && hasModuleAccess('customers') ? [{ id: 'customers', label: 'Customers', icon: Users, module: 'customers' }] : []),
-    ...(cafeSettings?.show_payment_methods_tab && hasModuleAccess('payment_methods') ? [{ id: 'payment-methods', label: 'Payment, Currency & Tax', icon: CreditCard, module: 'payment_methods' }] : []),
-    ...(cafeSettings?.admin_can_access_settings && hasModuleAccess('settings') ? [{ id: 'cafe-settings', label: 'Cafe Settings', icon: Building, module: 'settings' }] : []),
-    ...(cafeSettings?.admin_can_manage_menu && hasModuleAccess('menu_management') ? [{ id: 'menu', label: 'Menu Management', icon: Settings, module: 'menu_management' }] : []),
-    ...(cafeSettings?.admin_can_manage_inventory && hasModuleAccess('inventory') ? [{ id: 'inventory', label: 'Inventory', icon: Package, module: 'inventory' }] : []),
-    ...(cafeSettings?.admin_can_view_reports && hasModuleAccess('advanced_reports') ? [{ id: 'history', label: 'Invoice History', icon: Receipt, module: 'advanced_reports' }] : []),
+    ...(cafeSettings?.show_kitchen_tab && checkFeatureAccess('orders') ? [{ id: 'kitchen', label: 'Kitchen Orders', icon: Utensils, module: 'orders' }] : []),
+    ...(cafeSettings?.show_customers_tab && checkFeatureAccess('customers') ? [{ id: 'customers', label: 'Customers', icon: Users, module: 'customers' }] : []),
+    ...(cafeSettings?.show_payment_methods_tab && checkFeatureAccess('payment_methods') ? [{ id: 'payment-methods', label: 'Payment, Currency & Tax', icon: CreditCard, module: 'payment_methods' }] : []),
+    ...(cafeSettings?.admin_can_access_settings && checkFeatureAccess('settings') ? [{ id: 'cafe-settings', label: 'Cafe Settings', icon: Building, module: 'settings' }] : []),
+    ...(cafeSettings?.admin_can_manage_menu && checkFeatureAccess('menu_management') ? [{ id: 'menu', label: 'Menu Management', icon: Settings, module: 'menu_management' }] : []),
+    ...(cafeSettings?.admin_can_manage_inventory && checkFeatureAccess('inventory') ? [{ id: 'inventory', label: 'Inventory', icon: Package, module: 'inventory' }] : []),
+    ...(cafeSettings?.admin_can_view_reports && checkFeatureAccess('advanced_reports') ? [{ id: 'history', label: 'Invoice History', icon: Receipt, module: 'advanced_reports' }] : []),
   ];
 
-  if (loading || cafeSettingsLoading || subscriptionLoading) {
+  if (loading || cafeSettingsLoading || subscriptionLoading || featuresLoading) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-accent-50 dark:bg-gray-900">
         <CafeInfo logoSize="h-16 w-16" nameSize="text-xl" className="mb-4" />
@@ -404,7 +415,8 @@ function App() {
           <CurrencyProvider>
             <CafeSettingsProvider>
               <SubscriptionProvider>
-                <ColorSchemeProvider>
+                <FeatureProvider>
+                  <ColorSchemeProvider>
                 <Routes>
                   <Route path="/" element={<LandingPage />} />
                   <Route path="/login" element={<Login />} />
@@ -480,7 +492,8 @@ function App() {
                   } />
                   <Route path="*" element={<Navigate to="/" replace />} />
                 </Routes>
-                </ColorSchemeProvider>
+                  </ColorSchemeProvider>
+                </FeatureProvider>
               </SubscriptionProvider>
             </CafeSettingsProvider>
           </CurrencyProvider>
