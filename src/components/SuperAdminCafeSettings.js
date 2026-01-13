@@ -31,6 +31,7 @@ const SuperAdminCafeSettings = () => {
     plan: 'FREE',
     status: 'active'
   });
+  const [selectKey, setSelectKey] = useState(0); // Force re-render of select
   const [savingSubscription, setSavingSubscription] = useState(false);
   const [togglingFeature, setTogglingFeature] = useState(null);
   const [resettingOnboarding, setResettingOnboarding] = useState(false);
@@ -39,6 +40,55 @@ const SuperAdminCafeSettings = () => {
     fetchCafe();
     fetchSubscription();
   }, [cafeId]);
+
+  // Sync subscriptionFormData when subscription or cafe data changes
+  useEffect(() => {
+    if (subscription || cafe) {
+      const planValue = (subscription?.plan || cafe?.subscription_plan || 'FREE').toUpperCase();
+      const statusValue = subscription?.status || cafe?.subscription_status || 'active';
+      
+      // Only update if different to avoid unnecessary re-renders
+      if (subscriptionFormData.plan !== planValue || subscriptionFormData.status !== statusValue) {
+        console.log('Syncing subscriptionFormData from subscription/cafe:', {
+          plan: planValue,
+          status: statusValue,
+          currentFormData: subscriptionFormData,
+          subscription: subscription,
+          cafe: cafe ? { subscription_plan: cafe.subscription_plan, subscription_status: cafe.subscription_status } : null
+        });
+        
+        setSubscriptionFormData({
+          plan: planValue,
+          status: statusValue
+        });
+        
+        // Force select to re-render
+        setSelectKey(prev => prev + 1);
+      }
+    }
+  }, [subscription?.plan, subscription?.status, cafe?.subscription_plan, cafe?.subscription_status]);
+
+  // Sync form data when subscription or cafe changes (only when they actually change)
+  useEffect(() => {
+    const planFromSubscription = subscription?.plan?.toUpperCase();
+    const planFromCafe = cafe?.subscription_plan?.toUpperCase();
+    const planValue = planFromSubscription || planFromCafe;
+    
+    if (planValue && subscriptionFormData.plan !== planValue) {
+      console.log('Syncing form data from subscription/cafe:', {
+        from: subscriptionFormData.plan,
+        to: planValue,
+        subscriptionPlan: subscription?.plan,
+        cafePlan: cafe?.subscription_plan
+      });
+      setSubscriptionFormData(prev => ({
+        ...prev,
+        plan: planValue,
+        status: subscription?.status || cafe?.subscription_status || prev.status
+      }));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [subscription?.plan, cafe?.subscription_plan, subscription?.status, cafe?.subscription_status]);
 
   const fetchCafe = async () => {
     try {
@@ -80,9 +130,24 @@ const SuperAdminCafeSettings = () => {
       setAvailablePlans(subscriptionData.available_plans || ['FREE', 'PRO']);
       setFeatureDetails(featuresData);
       
-      setSubscriptionFormData({
-        plan: subscriptionData.subscription.plan || 'FREE',
-        status: subscriptionData.subscription.status || 'active'
+      const planValue = (subscriptionData.subscription?.plan || 'FREE').toUpperCase();
+      const statusValue = subscriptionData.subscription?.status || 'active';
+      
+      console.log('Setting subscription form data from fetch:', {
+        plan: planValue,
+        status: statusValue,
+        subscriptionData: subscriptionData.subscription,
+        fullResponse: subscriptionData
+      });
+      
+      // Force update form data
+      setSubscriptionFormData(prev => {
+        const updated = {
+          plan: planValue,
+          status: statusValue
+        };
+        console.log('Updating subscriptionFormData from:', prev, 'to:', updated);
+        return updated;
       });
     } catch (error) {
       console.error('Error fetching subscription:', error);
@@ -119,15 +184,63 @@ const SuperAdminCafeSettings = () => {
     
     try {
       setSavingSubscription(true);
-      await axios.put(`/superadmin/cafes/${cafeId}/subscription`, {
-        plan: subscriptionFormData.plan,
+      
+      // Ensure plan value is uppercase
+      const planValue = subscriptionFormData.plan?.toUpperCase() || subscriptionFormData.plan;
+      
+      console.log('Submitting subscription update:', {
+        cafeId,
+        plan: planValue,
+        status: subscriptionFormData.status,
+        currentFormData: subscriptionFormData
+      });
+      
+      const response = await axios.put(`/superadmin/cafes/${cafeId}/subscription`, {
+        plan: planValue,
         status: subscriptionFormData.status
       });
+      
+      console.log('Subscription update response:', response.data);
+      
       toast.success('Subscription updated successfully');
-      fetchSubscription();
+      
+      // Immediately update local state from response
+      if (response.data?.cafe) {
+        const newPlan = (response.data.cafe.subscription_plan || 'FREE').toUpperCase();
+        const newStatus = response.data.cafe.subscription_status || 'active';
+        console.log('Updating from response.data.cafe:', { newPlan, newStatus });
+        setSubscriptionFormData({
+          plan: newPlan,
+          status: newStatus
+        });
+        setCafe(prev => prev ? { ...prev, subscription_plan: newPlan, subscription_status: newStatus } : null);
+      }
+      
+      if (response.data?.subscription) {
+        const newPlan = (response.data.subscription.plan || 'FREE').toUpperCase();
+        const newStatus = response.data.subscription.status || 'active';
+        console.log('Updating from response.data.subscription:', { newPlan, newStatus });
+        setSubscription(prev => prev ? { ...prev, plan: newPlan, status: newStatus } : { plan: newPlan, status: newStatus });
+      }
+      
+      // Force select to re-render
+      setSelectKey(prev => prev + 1);
+      
+      // Force refresh subscription data to ensure UI is in sync
+      // Use a small delay to ensure database transaction is committed
+      setTimeout(async () => {
+        console.log('Refreshing subscription data...');
+        await fetchSubscription();
+        await fetchCafe();
+        // Force select to re-render again after refresh
+        setSelectKey(prev => prev + 1);
+      }, 500);
+      
     } catch (error) {
       console.error('Error updating subscription:', error);
-      toast.error(error.response?.data?.error || 'Failed to update subscription');
+      console.error('Error response:', error.response?.data);
+      const errorMessage = error.response?.data?.error || error.message || 'Failed to update subscription';
+      toast.error(errorMessage);
     } finally {
       setSavingSubscription(false);
     }
@@ -468,14 +581,32 @@ const SuperAdminCafeSettings = () => {
                   Subscription Plan
                 </label>
                 <select
-                  value={subscriptionFormData.plan}
-                  onChange={(e) => setSubscriptionFormData(prev => ({ ...prev, plan: e.target.value }))}
+                  key={`plan-select-${selectKey}-${subscriptionFormData.plan || subscription?.plan || cafe?.subscription_plan || 'FREE'}`}
+                  value={(subscriptionFormData.plan || subscription?.plan || cafe?.subscription_plan || 'FREE').toUpperCase()}
+                  onChange={(e) => {
+                    const newPlan = e.target.value.toUpperCase();
+                    console.log('Plan changed in select:', newPlan, 'from', subscriptionFormData.plan);
+                    setSubscriptionFormData(prev => {
+                      const updated = { ...prev, plan: newPlan };
+                      console.log('Updated subscriptionFormData:', updated);
+                      return updated;
+                    });
+                  }}
                   className="w-full px-3 py-2 border border-accent-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-secondary-500 focus:border-secondary-500 dark:bg-gray-700 dark:text-gray-100"
                 >
-                  {availablePlans.map(plan => (
-                    <option key={plan} value={plan}>{plan}</option>
-                  ))}
+                  {availablePlans.map(plan => {
+                    const planUpper = plan.toUpperCase();
+                    return (
+                      <option key={planUpper} value={planUpper}>{plan}</option>
+                    );
+                  })}
                 </select>
+                <div className="mt-1 text-xs text-secondary-500 dark:text-gray-400 space-y-0.5">
+                  <p>Form state: <strong>{subscriptionFormData.plan || 'not set'}</strong></p>
+                  <p>Subscription state: <strong>{subscription?.plan || 'not set'}</strong></p>
+                  <p>Cafe data: <strong>{cafe?.subscription_plan || 'not set'}</strong></p>
+                  <p>Select value: <strong>{(subscriptionFormData.plan || subscription?.plan || cafe?.subscription_plan || 'FREE').toUpperCase()}</strong></p>
+                </div>
               </div>
 
               <div>

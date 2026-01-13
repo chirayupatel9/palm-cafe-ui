@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { Toaster } from 'react-hot-toast';
+import { Toaster, toast } from 'react-hot-toast';
 import { Receipt, Settings, Plus, Menu, X, LogOut, User, Package, Utensils, Users, CreditCard, ShoppingCart, Building } from 'lucide-react';
 import axios from 'axios';
 import { CurrencyProvider } from './contexts/CurrencyContext';
@@ -69,7 +69,7 @@ function MainApp() {
   const [cart, setCart] = useState([]);
   const { user, logout } = useAuth();
   const { cafeSettings, loading: cafeSettingsLoading } = useCafeSettings();
-  const { hasModuleAccess, loading: subscriptionLoading } = useSubscription();
+  const { hasModuleAccess, loading: subscriptionLoading, subscription, isActive, getStatus } = useSubscription();
   const { hasFeature, loading: featuresLoading } = useFeatures();
   
   // Use FeatureContext for feature checks (preferred), fallback to SubscriptionContext for backward compatibility
@@ -81,47 +81,101 @@ function MainApp() {
     return hasModuleAccess(featureKey);
   };
 
-  useEffect(() => {
-    fetchMenuItems();
-  }, []);
-
-
-
-  const fetchMenuItems = async () => {
+  // Memoize fetchMenuItems to prevent unnecessary re-renders
+  const fetchMenuItems = useCallback(async () => {
     try {
+      // Log subscription status for debugging
+      if (subscription) {
+        console.log('Fetching menu items with subscription:', {
+          plan: subscription.plan,
+          status: subscription.status,
+          isActive: isActive ? isActive() : 'N/A'
+        });
+      }
+      
       const response = await axios.get('/menu');
-      setMenuItems(response.data);
+      setMenuItems(response.data || []);
+      console.log('Menu items loaded:', response.data?.length || 0, 'items');
+      
+      // If no menu items, this is normal - user needs to add them
+      if (!response.data || response.data.length === 0) {
+        console.log('No menu items found. User should add items via Menu Management.');
+      }
     } catch (error) {
       console.error('Error fetching menu items:', error);
+      const errorMessage = error.response?.data?.error || error.message || 'Failed to load menu items';
+      const errorCode = error.response?.data?.code;
+      
+      // Show user-friendly error message
+      if (error.response?.status === 403) {
+        if (errorCode === 'SUBSCRIPTION_INACTIVE') {
+          const status = error.response?.data?.subscription_status || 'inactive';
+          toast.error(`Subscription is ${status}. Please activate your subscription in Super Admin settings.`, {
+            duration: 5000
+          });
+        } else if (errorCode === 'FEATURE_ACCESS_DENIED') {
+          toast.error(`Menu management is not available on your current plan (${error.response?.data?.current_plan || 'FREE'}).`, {
+            duration: 5000
+          });
+        } else {
+          toast.error('Access denied. Please check your subscription status.', {
+            duration: 5000
+          });
+        }
+      } else if (error.response?.status === 401) {
+        toast.error('Please log in to view menu items.');
+      } else {
+        toast.error(errorMessage);
+      }
+      
+      // Set empty array on error so UI can still render
+      setMenuItems([]);
     } finally {
       setLoading(false);
     }
-  };
+  }, [subscription, isActive]);
+
+  // Fetch menu items when subscription is loaded and user is ready
+  useEffect(() => {
+    // Only fetch if all contexts are loaded and user is authenticated
+    if (!subscriptionLoading && !cafeSettingsLoading && !featuresLoading && user) {
+      fetchMenuItems();
+    }
+  }, [subscriptionLoading, cafeSettingsLoading, featuresLoading, user, subscription, fetchMenuItems]);
 
   const updateMenuItem = async (id, updatedItem) => {
     try {
       await axios.put(`/menu/${id}`, updatedItem);
-      fetchMenuItems();
+      toast.success('Menu item updated successfully');
+      // Force refresh menu items
+      await fetchMenuItems();
     } catch (error) {
       console.error('Error updating menu item:', error);
+      toast.error(error.response?.data?.error || 'Failed to update menu item');
     }
   };
 
   const addMenuItem = async (newItem) => {
     try {
       await axios.post('/menu', newItem);
-      fetchMenuItems();
+      toast.success('Menu item added successfully');
+      // Force refresh menu items
+      await fetchMenuItems();
     } catch (error) {
       console.error('Error adding menu item:', error);
+      toast.error(error.response?.data?.error || 'Failed to add menu item');
     }
   };
 
   const deleteMenuItem = async (id) => {
     try {
       await axios.delete(`/menu/${id}`);
-      fetchMenuItems();
+      toast.success('Menu item deleted successfully');
+      // Force refresh menu items
+      await fetchMenuItems();
     } catch (error) {
       console.error('Error deleting menu item:', error);
+      toast.error(error.response?.data?.error || 'Failed to delete menu item');
     }
   };
 
