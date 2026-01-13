@@ -37,6 +37,27 @@ import DashboardRedirect from './components/DashboardRedirect';
 const API_BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
 axios.defaults.baseURL = `${API_BASE_URL}/api`;
 
+// Component to update document title based on user's cafe
+const TitleUpdater = () => {
+  const { user } = useAuth();
+  
+  React.useEffect(() => {
+    if (user) {
+      if (user.cafe_name) {
+        document.title = user.cafe_name;
+      } else if (user.role === 'superadmin') {
+        document.title = 'Super Admin Dashboard';
+      } else {
+        document.title = 'Cafe Management System';
+      }
+    } else {
+      document.title = 'Palm Cafe Management System';
+    }
+  }, [user]);
+  
+  return null;
+};
+
 function MainApp() {
   const [currentPage, setCurrentPage] = useState('order');
   const [menuItems, setMenuItems] = useState([]);
@@ -363,26 +384,20 @@ function MainApp() {
 }
 
 function App() {
-  // Set document title dynamically based on cafe settings
+  // Title will be updated by AuthContext when user logs in
+  // This is just a fallback for when no user is logged in
   React.useEffect(() => {
-    const updateTitle = async () => {
-      try {
-        const response = await axios.get('/cafe-settings');
-        if (response.data && response.data.cafe_name) {
-          document.title = response.data.cafe_name;
-        }
-      } catch (error) {
-        console.error('Error fetching cafe settings for title:', error);
-        document.title = 'Cafe Management System'; // Fallback
-      }
-    };
-    
-    updateTitle();
+    // Only set default title if no user is logged in
+    // AuthContext will update it when user logs in
+    if (!localStorage.getItem('token')) {
+      document.title = 'Palm Cafe Management System';
+    }
   }, []);
 
   return (
     <Router>
       <AuthProvider>
+        <TitleUpdater />
         <DarkModeProvider>
           <CurrencyProvider>
             <CafeSettingsProvider>

@@ -32,7 +32,17 @@ export const AuthProvider = ({ children }) => {
       if (token) {
         try {
           const response = await axios.get('/auth/profile');
-          setUser(response.data.user);
+          const userData = response.data.user;
+          setUser(userData);
+          
+          // Update document title with cafe name if available
+          if (userData.cafe_name) {
+            document.title = userData.cafe_name;
+          } else if (userData.role === 'superadmin') {
+            document.title = 'Super Admin Dashboard';
+          } else {
+            document.title = 'Cafe Management System';
+          }
         } catch (error) {
           console.error('Auth check failed:', error);
           
@@ -45,6 +55,9 @@ export const AuthProvider = ({ children }) => {
           
           logout();
         }
+      } else {
+        // Reset title when logged out
+        document.title = 'Palm Cafe Management System';
       }
       setLoading(false);
     };
@@ -60,6 +73,15 @@ export const AuthProvider = ({ children }) => {
       setUser(userData);
       setToken(authToken);
       localStorage.setItem('token', authToken);
+      
+      // Update document title with cafe name if available
+      if (userData.cafe_name) {
+        document.title = userData.cafe_name;
+      } else if (userData.role === 'superadmin') {
+        document.title = 'Super Admin Dashboard';
+      } else {
+        document.title = 'Cafe Management System';
+      }
       
       return { success: true, user: userData };
     } catch (error) {
@@ -141,6 +163,8 @@ export const AuthProvider = ({ children }) => {
     setToken(null);
     localStorage.removeItem('token');
     delete axios.defaults.headers.common['Authorization'];
+    // Reset title on logout
+    document.title = 'Palm Cafe Management System';
   };
 
   const value = {
