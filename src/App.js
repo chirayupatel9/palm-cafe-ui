@@ -434,6 +434,27 @@ function App() {
                       </RoleBasedRedirect>
                     </ProtectedRoute>
                   } />
+                  <Route path="/superadmin/cafes/:cafeId" element={
+                    <ProtectedRoute>
+                      <RoleBasedRedirect>
+                        <SuperadminApp />
+                      </RoleBasedRedirect>
+                    </ProtectedRoute>
+                  } />
+                  <Route path="/superadmin/cafes/:cafeId/users" element={
+                    <ProtectedRoute>
+                      <RoleBasedRedirect>
+                        <SuperadminApp />
+                      </RoleBasedRedirect>
+                    </ProtectedRoute>
+                  } />
+                  <Route path="/superadmin/users" element={
+                    <ProtectedRoute>
+                      <RoleBasedRedirect>
+                        <SuperadminApp />
+                      </RoleBasedRedirect>
+                    </ProtectedRoute>
+                  } />
                   <Route path="/dashboard" element={
                     <ProtectedRoute>
                       <DashboardRedirect />

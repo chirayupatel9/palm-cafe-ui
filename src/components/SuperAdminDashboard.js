@@ -311,14 +311,14 @@ const SuperAdminDashboard = () => {
                 {/* Actions */}
                 <div className="flex space-x-3 pt-4 border-t border-accent-200 dark:border-gray-700">
                   <button
-                    onClick={() => navigate(`/superadmin?page=cafe-management&cafe=${selectedCafe.id}`)}
+                    onClick={() => navigate(`/superadmin/cafes/${selectedCafe.id}`)}
                     className="flex-1 flex items-center justify-center space-x-2 bg-secondary-600 hover:bg-secondary-700 text-white px-4 py-2 rounded-lg transition-colors"
                   >
                     <Settings className="h-4 w-4" />
                     <span>Manage Cafe</span>
                   </button>
                   <button
-                    onClick={() => navigate(`/superadmin?page=user-management&cafe=${selectedCafe.id}`)}
+                    onClick={() => navigate(`/superadmin/cafes/${selectedCafe.id}/users`)}
                     className="flex-1 flex items-center justify-center space-x-2 bg-secondary-100 hover:bg-secondary-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-secondary-700 dark:text-gray-200 px-4 py-2 rounded-lg transition-colors"
                   >
                     <Users className="h-4 w-4" />

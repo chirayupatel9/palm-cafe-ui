@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation, useParams } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import toast from 'react-hot-toast';
 import { 
@@ -11,13 +11,16 @@ import DarkModeToggle from './DarkModeToggle';
 import CafeManagement from './CafeManagement';
 import SuperAdminDashboard from './SuperAdminDashboard';
 import SuperAdminUserManagement from './SuperAdminUserManagement';
+import SuperAdminCafeSettings from './SuperAdminCafeSettings';
+import SuperAdminCafeUsers from './SuperAdminCafeUsers';
 
 const SuperadminApp = () => {
-  const [currentPage, setCurrentPage] = useState('dashboard');
   const [loading, setLoading] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+  const params = useParams();
 
   // Verify user is superadmin
   useEffect(() => {
@@ -28,8 +31,21 @@ const SuperadminApp = () => {
   }, [user, navigate]);
 
   const handlePageChange = (page) => {
-    setCurrentPage(page);
     setMobileMenuOpen(false);
+    switch (page) {
+      case 'dashboard':
+        navigate('/superadmin');
+        break;
+      case 'cafe-management':
+        navigate('/superadmin');
+        // Note: CafeManagement will be shown via state, but we'll navigate to /superadmin first
+        break;
+      case 'user-management':
+        navigate('/superadmin/users');
+        break;
+      default:
+        navigate('/superadmin');
+    }
   };
 
   const handleLogout = () => {
@@ -37,17 +53,67 @@ const SuperadminApp = () => {
   };
 
   const renderPage = () => {
-    switch (currentPage) {
-      case 'dashboard':
-        return <SuperAdminDashboard />;
-      case 'cafe-management':
-        return <CafeManagement />;
-      case 'user-management':
-        return <SuperAdminUserManagement />;
-      default:
-        return <SuperAdminDashboard />;
+    const path = location.pathname;
+    
+    // Route-based rendering
+    // Check for /superadmin/cafes/:cafeId/users
+    if (path.match(/^\/superadmin\/cafes\/\d+\/users$/)) {
+      return <SuperAdminCafeUsers />;
     }
+    
+    // Check for /superadmin/cafes/:cafeId (but not /users)
+    if (path.match(/^\/superadmin\/cafes\/\d+$/) || path.match(/^\/superadmin\/cafes\/\d+\/?$/)) {
+      return <SuperAdminCafeSettings />;
+    }
+    
+    // Check for /superadmin/users
+    if (path === '/superadmin/users') {
+      return <SuperAdminUserManagement />;
+    }
+    
+    // Default to dashboard for /superadmin
+    // Check if we should show cafe-management or dashboard
+    if (path === '/superadmin' || path === '/superadmin/') {
+      // Check URL params for cafe-management
+      const searchParams = new URLSearchParams(location.search);
+      const page = searchParams.get('page');
+      
+      if (page === 'cafe-management') {
+        return <CafeManagement />;
+      }
+      
+      return <SuperAdminDashboard />;
+    }
+    
+    return <SuperAdminDashboard />;
   };
+
+  // Determine current page for navigation highlighting
+  const getCurrentPage = () => {
+    const path = location.pathname;
+    
+    // Check for cafe-specific routes
+    if (path.match(/^\/superadmin\/cafes\/\d+/)) {
+      return 'cafe-management'; // Highlight cafe management when viewing cafe details
+    }
+    
+    if (path === '/superadmin/users') {
+      return 'user-management';
+    }
+    
+    if (path === '/superadmin' || path === '/superadmin/') {
+      const searchParams = new URLSearchParams(location.search);
+      const page = searchParams.get('page');
+      if (page === 'cafe-management') {
+        return 'cafe-management';
+      }
+      return 'dashboard';
+    }
+    
+    return 'dashboard';
+  };
+
+  const currentPage = getCurrentPage();
 
 
   const navigationItems = [
@@ -141,7 +207,7 @@ const SuperadminApp = () => {
                   className={`w-full flex items-center px-3 py-3 text-sm font-medium rounded-lg transition-colors ${
                     currentPage === item.id
                       ? 'bg-secondary-500 text-white'
-                      : 'text-secondary-600 hover:bg-accent-100'
+                      : 'text-secondary-600 dark:text-gray-300 hover:bg-accent-100 dark:hover:bg-gray-700'
                   }`}
                 >
                   <Icon className="h-4 w-4 mr-3" />
@@ -165,8 +231,8 @@ const SuperadminApp = () => {
                   onClick={() => handlePageChange(item.id)}
                   className={`flex items-center px-3 py-4 text-sm font-medium border-b-2 transition-colors ${
                     currentPage === item.id
-                      ? 'nav-active'
-                      : 'nav-inactive'
+                      ? 'border-secondary-500 text-secondary-700 dark:text-gray-100'
+                      : 'border-transparent text-secondary-600 dark:text-gray-400 hover:text-secondary-700 dark:hover:text-gray-200'
                   }`}
                 >
                   <Icon className="h-4 w-4 mr-2" />
