@@ -1,9 +1,12 @@
 import React from 'react';
 import { Plus } from 'lucide-react';
+import Button from './ui/Button';
 
 /**
  * Consistent page header component
  * Provides: Title, Description, and Primary Action
+ * 
+ * Uses standardized spacing (24px bottom margin)
  */
 const PageHeader = ({ 
   title, 
@@ -18,11 +21,11 @@ const PageHeader = ({
     <div className="mb-6">
       <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
         <div className="flex-1">
-          <h2 className="text-2xl font-bold text-secondary-700 dark:text-gray-100">
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-1">
             {title}
           </h2>
           {description && (
-            <p className="text-sm text-secondary-600 dark:text-gray-400 mt-1">
+            <p className="text-sm text-gray-600 dark:text-gray-400">
               {description}
             </p>
           )}
@@ -30,28 +33,28 @@ const PageHeader = ({
         
         {/* Primary Action */}
         {primaryAction && primaryActionLabel && (
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-3">
             {secondaryActions.map((action, index) => (
-              <button
+              <Button
                 key={index}
                 onClick={action.onClick}
-                className="flex items-center space-x-2 px-4 py-2 text-sm font-medium text-secondary-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-accent-300 dark:border-gray-600 rounded-lg hover:bg-accent-50 dark:hover:bg-gray-700 transition-colors"
+                variant="secondary"
+                icon={action.icon}
               >
-                {action.icon && <action.icon className="h-4 w-4" />}
-                <span>{action.label}</span>
-              </button>
+                {action.label}
+              </Button>
             ))}
-            <button
+            <Button
               onClick={primaryAction}
-              className="flex items-center space-x-2 bg-secondary-600 hover:bg-secondary-700 text-white px-4 py-2 rounded-lg transition-colors font-medium"
+              variant="primary"
+              icon={PrimaryActionIcon}
             >
-              <PrimaryActionIcon className="h-4 w-4" />
-              <span>{primaryActionLabel}</span>
-            </button>
+              {primaryActionLabel}
+            </Button>
           </div>
         )}
       </div>
-      {children && <div className="mt-4">{children}</div>}
+      {children && <div className="mt-6">{children}</div>}
     </div>
   );
 };

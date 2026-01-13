@@ -631,7 +631,7 @@ const MenuManagement = ({ menuItems, onUpdate, onAdd, onDelete }) => {
                     </thead>
                     <tbody className={`${isDarkMode ? 'bg-gray-800 divide-gray-700' : 'bg-white divide-accent-200'}`}>
                       {items.map((item) => (
-                        <tr key={item.id} className={isDarkMode ? 'hover:bg-gray-700' : 'hover:bg-accent-50'}>
+                        <tr key={item.id} className={`h-14 ${isDarkMode ? 'hover:bg-gray-700' : 'hover:bg-accent-50'} transition-colors`}>
                           {editingId === item.id ? (
                             // Edit Mode
                             <>

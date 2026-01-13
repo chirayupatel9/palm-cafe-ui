@@ -389,7 +389,7 @@ const CustomerManagement = () => {
               </thead>
               <tbody className={`${isDarkMode ? 'bg-gray-800 divide-gray-700' : 'bg-white divide-gray-200'}`}>
                 {filteredCustomers.map((customer) => (
-                  <tr key={customer.id} className={isDarkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-50'}>
+                  <tr key={customer.id} className={`h-14 ${isDarkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-50'} transition-colors`}>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
                         <div className="flex-shrink-0 h-10 w-10">
@@ -480,7 +480,7 @@ const CustomerManagement = () => {
 
       {/* Add Customer Modal */}
       {showAddModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className={`${isDarkMode ? 'bg-gray-800' : 'bg-white'} rounded-lg p-6 w-full max-w-md`}>
             <h3 className={`text-lg font-medium mb-4 ${isDarkMode ? 'text-gray-100' : 'text-gray-900'}`}>Add New Customer</h3>
             <form onSubmit={handleSubmit}>
@@ -492,11 +492,7 @@ const CustomerManagement = () => {
                     required
                     value={formData.name}
                     onChange={(e) => setFormData({...formData, name: e.target.value})}
-                    className={`mt-1 block w-full border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-secondary-500 ${
-                      isDarkMode 
-                        ? 'bg-gray-700 border-gray-600 text-gray-100' 
-                        : 'border-gray-300 bg-white text-gray-900'
-                    }`}
+                    className="input-field"
                   />
                 </div>
                 
@@ -506,11 +502,7 @@ const CustomerManagement = () => {
                     type="email"
                     value={formData.email}
                     onChange={(e) => setFormData({...formData, email: e.target.value})}
-                    className={`mt-1 block w-full border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-secondary-500 ${
-                      isDarkMode 
-                        ? 'bg-gray-700 border-gray-600 text-gray-100' 
-                        : 'border-gray-300 bg-white text-gray-900'
-                    }`}
+                    className="input-field"
                   />
                 </div>
                 
@@ -520,11 +512,7 @@ const CustomerManagement = () => {
                     type="tel"
                     value={formData.phone}
                     onChange={(e) => setFormData({...formData, phone: e.target.value})}
-                    className={`mt-1 block w-full border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-secondary-500 ${
-                      isDarkMode 
-                        ? 'bg-gray-700 border-gray-600 text-gray-100' 
-                        : 'border-gray-300 bg-white text-gray-900'
-                    }`}
+                    className="input-field"
                   />
                 </div>
                 
@@ -534,11 +522,7 @@ const CustomerManagement = () => {
                     value={formData.address}
                     onChange={(e) => setFormData({...formData, address: e.target.value})}
                     rows="3"
-                    className={`mt-1 block w-full border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-secondary-500 ${
-                      isDarkMode 
-                        ? 'bg-gray-700 border-gray-600 text-gray-100' 
-                        : 'border-gray-300 bg-white text-gray-900'
-                    }`}
+                    className="input-field"
                   />
                 </div>
                 
@@ -548,11 +532,7 @@ const CustomerManagement = () => {
                     type="date"
                     value={formData.date_of_birth}
                     onChange={(e) => setFormData({...formData, date_of_birth: e.target.value})}
-                    className={`mt-1 block w-full border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-secondary-500 ${
-                      isDarkMode 
-                        ? 'bg-gray-700 border-gray-600 text-gray-100' 
-                        : 'border-gray-300 bg-white text-gray-900'
-                    }`}
+                    className="input-field"
                   />
                 </div>
                 
@@ -562,11 +542,7 @@ const CustomerManagement = () => {
                     value={formData.notes}
                     onChange={(e) => setFormData({...formData, notes: e.target.value})}
                     rows="2"
-                    className={`mt-1 block w-full border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-secondary-500 ${
-                      isDarkMode 
-                        ? 'bg-gray-700 border-gray-600 text-gray-100' 
-                        : 'border-gray-300 bg-white text-gray-900'
-                    }`}
+                    className="input-field"
                   />
                 </div>
               </div>
@@ -590,7 +566,7 @@ const CustomerManagement = () => {
 
       {/* Edit Customer Modal */}
       {showEditModal && selectedCustomer && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-lg p-6 w-full max-w-md">
             <h3 className="text-lg font-medium mb-4">Edit Customer</h3>
             <form onSubmit={handleSubmit}>
@@ -602,7 +578,7 @@ const CustomerManagement = () => {
                     required
                     value={formData.name}
                     onChange={(e) => setFormData({...formData, name: e.target.value})}
-                    className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-secondary-500"
+                    className="input-field"
                   />
                 </div>
                 
@@ -612,7 +588,7 @@ const CustomerManagement = () => {
                     type="email"
                     value={formData.email}
                     onChange={(e) => setFormData({...formData, email: e.target.value})}
-                    className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-secondary-500"
+                    className="input-field"
                   />
                 </div>
                 
@@ -622,7 +598,7 @@ const CustomerManagement = () => {
                     type="tel"
                     value={formData.phone}
                     onChange={(e) => setFormData({...formData, phone: e.target.value})}
-                    className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-secondary-500"
+                    className="input-field"
                   />
                 </div>
                 
@@ -632,7 +608,7 @@ const CustomerManagement = () => {
                     value={formData.address}
                     onChange={(e) => setFormData({...formData, address: e.target.value})}
                     rows="3"
-                    className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-secondary-500"
+                    className="input-field"
                   />
                 </div>
                 
@@ -642,7 +618,7 @@ const CustomerManagement = () => {
                     type="date"
                     value={formData.date_of_birth}
                     onChange={(e) => setFormData({...formData, date_of_birth: e.target.value})}
-                    className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-secondary-500"
+                    className="input-field"
                   />
                 </div>
                 
@@ -652,7 +628,7 @@ const CustomerManagement = () => {
                     value={formData.notes}
                     onChange={(e) => setFormData({...formData, notes: e.target.value})}
                     rows="2"
-                    className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-secondary-500"
+                    className="input-field"
                   />
                 </div>
                 
@@ -688,7 +664,7 @@ const CustomerManagement = () => {
 
       {/* Order History Modal */}
       {showOrderHistoryModal && selectedCustomer && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className={`${isDarkMode ? 'bg-gray-800' : 'bg-white'} rounded-lg p-6 w-full max-w-4xl max-h-[80vh] overflow-y-auto`}>
             <div className="flex justify-between items-center mb-4">
               <h3 className={`text-lg font-medium ${isDarkMode ? 'text-gray-100' : 'text-gray-900'}`}>Order History - {selectedCustomer.name}</h3>

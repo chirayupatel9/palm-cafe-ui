@@ -488,27 +488,27 @@ const OrderPage = ({ menuItems, cart: externalCart, setCart: setExternalCart }) 
               </div>
               
               {/* Customer Info */}
-              <div className="mb-4">
+              <div className="space-form">
                 <input
                   type="text"
                   placeholder="Customer Name *"
                   value={customerName}
                   onChange={(e) => setCustomerName(e.target.value)}
-                  className="input-field mb-2"
+                  className="input-field"
                 />
                 <input
                   type="tel"
                   placeholder="Phone Number (optional)"
                   value={customerPhone}
                   onChange={(e) => setCustomerPhone(e.target.value)}
-                  className="input-field mb-2"
+                  className="input-field"
                 />
                 <input
                   type="text"
                   placeholder="Table Number/Character (optional)"
                   value={tableNumber}
                   onChange={(e) => setTableNumber(e.target.value)}
-                  className="input-field mb-2"
+                  className="input-field"
                 />
                 {customerInfo && (
                   <div className="mb-2 p-2 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
@@ -553,7 +553,7 @@ const OrderPage = ({ menuItems, cart: externalCart, setCart: setExternalCart }) 
                         onChange={(e) => handlePointsRedemption(parseInt(e.target.value) || 0)}
                         min="0"
                         max={maxRedeemablePoints}
-                        className="flex-1 p-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                        className="flex-1 input-field"
                         placeholder="0"
                       />
                     </div>
@@ -577,14 +577,14 @@ const OrderPage = ({ menuItems, cart: externalCart, setCart: setExternalCart }) 
                         key={method.code}
                         type="button"
                         onClick={() => setPaymentMethod(method.code)}
-                        className={`flex items-center justify-center p-3 rounded-lg border transition-colors ${
+                        className={`h-10 flex items-center justify-center rounded-lg border transition-colors text-sm font-medium ${
                           paymentMethod === method.code
-                            ? 'bg-secondary-500 text-white border-secondary-500'
-                            : 'bg-white text-secondary-700 border-accent-300 hover:bg-accent-50'
+                            ? 'bg-secondary-600 text-white border-secondary-600'
+                            : 'btn-secondary'
                         }`}
                       >
                         <span className="mr-2">{method.icon}</span>
-                        <span className="text-sm font-medium">{method.name}</span>
+                        <span>{method.name}</span>
                       </button>
                     ))}
                   </div>
@@ -623,14 +623,14 @@ const OrderPage = ({ menuItems, cart: externalCart, setCart: setExternalCart }) 
                                 key={method.code}
                                 type="button"
                                 onClick={() => setSplitPaymentMethod(method.code)}
-                                className={`flex items-center justify-center p-3 rounded-lg border transition-colors ${
+                                className={`h-10 flex items-center justify-center rounded-lg border transition-colors text-sm font-medium ${
                                   splitPaymentMethod === method.code
-                                    ? 'bg-secondary-500 text-white border-secondary-500'
-                                    : 'bg-white text-secondary-700 border-accent-300 hover:bg-accent-50'
+                                    ? 'bg-secondary-600 text-white border-secondary-600'
+                                    : 'btn-secondary'
                                 }`}
                               >
                                 <span className="mr-2">{method.icon}</span>
-                                <span className="font-medium">{method.name}</span>
+                                <span>{method.name}</span>
                               </button>
                             ))}
                           </div>
@@ -647,7 +647,7 @@ const OrderPage = ({ menuItems, cart: externalCart, setCart: setExternalCart }) 
                             min="0"
                             max={getTotal() - 0.01}
                             step="0.01"
-                            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-secondary-500 focus:border-transparent"
+                            className="input-field"
                             placeholder="Enter amount"
                           />
                           <p className="text-xs text-gray-500 mt-1">
@@ -670,26 +670,26 @@ const OrderPage = ({ menuItems, cart: externalCart, setCart: setExternalCart }) 
                     <button
                       type="button"
                       onClick={() => setPickupOption('pickup')}
-                      className={`flex items-center justify-center p-3 rounded-lg border transition-colors ${
+                      className={`h-10 flex items-center justify-center rounded-lg border transition-colors text-sm font-medium ${
                         pickupOption === 'pickup'
-                          ? 'bg-secondary-500 text-white border-secondary-500'
-                          : 'bg-white text-secondary-700 border-accent-300 hover:bg-accent-50'
+                          ? 'bg-secondary-600 text-white border-secondary-600'
+                          : 'btn-secondary'
                       }`}
                     >
                       <span className="mr-2">🏪</span>
-                      <span className="text-sm font-medium">Pickup</span>
+                      <span>Pickup</span>
                     </button>
                     <button
                       type="button"
                       onClick={() => setPickupOption('dine-in')}
-                      className={`flex items-center justify-center p-3 rounded-lg border transition-colors ${
+                      className={`h-10 flex items-center justify-center rounded-lg border transition-colors text-sm font-medium ${
                         pickupOption === 'dine-in'
-                          ? 'bg-secondary-500 text-white border-secondary-500'
-                          : 'bg-white text-secondary-700 border-accent-300 hover:bg-accent-50'
+                          ? 'bg-secondary-600 text-white border-secondary-600'
+                          : 'btn-secondary'
                       }`}
                     >
                       <span className="mr-2">🍽️</span>
-                      <span className="text-sm font-medium">Dine-in</span>
+                      <span>Dine-in</span>
                     </button>
                   </div>
                   <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
@@ -806,10 +806,10 @@ const OrderPage = ({ menuItems, cart: externalCart, setCart: setExternalCart }) 
                       <button
                         key={percentage}
                         onClick={() => handleTipPercentageChange(percentage)}
-                        className={`py-2 px-3 text-sm rounded-lg border transition-colors ${
+                        className={`h-10 text-sm rounded-lg border transition-colors font-medium ${
                           tipPercentage === percentage
-                            ? 'bg-secondary-500 text-white border-secondary-500'
-                            : 'bg-white dark:bg-gray-700 text-secondary-700 dark:text-gray-200 border-accent-300 dark:border-gray-600 hover:bg-accent-50 dark:hover:bg-gray-600'
+                            ? 'bg-secondary-600 text-white border-secondary-600'
+                            : 'btn-secondary'
                         }`}
                       >
                         {percentage === 0 ? 'No Tip' : `${percentage}%`}
@@ -826,7 +826,7 @@ const OrderPage = ({ menuItems, cart: externalCart, setCart: setExternalCart }) 
                       onChange={(e) => handleTipAmountChange(e.target.value)}
                       step="0.01"
                       min="0"
-                      className="flex-1 px-3 py-2 border border-accent-300 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-secondary-500 focus:border-transparent"
+                      className="flex-1 input-field"
                       placeholder="0.00"
                     />
                   </div>
@@ -883,7 +883,7 @@ const OrderPage = ({ menuItems, cart: externalCart, setCart: setExternalCart }) 
                   setShowCart(false);
                 }}
                 disabled={currentCart.length === 0 || loading}
-                className="btn-primary w-full flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed py-3"
+                className="btn-primary w-full flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <Receipt className="h-4 w-4 mr-2" />
                 {loading ? 'Generating...' : 'Generate & Open Invoice'}
@@ -916,27 +916,27 @@ const OrderPage = ({ menuItems, cart: externalCart, setCart: setExternalCart }) 
           </div>
 
           {/* Customer Info */}
-          <div className="mb-4">
+          <div className="space-form">
             <input
               type="text"
               placeholder="Customer Name *"
               value={customerName}
               onChange={(e) => setCustomerName(e.target.value)}
-              className="input-field mb-2"
+              className="input-field"
             />
             <input
               type="tel"
               placeholder="Phone Number (optional)"
               value={customerPhone}
               onChange={(e) => setCustomerPhone(e.target.value)}
-              className="input-field mb-2"
+              className="input-field"
             />
             <input
               type="text"
               placeholder="Table Number/Character (optional)"
               value={tableNumber}
               onChange={(e) => setTableNumber(e.target.value)}
-              className="input-field mb-2"
+              className="input-field"
             />
             {customerInfo && (
               <div className="mb-2 p-2 bg-green-50 border border-green-200 rounded-lg">
@@ -981,7 +981,7 @@ const OrderPage = ({ menuItems, cart: externalCart, setCart: setExternalCart }) 
                     onChange={(e) => handlePointsRedemption(parseInt(e.target.value) || 0)}
                     min="0"
                     max={maxRedeemablePoints}
-                    className="flex-1 p-2 border border-gray-300 rounded-lg text-sm"
+                    className="flex-1 input-field"
                     placeholder="0"
                   />
                 </div>
@@ -1003,14 +1003,14 @@ const OrderPage = ({ menuItems, cart: externalCart, setCart: setExternalCart }) 
                     key={method.code}
                     type="button"
                     onClick={() => setPaymentMethod(method.code)}
-                    className={`flex items-center justify-center p-3 rounded-lg border transition-colors ${
+                    className={`h-10 flex items-center justify-center rounded-lg border transition-colors text-sm font-medium ${
                       paymentMethod === method.code
-                        ? 'bg-secondary-500 text-white border-secondary-500'
-                        : 'bg-white text-secondary-700 border-accent-300 hover:bg-accent-50'
+                        ? 'bg-secondary-600 text-white border-secondary-600'
+                        : 'btn-secondary'
                     }`}
                   >
                     <span className="mr-2">{method.icon}</span>
-                    <span className="font-medium">{method.name}</span>
+                    <span>{method.name}</span>
                   </button>
                 ))}
               </div>
@@ -1049,14 +1049,14 @@ const OrderPage = ({ menuItems, cart: externalCart, setCart: setExternalCart }) 
                             key={method.code}
                             type="button"
                             onClick={() => setSplitPaymentMethod(method.code)}
-                            className={`flex items-center justify-center p-3 rounded-lg border transition-colors ${
+                            className={`h-10 flex items-center justify-center rounded-lg border transition-colors text-sm font-medium ${
                               splitPaymentMethod === method.code
-                                ? 'bg-secondary-500 text-white border-secondary-500'
-                                : 'bg-white text-secondary-700 border-accent-300 hover:bg-accent-50'
+                                ? 'bg-secondary-600 text-white border-secondary-600'
+                                : 'btn-secondary'
                             }`}
                           >
                             <span className="mr-2">{method.icon}</span>
-                            <span className="font-medium">{method.name}</span>
+                            <span>{method.name}</span>
                           </button>
                         ))}
                       </div>
@@ -1073,7 +1073,7 @@ const OrderPage = ({ menuItems, cart: externalCart, setCart: setExternalCart }) 
                         min="0"
                         max={getTotal() - 0.01}
                         step="0.01"
-                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-secondary-500 focus:border-transparent"
+                        className="input-field"
                         placeholder="Enter amount"
                       />
                       <p className="text-xs text-gray-500 mt-1">
@@ -1096,26 +1096,26 @@ const OrderPage = ({ menuItems, cart: externalCart, setCart: setExternalCart }) 
                 <button
                   type="button"
                   onClick={() => setPickupOption('pickup')}
-                  className={`flex items-center justify-center p-2 rounded-lg border transition-colors text-xs ${
+                  className={`h-10 flex items-center justify-center rounded-lg border transition-colors text-sm font-medium ${
                     pickupOption === 'pickup'
-                      ? 'bg-secondary-500 text-white border-secondary-500'
-                      : 'bg-white text-secondary-700 border-accent-300 hover:bg-accent-50'
+                      ? 'bg-secondary-600 text-white border-secondary-600'
+                      : 'btn-secondary'
                   }`}
                 >
-                  <span className="mr-1">🏪</span>
-                  <span className="font-medium">Pickup</span>
+                  <span className="mr-2">🏪</span>
+                  <span>Pickup</span>
                 </button>
                 <button
                   type="button"
                   onClick={() => setPickupOption('dine-in')}
-                  className={`flex items-center justify-center p-2 rounded-lg border transition-colors text-xs ${
+                  className={`h-10 flex items-center justify-center rounded-lg border transition-colors text-sm font-medium ${
                     pickupOption === 'dine-in'
-                      ? 'bg-secondary-500 text-white border-secondary-500'
-                      : 'bg-white text-secondary-700 border-accent-300 hover:bg-accent-50'
+                      ? 'bg-secondary-600 text-white border-secondary-600'
+                      : 'btn-secondary'
                   }`}
                 >
-                  <span className="mr-1">🍽️</span>
-                  <span className="font-medium">Dine-in</span>
+                  <span className="mr-2">🍽️</span>
+                  <span>Dine-in</span>
                 </button>
               </div>
               <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
@@ -1252,7 +1252,7 @@ const OrderPage = ({ menuItems, cart: externalCart, setCart: setExternalCart }) 
                   onChange={(e) => handleTipAmountChange(e.target.value)}
                   step="0.01"
                   min="0"
-                  className="flex-1 px-3 py-2 border border-accent-300 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-secondary-500 focus:border-transparent"
+                  className="flex-1 input-field"
                   placeholder="0.00"
                 />
               </div>

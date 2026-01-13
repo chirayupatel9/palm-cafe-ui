@@ -135,21 +135,21 @@ const CafeManagement = () => {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
+    <div className="space-section">
+      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-6">
         <div>
-          <h2 className="text-2xl font-bold text-secondary-700 dark:text-gray-100">
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-1">
             Cafes
           </h2>
-          <p className="text-sm text-secondary-600 dark:text-gray-400 mt-1">
+          <p className="text-sm text-gray-600 dark:text-gray-400">
             Manage all cafes in the system
           </p>
         </div>
         <button
           onClick={handleNewCafe}
-          className="flex items-center space-x-2 bg-secondary-600 hover:bg-secondary-700 text-white px-4 py-2 rounded-lg transition-colors font-medium"
+          className="btn-primary flex items-center"
         >
-          <Plus className="h-4 w-4" />
+          <Plus className="h-4 w-4 mr-2" />
           <span>Add New Cafe</span>
         </button>
       </div>
@@ -221,19 +221,19 @@ const CafeManagement = () => {
               )}
             </div>
 
-            <div className="flex items-center space-x-2 pt-4 border-t border-accent-200 dark:border-gray-700">
+            <div className="flex items-center space-x-3 pt-4 border-t border-gray-200 dark:border-gray-700">
               <button
                 onClick={() => handleEdit(cafe)}
-                className="flex-1 flex items-center justify-center space-x-1 bg-secondary-100 hover:bg-secondary-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-secondary-700 dark:text-gray-200 px-3 py-2 rounded transition-colors"
+                className="flex-1 btn-secondary flex items-center justify-center"
               >
-                <Edit className="h-4 w-4" />
+                <Edit className="h-4 w-4 mr-1.5" />
                 <span>Edit</span>
               </button>
               <button
                 onClick={() => handleDelete(cafe)}
-                className="flex-1 flex items-center justify-center space-x-1 bg-red-100 hover:bg-red-200 dark:bg-red-900 dark:hover:bg-red-800 text-red-700 dark:text-red-200 px-3 py-2 rounded transition-colors"
+                className="flex-1 btn-destructive flex items-center justify-center"
               >
-                <Trash2 className="h-4 w-4" />
+                <Trash2 className="h-4 w-4 mr-1.5" />
                 <span>Delete</span>
               </button>
             </div>
@@ -269,7 +269,7 @@ const CafeManagement = () => {
               </button>
             </div>
 
-            <form onSubmit={handleSubmit} className="p-6 space-y-4">
+            <form onSubmit={handleSubmit} className="p-6 space-form">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-secondary-700 dark:text-gray-300 mb-1">
@@ -283,7 +283,7 @@ const CafeManagement = () => {
                     required
                     pattern="[a-z0-9-]+"
                     placeholder="palmcafe"
-                    className="w-full px-3 py-2 border border-accent-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-secondary-500 focus:border-secondary-500 dark:bg-gray-700 dark:text-gray-100"
+                    className="input-field"
                     disabled={!!editingCafe}
                   />
                   <p className="text-xs text-secondary-500 dark:text-gray-400 mt-1">
@@ -302,7 +302,7 @@ const CafeManagement = () => {
                     onChange={handleInputChange}
                     required
                     placeholder="Palm Cafe"
-                    className="w-full px-3 py-2 border border-accent-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-secondary-500 focus:border-secondary-500 dark:bg-gray-700 dark:text-gray-100"
+                    className="input-field"
                   />
                 </div>
               </div>
@@ -317,7 +317,7 @@ const CafeManagement = () => {
                   onChange={handleInputChange}
                   rows={3}
                   placeholder="Cafe description..."
-                  className="w-full px-3 py-2 border border-accent-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-secondary-500 focus:border-secondary-500 dark:bg-gray-700 dark:text-gray-100"
+                  className="input-field"
                 />
               </div>
 
@@ -331,7 +331,7 @@ const CafeManagement = () => {
                   value={formData.logo_url}
                   onChange={handleInputChange}
                   placeholder="/images/logo.png"
-                  className="w-full px-3 py-2 border border-accent-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-secondary-500 focus:border-secondary-500 dark:bg-gray-700 dark:text-gray-100"
+                  className="input-field"
                 />
               </div>
 
@@ -346,7 +346,7 @@ const CafeManagement = () => {
                     value={formData.address}
                     onChange={handleInputChange}
                     placeholder="123 Main Street"
-                    className="w-full px-3 py-2 border border-accent-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-secondary-500 focus:border-secondary-500 dark:bg-gray-700 dark:text-gray-100"
+                    className="input-field"
                   />
                 </div>
 
@@ -360,7 +360,7 @@ const CafeManagement = () => {
                     value={formData.phone}
                     onChange={handleInputChange}
                     placeholder="+1 234 567 8900"
-                    className="w-full px-3 py-2 border border-accent-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-secondary-500 focus:border-secondary-500 dark:bg-gray-700 dark:text-gray-100"
+                    className="input-field"
                   />
                 </div>
               </div>
@@ -376,7 +376,7 @@ const CafeManagement = () => {
                     value={formData.email}
                     onChange={handleInputChange}
                     placeholder="info@cafe.com"
-                    className="w-full px-3 py-2 border border-accent-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-secondary-500 focus:border-secondary-500 dark:bg-gray-700 dark:text-gray-100"
+                    className="input-field"
                   />
                 </div>
 
@@ -390,7 +390,7 @@ const CafeManagement = () => {
                     value={formData.website}
                     onChange={handleInputChange}
                     placeholder="https://cafe.com"
-                    className="w-full px-3 py-2 border border-accent-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-secondary-500 focus:border-secondary-500 dark:bg-gray-700 dark:text-gray-100"
+                    className="input-field"
                   />
                 </div>
               </div>
@@ -411,20 +411,20 @@ const CafeManagement = () => {
                 </div>
               )}
 
-              <div className="flex justify-end space-x-3 pt-4 border-t border-accent-200 dark:border-gray-700">
+              <div className="flex justify-end space-x-3 pt-6 border-t border-gray-200 dark:border-gray-700">
                 <button
                   type="button"
                   onClick={() => {
                     setShowModal(false);
                     setEditingCafe(null);
                   }}
-                  className="px-4 py-2 border border-accent-300 dark:border-gray-600 text-secondary-700 dark:text-gray-300 rounded-lg hover:bg-accent-50 dark:hover:bg-gray-700 transition-colors"
+                  className="btn-secondary"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-secondary-600 hover:bg-secondary-700 text-white rounded-lg transition-colors"
+                  className="btn-primary"
                 >
                   {editingCafe ? 'Update Cafe' : 'Create Cafe'}
                 </button>

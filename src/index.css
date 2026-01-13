@@ -792,19 +792,53 @@ tbody tr:hover {
 }
 
 @layer components {
-  /* Card component */
+  /* Standardized Spacing Utilities */
+  .space-section {
+    @apply space-y-6;
+  }
+  
+  .space-card {
+    @apply space-y-4;
+  }
+  
+  .space-form {
+    @apply space-y-4;
+  }
+  
+  .space-inline {
+    @apply space-x-3;
+  }
+  
+  /* Card component - Standardized */
   .card {
-    @apply rounded-lg shadow-sm border border-warm-200 p-4 sm:p-6;
+    @apply rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6;
     background-color: var(--color-surface) !important;
   }
+  
+  /* Card variants */
+  .card-sm {
+    @apply p-4;
+  }
+  
+  .card-lg {
+    @apply p-8;
+  }
 
-  /* Button styles */
+  /* Button styles - Standardized */
   .btn-primary {
-    @apply bg-secondary-500 hover:bg-secondary-600 text-white px-4 py-2 rounded-lg transition-colors duration-200 font-medium;
+    @apply bg-secondary-600 hover:bg-secondary-700 text-white px-4 py-2 h-10 rounded-lg transition-all duration-200 font-medium text-sm shadow-sm hover:shadow-md focus:outline-none focus:ring-2 focus:ring-secondary-500 focus:ring-offset-2;
   }
 
   .btn-secondary {
-    @apply bg-warm-100 hover:bg-warm-200 text-secondary-700 px-4 py-2 rounded-lg transition-colors duration-200 font-medium border border-warm-300;
+    @apply bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 px-4 py-2 h-10 rounded-lg transition-all duration-200 font-medium text-sm focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2;
+  }
+  
+  .btn-destructive {
+    @apply bg-red-600 hover:bg-red-700 text-white px-4 py-2 h-10 rounded-lg transition-all duration-200 font-medium text-sm shadow-sm hover:shadow-md focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2;
+  }
+  
+  .btn-ghost {
+    @apply text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 px-4 py-2 h-10 rounded-lg transition-all duration-200 font-medium text-sm focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2;
   }
 
   /* Materialize button style */
@@ -812,20 +846,23 @@ tbody tr:hover {
     @apply bg-gradient-to-r from-[#6F4E37] to-[#8B6F47] hover:from-[#5d4230] hover:to-[#6F4E37] text-white px-4 py-2 rounded-full shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 font-medium border-0;
   }
 
-                /* Input field styles */
-              .input-field {
-                @apply w-full px-3 py-2 border-2 rounded-lg transition-all duration-200;
-                background-color: var(--color-surface) !important;
-                border-color: #CBD5E1 !important;
-                color: var(--color-text) !important;
-              }
-              
-              .input-field:focus {
-                @apply focus:ring-2 focus:ring-secondary-500 focus:border-transparent;
-                border-color: var(--color-primary) !important;
-                box-shadow: 0 0 0 3px rgba(111, 78, 55, 0.1) !important;
-                transform: translateY(-1px) !important;
-              }
+  /* Input field styles - Standardized */
+  .input-field {
+    @apply w-full h-10 px-3 py-2 text-sm border rounded-lg transition-all duration-200;
+    background-color: var(--color-surface) !important;
+    border-color: #CBD5E1 !important;
+    color: var(--color-text) !important;
+  }
+  
+  .input-field:focus {
+    @apply focus:ring-2 focus:ring-secondary-500 focus:border-transparent;
+    border-color: var(--color-primary) !important;
+    outline: none;
+  }
+  
+  .input-field::placeholder {
+    @apply text-gray-400 dark:text-gray-500;
+  }
 
   /* Navigation styles */
   .nav-active {
