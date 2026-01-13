@@ -8,6 +8,7 @@ import { DarkModeProvider } from './contexts/DarkModeContext';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { CafeSettingsProvider, useCafeSettings } from './contexts/CafeSettingsContext';
 import { ColorSchemeProvider } from './contexts/ColorSchemeContext';
+import { SubscriptionProvider, useSubscription } from './contexts/SubscriptionContext';
 import OrderPage from './components/OrderPage';
 import MenuManagement from './components/MenuManagement';
 
@@ -66,6 +67,7 @@ function MainApp() {
   const [cart, setCart] = useState([]);
   const { user, logout } = useAuth();
   const { cafeSettings, loading: cafeSettingsLoading } = useCafeSettings();
+  const { hasModuleAccess, loading: subscriptionLoading } = useSubscription();
 
   useEffect(() => {
     fetchMenuItems();
@@ -153,17 +155,17 @@ function MainApp() {
   };
 
   const navigationItems = [
-    { id: 'order', label: 'New Order', icon: Plus },
-    ...(cafeSettings?.show_kitchen_tab ? [{ id: 'kitchen', label: 'Kitchen Orders', icon: Utensils }] : []),
-    ...(cafeSettings?.show_customers_tab ? [{ id: 'customers', label: 'Customers', icon: Users }] : []),
-    ...(cafeSettings?.show_payment_methods_tab ? [{ id: 'payment-methods', label: 'Payment, Currency & Tax', icon: CreditCard }] : []),
-    ...(cafeSettings?.admin_can_access_settings ? [{ id: 'cafe-settings', label: 'Cafe Settings', icon: Building }] : []),
-    ...(cafeSettings?.admin_can_manage_menu ? [{ id: 'menu', label: 'Menu Management', icon: Settings }] : []),
-    ...(cafeSettings?.admin_can_manage_inventory ? [{ id: 'inventory', label: 'Inventory', icon: Package }] : []),
-    ...(cafeSettings?.admin_can_view_reports ? [{ id: 'history', label: 'Invoice History', icon: Receipt }] : []),
+    { id: 'order', label: 'New Order', icon: Plus, module: 'orders' },
+    ...(cafeSettings?.show_kitchen_tab && hasModuleAccess('orders') ? [{ id: 'kitchen', label: 'Kitchen Orders', icon: Utensils, module: 'orders' }] : []),
+    ...(cafeSettings?.show_customers_tab && hasModuleAccess('customers') ? [{ id: 'customers', label: 'Customers', icon: Users, module: 'customers' }] : []),
+    ...(cafeSettings?.show_payment_methods_tab && hasModuleAccess('payment_methods') ? [{ id: 'payment-methods', label: 'Payment, Currency & Tax', icon: CreditCard, module: 'payment_methods' }] : []),
+    ...(cafeSettings?.admin_can_access_settings && hasModuleAccess('settings') ? [{ id: 'cafe-settings', label: 'Cafe Settings', icon: Building, module: 'settings' }] : []),
+    ...(cafeSettings?.admin_can_manage_menu && hasModuleAccess('menu_management') ? [{ id: 'menu', label: 'Menu Management', icon: Settings, module: 'menu_management' }] : []),
+    ...(cafeSettings?.admin_can_manage_inventory && hasModuleAccess('inventory') ? [{ id: 'inventory', label: 'Inventory', icon: Package, module: 'inventory' }] : []),
+    ...(cafeSettings?.admin_can_view_reports && hasModuleAccess('advanced_reports') ? [{ id: 'history', label: 'Invoice History', icon: Receipt, module: 'advanced_reports' }] : []),
   ];
 
-  if (loading || cafeSettingsLoading) {
+  if (loading || cafeSettingsLoading || subscriptionLoading) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-accent-50 dark:bg-gray-900">
         <CafeInfo logoSize="h-16 w-16" nameSize="text-xl" className="mb-4" />
@@ -401,7 +403,8 @@ function App() {
         <DarkModeProvider>
           <CurrencyProvider>
             <CafeSettingsProvider>
-              <ColorSchemeProvider>
+              <SubscriptionProvider>
+                <ColorSchemeProvider>
                 <Routes>
                   <Route path="/" element={<LandingPage />} />
                   <Route path="/login" element={<Login />} />
@@ -477,7 +480,8 @@ function App() {
                   } />
                   <Route path="*" element={<Navigate to="/" replace />} />
                 </Routes>
-              </ColorSchemeProvider>
+                </ColorSchemeProvider>
+              </SubscriptionProvider>
             </CafeSettingsProvider>
           </CurrencyProvider>
         </DarkModeProvider>
