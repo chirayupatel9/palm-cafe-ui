@@ -29,29 +29,35 @@ const RoleBasedRedirect = ({ children }) => {
   
   switch (userRole) {
     case 'superadmin':
-      // Superadmin has access to everything
+      // Superadmin can ONLY access /superadmin routes
+      if (!currentPath.startsWith('/superadmin')) {
+        return <Navigate to="/superadmin" replace />;
+      }
       return children;
     case 'admin':
-      // Admin can access most routes, but not /superadmin
+      // Admin can access most routes, but NOT /superadmin
       if (currentPath.startsWith('/superadmin')) {
         return <Navigate to="/admin" replace />;
       }
       return children;
     case 'chef':
-      // Redirect chef to chef dashboard if they try to access admin routes
+      // Chef can only access /chef routes
       if (currentPath.startsWith('/admin') || currentPath.startsWith('/superadmin')) {
         return <Navigate to="/chef" replace />;
       }
       return children;
     case 'reception':
-      // Redirect reception to reception dashboard if they try to access admin routes
+      // Reception can only access /reception routes
       if (currentPath.startsWith('/admin') || currentPath.startsWith('/superadmin')) {
         return <Navigate to="/reception" replace />;
       }
       return children;
     default:
-      // Fallback for any other roles
-      return <Navigate to="/admin" replace />;
+      // Fallback for any other roles - redirect to admin
+      if (currentPath.startsWith('/superadmin')) {
+        return <Navigate to="/admin" replace />;
+      }
+      return children;
   }
 };
 
