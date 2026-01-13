@@ -20,6 +20,8 @@ import {
   UserX
 } from 'lucide-react';
 import PageHeader from './PageHeader';
+import { TableSkeleton } from './ui/Skeleton';
+import { EmptyCustomers } from './ui/EmptyState';
 
 const CustomerManagement = () => {
   const { isAuthenticated, user, loading: authLoading } = useAuth();
@@ -241,14 +243,29 @@ const CustomerManagement = () => {
 
   if (loading && customers.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center py-12">
-        <img 
-          src="/images/palm-cafe-logo.png" 
-          alt="Palm Cafe Logo" 
-          className="h-12 w-12 mb-3"
+      <div className="space-y-6">
+        <PageHeader
+          title="Users"
+          description="Loading customers..."
         />
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-secondary-500"></div>
-        <p className="mt-3 text-sm text-secondary-600">Loading customers...</p>
+        <div className="card">
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+              <thead className="bg-gray-50 dark:bg-gray-700">
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-300">Customer</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-300">Contact</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-300">Loyalty</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-300">Visits</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-300">Total Spent</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-300">Status</th>
+                  <th className="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-300">Actions</th>
+                </tr>
+              </thead>
+              <TableSkeleton rows={5} columns={7} />
+            </table>
+          </div>
+        </div>
       </div>
     );
   }
@@ -354,11 +371,7 @@ const CustomerManagement = () => {
       {/* Customers List */}
       <div className="card">
         {filteredCustomers.length === 0 ? (
-          <div className="text-center py-8 text-gray-500 dark:text-gray-400">
-            <Users className="h-16 w-16 mx-auto mb-4 opacity-50" />
-            <h3 className="text-lg font-medium text-secondary-700 dark:text-secondary-300 mb-2">No customers found</h3>
-            <p className="text-sm">Add your first customer to get started</p>
-          </div>
+          <EmptyCustomers onAdd={() => setShowAddModal(true)} />
         ) : (
           <div className="overflow-x-auto">
             <table className={`min-w-full divide-y ${isDarkMode ? 'divide-gray-700' : 'divide-gray-200'}`}>

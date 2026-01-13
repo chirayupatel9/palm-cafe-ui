@@ -119,9 +119,19 @@ const SuperadminApp = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-accent-50 dark:bg-gray-900">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-secondary-500"></div>
-        <p className="mt-4 text-secondary-600 dark:text-gray-400">Loading Super Admin Dashboard...</p>
+      <div className="min-h-screen bg-accent-50 dark:bg-gray-900">
+        <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
+          <div className="h-8 w-64 bg-gray-200 dark:bg-gray-700 rounded animate-pulse mb-4"></div>
+          <div className="h-4 w-96 bg-gray-200 dark:bg-gray-700 rounded animate-pulse mb-8"></div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="card">
+                <div className="h-6 w-32 bg-gray-200 dark:bg-gray-700 rounded animate-pulse mb-4"></div>
+                <div className="h-8 w-24 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
     );
   }
@@ -199,9 +209,9 @@ const SuperadminApp = () => {
                 <button
                   key={item.id}
                   onClick={() => handlePageChange(item.id)}
-                  className={`w-full flex items-center px-3 py-3 text-sm font-medium rounded-lg transition-colors ${
+                  className={`w-full flex items-center px-3 py-3 text-sm font-medium rounded-lg transition-all duration-200 ${
                     currentPage === item.id
-                      ? 'bg-secondary-500 text-white'
+                      ? 'bg-secondary-600 text-white font-semibold shadow-sm'
                       : 'text-secondary-600 dark:text-gray-300 hover:bg-accent-100 dark:hover:bg-gray-700'
                   }`}
                 >
@@ -224,10 +234,10 @@ const SuperadminApp = () => {
                 <button
                   key={item.id}
                   onClick={() => handlePageChange(item.id)}
-                  className={`flex items-center px-3 py-4 text-sm font-medium border-b-2 transition-colors ${
+                  className={`flex items-center px-4 py-4 text-sm font-medium border-b-2 transition-all duration-200 ${
                     currentPage === item.id
-                      ? 'border-secondary-500 text-secondary-700 dark:text-gray-100'
-                      : 'border-transparent text-secondary-600 dark:text-gray-400 hover:text-secondary-700 dark:hover:text-gray-200'
+                      ? 'nav-active'
+                      : 'nav-inactive'
                   }`}
                 >
                   <Icon className="h-4 w-4 mr-2" />

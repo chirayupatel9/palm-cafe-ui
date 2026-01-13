@@ -1,13 +1,27 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import toast from 'react-hot-toast';
-import { Plus, Edit, Trash2, Building, X, Check, AlertCircle } from 'lucide-react';
+import { Plus, Edit, Trash2, Building, X, Check, AlertCircle, AlertTriangle } from 'lucide-react';
+import { CardSkeleton, TableSkeleton } from './ui/Skeleton';
+import EmptyState from './ui/EmptyState';
+import ConfirmModal from './ui/ConfirmModal';
+import { useFormChanges } from '../hooks/useUnsavedChanges';
 
 const CafeManagement = () => {
   const [cafes, setCafes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [editingCafe, setEditingCafe] = useState(null);
+  const [deleteConfirm, setDeleteConfirm] = useState(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const initialFormDataRef = useRef(null);
+  
+  // Track form changes for unsaved changes warning
+  const hasUnsavedChanges = useFormChanges(
+    initialFormDataRef.current || formData,
+    formData
+  );
   const [formData, setFormData] = useState({
     slug: '',
     name: '',
@@ -48,20 +62,21 @@ const CafeManagement = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
+    setIsSubmitting(true);
     try {
       if (editingCafe) {
         // Update existing cafe
         await axios.put(`/superadmin/cafes/${editingCafe.id}`, formData);
-        toast.success('Cafe updated successfully');
+        toast.success(`"${formData.name}" has been updated successfully`);
       } else {
         // Create new cafe
         await axios.post('/superadmin/cafes', formData);
-        toast.success('Cafe created successfully');
+        toast.success(`"${formData.name}" has been created successfully`);
       }
       
       setShowModal(false);
       setEditingCafe(null);
-      setFormData({
+      const resetData = {
         slug: '',
         name: '',
         description: '',
@@ -71,17 +86,21 @@ const CafeManagement = () => {
         email: '',
         website: '',
         is_active: true
-      });
+      };
+      setFormData(resetData);
+      initialFormDataRef.current = JSON.parse(JSON.stringify(resetData));
       fetchCafes();
     } catch (error) {
       console.error('Error saving cafe:', error);
-      toast.error(error.response?.data?.error || 'Failed to save cafe');
+      const errorMessage = error.response?.data?.error || 'Failed to save cafe. Please check your input and try again.';
+      toast.error(errorMessage);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   const handleEdit = (cafe) => {
-    setEditingCafe(cafe);
-    setFormData({
+    const cafeFormData = {
       slug: cafe.slug || '',
       name: cafe.name || '',
       description: cafe.description || '',
@@ -91,28 +110,32 @@ const CafeManagement = () => {
       email: cafe.email || '',
       website: cafe.website || '',
       is_active: cafe.is_active !== undefined ? cafe.is_active : true
-    });
+    };
+    setEditingCafe(cafe);
+    setFormData(cafeFormData);
+    initialFormDataRef.current = JSON.parse(JSON.stringify(cafeFormData)); // Deep copy
     setShowModal(true);
   };
 
-  const handleDelete = async (cafe) => {
-    if (!window.confirm(`Are you sure you want to delete "${cafe.name}"? This will deactivate the cafe.`)) {
-      return;
-    }
-
+  const handleDelete = async () => {
+    if (!deleteConfirm) return;
+    
+    setIsDeleting(true);
     try {
-      await axios.delete(`/superadmin/cafes/${cafe.id}`);
-      toast.success('Cafe deleted successfully');
+      await axios.delete(`/superadmin/cafes/${deleteConfirm.id}`);
+      toast.success(`"${deleteConfirm.name}" has been deleted successfully`);
+      setDeleteConfirm(null);
       fetchCafes();
     } catch (error) {
       console.error('Error deleting cafe:', error);
-      toast.error(error.response?.data?.error || 'Failed to delete cafe');
+      toast.error(error.response?.data?.error || 'Failed to delete cafe. Please try again.');
+    } finally {
+      setIsDeleting(false);
     }
   };
 
   const handleNewCafe = () => {
-    setEditingCafe(null);
-    setFormData({
+    const newFormData = {
       slug: '',
       name: '',
       description: '',
@@ -122,14 +145,28 @@ const CafeManagement = () => {
       email: '',
       website: '',
       is_active: true
-    });
+    };
+    setEditingCafe(null);
+    setFormData(newFormData);
+    initialFormDataRef.current = JSON.parse(JSON.stringify(newFormData)); // Deep copy
     setShowModal(true);
   };
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-secondary-500"></div>
+      <div className="space-section">
+        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-6">
+          <div>
+            <div className="h-8 w-32 bg-gray-200 dark:bg-gray-700 rounded animate-pulse mb-2"></div>
+            <div className="h-4 w-48 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+          </div>
+          <div className="h-10 w-40 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {[1, 2, 3].map((i) => (
+            <CardSkeleton key={i} lines={4} />
+          ))}
+        </div>
       </div>
     );
   }
@@ -155,8 +192,17 @@ const CafeManagement = () => {
       </div>
 
       {/* Cafes List */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {cafes.map((cafe) => (
+      {cafes.length === 0 ? (
+        <EmptyState
+          icon={Building}
+          title="No cafes yet"
+          description="Create your first cafe to start managing locations and settings."
+          action={handleNewCafe}
+          actionLabel="Create First Cafe"
+        />
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {cafes.map((cafe) => (
           <div
             key={cafe.id}
             className={`bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 border-l-4 ${
@@ -230,8 +276,9 @@ const CafeManagement = () => {
                 <span>Edit</span>
               </button>
               <button
-                onClick={() => handleDelete(cafe)}
+                onClick={() => setDeleteConfirm(cafe)}
                 className="flex-1 btn-destructive flex items-center justify-center"
+                disabled={isDeleting}
               >
                 <Trash2 className="h-4 w-4 mr-1.5" />
                 <span>Delete</span>
@@ -239,14 +286,6 @@ const CafeManagement = () => {
             </div>
           </div>
         ))}
-      </div>
-
-      {cafes.length === 0 && (
-        <div className="text-center py-12 bg-white dark:bg-gray-800 rounded-lg shadow">
-          <Building className="h-12 w-12 text-secondary-400 mx-auto mb-4" />
-          <p className="text-secondary-600 dark:text-gray-400">
-            No cafes found. Create your first cafe to get started.
-          </p>
         </div>
       )}
 
@@ -260,8 +299,12 @@ const CafeManagement = () => {
               </h3>
               <button
                 onClick={() => {
+                  if (hasUnsavedChanges && !window.confirm('You have unsaved changes. Are you sure you want to close?')) {
+                    return;
+                  }
                   setShowModal(false);
                   setEditingCafe(null);
+                  initialFormDataRef.current = null;
                 }}
                 className="text-secondary-500 hover:text-secondary-700 dark:text-gray-400 dark:hover:text-gray-200"
               >
@@ -269,6 +312,12 @@ const CafeManagement = () => {
               </button>
             </div>
 
+            {hasUnsavedChanges && (
+              <div className="mx-6 mt-4 p-3 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg flex items-center">
+                <AlertTriangle className="h-4 w-4 text-yellow-600 dark:text-yellow-400 mr-2 flex-shrink-0" />
+                <p className="text-sm text-yellow-800 dark:text-yellow-200">You have unsaved changes</p>
+              </div>
+            )}
             <form onSubmit={handleSubmit} className="p-6 space-form">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
@@ -415,8 +464,12 @@ const CafeManagement = () => {
                 <button
                   type="button"
                   onClick={() => {
+                    if (hasUnsavedChanges && !window.confirm('You have unsaved changes. Are you sure you want to cancel?')) {
+                      return;
+                    }
                     setShowModal(false);
                     setEditingCafe(null);
+                    initialFormDataRef.current = null;
                   }}
                   className="btn-secondary"
                 >
@@ -424,15 +477,36 @@ const CafeManagement = () => {
                 </button>
                 <button
                   type="submit"
-                  className="btn-primary"
+                  className="btn-primary flex items-center justify-center"
+                  disabled={isSubmitting}
                 >
-                  {editingCafe ? 'Update Cafe' : 'Create Cafe'}
+                  {isSubmitting ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                      {editingCafe ? 'Updating...' : 'Creating...'}
+                    </>
+                  ) : (
+                    editingCafe ? 'Update Cafe' : 'Create Cafe'
+                  )}
                 </button>
               </div>
             </form>
           </div>
         </div>
       )}
+
+      {/* Delete Confirmation Modal */}
+      <ConfirmModal
+        isOpen={!!deleteConfirm}
+        onClose={() => setDeleteConfirm(null)}
+        onConfirm={handleDelete}
+        title="Delete Cafe"
+        message={`Are you sure you want to delete "${deleteConfirm?.name}"? This action cannot be undone and will permanently remove the cafe from the system.`}
+        confirmLabel="Delete Cafe"
+        cancelLabel="Cancel"
+        variant="danger"
+        isLoading={isDeleting}
+      />
     </div>
   );
 };

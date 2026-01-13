@@ -864,13 +864,22 @@ tbody tr:hover {
     @apply text-gray-400 dark:text-gray-500;
   }
 
-  /* Navigation styles */
+  /* Navigation styles - Enhanced */
   .nav-active {
-    @apply border-secondary-500 text-secondary-700;
+    @apply border-secondary-600 text-secondary-700 dark:text-secondary-300 font-semibold;
+    background-color: rgba(111, 78, 55, 0.08) !important;
+    border-bottom-width: 3px !important;
+  }
+
+  .dark .nav-active {
+    background-color: rgba(139, 111, 71, 0.15) !important;
+    border-color: var(--color-primary) !important;
+    color: var(--color-primary) !important;
   }
 
   .nav-inactive {
-    @apply border-transparent text-secondary-600 hover:text-secondary-700 hover:border-warm-300;
+    @apply border-transparent text-secondary-600 dark:text-gray-400 hover:text-secondary-700 dark:hover:text-gray-300 hover:border-warm-300;
+    transition: all 0.2s ease;
   }
 
   /* Mobile-specific styles */

@@ -6,6 +6,7 @@ import {
   Building, Users, ShoppingCart, TrendingUp, Clock, 
   CheckCircle, XCircle, ArrowRight, Settings, BarChart3 
 } from 'lucide-react';
+import { CardSkeleton } from './ui/Skeleton';
 
 const SuperAdminDashboard = () => {
   const [cafesOverview, setCafesOverview] = useState([]);
@@ -61,8 +62,16 @@ const SuperAdminDashboard = () => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-secondary-500"></div>
+      <div className="space-y-6">
+        <div>
+          <div className="h-8 w-48 bg-gray-200 dark:bg-gray-700 rounded animate-pulse mb-2"></div>
+          <div className="h-4 w-64 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          {[1, 2, 3, 4].map((i) => (
+            <CardSkeleton key={i} lines={2} />
+          ))}
+        </div>
       </div>
     );
   }

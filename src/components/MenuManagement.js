@@ -5,6 +5,9 @@ import axios from 'axios';
 import { useCurrency } from '../contexts/CurrencyContext';
 import { useDarkMode } from '../contexts/DarkModeContext';
 import { getImageUrl, getPlaceholderImage } from '../utils/imageUtils';
+import { TableSkeleton, CardSkeleton } from './ui/Skeleton';
+import { EmptyMenu } from './ui/EmptyState';
+import ConfirmModal from './ui/ConfirmModal';
 
 const MenuManagement = ({ menuItems, onUpdate, onAdd, onDelete }) => {
   const { formatCurrency } = useCurrency();
@@ -24,6 +27,9 @@ const MenuManagement = ({ menuItems, onUpdate, onAdd, onDelete }) => {
   });
   const [loading, setLoading] = useState(false);
   const [imageUploading, setImageUploading] = useState(false);
+  const [deleteConfirm, setDeleteConfirm] = useState(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
 
   // Category management state
   const [categoryEditingId, setCategoryEditingId] = useState(null);
@@ -149,21 +155,25 @@ const MenuManagement = ({ menuItems, onUpdate, onAdd, onDelete }) => {
     });
   };
 
-  const handleDelete = async (id, name) => {
-    if (window.confirm(`Are you sure you want to delete "${name}"?`)) {
+  const handleDelete = async () => {
+    if (!deleteConfirm) return;
+    
+    setIsDeleting(true);
+    try {
+      await onDelete(deleteConfirm.id);
+      toast.success(`"${deleteConfirm.name}" has been deleted successfully`);
+      setDeleteConfirm(null);
+      
+      // Auto-generate categories from menu items after deletion
       try {
-        await onDelete(id);
-        toast.success('Menu item deleted successfully');
-        
-        // Auto-generate categories from menu items after deletion
-        try {
-          await axios.post('/categories/generate');
-        } catch (error) {
-          console.error('Error auto-generating categories:', error);
-        }
+        await axios.post('/categories/generate');
       } catch (error) {
-        toast.error('Failed to delete menu item');
+        console.error('Error auto-generating categories:', error);
       }
+    } catch (error) {
+      toast.error('Failed to delete menu item. Please try again.');
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -571,9 +581,22 @@ const MenuManagement = ({ menuItems, onUpdate, onAdd, onDelete }) => {
                   <X className="h-4 w-4 mr-2" />
                   Cancel
                 </button>
-                <button onClick={handleSave} className="btn-primary flex items-center justify-center">
-                  <Save className="h-4 w-4 mr-2" />
-                  Save
+                <button 
+                  onClick={handleSave} 
+                  className="btn-primary flex items-center justify-center"
+                  disabled={isSaving}
+                >
+                  {isSaving ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                      Saving...
+                    </>
+                  ) : (
+                    <>
+                      <Save className="h-4 w-4 mr-2" />
+                      Save
+                    </>
+                  )}
                 </button>
               </div>
             </div>
@@ -581,17 +604,7 @@ const MenuManagement = ({ menuItems, onUpdate, onAdd, onDelete }) => {
 
           {/* Menu Items by Category */}
           {Object.keys(groupedMenuItems).length === 0 ? (
-            <div className="card">
-              <div className={`text-center py-8 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                <img 
-                  src="/images/palm-cafe-logo.png" 
-                  alt="Palm Cafe Logo" 
-                  className="h-16 w-16 mx-auto mb-4 opacity-50"
-                />
-                <p>No menu items found</p>
-                <p className="text-sm">Add your first menu item to get started</p>
-              </div>
-            </div>
+            <EmptyMenu onAdd={() => setShowAddForm(true)} />
           ) : (
             Object.entries(groupedMenuItems).map(([categoryName, items], index) => {
               return (
@@ -755,8 +768,9 @@ const MenuManagement = ({ menuItems, onUpdate, onAdd, onDelete }) => {
                                     <Edit className="h-4 w-4" />
                                   </button>
                                   <button
-                                    onClick={() => handleDelete(item.id, item.name)}
+                                    onClick={() => setDeleteConfirm({ id: item.id, name: item.name })}
                                     className={`${isDarkMode ? 'text-red-400 hover:text-red-300' : 'text-red-600 hover:text-red-900'}`}
+                                    disabled={isDeleting}
                                   >
                                     <Trash2 className="h-4 w-4" />
                                   </button>
@@ -843,9 +857,22 @@ const MenuManagement = ({ menuItems, onUpdate, onAdd, onDelete }) => {
                             />
                           </div>
                           <div className="flex space-x-2">
-                            <button onClick={handleSave} className="flex-1 btn-primary flex items-center justify-center">
-                              <Save className="h-4 w-4 mr-2" />
-                              Save
+                            <button 
+                              onClick={handleSave} 
+                              className="flex-1 btn-primary flex items-center justify-center"
+                              disabled={isSaving}
+                            >
+                              {isSaving ? (
+                                <>
+                                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                                  Saving...
+                                </>
+                              ) : (
+                                <>
+                                  <Save className="h-4 w-4 mr-2" />
+                                  Save
+                                </>
+                              )}
                             </button>
                             <button onClick={handleCancel} className="flex-1 btn-secondary flex items-center justify-center">
                               <X className="h-4 w-4 mr-2" />
@@ -873,8 +900,9 @@ const MenuManagement = ({ menuItems, onUpdate, onAdd, onDelete }) => {
                                     <Edit className="h-4 w-4" />
                                   </button>
                                   <button
-                                    onClick={() => handleDelete(item.id, item.name)}
+                                    onClick={() => setDeleteConfirm({ id: item.id, name: item.name })}
                                     className={`p-2 rounded-full ${isDarkMode ? 'text-red-400 hover:text-red-300 bg-red-900/30' : 'text-red-600 hover:text-red-900 bg-red-50'}`}
+                                    disabled={isDeleting}
                                   >
                                     <Trash2 className="h-4 w-4" />
                                   </button>
@@ -1202,6 +1230,19 @@ const MenuManagement = ({ menuItems, onUpdate, onAdd, onDelete }) => {
           </div>
         </div>
       )}
+
+      {/* Delete Confirmation Modal */}
+      <ConfirmModal
+        isOpen={!!deleteConfirm}
+        onClose={() => setDeleteConfirm(null)}
+        onConfirm={handleDelete}
+        title="Delete Menu Item"
+        message={`Are you sure you want to delete "${deleteConfirm?.name}"? This action cannot be undone.`}
+        confirmLabel="Delete Item"
+        cancelLabel="Cancel"
+        variant="danger"
+        isLoading={isDeleting}
+      />
     </div>
   );
 };
