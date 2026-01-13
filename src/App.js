@@ -34,6 +34,7 @@ import SuperadminApp from './components/SuperadminApp';
 import ProtectedRoute from './components/ProtectedRoute';
 import RoleBasedRedirect from './components/RoleBasedRedirect';
 import DashboardRedirect from './components/DashboardRedirect';
+import OnboardingGuard from './components/OnboardingGuard';
 
 // Configure axios base URL - use environment variable or fallback to localhost
 const API_BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
@@ -438,23 +439,29 @@ function App() {
                   <Route path="/customer" element={<CustomerApp />} />
                   <Route path="/admin" element={
                     <ProtectedRoute>
-                      <RoleBasedRedirect>
-                        <MainApp />
-                      </RoleBasedRedirect>
+                      <OnboardingGuard>
+                        <RoleBasedRedirect>
+                          <MainApp />
+                        </RoleBasedRedirect>
+                      </OnboardingGuard>
                     </ProtectedRoute>
                   } />
                   <Route path="/chef" element={
                     <ProtectedRoute>
-                      <RoleBasedRedirect>
-                        <ChefApp />
-                      </RoleBasedRedirect>
+                      <OnboardingGuard>
+                        <RoleBasedRedirect>
+                          <ChefApp />
+                        </RoleBasedRedirect>
+                      </OnboardingGuard>
                     </ProtectedRoute>
                   } />
                   <Route path="/reception" element={
                     <ProtectedRoute>
-                      <RoleBasedRedirect>
-                        <ReceptionApp />
-                      </RoleBasedRedirect>
+                      <OnboardingGuard>
+                        <RoleBasedRedirect>
+                          <ReceptionApp />
+                        </RoleBasedRedirect>
+                      </OnboardingGuard>
                     </ProtectedRoute>
                   } />
                   <Route path="/superadmin" element={
@@ -487,7 +494,16 @@ function App() {
                   } />
                   <Route path="/dashboard" element={
                     <ProtectedRoute>
-                      <DashboardRedirect />
+                      <OnboardingGuard>
+                        <DashboardRedirect />
+                      </OnboardingGuard>
+                    </ProtectedRoute>
+                  } />
+                  <Route path="/onboarding" element={
+                    <ProtectedRoute>
+                      <OnboardingGuard>
+                        <div />
+                      </OnboardingGuard>
                     </ProtectedRoute>
                   } />
                   <Route path="*" element={<Navigate to="/" replace />} />

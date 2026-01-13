@@ -4,7 +4,7 @@ import toast from 'react-hot-toast';
 import { useParams, useNavigate } from 'react-router-dom';
 import { 
   Building, Settings, Save, ArrowLeft, CheckCircle, XCircle, 
-  AlertCircle, Loader, CreditCard, Lock, Unlock, Crown
+  AlertCircle, Loader, CreditCard, Lock, Unlock, Crown, RotateCcw, UserCheck
 } from 'lucide-react';
 
 const SuperAdminCafeSettings = () => {
@@ -33,6 +33,7 @@ const SuperAdminCafeSettings = () => {
   });
   const [savingSubscription, setSavingSubscription] = useState(false);
   const [togglingFeature, setTogglingFeature] = useState(null);
+  const [resettingOnboarding, setResettingOnboarding] = useState(false);
 
   useEffect(() => {
     fetchCafe();
@@ -162,6 +163,24 @@ const SuperAdminCafeSettings = () => {
     }
   };
 
+  const resetOnboarding = async () => {
+    if (!window.confirm(`Are you sure you want to reset onboarding for "${cafe.name}"? This will require the cafe to complete onboarding again.`)) {
+      return;
+    }
+
+    try {
+      setResettingOnboarding(true);
+      await axios.post(`/superadmin/cafes/${cafeId}/reset-onboarding`);
+      toast.success('Onboarding reset successfully');
+      fetchCafe();
+    } catch (error) {
+      console.error('Error resetting onboarding:', error);
+      toast.error(error.response?.data?.error || 'Failed to reset onboarding');
+    } finally {
+      setResettingOnboarding(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -200,7 +219,7 @@ const SuperAdminCafeSettings = () => {
             </p>
           </div>
         </div>
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center space-x-4">
           {cafe.is_active ? (
             <span className="flex items-center text-green-600 text-sm">
               <CheckCircle className="h-4 w-4 mr-1" />
@@ -210,6 +229,14 @@ const SuperAdminCafeSettings = () => {
             <span className="flex items-center text-red-600 text-sm">
               <XCircle className="h-4 w-4 mr-1" />
               Inactive
+            </span>
+          )}
+          {cafe.is_onboarded !== undefined && (
+            <span className={`flex items-center text-sm ${
+              cafe.is_onboarded ? 'text-green-600' : 'text-orange-600'
+            }`}>
+              <UserCheck className="h-4 w-4 mr-1" />
+              {cafe.is_onboarded ? 'Onboarded' : 'Not Onboarded'}
             </span>
           )}
         </div>
@@ -375,6 +402,54 @@ const SuperAdminCafeSettings = () => {
           </button>
         </div>
       </form>
+
+      {/* Onboarding Status Section */}
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 space-y-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-2">
+            <UserCheck className="h-5 w-5 text-secondary-600 dark:text-gray-400" />
+            <h3 className="text-xl font-bold text-secondary-700 dark:text-gray-100">
+              Onboarding Status
+            </h3>
+          </div>
+        </div>
+
+        <div className="flex items-center justify-between p-4 bg-accent-50 dark:bg-gray-700 rounded-lg">
+          <div>
+            <p className="text-sm font-medium text-secondary-700 dark:text-gray-300">
+              Status: {cafe.is_onboarded ? (
+                <span className="text-green-600">Completed</span>
+              ) : (
+                <span className="text-orange-600">Pending</span>
+              )}
+            </p>
+            <p className="text-xs text-secondary-500 dark:text-gray-400 mt-1">
+              {cafe.is_onboarded 
+                ? 'This cafe has completed the onboarding process.'
+                : 'This cafe needs to complete onboarding before accessing the full application.'}
+            </p>
+          </div>
+          {cafe.is_onboarded && (
+            <button
+              onClick={resetOnboarding}
+              disabled={resettingOnboarding}
+              className="flex items-center space-x-2 px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {resettingOnboarding ? (
+                <>
+                  <Loader className="h-4 w-4 animate-spin" />
+                  <span>Resetting...</span>
+                </>
+              ) : (
+                <>
+                  <RotateCcw className="h-4 w-4" />
+                  <span>Reset Onboarding</span>
+                </>
+              )}
+            </button>
+          )}
+        </div>
+      </div>
 
       {/* Subscription Management Section */}
       {subscription && (
