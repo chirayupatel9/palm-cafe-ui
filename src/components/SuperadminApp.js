@@ -37,8 +37,7 @@ const SuperadminApp = () => {
         navigate('/superadmin');
         break;
       case 'cafe-management':
-        navigate('/superadmin');
-        // Note: CafeManagement will be shown via state, but we'll navigate to /superadmin first
+        navigate('/superadmin?page=cafe-management');
         break;
       case 'user-management':
         navigate('/superadmin/users');
