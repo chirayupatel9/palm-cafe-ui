@@ -17,6 +17,7 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   transition: background-color 0.2s ease, color 0.2s ease;
+  line-height: 1.6;
 }
 
 /* ============================================
@@ -24,11 +25,13 @@ body {
    ============================================ */
 
 @layer components {
-  /* Card component */
+  /* Card component - Material Design elevation system */
   .card {
-    @apply rounded-lg shadow-sm border border-border p-6;
+    @apply rounded-lg p-6;
     background-color: var(--color-surface);
-    transition: all 0.2s ease;
+    border: 1px solid var(--color-outline);
+    box-shadow: var(--elevation-1);
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   }
   
   .card-sm {
@@ -39,76 +42,157 @@ body {
     @apply p-8;
   }
   
+  /* Elevated card for emphasis */
+  .card-elevated {
+    @apply rounded-lg p-6;
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-outline);
+    box-shadow: var(--elevation-2);
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  /* Surface container - sits on background */
+  .surface {
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-outline);
+  }
+  
+  /* Surface variant - subtle differentiation */
+  .surface-variant {
+    background-color: var(--color-surface-variant);
+    border: 1px solid var(--color-outline-variant);
+  }
+  
   .card:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-md);
+    box-shadow: var(--elevation-2);
+  }
+  
+  .card-elevated:hover {
+    box-shadow: var(--elevation-3);
   }
 
-  /* Button styles - using CSS variables */
+  /* Button styles - refined with subtle depth */
   .btn-primary {
     background-color: var(--color-primary);
     color: var(--color-on-primary);
-    @apply hover:opacity-90 px-4 py-2 h-10 rounded-lg transition-all duration-200 font-medium text-sm shadow-sm hover:shadow-md focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2;
+    @apply px-4 py-2 h-10 rounded-lg transition-all duration-200 font-medium text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2;
+    box-shadow: var(--elevation-1);
+  }
+  
+  .btn-primary:hover {
+    box-shadow: var(--elevation-2);
+    transform: translateY(-1px);
+  }
+  
+  .btn-primary:active {
+    box-shadow: var(--elevation-1);
+    transform: translateY(0);
   }
 
   .btn-secondary {
     background-color: var(--color-surface);
     border-color: var(--color-outline);
     color: var(--color-on-surface);
-    @apply border px-4 py-2 h-10 rounded-lg transition-all duration-200 font-medium text-sm hover:bg-opacity-80 focus:outline-none focus:ring-2 focus:ring-offset-2;
+    @apply border px-4 py-2 h-10 rounded-lg transition-all duration-200 font-medium text-sm focus:outline-none focus:ring-2 focus:ring-offset-2;
     --tw-ring-color: var(--color-outline);
+    box-shadow: var(--elevation-0);
+  }
+  
+  .btn-secondary:hover {
+    background-color: var(--color-surface-variant);
+    box-shadow: var(--elevation-1);
   }
   
   .btn-destructive {
     background-color: var(--color-error);
     color: var(--color-on-error);
-    @apply hover:opacity-90 px-4 py-2 h-10 rounded-lg transition-all duration-200 font-medium text-sm shadow-sm hover:shadow-md focus:outline-none focus:ring-2 focus:ring-error focus:ring-offset-2;
+    @apply px-4 py-2 h-10 rounded-lg transition-all duration-200 font-medium text-sm focus:outline-none focus:ring-2 focus:ring-error focus:ring-offset-2;
+    box-shadow: var(--elevation-1);
+  }
+  
+  .btn-destructive:hover {
+    box-shadow: var(--elevation-2);
+    transform: translateY(-1px);
+  }
+  
+  .btn-destructive:active {
+    box-shadow: var(--elevation-1);
+    transform: translateY(0);
   }
   
   .btn-ghost {
     color: var(--color-on-surface);
-    @apply hover:bg-surface px-4 py-2 h-10 rounded-lg transition-all duration-200 font-medium text-sm focus:outline-none focus:ring-2 focus:ring-offset-2;
+    @apply px-4 py-2 h-10 rounded-lg transition-all duration-200 font-medium text-sm focus:outline-none focus:ring-2 focus:ring-offset-2;
     --tw-ring-color: var(--color-outline);
   }
+  
+  .btn-ghost:hover {
+    background-color: var(--color-surface-variant);
+  }
 
-  /* Input field styles - using CSS variables */
+  /* Input field styles - refined with subtle elevation */
   .input-field {
     @apply w-full h-10 px-3 py-2 text-sm border rounded-lg transition-all duration-200;
     background-color: var(--color-surface);
     border-color: var(--color-outline);
     color: var(--color-on-surface);
+    box-shadow: var(--elevation-0);
   }
   
   .input-field:focus {
     @apply focus:ring-2 focus:ring-primary focus:border-transparent;
     border-color: var(--color-primary);
     outline: none;
+    box-shadow: var(--elevation-1), 0 0 0 3px rgba(var(--color-primary-rgb, 111, 78, 55), 0.1);
   }
   
   .input-field::placeholder {
     color: var(--color-on-surface-variant);
   }
 
-  /* Navigation styles - using CSS variables */
+  /* Navigation styles - refined with subtle depth */
   .nav-active {
     border-color: var(--color-primary);
     color: var(--color-primary);
     background-color: var(--color-primary-container);
     @apply font-semibold;
-    border-bottom-width: 3px;
+    border-bottom-width: 2px;
+    position: relative;
+  }
+  
+  .nav-active::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background-color: var(--color-primary);
+    border-radius: 2px 2px 0 0;
   }
 
   .nav-inactive {
     border-color: transparent;
     color: var(--color-on-surface-variant);
-    transition: all 0.2s ease;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
   }
   
   .nav-inactive:hover {
     color: var(--color-on-surface);
-    border-color: var(--color-primary);
-    background-color: var(--color-primary-container);
-    opacity: 0.5;
+    background-color: var(--color-surface-variant);
+  }
+  
+  .nav-inactive:hover::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background-color: var(--color-primary);
+    opacity: 0.3;
+    border-radius: 2px 2px 0 0;
   }
 
   /* Mobile navigation - using CSS variables */
@@ -171,17 +255,63 @@ body {
   color: var(--color-on-primary-container);
 }
 
-/* Spacing utilities */
+/* Surface hierarchy utilities */
+.bg-surface {
+  background-color: var(--color-surface);
+}
+
+.bg-surface-variant {
+  background-color: var(--color-surface-variant);
+}
+
+.bg-elevated {
+  background-color: var(--color-surface);
+  box-shadow: var(--elevation-2);
+}
+
+/* Spacing utilities - improved rhythm */
 .space-section {
-  @apply space-y-6;
+  @apply space-y-8;
 }
 
 .space-card {
-  @apply space-y-4;
+  @apply space-y-6;
 }
 
 .space-form {
-  @apply space-y-4;
+  @apply space-y-5;
+}
+
+/* Typography hierarchy - improved rhythm */
+.text-heading-1 {
+  @apply text-3xl font-bold;
+  color: var(--color-on-surface);
+  line-height: 1.2;
+  margin-bottom: var(--spacing-lg);
+}
+
+.text-heading-2 {
+  @apply text-2xl font-semibold;
+  color: var(--color-on-surface);
+  line-height: 1.3;
+  margin-bottom: var(--spacing-md);
+}
+
+.text-heading-3 {
+  @apply text-xl font-semibold;
+  color: var(--color-on-surface);
+  line-height: 1.4;
+  margin-bottom: var(--spacing-sm);
+}
+
+.text-body {
+  color: var(--color-on-surface);
+  line-height: 1.6;
+}
+
+.text-body-muted {
+  color: var(--color-on-surface-variant);
+  line-height: 1.6;
 }
 
 /* Responsive text sizes */
@@ -226,6 +356,32 @@ body {
   .btn-primary, .btn-secondary {
     @apply min-h-[44px];
   }
+}
+
+/* ============================================
+   TABLE STYLES
+   ============================================ */
+
+.table-container {
+  background-color: var(--color-surface);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-outline);
+  box-shadow: var(--elevation-1);
+  overflow: hidden;
+}
+
+.table-header {
+  background-color: var(--color-surface-variant);
+  color: var(--color-on-surface-variant);
+}
+
+.table-row {
+  border-bottom: 1px solid var(--color-outline-variant);
+  transition: background-color 0.15s ease;
+}
+
+.table-row:hover {
+  background-color: var(--color-surface-variant);
 }
 
 /* ============================================

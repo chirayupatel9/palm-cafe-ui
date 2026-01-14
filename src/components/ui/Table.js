@@ -17,34 +17,59 @@ const Table = ({
   className = ''
 }) => {
   return (
-    <div className={`overflow-x-auto ${className}`}>
-      <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-        <thead className="bg-gray-50 dark:bg-gray-900">
+    <div className={`overflow-x-auto ${className}`} style={{ 
+      backgroundColor: 'var(--color-surface)',
+      borderRadius: 'var(--radius-lg)',
+      border: '1px solid var(--color-outline)',
+      boxShadow: 'var(--elevation-1)'
+    }}>
+      <table className="min-w-full" style={{ 
+        borderCollapse: 'separate',
+        borderSpacing: 0
+      }}>
+        <thead style={{ 
+          backgroundColor: 'var(--color-surface-variant)'
+        }}>
           <tr>
             {columns.map((column, index) => (
               <th
                 key={column.key || index}
-                className={`px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider ${
+                className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
                   column.align === 'right' ? 'text-right' : ''
                 }`}
+                style={{ 
+                  color: 'var(--color-on-surface-variant)',
+                  borderBottom: '1px solid var(--color-outline)'
+                }}
               >
                 {column.label}
               </th>
             ))}
           </tr>
         </thead>
-        <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+        <tbody style={{ 
+          backgroundColor: 'var(--color-surface)'
+        }}>
           {data.length === 0 ? (
             <tr>
               <td colSpan={columns.length} className="px-6 py-12 text-center">
-                <p className="text-sm text-gray-500 dark:text-gray-400">{emptyMessage}</p>
+                <p className="text-sm" style={{ color: 'var(--color-on-surface-variant)' }}>{emptyMessage}</p>
               </td>
             </tr>
           ) : (
             data.map((row, rowIndex) => (
               <tr
                 key={row.id || rowIndex}
-                className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors h-14"
+                className="transition-colors h-14"
+                style={{ 
+                  borderBottom: '1px solid var(--color-outline-variant)'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = 'var(--color-surface-variant)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = 'var(--color-surface)';
+                }}
               >
                 {renderRow(row, rowIndex)}
               </tr>

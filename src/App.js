@@ -241,28 +241,34 @@ function MainApp() {
 
   if (loading || cafeSettingsLoading || subscriptionLoading || featuresLoading) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-accent-50 dark:bg-gray-900">
+      <div className="min-h-screen flex flex-col items-center justify-center" style={{ backgroundColor: 'var(--color-background)' }}>
         <CafeInfo logoSize="h-16 w-16" nameSize="text-xl" className="mb-4" />
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-secondary-500"></div>
-        <p className="mt-4 text-secondary-600 dark:text-gray-400">Loading {cafeSettings.cafe_name}...</p>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2" style={{ borderColor: 'var(--color-primary)' }}></div>
+        <p className="mt-4" style={{ color: 'var(--color-on-surface-variant)' }}>Loading {cafeSettings.cafe_name}...</p>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-accent-50 dark:bg-gray-900">
+    <div className="min-h-screen" style={{ backgroundColor: 'var(--color-background)' }}>
       <Toaster position="top-right" />
     
-    {/* Header */}
-    <header className="bg-white dark:bg-gray-800 shadow-sm border-b border-accent-200 dark:border-gray-700">
+    {/* Header - elevated surface with subtle shadow */}
+    <header className="surface" style={{ 
+      boxShadow: 'var(--elevation-1)',
+      borderBottom: '1px solid var(--color-outline)'
+    }}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           <div className="flex items-center">
             <CafeInfo />
             {cart && cart.length > 0 && (
-              <div className="ml-4 flex items-center space-x-1 text-sm text-secondary-600 dark:text-gray-400">
+              <div className="ml-4 flex items-center space-x-1 text-sm" style={{ color: 'var(--color-on-surface-variant)' }}>
                 <ShoppingCart className="h-4 w-4" />
-                <span className="bg-secondary-100 text-secondary-800 px-2 py-1 rounded-full text-xs font-medium">
+                <span className="px-2 py-1 rounded-full text-xs font-medium" style={{ 
+                  backgroundColor: 'var(--color-primary-container)',
+                  color: 'var(--color-on-primary-container)'
+                }}>
                   {cart.length} items
                 </span>
               </div>
@@ -271,7 +277,7 @@ function MainApp() {
           
           <div className="flex items-center space-x-2">
               {/* User info */}
-              <div className="hidden sm:flex items-center space-x-2 text-sm text-secondary-600 dark:text-gray-400">
+              <div className="hidden sm:flex items-center space-x-2 text-sm" style={{ color: 'var(--color-on-surface-variant)' }}>
                 <User className="h-4 w-4" />
                 <span>{user?.username}</span>
               </div>
@@ -282,7 +288,18 @@ function MainApp() {
             {/* Logout button */}
             <button
               onClick={handleLogout}
-              className="p-2 rounded-md text-secondary-600 hover:text-secondary-700 hover:bg-accent-100 dark:text-gray-400 dark:hover:text-gray-300 dark:hover:bg-gray-700"
+              className="p-2 rounded-md transition-colors"
+              style={{ 
+                color: 'var(--color-on-surface-variant)'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = 'var(--color-surface-variant)';
+                e.currentTarget.style.color = 'var(--color-on-surface)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = 'transparent';
+                e.currentTarget.style.color = 'var(--color-on-surface-variant)';
+              }}
               title="Logout"
             >
               <LogOut className="h-5 w-5" />
@@ -291,7 +308,16 @@ function MainApp() {
             {/* Mobile menu button */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="lg:hidden p-2 rounded-md text-secondary-600 hover:text-secondary-700 hover:bg-accent-100"
+              className="lg:hidden p-2 rounded-md transition-colors"
+              style={{ color: 'var(--color-on-surface-variant)' }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = 'var(--color-surface-variant)';
+                e.currentTarget.style.color = 'var(--color-on-surface)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = 'transparent';
+                e.currentTarget.style.color = 'var(--color-on-surface-variant)';
+              }}
             >
               {mobileMenuOpen ? (
                 <X className="h-6 w-6" />
@@ -306,7 +332,10 @@ function MainApp() {
 
     {/* Mobile Navigation Menu */}
     {mobileMenuOpen && (
-      <div className="lg:hidden bg-white dark:bg-gray-800 border-b border-accent-200 dark:border-gray-700 shadow-sm">
+      <div className="lg:hidden surface" style={{ 
+        boxShadow: 'var(--elevation-1)',
+        borderBottom: '1px solid var(--color-outline)'
+      }}>
         <div className="px-4 py-2 space-y-1">
           {navigationItems.map((item) => {
             const Icon = item.icon;
@@ -316,9 +345,28 @@ function MainApp() {
                 onClick={() => handlePageChange(item.id)}
                 className={`w-full flex items-center px-3 py-3 text-sm font-medium rounded-lg transition-colors ${
                   currentPage === item.id
-                    ? 'bg-secondary-500 text-white'
-                    : 'text-secondary-600 hover:bg-accent-100'
+                    ? ''
+                    : ''
                 }`}
+                style={currentPage === item.id ? {
+                  backgroundColor: 'var(--color-primary)',
+                  color: 'var(--color-on-primary)',
+                  boxShadow: 'var(--elevation-1)'
+                } : {
+                  color: 'var(--color-on-surface-variant)'
+                }}
+                onMouseEnter={(e) => {
+                  if (currentPage !== item.id) {
+                    e.currentTarget.style.backgroundColor = 'var(--color-surface-variant)';
+                    e.currentTarget.style.color = 'var(--color-on-surface)';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (currentPage !== item.id) {
+                    e.currentTarget.style.backgroundColor = 'transparent';
+                    e.currentTarget.style.color = 'var(--color-on-surface-variant)';
+                  }
+                }}
               >
                 <Icon className="h-4 w-4 mr-3" />
                 {item.label}
@@ -330,8 +378,11 @@ function MainApp() {
       </div>
     )}
 
-    {/* Desktop Navigation */}
-    <nav className="hidden lg:block bg-white dark:bg-gray-800 shadow-sm border-b border-accent-200 dark:border-gray-700">
+    {/* Desktop Navigation - refined with subtle depth */}
+    <nav className="hidden lg:block surface" style={{ 
+      boxShadow: 'var(--elevation-1)',
+      borderBottom: '1px solid var(--color-outline)'
+    }}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex space-x-8">
           {navigationItems.map((item) => {
@@ -355,8 +406,8 @@ function MainApp() {
       </div>
     </nav>
 
-    {/* Main Content */}
-    <main className="max-w-7xl mx-auto py-4 sm:py-6 px-4 sm:px-6 lg:px-8">
+    {/* Main Content - increased vertical rhythm */}
+    <main className="max-w-7xl mx-auto py-6 sm:py-8 px-4 sm:px-6 lg:px-8">
       {renderPage()}
     </main>
       </div>

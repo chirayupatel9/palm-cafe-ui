@@ -15,7 +15,8 @@ const Card = ({
   headerAction,
   footer,
   className = '',
-  padding = 'md' // sm: 16px, md: 24px, lg: 32px
+  padding = 'md', // sm: 16px, md: 24px, lg: 32px
+  elevated = false // Use elevated card style
 }) => {
   const paddingClasses = {
     sm: 'p-4',
@@ -23,18 +24,20 @@ const Card = ({
     lg: 'p-8'
   };
   
+  const cardClass = elevated ? 'card-elevated' : 'card';
+  
   return (
-    <div className={`bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm ${paddingClasses[padding]} ${className}`}>
+    <div className={`${cardClass} ${paddingClasses[padding]} ${className}`}>
       {(title || description || headerAction) && (
         <div className="mb-6 flex items-start justify-between">
           <div className="flex-1">
             {title && (
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-1">
+              <h3 className="text-lg font-semibold mb-1" style={{ color: 'var(--color-on-surface)' }}>
                 {title}
               </h3>
             )}
             {description && (
-              <p className="text-sm text-gray-600 dark:text-gray-400">
+              <p className="text-sm" style={{ color: 'var(--color-on-surface-variant)' }}>
                 {description}
               </p>
             )}
@@ -48,7 +51,7 @@ const Card = ({
       )}
       <div>{children}</div>
       {footer && (
-        <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
+        <div className="mt-6 pt-6" style={{ borderTop: '1px solid var(--color-outline)' }}>
           {footer}
         </div>
       )}
