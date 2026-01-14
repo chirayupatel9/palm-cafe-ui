@@ -42,7 +42,8 @@ export const FeatureProvider = ({ children }) => {
       const data = response.data;
       
       setFeatures(data.features || {});
-      setPlan(data.plan || 'FREE');
+      // Normalize plan to uppercase for consistency
+      setPlan(data.plan ? data.plan.toUpperCase() : 'FREE');
       setStatus(data.status || 'active');
     } catch (error) {
       console.error('Error fetching features:', error);

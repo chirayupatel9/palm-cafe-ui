@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster, toast } from 'react-hot-toast';
-import { Receipt, Settings, Plus, Menu, X, LogOut, User, Package, Utensils, Users, CreditCard, ShoppingCart, Building, BarChart3 } from 'lucide-react';
+import { Receipt, Settings, Plus, Menu, X, LogOut, User, Package, Utensils, Users, CreditCard, ShoppingCart, Building, BarChart3, TrendingUp, FileText } from 'lucide-react';
 import axios from 'axios';
 import { CurrencyProvider } from './contexts/CurrencyContext';
 import { DarkModeProvider } from './contexts/DarkModeContext';
@@ -70,15 +70,27 @@ function MainApp() {
   const { user, logout } = useAuth();
   const { cafeSettings, loading: cafeSettingsLoading } = useCafeSettings();
   const { hasModuleAccess, loading: subscriptionLoading, subscription, isActive, getStatus } = useSubscription();
-  const { hasFeature, loading: featuresLoading } = useFeatures();
+  const { hasFeature, loading: featuresLoading, features, plan, status } = useFeatures();
   
   // Use FeatureContext for feature checks (preferred), fallback to SubscriptionContext for backward compatibility
   const checkFeatureAccess = (featureKey) => {
-    if (hasFeature) {
-      return hasFeature(featureKey);
+    // Always use hasFeature if available (from FeatureContext)
+    if (typeof hasFeature === 'function') {
+      const hasAccess = hasFeature(featureKey);
+      // Debug logging for PRO features to help diagnose issues
+      if (featureKey === 'analytics' || featureKey === 'inventory' || featureKey === 'users' || featureKey === 'advanced_reports') {
+        console.log(`[Frontend Feature Check] ${featureKey}:`, {
+          hasAccess,
+          featureValue: features[featureKey],
+          plan,
+          status,
+          allFeatures: features
+        });
+      }
+      return hasAccess;
     }
     // Fallback to old method
-    return hasModuleAccess(featureKey);
+    return hasModuleAccess ? hasModuleAccess(featureKey) : false;
   };
 
   // Memoize fetchMenuItems to prevent unnecessary re-renders
@@ -197,6 +209,14 @@ function MainApp() {
         return <InvoiceHistory cart={cart} setCart={setCart} setCurrentPage={setCurrentPage} />;
       case 'inventory':
         return <InventoryManagement />;
+      case 'analytics':
+        // TODO: Create Analytics component
+        return <div className="p-6"><h2 className="text-2xl font-bold">Analytics</h2><p>Analytics dashboard coming soon...</p></div>;
+      case 'users':
+        // TODO: Create User Management component for cafe admins (different from SuperAdmin)
+        return <div className="p-6"><h2 className="text-2xl font-bold">User Management</h2><p>User management for cafe admins coming soon...</p></div>;
+      case 'advanced-reports':
+        return <InvoiceHistory cart={cart} setCart={setCart} setCurrentPage={setCurrentPage} />;
       case 'payment-methods':
         return <PaymentMethodManagement />;
       default:
@@ -205,12 +225,18 @@ function MainApp() {
   };
 
   // Reorganized navigation structure: Dashboard, Orders, Menu, Users, Settings
+  // PRO features: Analytics, Inventory, Advanced Reports, User Management
   const navigationItems = [
-    { id: 'order', label: 'Dashboard', icon: BarChart3, module: 'orders', primary: true },
-    { id: 'kitchen', label: 'Orders', icon: Receipt, module: 'orders', show: cafeSettings?.show_kitchen_tab && checkFeatureAccess('orders') },
-    { id: 'menu', label: 'Menu', icon: Utensils, module: 'menu_management', show: cafeSettings?.admin_can_manage_menu && checkFeatureAccess('menu_management') },
-    { id: 'customers', label: 'Users', icon: Users, module: 'customers', show: cafeSettings?.show_customers_tab && checkFeatureAccess('customers') },
-    { id: 'cafe-settings', label: 'Settings', icon: Settings, module: 'settings', show: cafeSettings?.admin_can_access_settings && checkFeatureAccess('settings') },
+    { id: 'order', label: 'Dashboard', icon: BarChart3, module: 'orders', primary: true, show: checkFeatureAccess('orders') },
+    { id: 'kitchen', label: 'Orders', icon: Receipt, module: 'orders', show: cafeSettings?.show_kitchen_tab !== false && checkFeatureAccess('orders') },
+    { id: 'menu', label: 'Menu', icon: Utensils, module: 'menu_management', show: cafeSettings?.admin_can_manage_menu !== false && checkFeatureAccess('menu_management') },
+    { id: 'customers', label: 'Customers', icon: Users, module: 'customers', show: cafeSettings?.show_customers_tab !== false && checkFeatureAccess('customers') },
+    // PRO Features
+    { id: 'analytics', label: 'Analytics', icon: TrendingUp, module: 'analytics', show: checkFeatureAccess('analytics') },
+    { id: 'inventory', label: 'Inventory', icon: Package, module: 'inventory', show: checkFeatureAccess('inventory') },
+    { id: 'users', label: 'User Management', icon: User, module: 'users', show: checkFeatureAccess('users') },
+    { id: 'advanced-reports', label: 'Reports', icon: FileText, module: 'advanced_reports', show: checkFeatureAccess('advanced_reports') },
+    { id: 'cafe-settings', label: 'Settings', icon: Settings, module: 'settings', show: cafeSettings?.admin_can_access_settings !== false && checkFeatureAccess('settings') },
   ].filter(item => item.show !== false); // Filter out items that should be hidden
 
   if (loading || cafeSettingsLoading || subscriptionLoading || featuresLoading) {

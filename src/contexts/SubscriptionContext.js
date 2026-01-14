@@ -38,6 +38,11 @@ export const SubscriptionProvider = ({ children }) => {
       const response = await axios.get('/subscription');
       const data = response.data;
       
+      // Normalize plan to uppercase for consistency
+      if (data.subscription && data.subscription.plan) {
+        data.subscription.plan = data.subscription.plan.toUpperCase();
+      }
+      
       setSubscription(data.subscription);
       
       // Handle both old and new API response formats
