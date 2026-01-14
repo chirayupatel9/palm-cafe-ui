@@ -1219,7 +1219,7 @@ const CustomerMenu = ({
 
       {/* Customer Profile - Full Page View */}
       {showProfile && customer && (
-        <div className="fixed inset-0 z-50 bg-[#F5F5DC] dark:bg-[#1a1612]">
+        <div className="fixed inset-0 z-50" style={{ backgroundColor: 'var(--color-background)' }}>
           <CustomerProfile
             customer={customer}
             onCustomerUpdate={onCustomerUpdate}

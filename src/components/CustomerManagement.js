@@ -314,7 +314,7 @@ const CustomerManagement = () => {
             </div>
           </div>
           
-          <div className="card bg-gradient-to-r from-[#6F4E37] to-[#8B6F47] text-white">
+          <div className="card text-white" style={{ background: 'linear-gradient(to right, var(--color-primary), var(--color-primary))' }}>
             <div className="flex items-center">
               <TrendingUp className="h-8 w-8 mr-3" />
               <div>

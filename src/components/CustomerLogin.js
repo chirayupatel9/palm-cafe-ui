@@ -108,7 +108,12 @@ const CustomerLogin = ({ onLogin, onRegister }) => {
                 </div>
               </div>
               <button
-                className="flex items-center justify-center text-center w-full h-14 px-6 py-2 mt-4 text-base font-bold leading-normal text-white bg-[#6F4E37] rounded-lg hover:bg-[#6F4E37]/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#6F4E37] dark:focus:ring-offset-[#1a1612] transition-colors disabled:opacity-50"
+                className="flex items-center justify-center text-center w-full h-14 px-6 py-2 mt-4 text-base font-bold leading-normal rounded-lg hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors disabled:opacity-50"
+                style={{ 
+                  backgroundColor: 'var(--color-primary)', 
+                  color: 'var(--color-on-primary)',
+                  '--tw-ring-color': 'var(--color-primary)'
+                }}
                 type="submit"
                 disabled={loading}
               >
@@ -239,7 +244,12 @@ const CustomerLogin = ({ onLogin, onRegister }) => {
                 </div>
               </div>
               <button
-                className="flex items-center justify-center text-center w-full h-14 px-6 py-2 mt-4 text-base font-bold leading-normal text-white bg-[#6F4E37] rounded-lg hover:bg-[#6F4E37]/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#6F4E37] dark:focus:ring-offset-[#1a1612] transition-colors disabled:opacity-50"
+                className="flex items-center justify-center text-center w-full h-14 px-6 py-2 mt-4 text-base font-bold leading-normal rounded-lg hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors disabled:opacity-50"
+                style={{ 
+                  backgroundColor: 'var(--color-primary)', 
+                  color: 'var(--color-on-primary)',
+                  '--tw-ring-color': 'var(--color-primary)'
+                }}
                 type="submit"
                 disabled={loading}
               >

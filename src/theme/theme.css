@@ -1,0 +1,135 @@
+/**
+ * Centralized Theme Variables
+ * 
+ * Single source of truth for all colors in the application.
+ * Material Design-aligned token naming for consistency.
+ * 
+ * This file defines ALL color values - no hardcoded colors should exist elsewhere.
+ */
+
+/* ============================================
+   BASE THEME (Light Mode)
+   ============================================ */
+
+:root {
+  /* Primary Colors - Material Design aligned */
+  --color-primary: #6F4E37;
+  --color-on-primary: #FFFFFF;
+  --color-primary-container: #F5F5DC;
+  --color-on-primary-container: #2C1810;
+  
+  /* Secondary Colors */
+  --color-secondary: #153059;
+  --color-on-secondary: #FFFFFF;
+  --color-secondary-container: #E1E7F1;
+  --color-on-secondary-container: #153059;
+  
+  /* Accent/Tertiary Colors */
+  --color-accent: #D4A574;
+  --color-on-accent: #FFFFFF;
+  
+  /* Surface Colors - Material Design aligned */
+  --color-background: #F5F5DC;
+  --color-on-background: #2C1810;
+  --color-surface: #FFFFFF;
+  --color-on-surface: #2C1810;
+  --color-surface-variant: #F9FAFB;
+  --color-on-surface-variant: #6B7280;
+  
+  /* Outline/Border */
+  --color-outline: #E5E7EB;
+  --color-outline-variant: #F3F4F6;
+  
+  /* Semantic Colors */
+  --color-success: #10B981;
+  --color-on-success: #FFFFFF;
+  --color-warning: #F59E0B;
+  --color-on-warning: #FFFFFF;
+  --color-error: #EF4444;
+  --color-on-error: #FFFFFF;
+  --color-info: #3B82F6;
+  --color-on-info: #FFFFFF;
+  
+  /* Text Colors - Material Design aligned */
+  --color-text-primary: #2C1810;
+  --color-text-secondary: #6B7280;
+  --color-text-disabled: #9CA3AF;
+  
+  /* Legacy compatibility - mapped to Material tokens */
+  --color-text-muted: var(--color-text-secondary);
+  --color-border: var(--color-outline);
+  
+  /* Spacing tokens */
+  --spacing-xs: 0.25rem;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+  --spacing-2xl: 3rem;
+  --spacing-3xl: 4rem;
+  
+  /* Radius tokens */
+  --radius-sm: 0.25rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+  --radius-full: 9999px;
+  
+  /* Shadow tokens */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+/* ============================================
+   DARK MODE
+   ============================================ */
+
+.dark {
+  /* Primary Colors */
+  --color-primary: #8B6F47;
+  --color-on-primary: #FFFFFF;
+  --color-primary-container: #2c241d;
+  --color-on-primary-container: #F5F5DC;
+  
+  /* Secondary Colors */
+  --color-secondary: #A0826D;
+  --color-on-secondary: #FFFFFF;
+  --color-secondary-container: #374151;
+  --color-on-secondary-container: #E1E7F1;
+  
+  /* Accent/Tertiary Colors */
+  --color-accent: #D4A574;
+  --color-on-accent: #FFFFFF;
+  
+  /* Surface Colors */
+  --color-background: #1a1612;
+  --color-on-background: #F5F5DC;
+  --color-surface: #2c241d;
+  --color-on-surface: #F5F5DC;
+  --color-surface-variant: #374151;
+  --color-on-surface-variant: #9CA3AF;
+  
+  /* Outline/Border */
+  --color-outline: #374151;
+  --color-outline-variant: #4B5563;
+  
+  /* Semantic Colors */
+  --color-success: #34D399;
+  --color-on-success: #FFFFFF;
+  --color-warning: #FBBF24;
+  --color-on-warning: #FFFFFF;
+  --color-error: #F87171;
+  --color-on-error: #FFFFFF;
+  --color-info: #60A5FA;
+  --color-on-info: #FFFFFF;
+  
+  /* Text Colors */
+  --color-text-primary: #F5F5DC;
+  --color-text-secondary: #9CA3AF;
+  --color-text-disabled: #6B7280;
+  
+  /* Legacy compatibility */
+  --color-text-muted: var(--color-text-secondary);
+  --color-border: var(--color-outline);
+}

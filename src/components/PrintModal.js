@@ -226,7 +226,7 @@ const PrintModal = ({ isOpen, onClose, order, onPrintSuccess }) => {
                     }`}
                   >
                     <div className="flex items-center space-x-2">
-                      <Usb className="h-4 w-4 text-[#6F4E37]" />
+                      <Usb className="h-4 w-4" style={{ color: 'var(--color-primary)' }} />
                       <div>
                         <div className="font-medium text-gray-900 dark:text-gray-100">
                           Serial Port Printer

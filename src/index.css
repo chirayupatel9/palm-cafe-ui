@@ -2,67 +2,8 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ============================================
-   THEME SYSTEM - Design Tokens
-   ============================================
-   CSS custom properties are set by ThemeContext.
-   These are fallback values that will be overridden.
-   ============================================ */
-
-:root {
-  /* Color tokens - fallback values */
-  --color-primary: #6F4E37;
-  --color-secondary: #153059;
-  --color-accent: #D4A574;
-  --color-background: #F5F5DC;
-  --color-surface: #FFFFFF;
-  --color-text-primary: #2C1810;
-  --color-text-muted: #6B7280;
-  --color-text-disabled: #9CA3AF;
-  --color-border: #E5E7EB;
-  --color-success: #10B981;
-  --color-warning: #F59E0B;
-  --color-error: #EF4444;
-  --color-info: #3B82F6;
-  
-  /* Spacing tokens */
-  --spacing-xs: 0.25rem;
-  --spacing-sm: 0.5rem;
-  --spacing-md: 1rem;
-  --spacing-lg: 1.5rem;
-  --spacing-xl: 2rem;
-  --spacing-2xl: 3rem;
-  --spacing-3xl: 4rem;
-  
-  /* Radius tokens */
-  --radius-sm: 0.25rem;
-  --radius-md: 0.5rem;
-  --radius-lg: 0.75rem;
-  --radius-xl: 1rem;
-  --radius-full: 9999px;
-  
-  /* Shadow tokens */
-  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-}
-
-/* Dark mode - ThemeContext will override these */
-.dark {
-  --color-primary: #8B6F47;
-  --color-secondary: #A0826D;
-  --color-accent: #D4A574;
-  --color-background: #1a1612;
-  --color-surface: #2c241d;
-  --color-text-primary: #F5F5DC;
-  --color-text-muted: #9CA3AF;
-  --color-text-disabled: #6B7280;
-  --color-border: #374151;
-  --color-success: #34D399;
-  --color-warning: #FBBF24;
-  --color-error: #F87171;
-  --color-info: #60A5FA;
-}
+/* Import centralized theme variables */
+@import './theme/theme.css';
 
 /* ============================================
    BASE STYLES
@@ -103,29 +44,39 @@ body {
     box-shadow: var(--shadow-md);
   }
 
-  /* Button styles */
+  /* Button styles - using CSS variables */
   .btn-primary {
-    @apply bg-primary hover:opacity-90 text-white px-4 py-2 h-10 rounded-lg transition-all duration-200 font-medium text-sm shadow-sm hover:shadow-md focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2;
+    background-color: var(--color-primary);
+    color: var(--color-on-primary);
+    @apply hover:opacity-90 px-4 py-2 h-10 rounded-lg transition-all duration-200 font-medium text-sm shadow-sm hover:shadow-md focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2;
   }
 
   .btn-secondary {
-    @apply bg-surface border border-border text-text-primary hover:bg-opacity-80 px-4 py-2 h-10 rounded-lg transition-all duration-200 font-medium text-sm focus:outline-none focus:ring-2 focus:ring-border focus:ring-offset-2;
+    background-color: var(--color-surface);
+    border-color: var(--color-outline);
+    color: var(--color-on-surface);
+    @apply border px-4 py-2 h-10 rounded-lg transition-all duration-200 font-medium text-sm hover:bg-opacity-80 focus:outline-none focus:ring-2 focus:ring-offset-2;
+    --tw-ring-color: var(--color-outline);
   }
   
   .btn-destructive {
-    @apply bg-error hover:bg-opacity-90 text-white px-4 py-2 h-10 rounded-lg transition-all duration-200 font-medium text-sm shadow-sm hover:shadow-md focus:outline-none focus:ring-2 focus:ring-error focus:ring-offset-2;
+    background-color: var(--color-error);
+    color: var(--color-on-error);
+    @apply hover:opacity-90 px-4 py-2 h-10 rounded-lg transition-all duration-200 font-medium text-sm shadow-sm hover:shadow-md focus:outline-none focus:ring-2 focus:ring-error focus:ring-offset-2;
   }
   
   .btn-ghost {
-    @apply text-text-primary hover:bg-surface px-4 py-2 h-10 rounded-lg transition-all duration-200 font-medium text-sm focus:outline-none focus:ring-2 focus:ring-border focus:ring-offset-2;
+    color: var(--color-on-surface);
+    @apply hover:bg-surface px-4 py-2 h-10 rounded-lg transition-all duration-200 font-medium text-sm focus:outline-none focus:ring-2 focus:ring-offset-2;
+    --tw-ring-color: var(--color-outline);
   }
 
-  /* Input field styles */
+  /* Input field styles - using CSS variables */
   .input-field {
     @apply w-full h-10 px-3 py-2 text-sm border rounded-lg transition-all duration-200;
     background-color: var(--color-surface);
-    border-color: var(--color-border);
-    color: var(--color-text-primary);
+    border-color: var(--color-outline);
+    color: var(--color-on-surface);
   }
   
   .input-field:focus {
@@ -135,46 +86,90 @@ body {
   }
   
   .input-field::placeholder {
-    color: var(--color-text-muted);
+    color: var(--color-on-surface-variant);
   }
 
-  /* Navigation styles */
+  /* Navigation styles - using CSS variables */
   .nav-active {
-    @apply border-primary text-primary font-semibold;
-    background-color: rgba(var(--color-primary-rgb, 111, 78, 55), 0.08);
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+    background-color: var(--color-primary-container);
+    @apply font-semibold;
     border-bottom-width: 3px;
   }
 
-  .dark .nav-active {
-    background-color: rgba(var(--color-primary-rgb, 139, 111, 71), 0.15);
-  }
-
   .nav-inactive {
-    @apply border-transparent text-text-muted hover:text-text-primary hover:border-primary;
+    border-color: transparent;
+    color: var(--color-on-surface-variant);
     transition: all 0.2s ease;
   }
   
   .nav-inactive:hover {
-    background-color: rgba(var(--color-primary-rgb, 111, 78, 55), 0.05);
+    color: var(--color-on-surface);
+    border-color: var(--color-primary);
+    background-color: var(--color-primary-container);
+    opacity: 0.5;
   }
 
-  .dark .nav-inactive:hover {
-    background-color: rgba(var(--color-primary-rgb, 139, 111, 71), 0.1);
-  }
-
-  /* Mobile navigation */
+  /* Mobile navigation - using CSS variables */
   .mobile-nav-active {
-    @apply bg-primary text-white;
+    background-color: var(--color-primary);
+    color: var(--color-on-primary);
   }
 
   .mobile-nav-inactive {
-    @apply text-text-muted hover:bg-surface;
+    color: var(--color-on-surface-variant);
+  }
+  
+  .mobile-nav-inactive:hover {
+    background-color: var(--color-surface);
   }
 }
 
 /* ============================================
    UTILITY CLASSES
    ============================================ */
+
+/* Color utility classes using CSS variables */
+.bg-primary {
+  background-color: var(--color-primary);
+}
+
+.text-primary {
+  color: var(--color-primary);
+}
+
+.bg-on-primary {
+  background-color: var(--color-on-primary);
+}
+
+.text-on-primary {
+  color: var(--color-on-primary);
+}
+
+.bg-surface {
+  background-color: var(--color-surface);
+}
+
+.text-on-surface {
+  color: var(--color-on-surface);
+}
+
+.bg-background {
+  background-color: var(--color-background);
+}
+
+.text-on-background {
+  color: var(--color-on-background);
+}
+
+.bg-primary-container {
+  background-color: var(--color-primary-container);
+}
+
+.text-on-primary-container {
+  color: var(--color-on-primary-container);
+}
 
 /* Spacing utilities */
 .space-section {

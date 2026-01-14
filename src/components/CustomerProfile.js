@@ -57,9 +57,9 @@ const CustomerProfile = ({ customer, onCustomerUpdate, onLogout, onClose }) => {
   };
 
   return (
-    <div className="relative flex h-auto min-h-screen w-full flex-col bg-[#F5F5DC] dark:bg-[#1a1612]">
+    <div className="relative flex h-auto min-h-screen w-full flex-col" style={{ backgroundColor: 'var(--color-background)' }}>
       {/* Header */}
-      <header className="sticky top-0 z-20 w-full border-b border-black/10 dark:border-white/10 bg-[#F5F5DC]/80 dark:bg-[#1a1612]/80 backdrop-blur-sm">
+      <header className="sticky top-0 z-20 w-full border-b backdrop-blur-sm" style={{ borderColor: 'var(--color-outline)', backgroundColor: 'var(--color-background)' }}>
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <h1 className="text-xl font-bold tracking-tight text-text-light dark:text-text-dark">
@@ -82,11 +82,11 @@ const CustomerProfile = ({ customer, onCustomerUpdate, onLogout, onClose }) => {
         <div className="flex w-full max-w-6xl flex-col gap-6 lg:flex-row lg:gap-8">
           {/* Sidebar Navigation */}
           <aside className="flex-shrink-0 lg:w-64">
-            <div className="flex h-full flex-col justify-between rounded-xl bg-white dark:bg-[#2c241d] p-4 shadow-sm">
+            <div className="flex h-full flex-col justify-between rounded-xl p-4 shadow-sm" style={{ backgroundColor: 'var(--color-surface)' }}>
               <div className="flex flex-col gap-4">
                 {/* User Info */}
-                <div className="flex items-center gap-3 pb-4 border-b border-[#f3eee7] dark:border-[#4a2c2a]">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#6F4E37] text-white">
+                <div className="flex items-center gap-3 pb-4 border-b" style={{ borderColor: 'var(--color-outline)' }}>
+                  <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary text-on-primary">
                     <User className="h-6 w-6" />
                   </div>
                   <div className="flex flex-col">
@@ -105,8 +105,8 @@ const CustomerProfile = ({ customer, onCustomerUpdate, onLogout, onClose }) => {
                     onClick={() => setActiveSection('account')}
                     className={`flex items-center gap-3 px-3 py-2.5 rounded-lg ${
                       activeSection === 'account'
-                        ? 'bg-[#6F4E37]/20 text-[#6F4E37]'
-                        : 'text-text-light/70 dark:text-text-dark/70 hover:bg-[#6F4E37]/10 hover:text-[#6F4E37]'
+                        ? 'bg-primary-container text-primary'
+                        : 'text-text-light/70 dark:text-text-dark/70 hover:bg-primary-container/50 hover:text-primary'
                     } transition-colors`}
                   >
                     <User className="h-5 w-5" />
@@ -116,8 +116,8 @@ const CustomerProfile = ({ customer, onCustomerUpdate, onLogout, onClose }) => {
                     onClick={() => setActiveSection('payment')}
                     className={`flex items-center gap-3 px-3 py-2.5 rounded-lg ${
                       activeSection === 'payment'
-                        ? 'bg-[#6F4E37]/20 text-[#6F4E37]'
-                        : 'text-text-light/70 dark:text-text-dark/70 hover:bg-[#6F4E37]/10 hover:text-[#6F4E37]'
+                        ? 'bg-primary-container text-primary'
+                        : 'text-text-light/70 dark:text-text-dark/70 hover:bg-primary-container/50 hover:text-primary'
                     } transition-colors`}
                   >
                     <CreditCard className="h-5 w-5" />
@@ -127,8 +127,8 @@ const CustomerProfile = ({ customer, onCustomerUpdate, onLogout, onClose }) => {
                     onClick={() => setActiveSection('addresses')}
                     className={`flex items-center gap-3 px-3 py-2.5 rounded-lg ${
                       activeSection === 'addresses'
-                        ? 'bg-[#6F4E37]/20 text-[#6F4E37]'
-                        : 'text-text-light/70 dark:text-text-dark/70 hover:bg-[#6F4E37]/10 hover:text-[#6F4E37]'
+                        ? 'bg-primary-container text-primary'
+                        : 'text-text-light/70 dark:text-text-dark/70 hover:bg-primary-container/50 hover:text-primary'
                     } transition-colors`}
                   >
                     <Home className="h-5 w-5" />
@@ -138,8 +138,8 @@ const CustomerProfile = ({ customer, onCustomerUpdate, onLogout, onClose }) => {
                     onClick={() => setActiveSection('notifications')}
                     className={`flex items-center gap-3 px-3 py-2.5 rounded-lg ${
                       activeSection === 'notifications'
-                        ? 'bg-[#6F4E37]/20 text-[#6F4E37]'
-                        : 'text-text-light/70 dark:text-text-dark/70 hover:bg-[#6F4E37]/10 hover:text-[#6F4E37]'
+                        ? 'bg-primary-container text-primary'
+                        : 'text-text-light/70 dark:text-text-dark/70 hover:bg-primary-container/50 hover:text-primary'
                     } transition-colors`}
                   >
                     <Bell className="h-5 w-5" />
@@ -152,7 +152,7 @@ const CustomerProfile = ({ customer, onCustomerUpdate, onLogout, onClose }) => {
               <div className="flex flex-col gap-4 pt-8">
                 <button
                   onClick={onLogout}
-                  className="flex items-center justify-center gap-2 rounded-lg h-11 px-4 bg-[#6F4E37]/10 text-[#6F4E37] text-sm font-bold leading-normal hover:bg-[#6F4E37]/20 transition-colors"
+                  className="flex items-center justify-center gap-2 rounded-lg h-11 px-4 bg-primary-container text-primary text-sm font-bold leading-normal hover:bg-primary-container/80 transition-colors"
                 >
                   <LogOut className="h-4 w-4" />
                   <span>Log Out</span>
@@ -162,7 +162,7 @@ const CustomerProfile = ({ customer, onCustomerUpdate, onLogout, onClose }) => {
           </aside>
 
           {/* Main Content Area */}
-          <div className="flex-1 rounded-xl bg-white dark:bg-[#2c241d] shadow-sm">
+          <div className="flex-1 rounded-xl shadow-sm" style={{ backgroundColor: 'var(--color-surface)' }}>
             <div className="flex flex-col gap-8 p-6 md:p-8">
               {activeSection === 'account' && (
                 <>
@@ -179,7 +179,7 @@ const CustomerProfile = ({ customer, onCustomerUpdate, onLogout, onClose }) => {
                     {!isEditing && (
                       <button
                         onClick={() => setIsEditing(true)}
-                        className="flex items-center gap-2 rounded-lg h-11 px-5 bg-[#6F4E37] text-white text-sm font-bold hover:bg-[#6F4E37]/90 transition-colors"
+                        className="flex items-center gap-2 rounded-lg h-11 px-5 bg-primary text-on-primary text-sm font-bold hover:opacity-90 transition-colors"
                       >
                         <Edit3 className="h-4 w-4" />
                         <span>Edit Profile</span>
@@ -199,7 +199,14 @@ const CustomerProfile = ({ customer, onCustomerUpdate, onLogout, onClose }) => {
                           value={formData.name}
                           onChange={(e) => handleInputChange('name', e.target.value)}
                           disabled={!isEditing}
-                          className="form-input flex w-full rounded-lg text-text-light dark:text-text-dark focus:outline-0 focus:ring-2 focus:ring-[#6F4E37]/50 border-2 border-[#f3eee7] dark:border-[#4a2c2a] bg-white dark:bg-[#2c241d] h-12 px-4 text-base font-normal disabled:opacity-60 disabled:cursor-not-allowed"
+                          className="form-input flex w-full rounded-lg text-text-light dark:text-text-dark focus:outline-0 focus:ring-2 border-2 h-12 px-4 text-base font-normal disabled:opacity-60 disabled:cursor-not-allowed"
+                          style={{ 
+                            borderColor: 'var(--color-outline)', 
+                            backgroundColor: 'var(--color-surface)',
+                            color: 'var(--color-on-surface)'
+                          }}
+                          onFocus={(e) => e.target.style.borderColor = 'var(--color-primary)'}
+                          onBlur={(e) => e.target.style.borderColor = 'var(--color-outline)'}
                           required
                         />
                       </label>
@@ -212,7 +219,11 @@ const CustomerProfile = ({ customer, onCustomerUpdate, onLogout, onClose }) => {
                           type="tel"
                           value={formData.phone}
                           disabled
-                          className="form-input flex w-full rounded-lg text-text-light dark:text-text-dark border-2 border-[#f3eee7] dark:border-[#4a2c2a] bg-[#f3eee7] dark:bg-[#2c241d] h-12 px-4 text-base font-normal opacity-60 cursor-not-allowed"
+                          className="form-input flex w-full rounded-lg text-text-light dark:text-text-dark border-2 h-12 px-4 text-base font-normal opacity-60 cursor-not-allowed"
+                          style={{ 
+                            borderColor: 'var(--color-outline)', 
+                            backgroundColor: 'var(--color-surface-variant)'
+                          }}
                         />
                       </label>
 
@@ -225,7 +236,14 @@ const CustomerProfile = ({ customer, onCustomerUpdate, onLogout, onClose }) => {
                           value={formData.email}
                           onChange={(e) => handleInputChange('email', e.target.value)}
                           disabled={!isEditing}
-                          className="form-input flex w-full rounded-lg text-text-light dark:text-text-dark focus:outline-0 focus:ring-2 focus:ring-[#6F4E37]/50 border-2 border-[#f3eee7] dark:border-[#4a2c2a] bg-white dark:bg-[#2c241d] h-12 px-4 text-base font-normal disabled:opacity-60 disabled:cursor-not-allowed"
+                          className="form-input flex w-full rounded-lg text-text-light dark:text-text-dark focus:outline-0 focus:ring-2 border-2 h-12 px-4 text-base font-normal disabled:opacity-60 disabled:cursor-not-allowed"
+                          style={{ 
+                            borderColor: 'var(--color-outline)', 
+                            backgroundColor: 'var(--color-surface)',
+                            color: 'var(--color-on-surface)'
+                          }}
+                          onFocus={(e) => e.target.style.borderColor = 'var(--color-primary)'}
+                          onBlur={(e) => e.target.style.borderColor = 'var(--color-outline)'}
                         />
                       </label>
 
@@ -238,7 +256,14 @@ const CustomerProfile = ({ customer, onCustomerUpdate, onLogout, onClose }) => {
                           value={formData.date_of_birth}
                           onChange={(e) => handleInputChange('date_of_birth', e.target.value)}
                           disabled={!isEditing}
-                          className="form-input flex w-full rounded-lg text-text-light dark:text-text-dark focus:outline-0 focus:ring-2 focus:ring-[#6F4E37]/50 border-2 border-[#f3eee7] dark:border-[#4a2c2a] bg-white dark:bg-[#2c241d] h-12 px-4 text-base font-normal disabled:opacity-60 disabled:cursor-not-allowed"
+                          className="form-input flex w-full rounded-lg text-text-light dark:text-text-dark focus:outline-0 focus:ring-2 border-2 h-12 px-4 text-base font-normal disabled:opacity-60 disabled:cursor-not-allowed"
+                          style={{ 
+                            borderColor: 'var(--color-outline)', 
+                            backgroundColor: 'var(--color-surface)',
+                            color: 'var(--color-on-surface)'
+                          }}
+                          onFocus={(e) => e.target.style.borderColor = 'var(--color-primary)'}
+                          onBlur={(e) => e.target.style.borderColor = 'var(--color-outline)'}
                         />
                       </label>
                     </div>
@@ -252,23 +277,30 @@ const CustomerProfile = ({ customer, onCustomerUpdate, onLogout, onClose }) => {
                         onChange={(e) => handleInputChange('address', e.target.value)}
                         disabled={!isEditing}
                         rows="3"
-                        className="form-input flex w-full rounded-lg text-text-light dark:text-text-dark focus:outline-0 focus:ring-2 focus:ring-[#6F4E37]/50 border-2 border-[#f3eee7] dark:border-[#4a2c2a] bg-white dark:bg-[#2c241d] px-4 py-3 text-base font-normal disabled:opacity-60 disabled:cursor-not-allowed resize-none"
+                        className="form-input flex w-full rounded-lg text-text-light dark:text-text-dark focus:outline-0 focus:ring-2 border-2 px-4 py-3 text-base font-normal disabled:opacity-60 disabled:cursor-not-allowed resize-none"
+                        style={{ 
+                          borderColor: 'var(--color-outline)', 
+                          backgroundColor: 'var(--color-surface)',
+                          color: 'var(--color-on-surface)'
+                        }}
+                        onFocus={(e) => e.target.style.borderColor = 'var(--color-primary)'}
+                        onBlur={(e) => e.target.style.borderColor = 'var(--color-outline)'}
                       />
                     </label>
 
                     {isEditing && (
-                      <div className="flex justify-end gap-3 pt-4 border-t border-[#f3eee7] dark:border-[#4a2c2a]">
+                      <div className="flex justify-end gap-3 pt-4 border-t" style={{ borderColor: 'var(--color-outline)' }}>
                         <button
                           type="button"
                           onClick={handleCancel}
-                          className="flex items-center justify-center rounded-lg h-11 px-5 bg-transparent text-text-light/60 dark:text-text-dark/60 text-sm font-bold hover:bg-[#6F4E37]/10 transition-colors"
+                          className="flex items-center justify-center rounded-lg h-11 px-5 bg-transparent text-text-light/60 dark:text-text-dark/60 text-sm font-bold hover:bg-primary-container/50 transition-colors"
                         >
                           Cancel
                         </button>
                         <button
                           type="submit"
                           disabled={loading}
-                          className="flex items-center justify-center gap-2 rounded-lg h-11 px-5 bg-[#6F4E37] text-white text-sm font-bold hover:bg-[#6F4E37]/90 transition-colors disabled:opacity-50"
+                          className="flex items-center justify-center gap-2 rounded-lg h-11 px-5 bg-primary text-on-primary text-sm font-bold hover:opacity-90 transition-colors disabled:opacity-50"
                         >
                           {loading ? (
                             <>

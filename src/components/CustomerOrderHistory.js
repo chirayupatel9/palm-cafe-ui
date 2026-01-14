@@ -403,7 +403,7 @@ const CustomerOrderHistory = ({ customerPhone, setActiveTab, cart, setCart }) =>
                     downloadingInvoices.has(order.order_number)
                       ? 'bg-gray-400 text-white cursor-not-allowed'
                       : ordersWithInvoices.has(order.order_number) || ['completed', 'ready', 'cancelled'].includes(order.status)
-                      ? 'bg-[#6F4E37] text-white hover:bg-[#6F4E37]/90'
+                      ? 'bg-primary text-on-primary hover:opacity-90'
                       : 'bg-gray-400 text-white cursor-not-allowed'
                   }`}
                   title={
