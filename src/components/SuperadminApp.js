@@ -119,7 +119,7 @@ const SuperadminApp = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-accent-50 dark:bg-gray-900">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
         <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
           <div className="h-8 w-64 bg-gray-200 dark:bg-gray-700 rounded animate-pulse mb-4"></div>
           <div className="h-4 w-96 bg-gray-200 dark:bg-gray-700 rounded animate-pulse mb-8"></div>
@@ -142,11 +142,11 @@ const SuperadminApp = () => {
 
 
   return (
-    <div className="min-h-screen bg-accent-50 dark:bg-gray-900">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <Toaster position="top-right" />
     
       {/* Header */}
-      <header className="bg-white dark:bg-gray-800 shadow-sm border-b border-accent-200 dark:border-gray-700">
+      <header className="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center">
@@ -177,7 +177,7 @@ const SuperadminApp = () => {
               {/* Logout button */}
               <button
                 onClick={handleLogout}
-                className="p-2 rounded-md text-secondary-600 hover:text-secondary-700 hover:bg-accent-100 dark:text-gray-400 dark:hover:text-gray-300 dark:hover:bg-gray-700"
+                className="p-2 rounded-md text-secondary-600 hover:text-secondary-700 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-gray-300 dark:hover:bg-gray-700"
                 title="Logout"
               >
                 <LogOut className="h-5 w-5" />
@@ -186,7 +186,7 @@ const SuperadminApp = () => {
               {/* Mobile menu button */}
               <button
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="lg:hidden p-2 rounded-md text-secondary-600 hover:text-secondary-700 hover:bg-accent-100"
+                className="lg:hidden p-2 rounded-md text-secondary-600 hover:text-secondary-700 hover:bg-gray-100"
               >
                 {mobileMenuOpen ? (
                   <X className="h-6 w-6" />
@@ -201,7 +201,7 @@ const SuperadminApp = () => {
 
       {/* Mobile Navigation Menu */}
       {mobileMenuOpen && (
-        <div className="lg:hidden bg-white dark:bg-gray-800 border-b border-accent-200 dark:border-gray-700 shadow-sm">
+        <div className="lg:hidden bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 shadow-sm">
           <div className="px-4 py-2 space-y-1">
             {navigationItems.map((item) => {
               const Icon = item.icon;
@@ -212,7 +212,7 @@ const SuperadminApp = () => {
                   className={`w-full flex items-center px-3 py-3 text-sm font-medium rounded-lg transition-all duration-200 ${
                     currentPage === item.id
                       ? 'bg-secondary-600 text-white font-semibold shadow-sm'
-                      : 'text-secondary-600 dark:text-gray-300 hover:bg-accent-100 dark:hover:bg-gray-700'
+                      : 'text-secondary-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
                   }`}
                 >
                   <Icon className="h-4 w-4 mr-3" />
@@ -225,7 +225,7 @@ const SuperadminApp = () => {
       )}
 
       {/* Desktop Navigation */}
-      <nav className="hidden lg:block bg-white dark:bg-gray-800 shadow-sm border-b border-accent-200 dark:border-gray-700">
+      <nav className="hidden lg:block bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex space-x-8">
             {navigationItems.map((item) => {

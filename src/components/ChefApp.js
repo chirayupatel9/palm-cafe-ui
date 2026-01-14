@@ -7,6 +7,7 @@ import MenuManagement from './MenuManagement';
 import InventoryManagement from './InventoryManagement';
 import InvoiceHistory from './InvoiceHistory';
 import DarkModeToggle from './DarkModeToggle';
+import CafeInfo from './CafeInfo';
 
 const ChefApp = () => {
   const { user, logout } = useAuth();
@@ -44,19 +45,10 @@ const ChefApp = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center">
-              <img 
-                src={cafeSettings.logo_url} 
-                alt={`${cafeSettings.cafe_name} Logo`} 
-                className="h-10 w-10 mr-3"
-              />
-              <div>
-                <h1 className="text-xl sm:text-2xl font-bold text-secondary-700 dark:text-gray-100">
-                  {cafeSettings.cafe_name} - Kitchen
-                </h1>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
-                  Chef Dashboard
-                </p>
-              </div>
+              <CafeInfo />
+              <span className="ml-3 px-2 py-1 bg-orange-100 dark:bg-orange-900/30 text-orange-800 dark:text-orange-300 rounded-full text-xs font-medium">
+                Chef
+              </span>
             </div>
             
             <div className="flex items-center space-x-2">
@@ -74,9 +66,6 @@ const ChefApp = () => {
               <div className="hidden sm:flex items-center space-x-2 text-sm text-secondary-600 dark:text-gray-400">
                 <User className="h-4 w-4" />
                 <span>{user?.username}</span>
-                <span className="px-2 py-1 bg-orange-100 text-orange-800 rounded-full text-xs font-medium">
-                  Chef
-                </span>
               </div>
               
               {/* Dark mode toggle */}

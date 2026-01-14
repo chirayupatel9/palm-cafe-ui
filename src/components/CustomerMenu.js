@@ -7,6 +7,7 @@ import { useCafeSettings } from '../contexts/CafeSettingsContext';
 import { useDarkMode } from '../contexts/DarkModeContext';
 import CustomerOrderHistory from './CustomerOrderHistory';
 import CustomerProfile from './CustomerProfile';
+import CafeInfo from './CafeInfo';
 import { getImageUrl, getPlaceholderImage, getCategoryBackground } from '../utils/imageUtils';
 
 const CustomerMenu = ({ 
@@ -478,11 +479,8 @@ const CustomerMenu = ({
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             {/* Logo and Title */}
-            <div className="flex items-center gap-4">
-              <Coffee className="text-secondary-600 dark:text-secondary-400 text-3xl h-8 w-8" />
-              <h1 className="text-xl font-bold tracking-tight text-secondary-700 dark:text-gray-100">
-                {cafeSettings?.cafe_name || 'Palm Cafe'}
-              </h1>
+            <div className="flex items-center gap-3">
+              <CafeInfo nameSize="text-xl" />
             </div>
 
             {/* Navigation */}
