@@ -17,7 +17,6 @@ const useWebSocket = (url, options = {}) => {
       ws.current = new WebSocket(url);
 
       ws.current.onopen = () => {
-        console.log('WebSocket connected');
         reconnectAttempts.current = 0;
         if (options.onOpen) {
           options.onOpen();
@@ -36,7 +35,6 @@ const useWebSocket = (url, options = {}) => {
       };
 
       ws.current.onclose = (event) => {
-        console.log('WebSocket disconnected:', event.code, event.reason);
         if (options.onClose) {
           options.onClose(event);
         }
@@ -44,7 +42,6 @@ const useWebSocket = (url, options = {}) => {
         // Attempt to reconnect if not a normal closure
         if (event.code !== 1000 && reconnectAttempts.current < maxReconnectAttempts) {
           reconnectAttempts.current++;
-          console.log(`Attempting to reconnect (${reconnectAttempts.current}/${maxReconnectAttempts})...`);
           
           reconnectTimeoutRef.current = setTimeout(() => {
             connect();

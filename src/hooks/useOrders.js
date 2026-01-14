@@ -16,7 +16,6 @@ const useOrders = (autoRefresh = true, refreshInterval = 30000, enableWebSocket 
     enableWebSocket ? `${process.env.REACT_APP_WS_URL || process.env.REACT_APP_API_URL?.replace('http', 'ws') || 'ws://localhost:5000'}/ws/orders` : null,
     {
       onMessage: (data) => {
-        console.log('WebSocket order update received:', data);
         handleWebSocketMessage(data);
       },
       onError: (error) => {
@@ -64,7 +63,8 @@ const useOrders = (autoRefresh = true, refreshInterval = 30000, enableWebSocket 
         removeOrderFromCache(data.orderId);
         break;
       default:
-        console.log('Unknown WebSocket message type:', data.type);
+        // Unknown message type, ignore
+        break;
     }
   }, [addOrderToCache, updateOrderInCache, removeOrderFromCache]);
 
@@ -94,7 +94,6 @@ const useOrders = (autoRefresh = true, refreshInterval = 30000, enableWebSocket 
 
       // Check if we got a 304 (Not Modified) response
       if (response.status === 304) {
-        console.log('Orders not modified, using cached data');
         return;
       }
 
@@ -119,12 +118,10 @@ const useOrders = (autoRefresh = true, refreshInterval = 30000, enableWebSocket 
       
     } catch (error) {
       if (error.name === 'AbortError') {
-        console.log('Request was aborted');
         return;
       }
       
       if (error.response?.status === 304) {
-        console.log('Orders not modified, using cached data');
         return;
       }
       

@@ -84,23 +84,8 @@ function MainApp() {
   // Memoize fetchMenuItems to prevent unnecessary re-renders
   const fetchMenuItems = useCallback(async () => {
     try {
-      // Log subscription status for debugging
-      if (subscription) {
-        console.log('Fetching menu items with subscription:', {
-          plan: subscription.plan,
-          status: subscription.status,
-          isActive: isActive ? isActive() : 'N/A'
-        });
-      }
-      
       const response = await axios.get('/menu');
       setMenuItems(response.data || []);
-      console.log('Menu items loaded:', response.data?.length || 0, 'items');
-      
-      // If no menu items, this is normal - user needs to add them
-      if (!response.data || response.data.length === 0) {
-        console.log('No menu items found. User should add items via Menu Management.');
-      }
     } catch (error) {
       console.error('Error fetching menu items:', error);
       const errorMessage = error.response?.data?.error || error.message || 'Failed to load menu items';

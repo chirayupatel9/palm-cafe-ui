@@ -57,9 +57,6 @@ const CustomerOrderHistory = ({ customerPhone, setActiveTab, cart, setCart }) =>
       const allInvoices = allInvoicesResponse.data;
       const availableInvoices = new Set();
       
-      console.log('Checking invoices for orders:', orders.map(o => o.order_number));
-      console.log('Available invoices:', allInvoices.map(i => i.order_number));
-      
       orders.forEach(order => {
         // Check if invoice exists in the invoices list
         const hasInvoice = allInvoices.some(invoice => invoice.order_number === order.order_number);
@@ -69,7 +66,6 @@ const CustomerOrderHistory = ({ customerPhone, setActiveTab, cart, setCart }) =>
         
         if (hasInvoice || canHaveInvoice) {
           availableInvoices.add(order.order_number);
-          console.log(`Order ${order.order_number} (${order.status}): Invoice available = ${hasInvoice}, Can have invoice = ${canHaveInvoice}`);
         }
       });
       
@@ -142,7 +138,7 @@ const CustomerOrderHistory = ({ customerPhone, setActiveTab, cart, setCart }) =>
         const invoice = invoiceResponse.data;
         invoiceNumber = invoice?.invoice_number;
       } catch (error) {
-        console.log('Could not find invoice by order number, trying alternative method');
+        // Try alternative method
       }
       
       // If we couldn't get the invoice number, try to find it in the invoices list
@@ -153,7 +149,7 @@ const CustomerOrderHistory = ({ customerPhone, setActiveTab, cart, setCart }) =>
           const matchingInvoice = allInvoices.find(inv => inv.order_number === orderNumber);
           invoiceNumber = matchingInvoice?.invoice_number;
         } catch (error) {
-          console.log('Could not find invoice in all invoices list');
+          // Invoice not found in list
         }
       }
       

@@ -17,14 +17,6 @@ const DailyReports = () => {
     fetchDailyReports();
   }, [timeRange]);
 
-  useEffect(() => {
-    console.log('DailyData state changed:', dailyData);
-    if (dailyData.length > 0) {
-      console.log('Sample data item:', dailyData[0]);
-      console.log('All earnings values:', dailyData.map(d => ({ date: d.date, earnings: d.earnings, orders: d.orders })));
-    }
-  }, [dailyData]);
-
   const fetchDailyReports = async () => {
     try {
       setLoading(true);
@@ -32,10 +24,6 @@ const DailyReports = () => {
         axios.get(`/reports/daily?days=${timeRange}`),
         axios.get('/reports/top-items')
       ]);
-
-      console.log('Daily data received:', dailyResponse.data);
-      console.log('Top items received:', topItemsResponse.data);
-      console.log('Daily data array:', dailyResponse.data.dailyData);
 
       setDailyData(dailyResponse.data.dailyData || []);
       setTopItems(topItemsResponse.data.topItems || []);
@@ -64,7 +52,6 @@ const DailyReports = () => {
       const value = key === 'earnings' ? parseFloat(item[key]) || 0 : parseInt(item[key]) || 0;
       return value;
     });
-    console.log(`Max value for ${key}:`, Math.max(...values), 'Values:', values);
     return Math.max(...values);
   };
 
@@ -72,7 +59,6 @@ const DailyReports = () => {
     if (!data || data.length === 0) return null;
     
     const maxValue = getMaxValue(data, key);
-    console.log(`Rendering line chart for ${key}, maxValue:`, maxValue);
     
     if (maxValue === 0) {
       return (
@@ -88,8 +74,6 @@ const DailyReports = () => {
       const heightPercentage = maxValue > 0 ? (value / maxValue) * 100 : 0;
       const x = (index / (data.length - 1)) * 100; // X position (0-100%)
       const y = 100 - heightPercentage; // Y position (inverted for SVG)
-      
-      console.log(`Point ${index}: value=${value}, x=${x}%, y=${y}%`);
       
       return { x, y, value, date: item.date };
     });

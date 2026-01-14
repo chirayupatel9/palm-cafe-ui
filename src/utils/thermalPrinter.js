@@ -44,7 +44,6 @@ class ThermalPrinterManager {
 
       return this.printers;
     } catch (error) {
-      console.log('No USB printers detected or access denied:', error);
       return [];
     }
   }
@@ -68,7 +67,7 @@ class ThermalPrinterManager {
         }));
       }
     } catch (error) {
-      console.log('Could not enumerate system printers:', error);
+      // Could not enumerate system printers
     }
     
     return [];
