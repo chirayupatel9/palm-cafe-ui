@@ -20,6 +20,8 @@ import KitchenOrders from './components/KitchenOrders';
 import CustomerManagement from './components/CustomerManagement';
 import PaymentMethodManagement from './components/PaymentMethodManagement';
 import CafeSettings from './components/CafeSettings';
+import CafeUserManagement from './components/CafeUserManagement';
+import CafeAnalytics from './components/CafeAnalytics';
 import CafeInfo from './components/CafeInfo';
 import CustomerApp from './components/CustomerApp';
 import LandingPage from './components/LandingPage';
@@ -210,11 +212,9 @@ function MainApp() {
       case 'inventory':
         return <InventoryManagement />;
       case 'analytics':
-        // TODO: Create Analytics component
-        return <div className="p-6"><h2 className="text-2xl font-bold">Analytics</h2><p>Analytics dashboard coming soon...</p></div>;
+        return <CafeAnalytics />;
       case 'users':
-        // TODO: Create User Management component for cafe admins (different from SuperAdmin)
-        return <div className="p-6"><h2 className="text-2xl font-bold">User Management</h2><p>User management for cafe admins coming soon...</p></div>;
+        return <CafeUserManagement />;
       case 'advanced-reports':
         return <InvoiceHistory cart={cart} setCart={setCart} setCurrentPage={setCurrentPage} />;
       case 'payment-methods':
