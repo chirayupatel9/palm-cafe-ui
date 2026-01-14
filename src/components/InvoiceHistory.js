@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Download, Calendar, User, DollarSign, Percent, Heart, BarChart3, Plus, ShoppingCart, X } from 'lucide-react';
+import { Download, Calendar, User, DollarSign, Percent, Heart, BarChart3, Plus, ShoppingCart, X, FileText } from 'lucide-react';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 import { useCurrency } from '../contexts/CurrencyContext';
@@ -280,7 +280,7 @@ const InvoiceHistory = ({ cart, setCart, setCurrentPage }) => {
             className="h-10 w-10 mr-3"
           />
           <div>
-            <h2 className="text-xl sm:text-2xl font-bold text-secondary-700 dark:text-secondary-300">Invoice History & Reports</h2>
+            <h2 className="text-xl sm:text-2xl font-bold text-secondary-700 dark:text-secondary-300">Reports & Invoices</h2>
                          <div className="text-sm text-gray-500 dark:text-gray-400">
                {activeTab === 'invoices' ? (
                  searchQuery ? 
@@ -293,7 +293,7 @@ const InvoiceHistory = ({ cart, setCart, setCurrentPage }) => {
                      return invoiceNumber.includes(query) || orderNumber.includes(query) || customerName.includes(query) || customerPhone.includes(query);
                    }).length}` :
                    `Total Invoices: ${invoices.length} | Showing: ${displayedInvoices.length} of ${invoices.length}`
-               ) : 'Business insights and analytics'}
+               ) : 'Operational reports and item-level data'}
              </div>
           </div>
         </div>
@@ -314,8 +314,8 @@ const InvoiceHistory = ({ cart, setCart, setCurrentPage }) => {
              }`}
            >
              <div className="flex items-center">
-               <BarChart3 className="h-4 w-4 mr-2" />
-               Daily Reports
+               <FileText className="h-4 w-4 mr-2" />
+               Operational Reports
              </div>
            </button>
            <button
