@@ -522,8 +522,8 @@ const InventoryManagement = () => {
               onChange={(e) => setFilterCategory(e.target.value)}
               className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-secondary-500 focus:border-transparent ${
                 isDarkMode 
-                  ? 'bg-gray-800 border-gray-600 text-gray-100' 
-                  : 'border-gray-300 bg-white text-gray-900'
+                  ? '' 
+                  : ''
               }`}
             >
               <option value="all">All Categories</option>
@@ -680,23 +680,51 @@ const InventoryManagement = () => {
       <div className="card">
         <div className="overflow-x-auto">
           <table className={`min-w-full divide-y ${isDarkMode ? 'divide-gray-700' : 'divide-gray-200'}`}>
-            <thead className={isDarkMode ? 'bg-gray-700' : 'bg-gray-50'}>
+            <thead style={{ backgroundColor: 'var(--surface-table)' }}>
               <tr>
-                <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${isDarkMode ? 'text-gray-300' : 'text-gray-500'}`}>Item</th>
-                <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${isDarkMode ? 'text-gray-300' : 'text-gray-500'}`}>Category</th>
-                <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${isDarkMode ? 'text-gray-300' : 'text-gray-500'}`}>Stock</th>
-                <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${isDarkMode ? 'text-gray-300' : 'text-gray-500'}`}>Cost</th>
-                <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${isDarkMode ? 'text-gray-300' : 'text-gray-500'}`}>Supplier</th>
-                <th className={`px-6 py-3 text-right text-xs font-medium uppercase tracking-wider ${isDarkMode ? 'text-gray-300' : 'text-gray-500'}`}>Actions</th>
+                <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider" style={{ 
+                  color: 'var(--color-on-surface-variant)',
+                  borderBottom: '2px solid var(--color-outline)'
+                }}>Item</th>
+                <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider" style={{ 
+                  color: 'var(--color-on-surface-variant)',
+                  borderBottom: '2px solid var(--color-outline)'
+                }}>Category</th>
+                <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider" style={{ 
+                  color: 'var(--color-on-surface-variant)',
+                  borderBottom: '2px solid var(--color-outline)'
+                }}>Stock</th>
+                <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider" style={{ 
+                  color: 'var(--color-on-surface-variant)',
+                  borderBottom: '2px solid var(--color-outline)'
+                }}>Cost</th>
+                <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider" style={{ 
+                  color: 'var(--color-on-surface-variant)',
+                  borderBottom: '2px solid var(--color-outline)'
+                }}>Supplier</th>
+                <th className="px-6 py-4 text-right text-xs font-semibold uppercase tracking-wider" style={{ 
+                  color: 'var(--color-on-surface-variant)',
+                  borderBottom: '2px solid var(--color-outline)'
+                }}>Actions</th>
               </tr>
             </thead>
-            <tbody className={`${isDarkMode ? 'bg-gray-800 divide-gray-700' : 'bg-white divide-gray-200'}`}>
+            <tbody style={{ backgroundColor: 'var(--surface-card)' }}>
               {filteredInventory.map((item) => {
                 const stockStatus = getStockStatus(item.quantity, item.reorder_level);
                 const StatusIcon = stockStatus.icon;
                 
                 return (
-                  <tr key={item.id} className={isDarkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-50'}>
+                  <tr 
+                    key={item.id} 
+                    className="transition-surface"
+                    style={{ borderBottom: '1px solid var(--color-outline-variant)' }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.backgroundColor = 'var(--surface-table)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.backgroundColor = 'var(--surface-card)';
+                    }}
+                  >
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div>
                         <div className={`text-sm font-medium ${isDarkMode ? 'text-gray-100' : 'text-gray-900'}`}>{item.name}</div>
@@ -707,7 +735,7 @@ const InventoryManagement = () => {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                        isDarkMode ? 'bg-gray-700 text-gray-300' : 'bg-gray-100 text-gray-800'
+                        'transition-surface'
                       }`}>
                         {item.category}
                       </span>

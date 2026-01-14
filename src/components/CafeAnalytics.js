@@ -107,33 +107,35 @@ const SimpleLineChart = ({ data, labelKey = 'date', valueKey = 'amount', maxValu
   );
 };
 
-// Metric Card Component
+// Metric Card Component - Using KPI card style for emphasis
 const MetricCard = ({ title, value, subtitle, icon: Icon, trend, className = '' }) => {
   return (
-    <Card className={className}>
+    <Card kpi={true} className={className}>
       <div className="flex items-start justify-between">
         <div className="flex-1">
-          <p className="text-sm font-medium text-secondary-500 dark:text-gray-400 mb-1">
+          <p className="text-sm font-semibold mb-2" style={{ color: 'var(--color-on-surface-variant)' }}>
             {title}
           </p>
-          <p className="text-2xl font-bold text-secondary-900 dark:text-gray-100">
+          <p className="text-3xl font-bold mb-1" style={{ color: 'var(--color-primary)' }}>
             {value}
           </p>
           {subtitle && (
-            <p className="text-xs text-secondary-500 dark:text-gray-400 mt-1">
+            <p className="text-xs mt-1" style={{ color: 'var(--color-on-surface-variant)' }}>
               {subtitle}
             </p>
           )}
           {trend && (
-            <div className={`flex items-center mt-2 text-xs ${trend > 0 ? 'text-green-600' : 'text-red-600'}`}>
+            <div className={`flex items-center mt-3 text-xs font-medium ${trend > 0 ? 'text-green-600' : 'text-red-600'}`}>
               <TrendingUp className={`h-3 w-3 mr-1 ${trend < 0 ? 'transform rotate-180' : ''}`} />
               {Math.abs(trend)}%
             </div>
           )}
         </div>
         {Icon && (
-          <div className="p-3 bg-secondary-100 dark:bg-gray-700 rounded-lg">
-            <Icon className="h-6 w-6 text-secondary-600 dark:text-gray-300" />
+          <div className="p-3 rounded-lg" style={{ 
+            backgroundColor: 'var(--color-primary-container)'
+          }}>
+            <Icon className="h-6 w-6" style={{ color: 'var(--color-primary)' }} />
           </div>
         )}
       </div>
@@ -231,17 +233,17 @@ const CafeAnalytics = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               {[1, 2, 3, 4].map(i => (
                 <Card key={i} className="opacity-50">
-                  <div className="h-20 bg-gray-100 dark:bg-gray-700 rounded animate-pulse" />
+                  <div className="h-20 rounded animate-pulse" style={{ backgroundColor: 'var(--surface-table)' }} />
                 </Card>
               ))}
             </div>
             
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <Card className="opacity-50">
-                <div className="h-64 bg-gray-100 dark:bg-gray-700 rounded animate-pulse" />
+                <div className="h-64 rounded animate-pulse" style={{ backgroundColor: 'var(--surface-table)' }} />
               </Card>
               <Card className="opacity-50">
-                <div className="h-64 bg-gray-100 dark:bg-gray-700 rounded animate-pulse" />
+                <div className="h-64 rounded animate-pulse" style={{ backgroundColor: 'var(--surface-table)' }} />
               </Card>
             </div>
           </div>
@@ -419,27 +421,27 @@ const CafeAnalytics = () => {
         description="Customer metrics and engagement"
       >
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="text-center p-4 bg-accent-50 dark:bg-gray-700 rounded-lg">
-            <p className="text-3xl font-bold text-secondary-900 dark:text-gray-100">
+          <div className="text-center p-4 rounded-lg transition-surface" style={{ backgroundColor: 'var(--surface-table)' }}>
+            <p className="text-3xl font-bold" style={{ color: 'var(--color-primary)' }}>
               {customers?.total || 0}
             </p>
-            <p className="text-sm text-secondary-500 dark:text-gray-400 mt-1">
+            <p className="text-sm mt-1" style={{ color: 'var(--color-on-surface-variant)' }}>
               Total Customers
             </p>
           </div>
-          <div className="text-center p-4 bg-accent-50 dark:bg-gray-700 rounded-lg">
-            <p className="text-3xl font-bold text-secondary-900 dark:text-gray-100">
+          <div className="text-center p-4 rounded-lg transition-surface" style={{ backgroundColor: 'var(--surface-table)' }}>
+            <p className="text-3xl font-bold" style={{ color: 'var(--color-primary)' }}>
               {customers?.new_this_month || 0}
             </p>
-            <p className="text-sm text-secondary-500 dark:text-gray-400 mt-1">
+            <p className="text-sm mt-1" style={{ color: 'var(--color-on-surface-variant)' }}>
               New This Month
             </p>
           </div>
-          <div className="text-center p-4 bg-accent-50 dark:bg-gray-700 rounded-lg">
-            <p className="text-3xl font-bold text-secondary-900 dark:text-gray-100">
+          <div className="text-center p-4 rounded-lg transition-surface" style={{ backgroundColor: 'var(--surface-table)' }}>
+            <p className="text-3xl font-bold" style={{ color: 'var(--color-primary)' }}>
               {customers?.returning || 0}
             </p>
-            <p className="text-sm text-secondary-500 dark:text-gray-400 mt-1">
+            <p className="text-sm mt-1" style={{ color: 'var(--color-on-surface-variant)' }}>
               Returning Customers
             </p>
           </div>

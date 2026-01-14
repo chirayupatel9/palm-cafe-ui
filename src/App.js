@@ -241,7 +241,7 @@ function MainApp() {
 
   if (loading || cafeSettingsLoading || subscriptionLoading || featuresLoading) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center" style={{ backgroundColor: 'var(--color-background)' }}>
+      <div className="min-h-screen flex flex-col items-center justify-center surface-page">
         <CafeInfo logoSize="h-16 w-16" nameSize="text-xl" className="mb-4" />
         <div className="animate-spin rounded-full h-12 w-12 border-b-2" style={{ borderColor: 'var(--color-primary)' }}></div>
         <p className="mt-4" style={{ color: 'var(--color-on-surface-variant)' }}>Loading {cafeSettings.cafe_name}...</p>
@@ -250,24 +250,22 @@ function MainApp() {
   }
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: 'var(--color-background)' }}>
+    <div className="min-h-screen surface-page">
       <Toaster position="top-right" />
     
-    {/* Header - elevated surface with subtle shadow */}
-    <header className="surface" style={{ 
-      boxShadow: 'var(--elevation-1)',
-      borderBottom: '1px solid var(--color-outline)'
-    }}>
+    {/* Header - Distinct navigation surface */}
+    <header className="surface-nav">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           <div className="flex items-center">
             <CafeInfo />
             {cart && cart.length > 0 && (
-              <div className="ml-4 flex items-center space-x-1 text-sm" style={{ color: 'var(--color-on-surface-variant)' }}>
+              <div className="ml-4 flex items-center space-x-1 text-sm" style={{ color: 'var(--on-surface-nav)' }}>
                 <ShoppingCart className="h-4 w-4" />
-                <span className="px-2 py-1 rounded-full text-xs font-medium" style={{ 
-                  backgroundColor: 'var(--color-primary-container)',
-                  color: 'var(--color-on-primary-container)'
+                <span className="px-2.5 py-1 rounded-full text-xs font-semibold" style={{ 
+                  backgroundColor: 'var(--color-primary)',
+                  color: 'var(--color-on-primary)',
+                  boxShadow: 'var(--elevation-1)'
                 }}>
                   {cart.length} items
                 </span>
@@ -293,8 +291,8 @@ function MainApp() {
                 color: 'var(--color-on-surface-variant)'
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = 'var(--color-surface-variant)';
-                e.currentTarget.style.color = 'var(--color-on-surface)';
+                e.currentTarget.style.backgroundColor = 'var(--color-primary-container)';
+                e.currentTarget.style.color = 'var(--color-primary)';
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.backgroundColor = 'transparent';
@@ -311,8 +309,8 @@ function MainApp() {
               className="lg:hidden p-2 rounded-md transition-colors"
               style={{ color: 'var(--color-on-surface-variant)' }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = 'var(--color-surface-variant)';
-                e.currentTarget.style.color = 'var(--color-on-surface)';
+                e.currentTarget.style.backgroundColor = 'var(--color-primary-container)';
+                e.currentTarget.style.color = 'var(--color-primary)';
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.backgroundColor = 'transparent';
@@ -330,11 +328,10 @@ function MainApp() {
       </div>
     </header>
 
-    {/* Mobile Navigation Menu */}
+    {/* Mobile Navigation Menu - Distinct surface */}
     {mobileMenuOpen && (
-      <div className="lg:hidden surface" style={{ 
-        boxShadow: 'var(--elevation-1)',
-        borderBottom: '1px solid var(--color-outline)'
+      <div className="lg:hidden surface-nav" style={{ 
+        borderTop: '1px solid var(--color-outline)'
       }}>
         <div className="px-4 py-2 space-y-1">
           {navigationItems.map((item) => {
@@ -343,7 +340,7 @@ function MainApp() {
               <button
                 key={item.id}
                 onClick={() => handlePageChange(item.id)}
-                className={`w-full flex items-center px-3 py-3 text-sm font-medium rounded-lg transition-colors ${
+                className={`w-full flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all ${
                   currentPage === item.id
                     ? ''
                     : ''
@@ -357,8 +354,8 @@ function MainApp() {
                 }}
                 onMouseEnter={(e) => {
                   if (currentPage !== item.id) {
-                    e.currentTarget.style.backgroundColor = 'var(--color-surface-variant)';
-                    e.currentTarget.style.color = 'var(--color-on-surface)';
+                    e.currentTarget.style.backgroundColor = 'var(--color-primary-container)';
+                    e.currentTarget.style.color = 'var(--color-primary)';
                   }
                 }}
                 onMouseLeave={(e) => {
@@ -378,11 +375,8 @@ function MainApp() {
       </div>
     )}
 
-    {/* Desktop Navigation - refined with subtle depth */}
-    <nav className="hidden lg:block surface" style={{ 
-      boxShadow: 'var(--elevation-1)',
-      borderBottom: '1px solid var(--color-outline)'
-    }}>
+    {/* Desktop Navigation - Distinct elevated surface */}
+    <nav className="hidden lg:block surface-nav">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex space-x-8">
           {navigationItems.map((item) => {
@@ -406,8 +400,8 @@ function MainApp() {
       </div>
     </nav>
 
-    {/* Main Content - increased vertical rhythm */}
-    <main className="max-w-7xl mx-auto py-6 sm:py-8 px-4 sm:px-6 lg:px-8">
+    {/* Main Content - Container surface with distinct background */}
+    <main className="surface-container max-w-7xl mx-auto my-6 sm:my-8">
       {renderPage()}
     </main>
       </div>

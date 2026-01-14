@@ -18,7 +18,7 @@ const Table = ({
 }) => {
   return (
     <div className={`overflow-x-auto ${className}`} style={{ 
-      backgroundColor: 'var(--color-surface)',
+      backgroundColor: 'var(--surface-card)',
       borderRadius: 'var(--radius-lg)',
       border: '1px solid var(--color-outline)',
       boxShadow: 'var(--elevation-1)'
@@ -28,18 +28,18 @@ const Table = ({
         borderSpacing: 0
       }}>
         <thead style={{ 
-          backgroundColor: 'var(--color-surface-variant)'
+          backgroundColor: 'var(--surface-table)'
         }}>
           <tr>
             {columns.map((column, index) => (
               <th
                 key={column.key || index}
-                className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
+                className={`px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider ${
                   column.align === 'right' ? 'text-right' : ''
                 }`}
                 style={{ 
                   color: 'var(--color-on-surface-variant)',
-                  borderBottom: '1px solid var(--color-outline)'
+                  borderBottom: '2px solid var(--color-outline)'
                 }}
               >
                 {column.label}
@@ -48,7 +48,7 @@ const Table = ({
           </tr>
         </thead>
         <tbody style={{ 
-          backgroundColor: 'var(--color-surface)'
+          backgroundColor: 'var(--surface-card)'
         }}>
           {data.length === 0 ? (
             <tr>
@@ -65,10 +65,10 @@ const Table = ({
                   borderBottom: '1px solid var(--color-outline-variant)'
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = 'var(--color-surface-variant)';
+                  e.currentTarget.style.backgroundColor = 'var(--surface-table)';
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = 'var(--color-surface)';
+                  e.currentTarget.style.backgroundColor = 'var(--surface-card)';
                 }}
               >
                 {renderRow(row, rowIndex)}

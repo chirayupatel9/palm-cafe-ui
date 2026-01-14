@@ -36,6 +36,22 @@
   --color-surface-variant: #F9FAFB;
   --color-on-surface-variant: #6B7280;
   
+  /* Explicit Surface Layers - Visually Distinct */
+  --surface-page: #F5F5DC;           /* App background - warm beige */
+  --surface-container: #F0EDE5;       /* Main content area - slightly darker */
+  --surface-nav: #FFFFFF;             /* Navigation - pure white */
+  --surface-card: #FFFFFF;            /* Cards - white */
+  --surface-elevated: #FFFFFF;        /* Important cards - white with shadow */
+  --surface-table: #FAFAFA;          /* Table backgrounds - very light gray */
+  
+  /* On-surface colors for each layer */
+  --on-surface-page: #2C1810;
+  --on-surface-container: #2C1810;
+  --on-surface-nav: #2C1810;
+  --on-surface-card: #2C1810;
+  --on-surface-elevated: #2C1810;
+  --on-surface-table: #2C1810;
+  
   /* Outline/Border */
   --color-outline: #E5E7EB;
   --color-outline-variant: #F3F4F6;
@@ -83,12 +99,13 @@
   --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
   --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
   
-  /* Elevation-specific shadows for surfaces */
+  /* Elevation-specific shadows for surfaces - MORE VISIBLE */
   --elevation-0: none;
-  --elevation-1: 0 1px 3px 0 rgba(0, 0, 0, 0.08), 0 1px 2px 0 rgba(0, 0, 0, 0.04);
-  --elevation-2: 0 3px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  --elevation-3: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-  --elevation-4: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  --elevation-1: 0 2px 4px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  --elevation-2: 0 4px 8px 0 rgba(0, 0, 0, 0.12), 0 2px 4px 0 rgba(0, 0, 0, 0.08);
+  --elevation-3: 0 8px 16px 0 rgba(0, 0, 0, 0.15), 0 4px 8px 0 rgba(0, 0, 0, 0.1);
+  --elevation-4: 0 12px 24px 0 rgba(0, 0, 0, 0.18), 0 6px 12px 0 rgba(0, 0, 0, 0.12);
+  --elevation-nav: 0 2px 8px 0 rgba(0, 0, 0, 0.08);
 }
 
 /* ============================================
@@ -119,6 +136,22 @@
   --color-on-surface: #F5F5DC;
   --color-surface-variant: #374151;
   --color-on-surface-variant: #9CA3AF;
+  
+  /* Explicit Surface Layers - Visually Distinct (Dark Mode) */
+  --surface-page: #1a1612;           /* App background - darkest */
+  --surface-container: #211d18;      /* Main content area - slightly lighter */
+  --surface-nav: #2c241d;            /* Navigation - surface color */
+  --surface-card: #2c241d;            /* Cards - surface color */
+  --surface-elevated: #332b24;        /* Important cards - lighter */
+  --surface-table: #25201a;          /* Table backgrounds - distinct */
+  
+  /* On-surface colors for each layer (Dark Mode) */
+  --on-surface-page: #F5F5DC;
+  --on-surface-container: #F5F5DC;
+  --on-surface-nav: #F5F5DC;
+  --on-surface-card: #F5F5DC;
+  --on-surface-elevated: #F5F5DC;
+  --on-surface-table: #F5F5DC;
   
   /* Outline/Border */
   --color-outline: #374151;
@@ -151,10 +184,11 @@
   --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -2px rgba(0, 0, 0, 0.4);
   --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.6), 0 10px 10px -5px rgba(0, 0, 0, 0.5);
   
-  /* Elevation-specific shadows for surfaces (dark mode) */
+  /* Elevation-specific shadows for surfaces (dark mode) - MORE VISIBLE */
   --elevation-0: none;
-  --elevation-1: 0 1px 3px 0 rgba(0, 0, 0, 0.4), 0 1px 2px 0 rgba(0, 0, 0, 0.3);
-  --elevation-2: 0 3px 6px -1px rgba(0, 0, 0, 0.5), 0 2px 4px -1px rgba(0, 0, 0, 0.4);
-  --elevation-3: 0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -2px rgba(0, 0, 0, 0.4);
-  --elevation-4: 0 20px 25px -5px rgba(0, 0, 0, 0.6), 0 10px 10px -5px rgba(0, 0, 0, 0.5);
+  --elevation-1: 0 2px 8px 0 rgba(0, 0, 0, 0.5), 0 1px 4px 0 rgba(0, 0, 0, 0.4);
+  --elevation-2: 0 4px 12px 0 rgba(0, 0, 0, 0.6), 0 2px 6px 0 rgba(0, 0, 0, 0.5);
+  --elevation-3: 0 8px 20px 0 rgba(0, 0, 0, 0.7), 0 4px 10px 0 rgba(0, 0, 0, 0.6);
+  --elevation-4: 0 12px 28px 0 rgba(0, 0, 0, 0.8), 0 6px 14px 0 rgba(0, 0, 0, 0.7);
+  --elevation-nav: 0 2px 12px 0 rgba(0, 0, 0, 0.6);
 }

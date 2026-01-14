@@ -64,17 +64,23 @@ const DailyReports = () => {
       </div>
 
       {/* Top Items Section */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 border border-accent-200 dark:border-gray-700">
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">
-          Top 5 Most Ordered Items
-        </h3>
-        <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
-          Item-level performance data for operational planning
-        </p>
+      <div className="card">
+        <div className="card-header">
+          <h3 className="card-title">
+            Top 5 Most Ordered Items
+          </h3>
+          <p className="card-description">
+            Item-level performance data for operational planning
+          </p>
+        </div>
         {topItems.length > 0 ? (
           <div className="space-y-3">
             {topItems.slice(0, 5).map((item, index) => (
-              <div key={item.id || index} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+              <div 
+                key={item.id || index} 
+                className="flex items-center justify-between p-3 rounded-lg transition-surface"
+                style={{ backgroundColor: 'var(--surface-table)' }}
+              >
                 <div className="flex items-center">
                   <div className="w-8 h-8 bg-secondary-100 dark:bg-secondary-900 rounded-full flex items-center justify-center mr-3">
                     <span className="text-sm font-bold text-secondary-600 dark:text-secondary-400">

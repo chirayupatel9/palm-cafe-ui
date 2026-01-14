@@ -617,7 +617,7 @@ const MenuManagement = ({ menuItems, onUpdate, onAdd, onDelete }) => {
                 {/* Desktop Table */}
                 <div className="hidden lg:block overflow-x-auto">
                   <table className={`min-w-full divide-y ${isDarkMode ? 'divide-gray-700' : 'divide-accent-200'}`}>
-                    <thead className={isDarkMode ? 'bg-gray-700' : 'bg-accent-50'}>
+                    <thead style={{ backgroundColor: 'var(--surface-table)' }}>
                       <tr>
                         <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${isDarkMode ? 'text-gray-300' : 'text-secondary-600'}`}>
                           Image
@@ -787,7 +787,15 @@ const MenuManagement = ({ menuItems, onUpdate, onAdd, onDelete }) => {
                 {/* Mobile Cards */}
                 <div className="lg:hidden space-y-3">
                   {items.map((item) => (
-                    <div key={item.id} className={`border rounded-lg p-4 ${isDarkMode ? 'border-gray-700 bg-gray-800' : 'border-accent-200 bg-white'}`}>
+                    <div 
+                      key={item.id} 
+                      className="border rounded-lg p-4 transition-surface hover-lift"
+                      style={{ 
+                        borderColor: 'var(--color-outline)',
+                        backgroundColor: 'var(--surface-card)',
+                        boxShadow: 'var(--elevation-1)'
+                      }}
+                    >
                       {editingId === item.id ? (
                         // Edit Mode Mobile
                         <div className="space-y-3">
@@ -1030,7 +1038,7 @@ const MenuManagement = ({ menuItems, onUpdate, onAdd, onDelete }) => {
                 {/* Desktop Table */}
                 <div className="hidden lg:block overflow-x-auto">
                   <table className={`min-w-full divide-y ${isDarkMode ? 'divide-gray-700' : 'divide-accent-200'}`}>
-                    <thead className={isDarkMode ? 'bg-gray-700' : 'bg-accent-50'}>
+                    <thead style={{ backgroundColor: 'var(--surface-table)' }}>
                       <tr>
                         <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${isDarkMode ? 'text-gray-300' : 'text-secondary-600'}`}>
                           Category
@@ -1147,7 +1155,15 @@ const MenuManagement = ({ menuItems, onUpdate, onAdd, onDelete }) => {
                 {/* Mobile Cards */}
                 <div className="lg:hidden space-y-3">
                   {categories.map((category) => (
-                    <div key={category.id} className={`border rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow ${isDarkMode ? 'border-gray-700 bg-gray-800' : 'border-accent-200 bg-white'}`}>
+                    <div 
+                      key={category.id} 
+                      className="border rounded-lg p-4 transition-elevation hover-lift"
+                      style={{ 
+                        borderColor: 'var(--color-outline)',
+                        backgroundColor: 'var(--surface-card)',
+                        boxShadow: 'var(--elevation-1)'
+                      }}
+                    >
                       {categoryEditingId === category.id ? (
                         // Edit Mode Mobile
                         <div className="space-y-3">

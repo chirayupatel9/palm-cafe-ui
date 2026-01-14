@@ -25,82 +25,195 @@ body {
    ============================================ */
 
 @layer components {
-  /* Card component - Material Design elevation system */
+  /* Surface Layer Classes - Explicit Visual Hierarchy */
+  .surface-page {
+    background-color: var(--surface-page);
+    color: var(--on-surface-page);
+  }
+  
+  .surface-container {
+    background-color: var(--surface-container);
+    color: var(--on-surface-container);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-lg);
+  }
+  
+  .surface-nav {
+    background-color: var(--surface-nav);
+    color: var(--on-surface-nav);
+    box-shadow: var(--elevation-nav);
+    border-bottom: 1px solid var(--color-outline);
+  }
+  
+  /* Card component - Redesigned with better composition */
   .card {
-    @apply rounded-lg p-6;
-    background-color: var(--color-surface);
+    @apply rounded-lg;
+    background-color: var(--surface-card);
+    color: var(--on-surface-card);
     border: 1px solid var(--color-outline);
     box-shadow: var(--elevation-1);
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    padding: var(--spacing-xl);
+    transition: box-shadow var(--motion-duration-normal) var(--motion-easing),
+                transform var(--motion-duration-normal) var(--motion-easing),
+                border-color var(--motion-duration-normal) var(--motion-easing);
+  }
+  
+  /* Card header - clear separation with increased spacing */
+  .card-header {
+    padding-bottom: var(--spacing-lg);
+    margin-bottom: var(--spacing-xl);
+    border-bottom: 2px solid var(--color-outline-variant);
+  }
+  
+  .card-title {
+    font-size: 1.375rem;
+    font-weight: 600;
+    color: var(--on-surface-card);
+    margin: 0;
+    letter-spacing: -0.01em;
+  }
+  
+  .card-description {
+    font-size: 0.9375rem;
+    color: var(--color-on-surface-variant);
+    margin-top: var(--spacing-sm);
+    margin: 0;
+    line-height: 1.5;
   }
   
   .card-sm {
-    @apply p-4;
+    padding: var(--spacing-lg);
   }
   
   .card-lg {
-    @apply p-8;
+    padding: var(--spacing-2xl);
   }
   
-  /* Elevated card for emphasis */
+  /* Elevated card for KPIs and important content */
   .card-elevated {
-    @apply rounded-lg p-6;
-    background-color: var(--color-surface);
+    @apply rounded-lg;
+    background-color: var(--surface-elevated);
+    color: var(--on-surface-elevated);
     border: 1px solid var(--color-outline);
     box-shadow: var(--elevation-2);
+    padding: var(--spacing-xl);
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   }
   
-  /* Surface container - sits on background */
-  .surface {
-    background-color: var(--color-surface);
+  /* KPI Card - Special style for dashboard metrics */
+  .card-kpi {
+    @apply rounded-lg;
+    background-color: var(--surface-elevated);
+    color: var(--on-surface-elevated);
     border: 1px solid var(--color-outline);
+    box-shadow: var(--elevation-2);
+    padding: var(--spacing-xl);
+    position: relative;
+    overflow: hidden;
   }
   
-  /* Surface variant - subtle differentiation */
-  .surface-variant {
-    background-color: var(--color-surface-variant);
-    border: 1px solid var(--color-outline-variant);
+  .card-kpi::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--color-primary), var(--color-accent));
   }
   
   .card:hover {
     box-shadow: var(--elevation-2);
+    transform: translateY(-2px);
+  }
+  
+  .card-elevated {
+    transition: box-shadow var(--motion-duration-normal) var(--motion-easing),
+                transform var(--motion-duration-normal) var(--motion-easing),
+                border-color var(--motion-duration-normal) var(--motion-easing);
   }
   
   .card-elevated:hover {
     box-shadow: var(--elevation-3);
+    transform: translateY(-2px);
+  }
+  
+  .card-kpi {
+    transition: box-shadow var(--motion-duration-normal) var(--motion-easing),
+                transform var(--motion-duration-normal) var(--motion-easing);
+  }
+  
+  .card-kpi:hover {
+    box-shadow: var(--elevation-3);
+    transform: translateY(-2px);
+  }
+  
+  /* Disable hover lift on mobile/touch devices */
+  @media (hover: none) {
+    .card:hover,
+    .card-elevated:hover,
+    .card-kpi:hover {
+      transform: none;
+    }
   }
 
-  /* Button styles - refined with subtle depth */
+  /* Button styles - Stronger primary color presence with motion */
   .btn-primary {
     background-color: var(--color-primary);
     color: var(--color-on-primary);
-    @apply px-4 py-2 h-10 rounded-lg transition-all duration-200 font-medium text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2;
+    @apply px-5 py-2.5 h-11 rounded-lg font-semibold text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2;
     box-shadow: var(--elevation-1);
+    border: none;
+    transition: box-shadow var(--motion-duration-normal) var(--motion-easing),
+                transform var(--motion-duration-fast) var(--motion-easing),
+                filter var(--motion-duration-normal) var(--motion-easing);
   }
   
   .btn-primary:hover {
     box-shadow: var(--elevation-2);
-    transform: translateY(-1px);
+    transform: translateY(-2px);
+    background-color: var(--color-primary);
+    filter: brightness(1.1);
   }
   
   .btn-primary:active {
     box-shadow: var(--elevation-1);
-    transform: translateY(0);
+    transform: translateY(0) scale(0.98);
+  }
+  
+  @media (hover: none) {
+    .btn-primary:hover {
+      transform: none;
+    }
   }
 
   .btn-secondary {
-    background-color: var(--color-surface);
+    background-color: var(--surface-card);
     border-color: var(--color-outline);
-    color: var(--color-on-surface);
-    @apply border px-4 py-2 h-10 rounded-lg transition-all duration-200 font-medium text-sm focus:outline-none focus:ring-2 focus:ring-offset-2;
+    color: var(--on-surface-card);
+    @apply border px-4 py-2 h-10 rounded-lg font-medium text-sm focus:outline-none focus:ring-2 focus:ring-offset-2;
     --tw-ring-color: var(--color-outline);
     box-shadow: var(--elevation-0);
+    transition: background-color var(--motion-duration-normal) var(--motion-easing),
+                box-shadow var(--motion-duration-normal) var(--motion-easing),
+                border-color var(--motion-duration-normal) var(--motion-easing),
+                transform var(--motion-duration-fast) var(--motion-easing);
   }
   
   .btn-secondary:hover {
-    background-color: var(--color-surface-variant);
+    background-color: var(--surface-table);
     box-shadow: var(--elevation-1);
+    transform: translateY(-1px);
+  }
+  
+  .btn-secondary:active {
+    transform: translateY(0) scale(0.98);
+  }
+  
+  @media (hover: none) {
+    .btn-secondary:hover {
+      transform: none;
+    }
   }
   
   .btn-destructive {
@@ -150,25 +263,26 @@ body {
     color: var(--color-on-surface-variant);
   }
 
-  /* Navigation styles - refined with subtle depth */
+  /* Navigation styles - Strong primary color presence */
   .nav-active {
     border-color: var(--color-primary);
     color: var(--color-primary);
     background-color: var(--color-primary-container);
     @apply font-semibold;
-    border-bottom-width: 2px;
+    border-bottom-width: 3px;
     position: relative;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
   }
   
   .nav-active::after {
     content: '';
     position: absolute;
-    bottom: -2px;
+    bottom: -3px;
     left: 0;
     right: 0;
-    height: 2px;
+    height: 3px;
     background-color: var(--color-primary);
-    border-radius: 2px 2px 0 0;
+    border-radius: 3px 3px 0 0;
   }
 
   .nav-inactive {
@@ -179,8 +293,9 @@ body {
   }
   
   .nav-inactive:hover {
-    color: var(--color-on-surface);
-    background-color: var(--color-surface-variant);
+    color: var(--color-primary);
+    background-color: var(--color-primary-container);
+    opacity: 0.7;
   }
   
   .nav-inactive:hover::after {
@@ -191,7 +306,7 @@ body {
     right: 0;
     height: 2px;
     background-color: var(--color-primary);
-    opacity: 0.3;
+    opacity: 0.5;
     border-radius: 2px 2px 0 0;
   }
 
@@ -255,18 +370,30 @@ body {
   color: var(--color-on-primary-container);
 }
 
-/* Surface hierarchy utilities */
-.bg-surface {
-  background-color: var(--color-surface);
+/* Surface hierarchy utilities - Using explicit layers */
+.bg-surface-page {
+  background-color: var(--surface-page);
 }
 
-.bg-surface-variant {
-  background-color: var(--color-surface-variant);
+.bg-surface-container {
+  background-color: var(--surface-container);
 }
 
-.bg-elevated {
-  background-color: var(--color-surface);
+.bg-surface-nav {
+  background-color: var(--surface-nav);
+}
+
+.bg-surface-card {
+  background-color: var(--surface-card);
+}
+
+.bg-surface-elevated {
+  background-color: var(--surface-elevated);
   box-shadow: var(--elevation-2);
+}
+
+.bg-surface-table {
+  background-color: var(--surface-table);
 }
 
 /* Spacing utilities - improved rhythm */
@@ -425,9 +552,69 @@ button:focus, input:focus, select:focus, textarea:focus {
 }
 
 /* ============================================
-   ANIMATIONS
+   MOTION & TRANSITIONS
    ============================================ */
 
+/* Motion timing tokens */
+:root {
+  --motion-duration-fast: 150ms;
+  --motion-duration-normal: 200ms;
+  --motion-duration-slow: 300ms;
+  --motion-easing: cubic-bezier(0.4, 0, 0.2, 1);
+  --motion-easing-out: cubic-bezier(0, 0, 0.2, 1);
+}
+
+/* Respect reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Standard transition utilities */
+.transition-interactive {
+  transition: all var(--motion-duration-normal) var(--motion-easing);
+}
+
+.transition-elevation {
+  transition: box-shadow var(--motion-duration-normal) var(--motion-easing),
+              transform var(--motion-duration-normal) var(--motion-easing);
+}
+
+.transition-surface {
+  transition: background-color var(--motion-duration-normal) var(--motion-easing),
+              border-color var(--motion-duration-normal) var(--motion-easing);
+}
+
+/* Hover elevation effect */
+.hover-lift {
+  transition: box-shadow var(--motion-duration-normal) var(--motion-easing),
+              transform var(--motion-duration-normal) var(--motion-easing);
+}
+
+.hover-lift:hover {
+  transform: translateY(-2px);
+}
+
+.hover-lift:active {
+  transform: translateY(0);
+}
+
+/* Button press effect */
+.btn-press {
+  transition: transform var(--motion-duration-fast) var(--motion-easing);
+}
+
+.btn-press:active {
+  transform: scale(0.98);
+}
+
+/* ANIMATIONS */
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -449,11 +636,11 @@ button:focus, input:focus, select:focus, textarea:focus {
 }
 
 .animate-fadeIn {
-  animation: fadeIn 0.3s ease-out;
+  animation: fadeIn var(--motion-duration-slow) var(--motion-easing-out);
 }
 
 .animate-slideIn {
-  animation: slideIn 0.3s ease-out;
+  animation: slideIn var(--motion-duration-slow) var(--motion-easing-out);
 }
 
 /* ============================================

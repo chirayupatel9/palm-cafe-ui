@@ -374,44 +374,77 @@ const CustomerManagement = () => {
           <EmptyCustomers onAdd={() => setShowAddModal(true)} />
         ) : (
           <div className="overflow-x-auto">
-            <table className={`min-w-full divide-y ${isDarkMode ? 'divide-gray-700' : 'divide-gray-200'}`}>
-              <thead className={isDarkMode ? 'bg-gray-700' : 'bg-gray-50'}>
+            <table className="min-w-full" style={{ borderCollapse: 'separate', borderSpacing: 0 }}>
+              <thead style={{ backgroundColor: 'var(--surface-table)' }}>
                 <tr>
-                  <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${isDarkMode ? 'text-gray-300' : 'text-gray-500'}`}>
+                  <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider" style={{ 
+                    color: 'var(--color-on-surface-variant)',
+                    borderBottom: '2px solid var(--color-outline)'
+                  }}>
                     Customer
                   </th>
-                  <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${isDarkMode ? 'text-gray-300' : 'text-gray-500'}`}>
+                  <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider" style={{ 
+                    color: 'var(--color-on-surface-variant)',
+                    borderBottom: '2px solid var(--color-outline)'
+                  }}>
                     Contact
                   </th>
-                  <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${isDarkMode ? 'text-gray-300' : 'text-gray-500'}`}>
+                  <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider" style={{ 
+                    color: 'var(--color-on-surface-variant)',
+                    borderBottom: '2px solid var(--color-outline)'
+                  }}>
                     Loyalty
                   </th>
-                  <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${isDarkMode ? 'text-gray-300' : 'text-gray-500'}`}>
+                  <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider" style={{ 
+                    color: 'var(--color-on-surface-variant)',
+                    borderBottom: '2px solid var(--color-outline)'
+                  }}>
                     Visits
                   </th>
-                  <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${isDarkMode ? 'text-gray-300' : 'text-gray-500'}`}>
+                  <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider" style={{ 
+                    color: 'var(--color-on-surface-variant)',
+                    borderBottom: '2px solid var(--color-outline)'
+                  }}>
                     Total Spent
                   </th>
-                  <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${isDarkMode ? 'text-gray-300' : 'text-gray-500'}`}>
+                  <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider" style={{ 
+                    color: 'var(--color-on-surface-variant)',
+                    borderBottom: '2px solid var(--color-outline)'
+                  }}>
                     Status
                   </th>
-                  <th className={`px-6 py-3 text-right text-xs font-medium uppercase tracking-wider ${isDarkMode ? 'text-gray-300' : 'text-gray-500'}`}>
+                  <th className="px-6 py-4 text-right text-xs font-semibold uppercase tracking-wider" style={{ 
+                    color: 'var(--color-on-surface-variant)',
+                    borderBottom: '2px solid var(--color-outline)'
+                  }}>
                     Actions
                   </th>
                 </tr>
               </thead>
-              <tbody className={`${isDarkMode ? 'bg-gray-800 divide-gray-700' : 'bg-white divide-gray-200'}`}>
+              <tbody style={{ backgroundColor: 'var(--surface-card)' }}>
                 {filteredCustomers.map((customer) => (
-                  <tr key={customer.id} className={`h-14 ${isDarkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-50'} transition-colors`}>
+                  <tr 
+                    key={customer.id} 
+                    className="h-14 transition-surface"
+                    style={{ 
+                      borderBottom: '1px solid var(--color-outline-variant)'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.backgroundColor = 'var(--surface-table)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.backgroundColor = 'var(--surface-card)';
+                    }}
+                  >
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
                         <div className="flex-shrink-0 h-10 w-10">
-                          <div className={`h-10 w-10 rounded-full flex items-center justify-center ${
-                            isDarkMode ? 'bg-gray-700' : 'bg-secondary-100'
-                          }`}>
-                            <span className={`text-sm font-medium ${
-                              isDarkMode ? 'text-gray-300' : 'text-secondary-700'
-                            }`}>
+                          <div className="h-10 w-10 rounded-full flex items-center justify-center transition-surface" style={{ 
+                            backgroundColor: 'var(--color-primary-container)'
+                          }}>
+                            <span className="text-sm font-medium" style={{ 
+                              color: 'var(--color-on-primary-container)'
+                            }}>
                               {customer.name.charAt(0).toUpperCase()}
                             </span>
                           </div>

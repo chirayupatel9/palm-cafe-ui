@@ -671,15 +671,15 @@ const KitchenOrders = ({ cart, setCart }) => {
         </div>
         <div className="card">
           <div className="flex items-center">
-            <div className={`p-2 rounded-lg ${isDarkMode ? 'bg-gray-700' : 'bg-gray-100'}`}>
-              <Coffee className={`h-6 w-6 ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`} />
+            <div className="p-2 rounded-lg transition-surface" style={{ backgroundColor: 'var(--surface-table)' }}>
+              <Coffee className="h-6 w-6" style={{ color: 'var(--color-on-surface-variant)' }} />
             </div>
             <div className="ml-4">
-              <p className={`text-sm font-medium ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+              <p className="text-sm font-medium" style={{ color: 'var(--color-on-surface-variant)' }}>
                 {activeTab === 'today' && todaySubTab === 'active' ? 'Total Active' : 
                  activeTab === 'today' && todaySubTab === 'completed' ? 'Total Completed' : 'Total Active'}
               </p>
-              <p className={`text-2xl font-bold ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+              <p className="text-2xl font-bold" style={{ color: 'var(--color-primary)' }}>
                 {activeTab === 'today' && todaySubTab === 'active' 
                   ? pendingOrders.length
                   : activeTab === 'today' && todaySubTab === 'completed'
