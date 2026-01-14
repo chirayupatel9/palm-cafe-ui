@@ -376,39 +376,69 @@ const OrderPage = ({ menuItems, cart: externalCart, setCart: setExternalCart }) 
       <div className="lg:col-span-2 mb-6 lg:mb-0">
         <div className="card">
           <div className="mb-6">
-            <h2 className="text-2xl font-bold text-secondary-700 dark:text-secondary-300 mb-1">Dashboard</h2>
-            <p className="text-sm text-gray-600 dark:text-gray-400">Create new orders and manage your cafe operations</p>
+            <h2 className="text-2xl font-bold mb-1" style={{ color: 'var(--color-on-surface)' }}>Dashboard</h2>
+            <p className="text-sm" style={{ color: 'var(--color-on-surface-variant)' }}>Create new orders and manage your cafe operations</p>
           </div>
           
           {Object.keys(groupedMenuItems).length === 0 ? (
-            <div className="text-center py-12 text-gray-500 dark:text-gray-400">
+            <div className="text-center py-12" style={{ color: 'var(--color-on-surface-variant)' }}>
               <img 
                 src="/images/palm-cafe-logo.png" 
                 alt="Palm Cafe Logo" 
                 className="h-24 w-24 mx-auto mb-6 opacity-50"
               />
-              <h3 className="text-xl font-semibold mb-2">No menu items available</h3>
+              <h3 className="text-xl font-semibold mb-2" style={{ color: 'var(--color-on-surface)' }}>No menu items available</h3>
               <p className="text-base">Add items in Menu Management to get started</p>
             </div>
           ) : (
             <div className="space-y-4 sm:space-y-6">
               {Object.entries(groupedMenuItems).map(([categoryName, items], index) => {
                 return (
-                <div key={categoryName} className={`border border-gray-200 dark:border-gray-700 rounded-xl p-4 sm:p-6 bg-gray-50 dark:bg-gray-800 shadow-sm`}>
-                  <h3 className={`text-xl font-bold text-gray-900 dark:text-gray-100 mb-4 sm:mb-6 flex items-center`}>
-                    <FolderOpen className={`h-6 w-6 mr-3 text-gray-600 dark:text-gray-400`} />
+                <div 
+                  key={categoryName} 
+                  className="rounded-xl p-4 sm:p-6 transition-surface"
+                  style={{ 
+                    backgroundColor: 'var(--surface-table)',
+                    border: '1px solid var(--color-outline-variant)',
+                    boxShadow: 'var(--elevation-0)'
+                  }}
+                >
+                  <h3 className="text-xl font-bold mb-4 sm:mb-6 flex items-center" style={{ color: 'var(--color-on-surface)' }}>
+                    <div className="p-2 rounded-lg mr-3 transition-surface" style={{ backgroundColor: 'var(--color-primary-container)' }}>
+                      <FolderOpen className="h-5 w-5" style={{ color: 'var(--color-primary)' }} />
+                    </div>
                     {categoryName}
                   </h3>
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
                     {items.map((item) => (
                       <div
                         key={item.id}
-                        className={`group relative border border-gray-200 dark:border-gray-700 rounded-xl p-4 sm:p-5 hover:shadow-lg transition-all duration-300 cursor-pointer bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 hover:scale-105 transform overflow-hidden`}
+                        className="group relative rounded-xl p-4 sm:p-5 cursor-pointer overflow-hidden transition-elevation hover-lift"
+                        style={{ 
+                          backgroundColor: 'var(--surface-card)',
+                          border: '1px solid var(--color-outline)',
+                          boxShadow: 'var(--elevation-1)'
+                        }}
                         onClick={() => addToCart(item)}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.boxShadow = 'var(--elevation-2)';
+                          e.currentTarget.style.backgroundColor = 'var(--surface-table)';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.boxShadow = 'var(--elevation-1)';
+                          e.currentTarget.style.backgroundColor = 'var(--surface-card)';
+                        }}
                       >
                         {/* Add to cart indicator */}
-                        <div className={`absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-white dark:bg-gray-800 rounded-full p-2 shadow-md border border-gray-200 dark:border-gray-600 z-10`}>
-                          <Plus className={`h-4 w-4 text-gray-600 dark:text-gray-400`} />
+                        <div 
+                          className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity rounded-full p-2 z-10 transition-elevation"
+                          style={{ 
+                            backgroundColor: 'var(--color-primary)',
+                            boxShadow: 'var(--elevation-1)',
+                            transition: 'opacity var(--motion-duration-normal) var(--motion-easing-out)'
+                          }}
+                        >
+                          <Plus className="h-4 w-4" style={{ color: 'var(--color-on-primary)' }} />
                         </div>
                         
                         {/* Menu Item Image */}
@@ -423,20 +453,23 @@ const OrderPage = ({ menuItems, cart: externalCart, setCart: setExternalCart }) 
                         )}
                         
                         <div className="flex justify-between items-start mb-3">
-                          <h4 className={`font-semibold text-gray-900 dark:text-gray-100 text-sm sm:text-base leading-tight`}>
+                          <h4 className="font-semibold text-sm sm:text-base leading-tight flex-1" style={{ color: 'var(--color-on-surface)' }}>
                             {item.name}
                           </h4>
-                          <span className={`text-lg sm:text-xl font-bold text-gray-700 dark:text-gray-300 ml-2`}>
+                          <span 
+                            className="text-lg sm:text-xl font-extrabold ml-2 whitespace-nowrap"
+                            style={{ 
+                              color: 'var(--color-primary)',
+                              fontWeight: 700
+                            }}
+                          >
                             {formatCurrency(ensureNumber(item.price))}
                           </span>
                         </div>
                         
-                        <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
+                        <p className="text-xs sm:text-sm leading-relaxed" style={{ color: 'var(--color-on-surface-variant)' }}>
                           {item.description}
                         </p>
-                        
-                        {/* Hover effect overlay */}
-                        <div className={`absolute inset-0 rounded-xl bg-gradient-to-t from-black/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none`}></div>
                       </div>
                     ))}
                   </div>
@@ -463,10 +496,16 @@ const OrderPage = ({ menuItems, cart: externalCart, setCart: setExternalCart }) 
         </button>
       </div>
 
-      {/* Mobile Cart Overlay */}
+      {/* Mobile Cart Overlay - Authoritative elevated surface */}
       {showCart && (
         <div className="lg:hidden fixed inset-0 bg-black bg-opacity-50 z-40">
-          <div className="absolute bottom-0 left-0 right-0 bg-white dark:bg-gray-800 rounded-t-lg max-h-[80vh] overflow-y-auto">
+          <div 
+            className="absolute bottom-0 left-0 right-0 rounded-t-lg max-h-[80vh] overflow-y-auto"
+            style={{ 
+              backgroundColor: 'var(--surface-elevated)',
+              boxShadow: 'var(--elevation-4)'
+            }}
+          >
             <div className="p-4">
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center">
@@ -765,27 +804,66 @@ const OrderPage = ({ menuItems, cart: externalCart, setCart: setExternalCart }) 
                           </div>
                         )}
                         <div className="flex-1">
-                          <h4 className="font-medium text-secondary-700 dark:text-secondary-300 text-sm">{item.name}</h4>
-                          <p className="text-xs text-gray-600 dark:text-gray-400">{formatCurrency(ensureNumber(item.price))} each</p>
+                          <h4 className="font-medium text-sm" style={{ color: 'var(--color-on-surface)' }}>{item.name}</h4>
+                          <p className="text-xs" style={{ color: 'var(--color-on-surface-variant)' }}>{formatCurrency(ensureNumber(item.price))} each</p>
                         </div>
                       </div>
                       <div className="flex items-center space-x-2">
                         <button
                           onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                          className="p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 bg-white dark:bg-gray-600 rounded-full border dark:border-gray-500"
+                          className="p-2 rounded-full border transition-interactive btn-press"
+                          style={{ 
+                            backgroundColor: 'var(--surface-card)',
+                            borderColor: 'var(--color-outline)',
+                            color: 'var(--color-on-surface-variant)'
+                          }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.backgroundColor = 'var(--surface-elevated)';
+                            e.currentTarget.style.color = 'var(--color-on-surface)';
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.backgroundColor = 'var(--surface-card)';
+                            e.currentTarget.style.color = 'var(--color-on-surface-variant)';
+                          }}
                         >
                           <Minus className="h-4 w-4" />
                         </button>
-                        <span className="w-8 text-center font-medium text-sm text-gray-900 dark:text-gray-100">{item.quantity}</span>
+                        <span className="w-8 text-center font-medium text-sm" style={{ color: 'var(--color-on-surface)' }}>{item.quantity}</span>
                         <button
                           onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                          className="p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 bg-white dark:bg-gray-600 rounded-full border dark:border-gray-500"
+                          className="p-2 rounded-full border transition-interactive btn-press"
+                          style={{ 
+                            backgroundColor: 'var(--surface-card)',
+                            borderColor: 'var(--color-outline)',
+                            color: 'var(--color-on-surface-variant)'
+                          }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.backgroundColor = 'var(--surface-elevated)';
+                            e.currentTarget.style.color = 'var(--color-on-surface)';
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.backgroundColor = 'var(--surface-card)';
+                            e.currentTarget.style.color = 'var(--color-on-surface-variant)';
+                          }}
                         >
                           <Plus className="h-4 w-4" />
                         </button>
                         <button
                           onClick={() => removeFromCart(item.id)}
-                          className="p-2 text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 bg-white dark:bg-gray-600 rounded-full border dark:border-gray-500"
+                          className="p-2 rounded-full border transition-interactive btn-press"
+                          style={{ 
+                            backgroundColor: 'var(--surface-card)',
+                            borderColor: 'var(--color-error)',
+                            color: 'var(--color-error)'
+                          }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.backgroundColor = 'var(--color-error)';
+                            e.currentTarget.style.color = 'var(--color-on-error)';
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.backgroundColor = 'var(--surface-card)';
+                            e.currentTarget.style.color = 'var(--color-error)';
+                          }}
                         >
                           <Trash2 className="h-4 w-4" />
                         </button>
@@ -893,9 +971,9 @@ const OrderPage = ({ menuItems, cart: externalCart, setCart: setExternalCart }) 
         </div>
       )}
 
-      {/* Desktop Cart */}
+      {/* Desktop Cart - Authoritative elevated surface */}
       <div className="hidden lg:block lg:col-span-1">
-        <div className="card sticky top-6">
+        <div className="card-elevated sticky top-6" style={{ boxShadow: 'var(--elevation-3)' }}>
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center">
               <img 
