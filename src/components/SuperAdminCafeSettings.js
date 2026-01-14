@@ -22,7 +22,9 @@ const SuperAdminCafeSettings = () => {
     phone: '',
     email: '',
     website: '',
-    is_active: true
+    is_active: true,
+    primary_color: '',
+    accent_color: '',
   });
   const [subscription, setSubscription] = useState(null);
   const [availablePlans, setAvailablePlans] = useState([]);
@@ -91,7 +93,9 @@ const SuperAdminCafeSettings = () => {
         phone: cafeData.phone || '',
         email: cafeData.email || '',
         website: cafeData.website || '',
-        is_active: cafeData.is_active !== undefined ? cafeData.is_active : true
+        is_active: cafeData.is_active !== undefined ? cafeData.is_active : true,
+        primary_color: cafeData.primary_color || '',
+        accent_color: cafeData.accent_color || '',
       });
     } catch (error) {
       console.error('Error fetching cafe:', error);
@@ -382,6 +386,72 @@ const SuperAdminCafeSettings = () => {
             onChange={handleInputChange}
             className="w-full px-3 py-2 border border-accent-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-secondary-500 focus:border-secondary-500 dark:bg-gray-700 dark:text-gray-100"
           />
+        </div>
+
+        {/* Branding Section */}
+        <div className="pt-4 border-t border-accent-200 dark:border-gray-700">
+          <h3 className="text-lg font-semibold text-secondary-700 dark:text-gray-100 mb-4">
+            Branding
+          </h3>
+          <p className="text-sm text-secondary-500 dark:text-gray-400 mb-4">
+            Customize the cafe's visual identity. These settings will apply to the cafe's UI only.
+          </p>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label className="block text-sm font-medium text-secondary-700 dark:text-gray-300 mb-2">
+                Primary Color
+              </label>
+              <div className="flex items-center space-x-2">
+                <input
+                  type="color"
+                  name="primary_color"
+                  value={formData.primary_color || '#6F4E37'}
+                  onChange={handleInputChange}
+                  className="h-10 w-20 rounded border border-accent-300 dark:border-gray-600 cursor-pointer"
+                />
+                <input
+                  type="text"
+                  name="primary_color"
+                  value={formData.primary_color}
+                  onChange={handleInputChange}
+                  placeholder="#6F4E37"
+                  pattern="^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$"
+                  className="flex-1 px-3 py-2 border border-accent-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-secondary-500 focus:border-secondary-500 dark:bg-gray-700 dark:text-gray-100"
+                />
+              </div>
+              <p className="text-xs text-secondary-500 dark:text-gray-400 mt-1">
+                Main brand color used for buttons and highlights
+              </p>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-secondary-700 dark:text-gray-300 mb-2">
+                Accent Color (Optional)
+              </label>
+              <div className="flex items-center space-x-2">
+                <input
+                  type="color"
+                  name="accent_color"
+                  value={formData.accent_color || '#D4A574'}
+                  onChange={handleInputChange}
+                  className="h-10 w-20 rounded border border-accent-300 dark:border-gray-600 cursor-pointer"
+                />
+                <input
+                  type="text"
+                  name="accent_color"
+                  value={formData.accent_color}
+                  onChange={handleInputChange}
+                  placeholder="#D4A574"
+                  pattern="^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$"
+                  className="flex-1 px-3 py-2 border border-accent-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-secondary-500 focus:border-secondary-500 dark:bg-gray-700 dark:text-gray-100"
+                />
+              </div>
+              <p className="text-xs text-secondary-500 dark:text-gray-400 mt-1">
+                Secondary accent color for subtle highlights
+              </p>
+            </div>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

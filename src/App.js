@@ -7,7 +7,7 @@ import { CurrencyProvider } from './contexts/CurrencyContext';
 import { DarkModeProvider } from './contexts/DarkModeContext';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { CafeSettingsProvider, useCafeSettings } from './contexts/CafeSettingsContext';
-import { ColorSchemeProvider } from './contexts/ColorSchemeContext';
+import { ThemeProvider } from './contexts/ThemeContext';
 import { SubscriptionProvider, useSubscription } from './contexts/SubscriptionContext';
 import { FeatureProvider, useFeatures } from './contexts/FeatureContext';
 import OrderPage from './components/OrderPage';
@@ -381,9 +381,9 @@ function App() {
         <DarkModeProvider>
           <CurrencyProvider>
             <CafeSettingsProvider>
-              <SubscriptionProvider>
-                <FeatureProvider>
-                  <ColorSchemeProvider>
+              <ThemeProvider>
+                <SubscriptionProvider>
+                  <FeatureProvider>
                 <Routes>
                   <Route path="/" element={<LandingPage />} />
                   <Route path="/login" element={<Login />} />
@@ -481,9 +481,9 @@ function App() {
                   } />
                   <Route path="*" element={<Navigate to="/" replace />} />
                 </Routes>
-                  </ColorSchemeProvider>
-                </FeatureProvider>
-              </SubscriptionProvider>
+                  </FeatureProvider>
+                </SubscriptionProvider>
+              </ThemeProvider>
             </CafeSettingsProvider>
           </CurrencyProvider>
         </DarkModeProvider>

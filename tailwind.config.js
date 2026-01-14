@@ -7,18 +7,55 @@ module.exports = {
   theme: {
     extend: {
       colors: {
+        // Theme tokens - use CSS variables
         primary: {
-          DEFAULT: 'var(--color-primary, #ec7f13)',
+          DEFAULT: 'var(--color-primary)',
+        },
+        secondary: {
+          DEFAULT: 'var(--color-secondary)',
+        },
+        accent: {
+          DEFAULT: 'var(--color-accent)',
+        },
+        background: {
+          DEFAULT: 'var(--color-background)',
+        },
+        surface: {
+          DEFAULT: 'var(--color-surface)',
+        },
+        text: {
+          primary: 'var(--color-text-primary)',
+          muted: 'var(--color-text-muted)',
+          disabled: 'var(--color-text-disabled)',
+        },
+        border: {
+          DEFAULT: 'var(--color-border)',
+        },
+        success: {
+          DEFAULT: 'var(--color-success)',
+        },
+        warning: {
+          DEFAULT: 'var(--color-warning)',
+        },
+        error: {
+          DEFAULT: 'var(--color-error)',
+        },
+        info: {
+          DEFAULT: 'var(--color-info)',
+        },
+        // Legacy color scales for backward compatibility
+        primary: {
+          DEFAULT: 'var(--color-primary)',
           50: 'var(--color-primary-50, #fef6ed)',
           100: 'var(--color-primary-100, #fdebd4)',
           200: 'var(--color-primary-200, #fad4a9)',
           300: 'var(--color-primary-300, #f7b975)',
           400: 'var(--color-primary-400, #f49c44)',
-          500: 'var(--color-primary, #ec7f13)',
-          600: 'var(--color-primary, #d46e0a)',
-          700: 'var(--color-primary, #b15a0a)',
-          800: 'var(--color-primary, #8e490f)',
-          900: 'var(--color-primary, #743d10)',
+          500: 'var(--color-primary)',
+          600: 'var(--color-primary)',
+          700: 'var(--color-primary)',
+          800: 'var(--color-primary)',
+          900: 'var(--color-primary)',
         },
         secondary: {
           50: 'var(--color-secondary-50, #f0f3f8)',
@@ -26,11 +63,11 @@ module.exports = {
           200: 'var(--color-secondary-200, #c3d0e3)',
           300: 'var(--color-secondary-300, #9db3d0)',
           400: 'var(--color-secondary-400, #6b8bb8)',
-          500: 'var(--color-secondary, #153059)',
-          600: 'var(--color-secondary, #132b50)',
-          700: 'var(--color-secondary, #102443)',
-          800: 'var(--color-secondary, #0d1d37)',
-          900: 'var(--color-secondary, #0b192f)',
+          500: 'var(--color-secondary)',
+          600: 'var(--color-secondary)',
+          700: 'var(--color-secondary)',
+          800: 'var(--color-secondary)',
+          900: 'var(--color-secondary)',
         },
         accent: {
           50: '#fdf8f3',
