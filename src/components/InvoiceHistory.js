@@ -281,7 +281,8 @@ const InvoiceHistory = ({ cart, setCart, setCurrentPage }) => {
           />
           <div>
             <h2 className="text-xl sm:text-2xl font-bold text-secondary-700 dark:text-secondary-300">Reports & Invoices</h2>
-                         <div className="text-sm text-gray-500 dark:text-gray-400">
+            <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">View order history, download invoices, and access operational reports</p>
+                         <div className="text-sm text-gray-500 dark:text-gray-400 mt-2">
                {activeTab === 'invoices' ? (
                  searchQuery ? 
                    `Total Invoices: ${invoices.length} | Filtered: ${displayedInvoices.length} of ${invoices.filter(invoice => {
@@ -473,7 +474,7 @@ const InvoiceHistory = ({ cart, setCart, setCurrentPage }) => {
                   className="h-16 w-16 mx-auto mb-4 opacity-50"
                 />
                 <h3 className="text-lg font-medium text-secondary-700 dark:text-secondary-300 mb-2">No invoices yet</h3>
-                <p className="text-sm">Generate your first invoice to see it here</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">Invoices are automatically created when orders are completed. Completed orders will appear here with their invoice details.</p>
               </div>
             ) : (
               <>

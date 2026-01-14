@@ -83,13 +83,13 @@ const MenuManagement = ({ menuItems, onUpdate, onAdd, onDelete }) => {
 
   const handleSave = async () => {
     if (!formData.category_id || !formData.name.trim() || !formData.price) {
-      toast.error('Please fill in all required fields');
+      toast.error('Fill in all required fields to continue');
       return;
     }
 
     const price = ensureNumber(formData.price);
     if (price <= 0) {
-      toast.error('Please enter a valid price');
+      toast.error('Enter a valid price amount');
       return;
     }
 
@@ -104,7 +104,7 @@ const MenuManagement = ({ menuItems, onUpdate, onAdd, onDelete }) => {
           image_url: formData.image_url
         };
         await onUpdate(editingId, updateData);
-        toast.success('Menu item updated successfully');
+        toast.success('Changes saved');
       } else {
         const addData = {
           category_id: formData.category_id,
@@ -115,7 +115,7 @@ const MenuManagement = ({ menuItems, onUpdate, onAdd, onDelete }) => {
           image_url: formData.image_url
         };
         await onAdd(addData);
-        toast.success('Menu item added successfully');
+        toast.success('Menu item added');
       }
       
       // Auto-generate categories from menu items
@@ -137,7 +137,7 @@ const MenuManagement = ({ menuItems, onUpdate, onAdd, onDelete }) => {
       });
     } catch (error) {
       console.error('Error saving menu item:', error);
-      const errorMessage = error.response?.data?.error || 'Failed to save menu item';
+      const errorMessage = error.response?.data?.error || 'We couldn\'t save your changes. Please try again.';
       toast.error(errorMessage);
     }
   };

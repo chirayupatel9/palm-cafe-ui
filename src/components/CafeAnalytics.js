@@ -181,7 +181,7 @@ const CafeAnalytics = () => {
         }
       } else {
         setError('fetch_error');
-        toast.error('Failed to load analytics data');
+        toast.error('We couldn\'t load analytics data. Please try again.');
       }
     } finally {
       setLoading(false);
@@ -210,7 +210,44 @@ const CafeAnalytics = () => {
   }
 
   if (!hasFeature('analytics')) {
-    return <LockedFeature featureName="Analytics" requiredPlan="Pro" />;
+    return (
+      <LockedFeature 
+        featureName="Analytics" 
+        requiredPlan="Pro"
+        description="Advanced insights and business intelligence to track performance, revenue trends, and customer behavior."
+        showPreview={true}
+        previewContent={
+          <div className="space-y-6">
+            <div>
+              <h2 className="text-2xl font-bold text-secondary-700 dark:text-gray-100 flex items-center mb-2">
+                <BarChart3 className="h-6 w-6 mr-2" />
+                Analytics
+              </h2>
+              <p className="text-sm text-secondary-500 dark:text-gray-400">
+                Business insights and performance metrics
+              </p>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {[1, 2, 3, 4].map(i => (
+                <Card key={i} className="opacity-50">
+                  <div className="h-20 bg-gray-100 dark:bg-gray-700 rounded animate-pulse" />
+                </Card>
+              ))}
+            </div>
+            
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <Card className="opacity-50">
+                <div className="h-64 bg-gray-100 dark:bg-gray-700 rounded animate-pulse" />
+              </Card>
+              <Card className="opacity-50">
+                <div className="h-64 bg-gray-100 dark:bg-gray-700 rounded animate-pulse" />
+              </Card>
+            </div>
+          </div>
+        }
+      />
+    );
   }
 
   // Format currency
@@ -250,7 +287,13 @@ const CafeAnalytics = () => {
   }
 
   if (error === 'feature_denied' || error === 'access_denied') {
-    return <LockedFeature featureName="Analytics" requiredPlan="Pro" />;
+    return (
+      <LockedFeature 
+        featureName="Analytics" 
+        requiredPlan="Pro"
+        description="Advanced insights and business intelligence to track performance, revenue trends, and customer behavior."
+      />
+    );
   }
 
   if (error === 'fetch_error') {

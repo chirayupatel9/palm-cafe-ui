@@ -32,7 +32,7 @@ const Login = () => {
       const result = await login(formData.email, formData.password);
       
       if (result.success) {
-        toast.success('Login successful!');
+        toast.success('Welcome back');
         
         // Redirect to dashboard, which will automatically route to the appropriate role-based dashboard
         navigate('/dashboard');
@@ -40,7 +40,7 @@ const Login = () => {
         toast.error(result.error);
       }
     } catch (error) {
-      toast.error('An unexpected error occurred');
+      toast.error('We couldn\'t sign you in. Please check your credentials and try again.');
     } finally {
       setLoading(false);
     }

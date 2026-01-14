@@ -876,9 +876,10 @@ const KitchenOrders = ({ cart, setCart }) => {
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
         </div>
       ) : displayedOrders.length === 0 ? (
-        <div className="text-center py-8">
+        <div className="text-center py-12">
           <Coffee className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-          <p className="text-gray-500">No orders found</p>
+          <p className="text-lg font-medium text-gray-700 dark:text-gray-300 mb-2">No orders found</p>
+          <p className="text-sm text-gray-500 dark:text-gray-400">Orders will appear here as they come in. New orders will show up automatically.</p>
         </div>
       ) : (
         <div>

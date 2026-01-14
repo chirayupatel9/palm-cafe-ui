@@ -5,11 +5,14 @@ import toast from 'react-hot-toast';
 import { useCurrency } from '../contexts/CurrencyContext';
 import { useAuth } from '../contexts/AuthContext';
 import { useDarkMode } from '../contexts/DarkModeContext';
+import { useFeatures } from '../contexts/FeatureContext';
+import LockedFeature from './ui/LockedFeature';
 
 const InventoryManagement = () => {
   const { formatCurrency } = useCurrency();
   const { isAuthenticated, user, loading: authLoading } = useAuth();
   const { isDarkMode } = useDarkMode();
+  const { hasFeature, loading: featuresLoading } = useFeatures();
   const [inventory, setInventory] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showAddForm, setShowAddForm] = useState(false);
@@ -68,7 +71,7 @@ const InventoryManagement = () => {
     const categoryToUse = formData.category === 'new' ? formData.newCategory : formData.category;
     
     if (!formData.name || !categoryToUse || !formData.quantity || !formData.unit) {
-      toast.error('Please fill in all required fields');
+      toast.error('Fill in all required fields to continue');
       return;
     }
 
@@ -80,10 +83,10 @@ const InventoryManagement = () => {
       
       if (editingItem) {
         await axios.put(`/inventory/${editingItem.id}`, submitData);
-        toast.success('Inventory item updated successfully');
+        toast.success('Changes saved');
       } else {
         await axios.post('/inventory', submitData);
-        toast.success('Inventory item added successfully');
+        toast.success('Item added');
       }
       
       setShowAddForm(false);
@@ -114,13 +117,14 @@ const InventoryManagement = () => {
   };
 
   const handleDelete = async (id) => {
-    if (!window.confirm('Are you sure you want to delete this inventory item?')) {
+    const item = inventory.find(i => i.id === id);
+    if (!window.confirm(`This will permanently remove "${item?.name || 'this item'}" from your inventory. This action cannot be undone. Continue?`)) {
       return;
     }
 
     try {
       await axios.delete(`/inventory/${id}`);
-      toast.success('Inventory item deleted successfully');
+      toast.success('Item removed');
       fetchInventory();
     } catch (error) {
       console.error('Error deleting inventory item:', error);
@@ -290,6 +294,25 @@ const InventoryManagement = () => {
     );
   }
 
+  // Feature flag check
+  if (featuresLoading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-secondary-500"></div>
+      </div>
+    );
+  }
+
+  if (!hasFeature('inventory')) {
+    return (
+      <LockedFeature 
+        featureName="Inventory Management" 
+        requiredPlan="Pro"
+        description="Track stock levels, manage suppliers, set reorder points, and export inventory data. Keep your cafe well-stocked with automated alerts."
+      />
+    );
+  }
+
   if (!isAuthenticated) {
     return (
       <div className="flex flex-col items-center justify-center py-12">
@@ -324,7 +347,7 @@ const InventoryManagement = () => {
           />
           <div>
             <h1 className={`text-2xl font-bold ${isDarkMode ? 'text-gray-100' : 'text-secondary-700'}`}>Inventory Management</h1>
-            <p className={isDarkMode ? 'text-gray-400' : 'text-gray-600'}>Track and manage your stock levels</p>
+            <p className={isDarkMode ? 'text-gray-400' : 'text-gray-600'}>Track stock levels, set reorder points, and manage suppliers</p>
           </div>
         </div>
         <div className="flex items-center space-x-2">
@@ -739,7 +762,7 @@ const InventoryManagement = () => {
         {filteredInventory.length === 0 && (
           <div className={`text-center py-8 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
             <Package className={`h-12 w-12 mx-auto mb-2 ${isDarkMode ? 'text-gray-600' : 'text-gray-300'}`} />
-            <p>No inventory items found</p>
+            <p className="text-gray-600 dark:text-gray-400">Inventory items will appear here once you add them. Track stock levels, set reorder points, and manage suppliers for each item.</p>
             <p className="text-sm">Add your first inventory item to get started</p>
           </div>
         )}

@@ -1,5 +1,6 @@
 import React from 'react';
 import { Lock, Crown } from 'lucide-react';
+import { useAuth } from '../../contexts/AuthContext';
 
 /**
  * Locked Feature Component
@@ -11,28 +12,44 @@ const LockedFeature = ({
   requiredPlan = 'Pro',
   description,
   onUpgrade,
+  showPreview = false,
+  previewContent,
   className = ''
 }) => {
+  const { user } = useAuth();
+
+  // Super Admins should never see locked states
+  if (user?.role === 'superadmin') {
+    return null;
+  }
+
   return (
-    <div className={`relative ${className}`}>
-      {/* Blurred overlay */}
-      <div className="absolute inset-0 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm rounded-lg z-10 flex items-center justify-center">
-        <div className="text-center p-6 max-w-md">
+    <div className={`space-y-6 ${className}`}>
+      {/* Preview content if provided */}
+      {showPreview && previewContent && (
+        <div className="opacity-60 pointer-events-none">
+          {previewContent}
+        </div>
+      )}
+
+      {/* Locked state overlay */}
+      <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm p-8">
+        <div className="text-center max-w-md mx-auto">
           <div className="mb-4 flex justify-center">
-            <div className="p-3 bg-yellow-100 dark:bg-yellow-900/30 rounded-full">
-              <Lock className="h-6 w-6 text-yellow-600 dark:text-yellow-400" />
+            <div className="p-3 bg-gray-100 dark:bg-gray-700 rounded-full">
+              <Lock className="h-6 w-6 text-gray-500 dark:text-gray-400" />
             </div>
           </div>
           <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">
-            {featureName} is Locked
+            Available on {requiredPlan}
           </h3>
-          <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-            {description || `This feature is available on the ${requiredPlan} plan. Upgrade to unlock this feature.`}
+          <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
+            {description || `${featureName} is available on the ${requiredPlan} plan. Contact your administrator to upgrade.`}
           </p>
           {onUpgrade && (
             <button
               onClick={onUpgrade}
-              className="btn-primary flex items-center justify-center mx-auto"
+              className="inline-flex items-center px-4 py-2 bg-secondary-600 hover:bg-secondary-700 text-white rounded-lg transition-colors text-sm font-medium"
             >
               <Crown className="h-4 w-4 mr-2" />
               Upgrade to {requiredPlan}

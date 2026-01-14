@@ -69,7 +69,7 @@ const CafeUserManagement = () => {
     
     try {
       await axios.post('/users', formData);
-      toast.success('User created successfully');
+      toast.success('User added');
       setShowCreateModal(false);
       setFormData({ username: '', email: '', password: '', role: 'admin' });
       fetchUsers();
@@ -106,7 +106,7 @@ const CafeUserManagement = () => {
       }
       
       await axios.put(`/users/${editingUser.id}`, updateData);
-      toast.success('User updated successfully');
+      toast.success('Changes saved');
       setShowEditModal(false);
       setEditingUser(null);
       setFormData({ username: '', email: '', password: '', role: 'admin' });
@@ -118,14 +118,15 @@ const CafeUserManagement = () => {
   };
 
   const handleDelete = async (userId) => {
-    if (!window.confirm('Are you sure you want to disable this user? They will no longer be able to access the system.')) {
+    const userToDelete = users.find(u => u.id === userId);
+    if (!window.confirm(`This will deactivate ${userToDelete?.username || 'this user'} and revoke their access to the system. They will no longer be able to log in. Continue?`)) {
       return;
     }
     
     try {
       setDeletingUserId(userId);
       await axios.delete(`/users/${userId}`);
-      toast.success('User disabled successfully');
+      toast.success('User deactivated');
       fetchUsers();
     } catch (error) {
       console.error('Error deleting user:', error);
@@ -165,7 +166,13 @@ const CafeUserManagement = () => {
   }
 
   if (!hasFeature('users')) {
-    return <LockedFeature featureName="User Management" />;
+    return (
+      <LockedFeature 
+        featureName="User Management" 
+        requiredPlan="Pro"
+        description="Manage team members, roles, and permissions for your cafe. Create and manage admin, chef, and reception accounts."
+      />
+    );
   }
 
   if (loading) {
@@ -186,7 +193,7 @@ const CafeUserManagement = () => {
             User Management
           </h2>
           <p className="text-sm text-secondary-500 dark:text-gray-400 mt-1">
-            Manage users for your cafe
+            Add team members, assign roles, and manage access permissions
           </p>
         </div>
         <button
@@ -298,7 +305,7 @@ const CafeUserManagement = () => {
         {filteredUsers.length === 0 && (
           <div className="text-center py-12 text-secondary-500 dark:text-gray-400">
             <Users className="h-12 w-12 mx-auto mb-4 opacity-50" />
-            <p>{searchTerm ? 'No users found matching your search' : 'No users yet. Add your first user to get started.'}</p>
+            <p>{searchTerm ? `No users found matching "${searchTerm}". Try a different search term.` : 'Team members will appear here once you add them. Add your first user to start managing access and permissions.'}</p>
           </div>
         )}
       </div>
@@ -310,7 +317,7 @@ const CafeUserManagement = () => {
             <div className="p-6 border-b border-accent-200 dark:border-gray-700">
               <div className="flex justify-between items-center">
                 <h3 className="text-lg font-semibold text-secondary-700 dark:text-gray-100">
-                  Create New User
+                  Add User
                 </h3>
                 <button
                   onClick={() => {
@@ -403,7 +410,7 @@ const CafeUserManagement = () => {
                   type="submit"
                   className="px-4 py-2 bg-secondary-600 hover:bg-secondary-700 text-white rounded-lg transition-colors"
                 >
-                  Create User
+                  Add User
                 </button>
               </div>
             </form>

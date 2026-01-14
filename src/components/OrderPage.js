@@ -256,12 +256,12 @@ const OrderPage = ({ menuItems, cart: externalCart, setCart: setExternalCart }) 
   // Generate invoice
   const generateInvoice = async () => {
     if (currentCart.length === 0) {
-      toast.error('Please add items to cart first');
+      toast.error('Add items to your cart before placing an order');
       return;
     }
 
     if (!customerName.trim()) {
-      toast.error('Please enter customer name');
+      toast.error('Enter a customer name to continue');
       return;
     }
 
@@ -340,10 +340,10 @@ const OrderPage = ({ menuItems, cart: externalCart, setCart: setExternalCart }) 
       setExtraCharge(0);
       setExtraChargeNote('');
       
-      toast.success(`Invoice generated successfully! Order #${response.data.orderNumber}`);
+      toast.success(`Order #${response.data.orderNumber} completed`);
     } catch (error) {
       console.error('Error generating invoice:', error);
-      toast.error('Failed to generate invoice');
+      toast.error('We couldn\'t complete the order. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -746,8 +746,8 @@ const OrderPage = ({ menuItems, cart: externalCart, setCart: setExternalCart }) 
               {currentCart.length === 0 ? (
                 <div className="text-center py-8 text-gray-500 dark:text-gray-400">
                   <ShoppingCart className="h-12 w-12 mx-auto mb-2 text-gray-300 dark:text-gray-500" />
-                  <p>Your cart is empty</p>
-                  <p className="text-sm">Add items from the menu</p>
+                  <p className="font-medium mb-1">Your cart is empty</p>
+                  <p className="text-sm">Select items from the menu to add them to your order</p>
                 </div>
               ) : (
                 <div className="space-y-3 mb-4">
@@ -1172,8 +1172,8 @@ const OrderPage = ({ menuItems, cart: externalCart, setCart: setExternalCart }) 
           {currentCart.length === 0 ? (
             <div className="text-center py-8 text-gray-500 dark:text-gray-400">
               <ShoppingCart className="h-12 w-12 mx-auto mb-2 text-gray-300 dark:text-gray-500" />
-              <p>Your cart is empty</p>
-              <p className="text-sm">Add items from the menu</p>
+              <p className="font-medium mb-1">Your cart is empty</p>
+              <p className="text-sm">Select items from the menu to add them to your order</p>
             </div>
           ) : (
             <div className="space-y-3 mb-4">

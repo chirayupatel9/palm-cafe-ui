@@ -46,19 +46,19 @@ export const EmptyCustomers = ({ onAdd }) => (
   <EmptyState
     icon={Users}
     title="No customers yet"
-    description="Add your first customer to start tracking orders and loyalty points."
+    description="Customer profiles help you track orders, manage loyalty points, and build relationships. Add your first customer to get started."
     action={onAdd}
-    actionLabel="Add First Customer"
+    actionLabel="Add Customer"
   />
 );
 
 export const EmptyMenu = ({ onAdd }) => (
   <EmptyState
     icon={Package}
-    title="No menu items yet"
-    description="Create your first menu item to start taking orders."
+    title="Your menu is empty"
+    description="Menu items will appear here once you add them. Start by adding your most popular items to begin taking orders."
     action={onAdd}
-    actionLabel="Add First Item"
+    actionLabel="Add Menu Item"
   />
 );
 
@@ -66,9 +66,9 @@ export const EmptyOrders = ({ onNewOrder }) => (
   <EmptyState
     icon={ShoppingCart}
     title="No orders yet"
-    description="Start taking orders to see them appear here."
+    description="Orders will appear here as you start taking them. Create your first order to begin tracking sales and customer activity."
     action={onNewOrder}
-    actionLabel="Create First Order"
+    actionLabel="New Order"
   />
 );
 
@@ -76,7 +76,7 @@ export const EmptyInvoices = () => (
   <EmptyState
     icon={FileText}
     title="No invoices yet"
-    description="Generate your first invoice to see it here."
+    description="Invoices are automatically generated when orders are completed. Completed orders will appear here with their invoice details."
   />
 );
 
@@ -84,15 +84,15 @@ export const EmptySearch = ({ query }) => (
   <EmptyState
     icon={Search}
     title={`No results for "${query}"`}
-    description="Try adjusting your search terms or filters."
+    description="We couldn't find anything matching your search. Try different keywords or clear your filters to see all items."
   />
 );
 
 export const EmptySettings = () => (
   <EmptyState
     icon={Settings}
-    title="No settings available"
-    description="Settings will appear here when available."
+    title="Settings"
+    description="Configure your cafe preferences, branding, and system options from the settings menu."
   />
 );
 

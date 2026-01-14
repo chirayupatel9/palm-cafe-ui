@@ -136,10 +136,10 @@ const CustomerManagement = () => {
     try {
       if (showEditModal) {
         await axios.put(`/customers/${selectedCustomer.id}`, formData);
-        toast.success('Customer updated successfully');
+        toast.success('Changes saved');
       } else {
         await axios.post('/customers', formData);
-        toast.success('Customer created successfully');
+        toast.success('Customer added');
       }
       
       setShowAddModal(false);
@@ -149,7 +149,7 @@ const CustomerManagement = () => {
       fetchStatistics();
     } catch (error) {
       console.error('Error saving customer:', error);
-      toast.error(error.response?.data?.error || 'Failed to save customer');
+      toast.error(error.response?.data?.error || 'We couldn\'t save your changes. Please try again.');
     }
   };
 
@@ -175,12 +175,12 @@ const CustomerManagement = () => {
   const handleRedeemPoints = async (customerId, points) => {
     try {
       await axios.post(`/customers/${customerId}/redeem-points`, { points });
-      toast.success('Points redeemed successfully');
+      toast.success('Points redeemed');
       fetchCustomers();
       fetchStatistics();
     } catch (error) {
       console.error('Error redeeming points:', error);
-      toast.error(error.response?.data?.error || 'Failed to redeem points');
+      toast.error(error.response?.data?.error || 'We couldn\'t redeem the points. Please check the amount and try again.');
     }
   };
 
@@ -690,7 +690,7 @@ const CustomerManagement = () => {
             </div>
             
             {orderHistory.length === 0 ? (
-              <p className={`${isDarkMode ? 'text-gray-400' : 'text-gray-500'} text-center py-8`}>No orders found for this customer.</p>
+              <p className={`${isDarkMode ? 'text-gray-400' : 'text-gray-500'} text-center py-8`}>This customer hasn't placed any orders yet. Orders will appear here once they make a purchase.</p>
             ) : (
               <div className="space-y-4">
                 {orderHistory.map((order) => (
