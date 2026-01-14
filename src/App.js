@@ -376,7 +376,7 @@ function MainApp() {
     )}
 
     {/* Desktop Navigation - Distinct elevated surface */}
-    <nav className="hidden lg:block surface-nav">
+    <nav className="hidden lg:block surface-nav p-2">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex space-x-8">
           {navigationItems.map((item) => {
@@ -385,7 +385,7 @@ function MainApp() {
               <button
                 key={item.id}
                 onClick={() => handlePageChange(item.id)}
-                className={`flex items-center px-5 py-3 text-sm font-medium ${
+                className={`flex items-center px-5 py-1 text-sm font-medium ${
                   currentPage === item.id
                     ? 'nav-active'
                     : 'nav-inactive'
@@ -402,7 +402,7 @@ function MainApp() {
     </nav>
 
     {/* Main Content - Container surface with distinct background */}
-    <main className="surface-container max-w-7xl mx-auto my-6 sm:my-8">
+    <main className="surface-container max-w-7xl mx-auto my-8 sm:my-12 px-4 sm:px-6 lg:px-8">
       {renderPage()}
     </main>
       </div>

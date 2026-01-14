@@ -371,7 +371,7 @@ const OrderPage = ({ menuItems, cart: externalCart, setCart: setExternalCart }) 
   const total = getTotal();
 
   return (
-    <div className="lg:grid lg:grid-cols-3 lg:gap-6">
+    <div className="lg:grid lg:grid-cols-3 lg:gap-6 pt-6 pb-6 sm:pt-8 sm:pb-8">
       {/* Menu Items */}
       <div className="lg:col-span-2 mb-6 lg:mb-0">
         <div className="card">

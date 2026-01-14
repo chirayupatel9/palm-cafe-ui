@@ -35,13 +35,15 @@ body {
     background-color: var(--surface-container);
     color: var(--on-surface-container);
     border-radius: var(--radius-lg);
-    padding: var(--spacing-lg);
+    padding-left: var(--spacing-lg);
+    padding-right: var(--spacing-lg);
   }
   
   .surface-nav {
     background-color: var(--surface-nav);
     color: var(--on-surface-nav);
     box-shadow: var(--elevation-nav);
+    padding: 2px;
   }
   
   /* Card component - Redesigned with better composition */
