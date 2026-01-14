@@ -385,11 +385,12 @@ function MainApp() {
               <button
                 key={item.id}
                 onClick={() => handlePageChange(item.id)}
-                className={`flex items-center px-3 py-4 text-sm font-medium border-b-2 transition-colors ${
+                className={`flex items-center px-5 py-3 text-sm font-medium ${
                   currentPage === item.id
                     ? 'nav-active'
                     : 'nav-inactive'
                 }`}
+                aria-current={currentPage === item.id ? 'page' : undefined}
               >
                 <Icon className="h-4 w-4 mr-2" />
                 {item.label}

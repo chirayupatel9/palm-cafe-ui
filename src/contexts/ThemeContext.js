@@ -57,12 +57,29 @@ export const ThemeProvider = ({ children }) => {
     });
   }, [uiRole, isDarkMode, cafeBranding]);
   
+  // Helper function to darken a color for gradient
+  const darkenColor = (color, percent = 15) => {
+    // Remove # if present
+    const hex = color.replace('#', '');
+    // Convert to RGB
+    const r = parseInt(hex.substr(0, 2), 16);
+    const g = parseInt(hex.substr(2, 2), 16);
+    const b = parseInt(hex.substr(4, 2), 16);
+    // Darken by percent
+    const newR = Math.max(0, Math.floor(r * (1 - percent / 100)));
+    const newG = Math.max(0, Math.floor(g * (1 - percent / 100)));
+    const newB = Math.max(0, Math.floor(b * (1 - percent / 100)));
+    // Convert back to hex
+    return `#${newR.toString(16).padStart(2, '0')}${newG.toString(16).padStart(2, '0')}${newB.toString(16).padStart(2, '0')}`;
+  };
+
   // Apply CSS custom properties with Material Design-aligned naming
   useEffect(() => {
     const root = document.documentElement;
     
     // Primary colors - Material Design aligned
     root.style.setProperty('--color-primary', theme.colors.primary);
+    root.style.setProperty('--color-primary-dark', darkenColor(theme.colors.primary, 15));
     root.style.setProperty('--color-on-primary', '#FFFFFF');
     root.style.setProperty('--color-primary-container', isDarkMode ? theme.colors.surface : theme.colors.background);
     root.style.setProperty('--color-on-primary-container', theme.colors.text.primary);

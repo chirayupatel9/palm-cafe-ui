@@ -14,6 +14,7 @@
 :root {
   /* Primary Colors - Material Design aligned */
   --color-primary: #6F4E37;
+  --color-primary-dark: #5A3E2A;
   --color-on-primary: #FFFFFF;
   --color-primary-container: #F5F5DC;
   --color-on-primary-container: #2C1810;
@@ -115,6 +116,7 @@
 .dark {
   /* Primary Colors */
   --color-primary: #8B6F47;
+  --color-primary-dark: #7A5F3A;
   --color-on-primary: #FFFFFF;
   --color-primary-container: #2c241d;
   --color-on-primary-container: #F5F5DC;
