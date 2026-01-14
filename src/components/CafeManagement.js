@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 import { Plus, Edit, Trash2, Building, X, Check, AlertCircle, AlertTriangle } from 'lucide-react';
@@ -8,20 +9,14 @@ import ConfirmModal from './ui/ConfirmModal';
 import { useFormChanges } from '../hooks/useUnsavedChanges';
 
 const CafeManagement = () => {
+  const navigate = useNavigate();
   const [cafes, setCafes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
-  const [editingCafe, setEditingCafe] = useState(null);
   const [deleteConfirm, setDeleteConfirm] = useState(null);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const initialFormDataRef = useRef(null);
-  
-  // Track form changes for unsaved changes warning
-  const hasUnsavedChanges = useFormChanges(
-    initialFormDataRef.current || formData,
-    formData
-  );
   const [formData, setFormData] = useState({
     slug: '',
     name: '',
@@ -33,6 +28,12 @@ const CafeManagement = () => {
     website: '',
     is_active: true
   });
+  
+  // Track form changes for unsaved changes warning
+  const hasUnsavedChanges = useFormChanges(
+    initialFormDataRef.current || formData,
+    formData
+  );
 
   useEffect(() => {
     fetchCafes();
@@ -64,18 +65,11 @@ const CafeManagement = () => {
     
     setIsSubmitting(true);
     try {
-      if (editingCafe) {
-        // Update existing cafe
-        await axios.put(`/superadmin/cafes/${editingCafe.id}`, formData);
-        toast.success(`"${formData.name}" has been updated successfully`);
-      } else {
-        // Create new cafe
-        await axios.post('/superadmin/cafes', formData);
-        toast.success(`"${formData.name}" has been created successfully`);
-      }
+      // Create new cafe
+      const response = await axios.post('/superadmin/cafes', formData);
+      toast.success(`"${formData.name}" has been created successfully`);
       
       setShowModal(false);
-      setEditingCafe(null);
       const resetData = {
         slug: '',
         name: '',
@@ -90,6 +84,11 @@ const CafeManagement = () => {
       setFormData(resetData);
       initialFormDataRef.current = JSON.parse(JSON.stringify(resetData));
       fetchCafes();
+      
+      // Navigate to the newly created cafe's settings page
+      if (response.data && response.data.id) {
+        navigate(`/superadmin/cafes/${response.data.id}`);
+      }
     } catch (error) {
       console.error('Error saving cafe:', error);
       const errorMessage = error.response?.data?.error || 'Failed to save cafe. Please check your input and try again.';
@@ -100,21 +99,8 @@ const CafeManagement = () => {
   };
 
   const handleEdit = (cafe) => {
-    const cafeFormData = {
-      slug: cafe.slug || '',
-      name: cafe.name || '',
-      description: cafe.description || '',
-      logo_url: cafe.logo_url || '',
-      address: cafe.address || '',
-      phone: cafe.phone || '',
-      email: cafe.email || '',
-      website: cafe.website || '',
-      is_active: cafe.is_active !== undefined ? cafe.is_active : true
-    };
-    setEditingCafe(cafe);
-    setFormData(cafeFormData);
-    initialFormDataRef.current = JSON.parse(JSON.stringify(cafeFormData)); // Deep copy
-    setShowModal(true);
+    // Navigate to the manage cafe page (same as overview)
+    navigate(`/superadmin/cafes/${cafe.id}`);
   };
 
   const handleDelete = async () => {
@@ -146,7 +132,6 @@ const CafeManagement = () => {
       website: '',
       is_active: true
     };
-    setEditingCafe(null);
     setFormData(newFormData);
     initialFormDataRef.current = JSON.parse(JSON.stringify(newFormData)); // Deep copy
     setShowModal(true);
@@ -295,7 +280,7 @@ const CafeManagement = () => {
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
             <div className="sticky top-0 bg-white dark:bg-gray-800 border-b border-accent-200 dark:border-gray-700 px-6 py-4 flex justify-between items-center">
               <h3 className="text-xl font-bold text-secondary-700 dark:text-gray-100">
-                {editingCafe ? 'Edit Cafe' : 'Create New Cafe'}
+                Create New Cafe
               </h3>
               <button
                 onClick={() => {
@@ -303,7 +288,6 @@ const CafeManagement = () => {
                     return;
                   }
                   setShowModal(false);
-                  setEditingCafe(null);
                   initialFormDataRef.current = null;
                 }}
                 className="text-secondary-500 hover:text-secondary-700 dark:text-gray-400 dark:hover:text-gray-200"
@@ -333,7 +317,6 @@ const CafeManagement = () => {
                     pattern="[a-z0-9-]+"
                     placeholder="palmcafe"
                     className="input-field"
-                    disabled={!!editingCafe}
                   />
                   <p className="text-xs text-secondary-500 dark:text-gray-400 mt-1">
                     Lowercase letters, numbers, and hyphens only. Used in URLs.
@@ -444,22 +427,6 @@ const CafeManagement = () => {
                 </div>
               </div>
 
-              {editingCafe && (
-                <div className="flex items-center">
-                  <input
-                    type="checkbox"
-                    name="is_active"
-                    id="is_active"
-                    checked={formData.is_active}
-                    onChange={handleInputChange}
-                    className="h-4 w-4 text-secondary-600 focus:ring-secondary-500 border-accent-300 rounded"
-                  />
-                  <label htmlFor="is_active" className="ml-2 text-sm text-secondary-700 dark:text-gray-300">
-                    Active (cafe is operational)
-                  </label>
-                </div>
-              )}
-
               <div className="flex justify-end space-x-3 pt-6 border-t border-gray-200 dark:border-gray-700">
                 <button
                   type="button"
@@ -468,7 +435,6 @@ const CafeManagement = () => {
                       return;
                     }
                     setShowModal(false);
-                    setEditingCafe(null);
                     initialFormDataRef.current = null;
                   }}
                   className="btn-secondary"
@@ -483,10 +449,10 @@ const CafeManagement = () => {
                   {isSubmitting ? (
                     <>
                       <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                      {editingCafe ? 'Updating...' : 'Creating...'}
+                      Creating...
                     </>
                   ) : (
-                    editingCafe ? 'Update Cafe' : 'Create Cafe'
+                    'Create Cafe'
                   )}
                 </button>
               </div>
