@@ -64,6 +64,11 @@ const CustomerMenu = ({
   });
   const [profileLoading, setProfileLoading] = useState(false);
 
+  // Most ordered items and cafe info state
+  const [mostOrderedItems, setMostOrderedItems] = useState([]);
+  const [cafePublicInfo, setCafePublicInfo] = useState(null);
+  const [loadingMostOrdered, setLoadingMostOrdered] = useState(false);
+
   // Helper function to ensure price is a number
   const ensureNumber = (value) => {
     const num = parseFloat(value);
@@ -86,6 +91,8 @@ const CustomerMenu = ({
     fetchMenuItems();
     fetchTaxSettings();
     fetchPaymentMethods();
+    fetchMostOrderedItems();
+    fetchCafePublicInfo();
   }, []);
 
   // Filter menu items based on search query
@@ -199,6 +206,37 @@ const CustomerMenu = ({
         { code: 'cash', name: 'Cash', icon: '₹' },
         { code: 'upi', name: 'UPI', icon: '📱' }
       ]);
+    }
+  };
+
+  // Fetch featured items
+  const fetchMostOrderedItems = async () => {
+    try {
+      setLoadingMostOrdered(true);
+      const response = await axios.get('/menu/featured?limit=6');
+      if (response.data && response.data.items) {
+        setMostOrderedItems(response.data.items);
+      }
+    } catch (error) {
+      console.error('Error fetching featured items:', error);
+      // Gracefully handle error - section will be hidden if no items
+      setMostOrderedItems([]);
+    } finally {
+      setLoadingMostOrdered(false);
+    }
+  };
+
+  // Fetch cafe public info
+  const fetchCafePublicInfo = async () => {
+    try {
+      const response = await axios.get('/menu/public-info');
+      if (response.data) {
+        setCafePublicInfo(response.data);
+      }
+    } catch (error) {
+      console.error('Error fetching cafe public info:', error);
+      // Gracefully handle error - fields will be hidden if missing
+      setCafePublicInfo(null);
     }
   };
 
@@ -474,14 +512,8 @@ const CustomerMenu = ({
 
   return (
     <div
-      className="relative w-full flex flex-col min-h-screen"
-      style={{
-        backgroundImage: 'url(/images/menu-background.png)',
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundRepeat: 'no-repeat',
-        backgroundAttachment: 'fixed'
-      }}
+      className="relative w-full flex flex-col min-h-screen bg-white/80"
+
     >
       {/* Sticky Header / Top App Bar */}
       <div className='pt-4'>
@@ -563,7 +595,7 @@ const CustomerMenu = ({
                 </div>
 
                 {/* Cart */}
-                
+
 
                 {/* User Profile - Only show when logged in */}
                 {customer && (
@@ -619,13 +651,13 @@ const CustomerMenu = ({
 
       {/* Main Content */}
       <main className="min-h-screen">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-12 sm:pt-12 sm:pb-16 bg-white rounded-xl">
+        <div className="max-w-full mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-12 sm:pt-12 sm:pb-16 bg-white">
           {activeTab === 'menu' ? (
             <div>
               {/* Hero Section with Background Image */}
-              <div className="relative -mx-4 sm:-mx-6 lg:-mx-8 -mt-8 sm:-mt-12 mb-16 p-2 ">
+              <div className="relative -mx-4 sm:-mx-6 max-w-full mx-auto lg:-mx-8 -mt-8 sm:-mt-12 mb-16">
                 <div
-                  className="relative h-[400px] sm:h-[500px] bg-cover bg-center bg-no-repeat rounded-xl mask1"
+                  className="relative h-[400px] sm:h-[500px] bg-cover bg-center bg-no-repeat"
                   style={{
                     backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('https://images.unsplash.com/photo-1504674900247-0877df9cc836?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80')`
                   }}
@@ -649,18 +681,18 @@ const CustomerMenu = ({
                   </div>
                   {/* Side Icons */}
                   <div className="absolute right-4 top-1/2 transform -translate-y-1/2 flex flex-col gap-4 hidden sm:flex">
-                    
+
                     <button
-                  onClick={() => setShowCart(true)}
-                  className="w-10 h-10 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center text-white transition-colors"
-                >
-                  <ShoppingBag className="h-5 w-5" />
-                  {cart.length > 0 && (
-                    <span className="absolute top-1 right-1 flex h-5 w-5 items-center justify-center rounded-full bg-secondary-500 text-xs font-bold text-white">
-                      {cart.reduce((total, item) => total + item.quantity, 0)}
-                    </span>
-                  )}
-                </button>
+                      onClick={() => setShowCart(true)}
+                      className="w-10 h-10 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center text-white transition-colors"
+                    >
+                      <ShoppingBag className="h-5 w-5" />
+                      {cart.length > 0 && (
+                        <span className="absolute top-1 right-1 flex h-5 w-5 items-center justify-center rounded-full bg-secondary-500 text-xs font-bold text-white">
+                          {cart.reduce((total, item) => total + item.quantity, 0)}
+                        </span>
+                      )}
+                    </button>
                   </div>
                 </div>
               </div>
@@ -676,14 +708,15 @@ const CustomerMenu = ({
                   <p className="text-base text-gray-500 dark:text-gray-400">Add items in Menu Management to get started</p>
                 </div>
               ) : (
-                <div className="space-y-16">
+                <div>
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-5">
                   {/* Individual Category Sections - Show first */}
                   {Object.entries(groupedMenuItems)
                     .filter(([categoryName]) => selectedCategory === 'All' || categoryName === selectedCategory)
                     .map(([categoryName, items], index) => {
                       const categoryNumber = String(index + 1).padStart(2, '0');
                       return (
-                        <div key={categoryName} className="space-y-8">
+                        <div key={categoryName} className="space-y-5">
                           {/* Divider before category (except first one) */}
                           {((selectedCategory === 'All' && index > 0) || (selectedCategory !== 'All' && index > 0)) && (
                             <div className="border-t border-dashed border-gray-300 dark:border-gray-600 mb-12"></div>
@@ -723,7 +756,8 @@ const CustomerMenu = ({
                               return (
                                 <div
                                   key={item.id}
-                                  className="group flex items-start gap-4 p-4 bg-white dark:bg-gray-800 rounded-lg hover:shadow-md transition-shadow"
+                                  className="group flex items-start gap-4 p-4 bg-white dark:bg-gray-800 rounded-lg hover:shadow-md hover:bg-orange-100 transition-shadow mask-hover"
+
                                 >
                                   {/* Menu Item Thumbnail */}
                                   <div className="flex-shrink-0 w-20 h-20 sm:w-24 sm:h-24 rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-700">
@@ -850,11 +884,13 @@ const CustomerMenu = ({
                       </div>
                     </div>
                   )}
+                  </div>
+                <div className="max-w-full mx-auto px-4 sm:px-6 lg:px-8 space-y-5">
 
                   {/* Promotional Banner - Pay for one Get two */}
-                  <div className="relative -mx-4 sm:-mx-6 lg:-mx-8 mt-16 mb-16">
+                  <div className="relative -mx-4 sm:-mx-6 max-w-8xl mx-auto lg:-mx-8 -mt-8 sm:-mt-12 mb-16">
                     <div
-                      className="relative h-[500px] sm:h-[600px] bg-cover bg-center bg-no-repeat rounded-xl mask2"
+                      className="relative h-[400px] sm:h-[500px] bg-cover bg-center bg-no-repeat"
                       style={{
                         backgroundImage: `url('https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80')`
                       }}
@@ -863,94 +899,90 @@ const CustomerMenu = ({
                   </div>
 
                   {/* Special Proposals Section */}
-                  <div className="mt-16">
-                    <div className="text-center mb-10">
-                      <div className="flex items-center justify-center mb-3">
-                        <div className="h-px w-12 bg-orange-500 mr-3"></div>
-                        <span className="text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400 font-medium">Featured</span>
-                        <div className="h-px w-12 bg-orange-500 ml-3"></div>
+                  {mostOrderedItems.length > 0 && (
+                    <div className="mt-16">
+                      <div className="text-center mb-10">
+                        <div className="flex items-center justify-center mb-3">
+                          <div className="h-px w-12 bg-orange-500 mr-3"></div>
+                          <span className="text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400 font-medium">Featured</span>
+                          <div className="h-px w-12 bg-orange-500 ml-3"></div>
+                        </div>
+                        <h2 className="text-3xl sm:text-4xl font-serif font-bold text-gray-900 dark:text-gray-100 mb-3">
+                          Special Proposals
+                        </h2>
+                        <p className="text-gray-500 dark:text-gray-400 text-sm sm:text-base max-w-xl mx-auto leading-relaxed">
+                          Our most popular items, loved by our customers
+                        </p>
                       </div>
-                      <h2 className="text-3xl sm:text-4xl font-serif font-bold text-gray-900 dark:text-gray-100 mb-3">
-                        Special Proposals
-                      </h2>
-                      <p className="text-gray-500 dark:text-gray-400 text-sm sm:text-base max-w-xl mx-auto leading-relaxed">
-                        {/* Porro eveniet, autem ipsam corrupti consectetur cum. Repudiandae dignissimos fugiat sit nam. */}
-                        {/* {categoryDescription} */}
-                      </p>
-                    </div>
 
-                    {/* Special Items Cards */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                      {Object.values(groupedMenuItems).flat().slice(0, 3).map((item, index) => {
-                        // Placeholder images from Unsplash for special items
-                        const specialPlaceholders = [
-                          'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=400&h=300&fit=crop',
-                          'https://images.unsplash.com/photo-1493770348161-369560ae357d?w=400&h=300&fit=crop',
-                          'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=400&h=300&fit=crop',
-                        ];
-                        const specialImage = item.image_url
-                          ? getImageUrl(item.image_url)
-                          : specialPlaceholders[index % specialPlaceholders.length];
+                      {/* Special Items Cards */}
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                        {mostOrderedItems.map((item, index) => {
+                          // Placeholder images from Unsplash for special items
+                          const specialPlaceholders = [
+                            'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=400&h=300&fit=crop',
+                            'https://images.unsplash.com/photo-1493770348161-369560ae357d?w=400&h=300&fit=crop',
+                            'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=400&h=300&fit=crop',
+                          ];
+                          const specialImage = item.image_url
+                            ? getImageUrl(item.image_url)
+                            : specialPlaceholders[index % specialPlaceholders.length];
 
-                        return (
-                          <div
-                            key={`special-${item.id}`}
-                            className="group bg-white dark:bg-gray-800 rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-shadow"
-                          >
-                            {/* Item Image */}
-                            <div className="relative h-48 sm:h-56 overflow-hidden">
-                              <img
-                                src={specialImage}
-                                alt={item.name}
-                                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                              />
-                            </div>
+                          return (
+                            <div
+                              key={`special-${item.id}`}
+                              className="group bg-white dark:bg-gray-800 rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-shadow"
+                            >
+                              {/* Item Image */}
+                              <div className="relative h-48 sm:h-56 overflow-hidden">
+                                <img
+                                  src={specialImage}
+                                  alt={item.name}
+                                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                                />
+                              </div>
 
-                            {/* Item Details */}
-                            <div className="p-5">
-                              <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">
-                                {item.name}
-                              </h3>
-                              <p className="text-sm text-gray-500 dark:text-gray-400 leading-relaxed mb-4 line-clamp-2">
-                                {item.description || 'Consectetur adipisicing elit. Soluta, impedit, saepe.'}
-                              </p>
+                              {/* Item Details */}
+                              <div className="p-5">
+                                <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">
+                                  {item.name}
+                                </h3>
+                                <p className="text-sm text-gray-500 dark:text-gray-400 leading-relaxed mb-4 line-clamp-2">
+                                  {item.description || 'A customer favorite'}
+                                </p>
 
-                              {/* Price and Add to Cart */}
-                              <div className="flex items-center justify-between">
-                                <div className="flex items-center gap-2">
-                                  {index === 0 && (
-                                    <span className="text-sm text-gray-400 line-through">
-                                      {formatCurrency(ensureNumber(item.price) * 1.3)}
+                                {/* Price and Add to Cart */}
+                                <div className="flex items-center justify-between">
+                                  <div className="flex items-center gap-2">
+                                    <span className="text-xl font-bold text-orange-500">
+                                      {formatCurrency(ensureNumber(item.price))}
                                     </span>
-                                  )}
-                                  <span className="text-xl font-bold text-orange-500">
-                                    {formatCurrency(ensureNumber(item.price))}
-                                  </span>
+                                  </div>
+                                  <button
+                                    onClick={() => addToCart(item)}
+                                    className="w-10 h-10 rounded-full bg-orange-500 hover:bg-orange-600 text-white flex items-center justify-center transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-110 active:scale-95"
+                                    aria-label={`Add ${item.name} to cart`}
+                                  >
+                                    <ShoppingBag className="h-4 w-4" />
+                                  </button>
                                 </div>
-                                <button
-                                  onClick={() => addToCart(item)}
-                                  className="w-10 h-10 rounded-full bg-orange-500 hover:bg-orange-600 text-white flex items-center justify-center transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-110 active:scale-95"
-                                  aria-label={`Add ${item.name} to cart`}
-                                >
-                                  <ShoppingBag className="h-4 w-4" />
-                                </button>
                               </div>
                             </div>
-                          </div>
-                        );
-                      })}
-                    </div>
+                          );
+                        })}
+                      </div>
 
-                    {/* View All Products Button */}
-                    <div className="text-center mt-10">
-                      <button
-                        onClick={() => document.getElementById('all-dishes-section')?.scrollIntoView({ behavior: 'smooth' })}
-                        className="inline-flex items-center gap-2 px-8 py-3 bg-orange-500 hover:bg-orange-600 text-white font-semibold rounded-full transition-colors"
-                      >
-                        All Products
-                      </button>
+                      {/* View All Products Button */}
+                      <div className="text-center mt-10">
+                        <button
+                          onClick={() => document.getElementById('all-dishes-section')?.scrollIntoView({ behavior: 'smooth' })}
+                          className="inline-flex items-center gap-2 px-8 py-3 bg-orange-500 hover:bg-orange-600 text-white font-semibold rounded-full transition-colors"
+                        >
+                          All Products
+                        </button>
+                      </div>
                     </div>
-                  </div>
+                  )}
 
                   {/* Footer Section */}
                   <div className="mt-20 pt-16 border-t border-gray-200 dark:border-gray-700">
@@ -963,10 +995,46 @@ const CustomerMenu = ({
                         <p className="text-gray-600 dark:text-gray-400 text-sm leading-relaxed mb-4">
                           Have questions or want to make a reservation? We'd love to hear from you. Reach out to us for any inquiries.
                         </p>
-                        <button className="text-orange-500 hover:text-orange-600 text-sm font-medium flex items-center gap-1 transition-colors">
-                          Read More
-                          <span className="text-lg">→</span>
-                        </button>
+                        {cafePublicInfo && (
+                          <div className="space-y-3 text-sm">
+                            {cafePublicInfo.name && (
+                              <div className="flex items-start gap-2">
+                                <MapPin className="h-4 w-4 text-orange-500 mt-1 flex-shrink-0" />
+                                <span className="text-gray-700 dark:text-gray-300 font-medium">{cafePublicInfo.name}</span>
+                              </div>
+                            )}
+                            {cafePublicInfo.address && (
+                              <div className="flex items-start gap-2">
+                                <MapPin className="h-4 w-4 text-orange-500 mt-1 flex-shrink-0" />
+                                <span className="text-gray-600 dark:text-gray-400">{cafePublicInfo.address}</span>
+                              </div>
+                            )}
+                            {cafePublicInfo.phone && (
+                              <div className="flex items-center gap-2">
+                                <Phone className="h-4 w-4 text-orange-500 flex-shrink-0" />
+                                <a href={`tel:${cafePublicInfo.phone}`} className="text-gray-600 dark:text-gray-400 hover:text-orange-500 transition-colors">
+                                  {cafePublicInfo.phone}
+                                </a>
+                              </div>
+                            )}
+                            {cafePublicInfo.email && (
+                              <div className="flex items-center gap-2">
+                                <Mail className="h-4 w-4 text-orange-500 flex-shrink-0" />
+                                <a href={`mailto:${cafePublicInfo.email}`} className="text-gray-600 dark:text-gray-400 hover:text-orange-500 transition-colors">
+                                  {cafePublicInfo.email}
+                                </a>
+                              </div>
+                            )}
+                            {cafePublicInfo.website && (
+                              <div className="flex items-center gap-2">
+                                <MapPin className="h-4 w-4 text-orange-500 flex-shrink-0" />
+                                <a href={cafePublicInfo.website} target="_blank" rel="noopener noreferrer" className="text-gray-600 dark:text-gray-400 hover:text-orange-500 transition-colors">
+                                  {cafePublicInfo.website}
+                                </a>
+                              </div>
+                            )}
+                          </div>
+                        )}
                       </div>
 
                       {/* Gallery Column */}
@@ -1007,6 +1075,7 @@ const CustomerMenu = ({
                       </button>
                     </div>
                   </div>
+                </div>
                 </div>
               )}
             </div>

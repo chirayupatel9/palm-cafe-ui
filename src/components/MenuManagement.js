@@ -23,7 +23,8 @@ const MenuManagement = ({ menuItems, onUpdate, onAdd, onDelete }) => {
     description: '',
     price: '',
     sort_order: '',
-    image_url: ''
+    image_url: '',
+    featured_priority: ''
   });
   const [loading, setLoading] = useState(false);
   const [imageUploading, setImageUploading] = useState(false);
@@ -77,7 +78,8 @@ const MenuManagement = ({ menuItems, onUpdate, onAdd, onDelete }) => {
       description: item.description,
       price: ensureNumber(item.price).toString(),
       sort_order: item.sort_order ? item.sort_order.toString() : '',
-      image_url: item.image_url || ''
+      image_url: item.image_url || '',
+      featured_priority: item.featured_priority ? item.featured_priority.toString() : ''
     });
   };
 
@@ -101,7 +103,10 @@ const MenuManagement = ({ menuItems, onUpdate, onAdd, onDelete }) => {
           description: formData.description.trim(),
           price: price,
           sort_order: parseInt(formData.sort_order) || 0,
-          image_url: formData.image_url
+          image_url: formData.image_url,
+          featured_priority: formData.featured_priority && formData.featured_priority.trim() !== '' 
+            ? parseInt(formData.featured_priority) 
+            : null
         };
         await onUpdate(editingId, updateData);
         toast.success('Changes saved');
@@ -112,7 +117,10 @@ const MenuManagement = ({ menuItems, onUpdate, onAdd, onDelete }) => {
           description: formData.description.trim(),
           price: price,
           sort_order: parseInt(formData.sort_order) || 0,
-          image_url: formData.image_url
+          image_url: formData.image_url,
+          featured_priority: formData.featured_priority && formData.featured_priority.trim() !== '' 
+            ? parseInt(formData.featured_priority) 
+            : null
         };
         await onAdd(addData);
         toast.success('Menu item added');
@@ -133,7 +141,8 @@ const MenuManagement = ({ menuItems, onUpdate, onAdd, onDelete }) => {
         description: '', 
         price: '',
         sort_order: '',
-        image_url: ''
+        image_url: '',
+        featured_priority: ''
       });
     } catch (error) {
       console.error('Error saving menu item:', error);
@@ -503,7 +512,7 @@ const MenuManagement = ({ menuItems, onUpdate, onAdd, onDelete }) => {
           {showAddForm && (
             <div className="card">
               <h3 className={`text-lg font-semibold mb-4 ${isDarkMode ? 'text-secondary-300' : 'text-secondary-700'}`}>Add New Menu Item</h3>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4">
                 <select
                   value={formData.category_id}
                   onChange={(e) => handleInputChange('category_id', e.target.value)}
@@ -547,6 +556,15 @@ const MenuManagement = ({ menuItems, onUpdate, onAdd, onDelete }) => {
                   value={formData.sort_order}
                   onChange={(e) => handleInputChange('sort_order', e.target.value)}
                   className="input-field"
+                />
+                <input
+                  type="number"
+                  min="0"
+                  placeholder="Featured Priority"
+                  value={formData.featured_priority}
+                  onChange={(e) => handleInputChange('featured_priority', e.target.value)}
+                  className="input-field"
+                  title="Set priority to feature this item (higher = more prominent, leave empty to not feature)"
                 />
               </div>
               {/* Image Upload Section */}
@@ -719,6 +737,17 @@ const MenuManagement = ({ menuItems, onUpdate, onAdd, onDelete }) => {
                                   className="input-field"
                                 />
                               </td>
+                              <td className="px-6 py-4 whitespace-nowrap">
+                                <input
+                                  type="number"
+                                  min="0"
+                                  placeholder="Priority"
+                                  value={formData.featured_priority}
+                                  onChange={(e) => handleInputChange('featured_priority', e.target.value)}
+                                  className="input-field"
+                                  title="Set priority to feature this item (higher = more prominent)"
+                                />
+                              </td>
                               <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                 <div className="flex justify-end space-x-2">
                                   <button onClick={handleSave} className="text-green-600 hover:text-green-900">
@@ -758,6 +787,13 @@ const MenuManagement = ({ menuItems, onUpdate, onAdd, onDelete }) => {
                               </td>
                               <td className="px-6 py-4 whitespace-nowrap">
                                 <div className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>{item.sort_order || 0}</div>
+                              </td>
+                              <td className="px-6 py-4 whitespace-nowrap">
+                                <div className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                                  {item.featured_priority !== null && item.featured_priority !== undefined 
+                                    ? item.featured_priority 
+                                    : '-'}
+                                </div>
                               </td>
                               <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                 <div className="flex justify-end space-x-2">

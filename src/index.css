@@ -30,7 +30,7 @@ body {
     background-color: var(--surface-page);
     color: var(--on-surface-page);
   }
-  .mask1 {
+  /* .mask1 {
     -webkit-mask-image: linear-gradient(
       to bottom,
       rgba(0, 0, 0, 1) 0%,
@@ -43,7 +43,45 @@ body {
       rgba(0, 0, 0, 1) 80%,
       rgba(0, 0, 0, 0) 100%
     );
+  } */
+  .mask-hover {
+    -webkit-mask-image:
+    /* top + bottom */
+    linear-gradient(
+      to bottom,
+      rgba(0, 0, 0, 0) 0%,
+      rgba(0, 0, 0, 1) 5%,
+      rgba(0, 0, 0, 1) 95%,
+      rgba(0, 0, 0, 0) 100%
+    ),
+    /* left + right */
+    linear-gradient(
+      to right,
+      rgba(0, 0, 0, 0) 0%,
+      rgba(0, 0, 0, 1) 2%,
+      rgba(0, 0, 0, 1) 98%,
+      rgba(0, 0, 0, 0) 100%
+    );
+  -webkit-mask-composite: intersect;
+
+  mask-image:
+    linear-gradient(
+      to bottom,
+      rgba(0, 0, 0, 0) 0%,
+      rgba(0, 0, 0, 1) 5%,
+      rgba(0, 0, 0, 1) 95%,
+      rgba(0, 0, 0, 0) 100%
+    ),
+    linear-gradient(
+      to right,
+      rgba(0, 0, 0, 0) 0%,
+      rgba(0, 0, 0, 1) 2%,
+      rgba(0, 0, 0, 1) 98%,
+      rgba(0, 0, 0, 0) 100%
+    );
+  mask-composite: intersect;
   }
+  
   .mask2 {
     -webkit-mask-image:
       /* top + bottom */
