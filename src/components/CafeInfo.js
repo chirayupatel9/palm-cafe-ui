@@ -1,5 +1,6 @@
 import React from 'react';
 import { useCafeSettings } from '../contexts/CafeSettingsContext';
+import { getImageUrl } from '../utils/imageUtils';
 
 const CafeInfo = ({ 
   showLogo = true, 
@@ -14,9 +15,9 @@ const CafeInfo = ({
 
   return (
     <div className={`flex items-center ${className}`}>
-      {showLogo && (
+      {showLogo && cafeSettings.logo_url && (
         <img 
-          src={cafeSettings.logo_url} 
+          src={getImageUrl(cafeSettings.logo_url)} 
           alt={`${cafeSettings.cafe_name} Logo`} 
           className={`${logoSize} mr-3 ${logoClassName}`}
         />

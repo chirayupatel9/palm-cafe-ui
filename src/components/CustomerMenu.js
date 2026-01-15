@@ -73,7 +73,7 @@ const CustomerMenu = ({
   // Most ordered items and cafe info state
   const [mostOrderedItems, setMostOrderedItems] = useState([]);
   const [loadingMostOrdered, setLoadingMostOrdered] = useState(false);
-  const [cafeBranding, setCafeBranding] = useState({ hero_image_url: null, promo_banner_image_url: null });
+  const [cafeBranding, setCafeBranding] = useState({ hero_image_url: null, promo_banner_image_url: null, logo_url: null });
 
   // Helper function to ensure price is a number
   const ensureNumber = (value) => {
@@ -306,20 +306,21 @@ const CustomerMenu = ({
     }
   };
 
-  // Fetch cafe branding (hero image, promo banner)
+  // Fetch cafe branding (hero image, promo banner, logo)
   const fetchCafeBranding = async () => {
     try {
       const response = await axios.get('/menu/branding');
       if (response.data) {
         setCafeBranding({
           hero_image_url: response.data.hero_image_url || null,
-          promo_banner_image_url: response.data.promo_banner_image_url || null
+          promo_banner_image_url: response.data.promo_banner_image_url || null,
+          logo_url: response.data.logo_url || null
         });
       }
     } catch (error) {
       console.error('Error fetching cafe branding:', error);
       // Gracefully handle error - use null values (will show fallback)
-      setCafeBranding({ hero_image_url: null, promo_banner_image_url: null });
+      setCafeBranding({ hero_image_url: null, promo_banner_image_url: null, logo_url: null });
     }
   };
 
@@ -1050,11 +1051,13 @@ const CustomerMenu = ({
 
               {Object.keys(groupedMenuItems).length === 0 ? (
                 <div className="text-center py-12">
-                  <img
-                    src="/images/palm-cafe-logo.png"
-                    alt="Palm Cafe Logo"
-                    className="h-24 w-24 mx-auto mb-6 opacity-50"
-                  />
+                  {cafeBranding.logo_url && (
+                    <img
+                      src={getImageUrl(cafeBranding.logo_url)}
+                      alt={`${cafeSettings.cafe_name} Logo`}
+                      className="h-24 w-24 mx-auto mb-6 opacity-50"
+                    />
+                  )}
                   <h3 className="text-xl font-semibold mb-2 text-gray-900 dark:text-gray-100">No menu items available</h3>
                   <p className="text-base text-gray-500 dark:text-gray-400">Add items in Menu Management to get started</p>
                 </div>

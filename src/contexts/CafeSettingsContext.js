@@ -14,7 +14,7 @@ export const useCafeSettings = () => {
 export const CafeSettingsProvider = ({ children }) => {
   const [cafeSettings, setCafeSettings] = useState({
     cafe_name: 'Our Cafe',
-    logo_url: '/images/palm-cafe-logo.png',
+    logo_url: null,
     address: '',
     phone: '',
     email: '',
@@ -130,7 +130,8 @@ export const CafeSettingsProvider = ({ children }) => {
         secondary_color: response.data.secondary_color || null,
         accent_color: response.data.accent_color || null,
         hero_image_url: response.data.hero_image_url || null,
-        promo_banner_image_url: response.data.promo_banner_image_url || null
+        promo_banner_image_url: response.data.promo_banner_image_url || null,
+        logo_url: response.data.logo_url || null
       };
       
       setCafeSettings(processedData);
@@ -202,7 +203,8 @@ export const CafeSettingsProvider = ({ children }) => {
         secondary_color: response.data.secondary_color || null,
         accent_color: response.data.accent_color || null,
         hero_image_url: response.data.hero_image_url || null,
-        promo_banner_image_url: response.data.promo_banner_image_url || null
+        promo_banner_image_url: response.data.promo_banner_image_url || null,
+        logo_url: response.data.logo_url || null
       };
       
       setCafeSettings(processedData);
@@ -274,6 +276,17 @@ export const CafeSettingsProvider = ({ children }) => {
     }
   };
 
+  const removeLogo = async () => {
+    try {
+      await axios.delete('/cafe-settings/logo');
+      setCafeSettings(prev => ({ ...prev, logo_url: null }));
+      return { success: true };
+    } catch (err) {
+      console.error('Error removing logo:', err);
+      return { success: false, error: err.response?.data?.error || 'Failed to remove logo' };
+    }
+  };
+
   useEffect(() => {
     fetchCafeSettings();
   }, []);
@@ -288,7 +301,8 @@ export const CafeSettingsProvider = ({ children }) => {
     updateHeroImage,
     updatePromoBannerImage,
     removeHeroImage,
-    removePromoBannerImage
+    removePromoBannerImage,
+    removeLogo
   };
 
   return (

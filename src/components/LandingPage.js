@@ -2,7 +2,7 @@ import React from 'react';
 import { User, Users, ArrowRight, Coffee } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useCafeSettings } from '../contexts/CafeSettingsContext';
-import { getLogoUrl } from '../utils/imageUtils';
+import { getImageUrl } from '../utils/imageUtils';
 
 const LandingPage = () => {
   const { cafeSettings } = useCafeSettings();
@@ -13,11 +13,13 @@ const LandingPage = () => {
         {/* Header */}
         <div className="text-center mb-12">
           <div className="flex justify-center mb-6">
-            <img 
-              src={getLogoUrl(cafeSettings.logo_url)} 
-              alt={`${cafeSettings.cafe_name} Logo`} 
-              className="h-24 w-24"
-            />
+            {cafeSettings.logo_url && (
+              <img 
+                src={getImageUrl(cafeSettings.logo_url)} 
+                alt={`${cafeSettings.cafe_name} Logo`} 
+                className="h-24 w-24"
+              />
+            )}
           </div>
           <h1 className="text-4xl sm:text-5xl font-bold mb-4" style={{ color: 'var(--color-text)' }}>
             Welcome to {cafeSettings.cafe_name}

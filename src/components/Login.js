@@ -4,6 +4,7 @@ import { useCafeSettings } from '../contexts/CafeSettingsContext';
 import { Link, useNavigate } from 'react-router-dom';
 import { Eye, EyeOff, Coffee } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { getImageUrl } from '../utils/imageUtils';
 
 const Login = () => {
   const [formData, setFormData] = useState({
@@ -51,11 +52,13 @@ const Login = () => {
       <div className="max-w-md w-full space-y-8">
         <div>
           <div className="flex justify-center">
-            <img 
-              src={cafeSettings.logo_url} 
-              alt={`${cafeSettings.cafe_name} Logo`} 
-              className="h-16 w-16"
-            />
+            {cafeSettings.logo_url && (
+              <img 
+                src={getImageUrl(cafeSettings.logo_url)} 
+                alt={`${cafeSettings.cafe_name} Logo`} 
+                className="h-16 w-16"
+              />
+            )}
           </div>
           <h2 className="mt-6 text-center text-3xl font-extrabold text-secondary-700 dark:text-gray-100">
             Welcome back to {cafeSettings.cafe_name}

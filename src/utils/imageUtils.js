@@ -19,22 +19,12 @@ export const getImageUrl = (imageUrl) => {
   return `${API_BASE_URL}/images/${imageUrl}`;
 };
 
-// Utility function to get the correct logo URL
+// Utility function to get the correct logo URL (deprecated - use getImageUrl instead)
 export const getLogoUrl = (logoUrl) => {
-  if (!logoUrl) return '/images/palm-cafe-logo.png';
+  if (!logoUrl) return null;
   
-  // If the logo URL is already a full URL, return it as is
-  if (logoUrl.startsWith('http://') || logoUrl.startsWith('https://')) {
-    return logoUrl;
-  }
-  
-  // If it's a relative path, construct the full URL
-  if (logoUrl.startsWith('/')) {
-    return logoUrl;
-  }
-  
-  // If it's just a filename, construct the full URL
-  return `/images/${logoUrl}`;
+  // Use getImageUrl for consistency
+  return getImageUrl(logoUrl);
 };
 
 // Utility function to get placeholder images for different food categories

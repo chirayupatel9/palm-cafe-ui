@@ -5,6 +5,7 @@ import CustomerMenu from './CustomerMenu';
 import { LogOut, User, ShoppingCart, History, LogIn, X } from 'lucide-react';
 import { useDarkMode } from '../contexts/DarkModeContext';
 import { useCafeSettings } from '../contexts/CafeSettingsContext';
+import { getImageUrl } from '../utils/imageUtils';
 
 const CustomerApp = () => {
   const { isDarkMode } = useDarkMode();
@@ -83,13 +84,15 @@ const CustomerApp = () => {
              {/* Modal Header */}
              <div className={`relative p-6 border-b ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}`}>
                <div className="flex items-center justify-center mb-4">
-                 <div className="w-16 h-16 bg-secondary-500 rounded-full flex items-center justify-center shadow-lg">
-                   <img 
-                     src={cafeSettings.logo_url} 
-                     alt={`${cafeSettings.cafe_name} Logo`} 
-                     className="w-10 h-10"
-                   />
-                 </div>
+                 {cafeSettings.logo_url && (
+                   <div className="w-16 h-16 bg-secondary-500 rounded-full flex items-center justify-center shadow-lg">
+                     <img 
+                       src={getImageUrl(cafeSettings.logo_url)} 
+                       alt={`${cafeSettings.cafe_name} Logo`} 
+                       className="w-10 h-10"
+                     />
+                   </div>
+                 )}
                </div>
                <h2 className={`text-2xl font-bold text-center mb-2 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
                  Welcome to {cafeSettings.cafe_name}

@@ -2,10 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { useCafeSettings } from '../contexts/CafeSettingsContext';
 import ColorSchemePreview from './ColorSchemePreview';
 import ColorSchemeTest from './ColorSchemeTest';
-import { getLogoUrl, getImageUrl } from '../utils/imageUtils';
+import { getImageUrl } from '../utils/imageUtils';
 
 const CafeSettings = () => {
-  const { cafeSettings, updateCafeSettings, updateLogo, updateHeroImage, updatePromoBannerImage, removeHeroImage, removePromoBannerImage } = useCafeSettings();
+  const { cafeSettings, updateCafeSettings, updateLogo, updateHeroImage, updatePromoBannerImage, removeHeroImage, removePromoBannerImage, removeLogo } = useCafeSettings();
   const [showDebugTest, setShowDebugTest] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showMessage, setShowMessage] = useState(false);
@@ -13,6 +13,7 @@ const CafeSettings = () => {
   const [selectedFile, setSelectedFile] = useState(null);
   const [selectedHeroFile, setSelectedHeroFile] = useState(null);
   const [selectedPromoBannerFile, setSelectedPromoBannerFile] = useState(null);
+  const [uploadingLogo, setUploadingLogo] = useState(false);
   const [uploadingHero, setUploadingHero] = useState(false);
   const [uploadingPromoBanner, setUploadingPromoBanner] = useState(false);
 
@@ -323,6 +324,7 @@ const CafeSettings = () => {
       return;
     }
 
+    setUploadingLogo(true);
     const formData = new FormData();
     formData.append('logo', selectedFile);
 
@@ -339,6 +341,31 @@ const CafeSettings = () => {
     } catch (error) {
       setMessage({ type: 'error', text: 'An error occurred while uploading logo' });
       setShowMessage(true);
+    } finally {
+      setUploadingLogo(false);
+    }
+  };
+
+  const handleRemoveLogo = async () => {
+    if (!window.confirm('Are you sure you want to remove the logo?')) {
+      return;
+    }
+
+    setUploadingLogo(true);
+    try {
+      const result = await removeLogo();
+      if (result.success) {
+        setMessage({ type: 'success', text: 'Logo removed successfully!' });
+      } else {
+        setMessage({ type: 'error', text: result.error || 'Failed to remove logo' });
+      }
+      setShowMessage(true);
+      setTimeout(() => setShowMessage(false), 3000);
+    } catch (error) {
+      setMessage({ type: 'error', text: 'An error occurred while removing logo' });
+      setShowMessage(true);
+    } finally {
+      setUploadingLogo(false);
     }
   };
 
@@ -626,36 +653,6 @@ const CafeSettings = () => {
                     rows={3}
                     placeholder="Brief description of your cafe..."
                   />
-                </div>
-
-                {/* Logo Upload */}
-                <div>
-                  <label className="block text-sm font-medium mb-2">Logo</label>
-                  <div className="flex items-center space-x-4">
-                    {cafeSettings?.logo_url && (
-                      <img
-                        src={getLogoUrl(cafeSettings.logo_url)}
-                        alt="Cafe Logo"
-                        className="w-16 h-16 object-contain border rounded-lg"
-                      />
-                    )}
-                    <div className="flex-1">
-                      <input
-                        type="file"
-                        onChange={handleFileChange}
-                        accept="image/*"
-                        className="input-field"
-                      />
-                    </div>
-                    <button
-                      type="button"
-                      onClick={handleLogoUpload}
-                      disabled={!selectedFile}
-                      className="btn-primary disabled:opacity-50"
-                    >
-                      Upload
-                    </button>
-                  </div>
                 </div>
 
                 {/* Tab Visibility */}
@@ -964,6 +961,52 @@ const CafeSettings = () => {
               <p className="text-sm text-secondary-600 dark:text-gray-400 mb-6">
                 Manage images displayed on the customer-facing menu page
               </p>
+
+              {/* Logo */}
+              <div className="mb-6">
+                <label className="block text-sm font-medium mb-2">Logo</label>
+                <p className="text-xs text-secondary-500 dark:text-gray-500 mb-3">
+                  Shown in headers, invoices, and customer-facing pages
+                </p>
+                <div className="space-y-3">
+                  {cafeSettings?.logo_url && (
+                    <div className="relative">
+                      <img
+                        src={getImageUrl(cafeSettings.logo_url)}
+                        alt="Cafe Logo"
+                        className="w-48 h-48 object-contain border rounded-lg"
+                      />
+                      <button
+                        type="button"
+                        onClick={handleRemoveLogo}
+                        disabled={uploadingLogo}
+                        className="mt-2 px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg text-sm disabled:opacity-50"
+                      >
+                        {uploadingLogo ? 'Removing...' : 'Remove'}
+                      </button>
+                    </div>
+                  )}
+                  <div className="flex items-center space-x-4">
+                    <div className="flex-1">
+                      <input
+                        type="file"
+                        onChange={(e) => setSelectedFile(e.target.files[0])}
+                        accept="image/*"
+                        className="input-field"
+                        disabled={uploadingLogo}
+                      />
+                    </div>
+                    <button
+                      type="button"
+                      onClick={handleLogoUpload}
+                      disabled={!selectedFile || uploadingLogo}
+                      className="btn-primary disabled:opacity-50"
+                    >
+                      {uploadingLogo ? 'Uploading...' : 'Upload'}
+                    </button>
+                  </div>
+                </div>
+              </div>
 
               {/* Hero Image */}
               <div className="mb-6">
