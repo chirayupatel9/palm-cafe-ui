@@ -513,12 +513,12 @@ const CustomerMenu = ({
   return (
     <div
       className="relative w-full flex flex-col min-h-screen bg-white/80"
-
+      
     >
       {/* Sticky Header / Top App Bar */}
-      <div className='pt-4'>
+      <div>
 
-        <header className="max-w-5xl mx-auto bg-white rounded-t-xl dark:bg-gray-800 shadow-sm sticky top-0 z-20 w-full">
+        <header className="max-w-full mx-auto bg-white rounded-t-xl dark:bg-gray-800 shadow-sm sticky top-0 z-20 w-full">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex items-center justify-between h-16">
               {/* Logo and Title */}
@@ -595,7 +595,7 @@ const CustomerMenu = ({
                 </div>
 
                 {/* Cart */}
-
+                
 
                 {/* User Profile - Only show when logged in */}
                 {customer && (
@@ -651,11 +651,11 @@ const CustomerMenu = ({
 
       {/* Main Content */}
       <main className="min-h-screen">
-        <div className="max-w-full mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-12 sm:pt-12 sm:pb-16 bg-white">
+        <div className="w-full pt-8 pb-12 sm:pt-12 sm:pb-16 bg-white">
           {activeTab === 'menu' ? (
             <div>
               {/* Hero Section with Background Image */}
-              <div className="relative -mx-4 sm:-mx-6 max-w-full mx-auto lg:-mx-8 -mt-8 sm:-mt-12 mb-16">
+              <div className="relative w-full -mt-8 sm:-mt-12 mb-16">
                 <div
                   className="relative h-[400px] sm:h-[500px] bg-cover bg-center bg-no-repeat"
                   style={{
@@ -681,18 +681,18 @@ const CustomerMenu = ({
                   </div>
                   {/* Side Icons */}
                   <div className="absolute right-4 top-1/2 transform -translate-y-1/2 flex flex-col gap-4 hidden sm:flex">
-
+                    
                     <button
-                      onClick={() => setShowCart(true)}
-                      className="w-10 h-10 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center text-white transition-colors"
-                    >
-                      <ShoppingBag className="h-5 w-5" />
-                      {cart.length > 0 && (
-                        <span className="absolute top-1 right-1 flex h-5 w-5 items-center justify-center rounded-full bg-secondary-500 text-xs font-bold text-white">
-                          {cart.reduce((total, item) => total + item.quantity, 0)}
-                        </span>
-                      )}
-                    </button>
+                  onClick={() => setShowCart(true)}
+                  className="w-10 h-10 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center text-white transition-colors"
+                >
+                  <ShoppingBag className="h-5 w-5" />
+                  {cart.length > 0 && (
+                    <span className="absolute top-1 right-1 flex h-5 w-5 items-center justify-center rounded-full bg-secondary-500 text-xs font-bold text-white">
+                      {cart.reduce((total, item) => total + item.quantity, 0)}
+                    </span>
+                  )}
+                </button>
                   </div>
                 </div>
               </div>
@@ -708,15 +708,14 @@ const CustomerMenu = ({
                   <p className="text-base text-gray-500 dark:text-gray-400">Add items in Menu Management to get started</p>
                 </div>
               ) : (
-                <div>
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-5">
+                <div className="w-full space-y-5">
                   {/* Individual Category Sections - Show first */}
                   {Object.entries(groupedMenuItems)
                     .filter(([categoryName]) => selectedCategory === 'All' || categoryName === selectedCategory)
                     .map(([categoryName, items], index) => {
                       const categoryNumber = String(index + 1).padStart(2, '0');
                       return (
-                        <div key={categoryName} className="space-y-5">
+                        <div key={categoryName} className="max-w-6xl mx-auto space-y-8space-y-5">
                           {/* Divider before category (except first one) */}
                           {((selectedCategory === 'All' && index > 0) || (selectedCategory !== 'All' && index > 0)) && (
                             <div className="border-t border-dashed border-gray-300 dark:border-gray-600 mb-12"></div>
@@ -757,7 +756,7 @@ const CustomerMenu = ({
                                 <div
                                   key={item.id}
                                   className="group flex items-start gap-4 p-4 bg-white dark:bg-gray-800 rounded-lg hover:shadow-md hover:bg-orange-100 transition-shadow mask-hover"
-
+                                  
                                 >
                                   {/* Menu Item Thumbnail */}
                                   <div className="flex-shrink-0 w-20 h-20 sm:w-24 sm:h-24 rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-700">
@@ -804,7 +803,7 @@ const CustomerMenu = ({
 
                   {/* All Dishes Section - Show at the end when "All" is selected */}
                   {selectedCategory === 'All' && (
-                    <div id="all-dishes-section" className="space-y-8">
+                    <div id="all-dishes-section" className="max-w-6xl mx-auto space-y-8">
                       {/* Divider */}
                       <div className="border-t border-dashed border-gray-300 dark:border-gray-600 mb-12"></div>
 
@@ -884,13 +883,11 @@ const CustomerMenu = ({
                       </div>
                     </div>
                   )}
-                  </div>
-                <div className="max-w-full mx-auto px-4 sm:px-6 lg:px-8 space-y-5">
 
                   {/* Promotional Banner - Pay for one Get two */}
-                  <div className="relative -mx-4 sm:-mx-6 max-w-8xl mx-auto lg:-mx-8 -mt-8 sm:-mt-12 mb-16">
+                  <div className="relative w-full -mt-8 sm:-mt-12 mb-16">
                     <div
-                      className="relative h-[400px] sm:h-[500px] bg-cover bg-center bg-no-repeat"
+                      className="relative max-w-full mx-auto h-[500px] sm:h-[600px] bg-cover bg-center bg-no-repeat"
                       style={{
                         backgroundImage: `url('https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80')`
                       }}
@@ -985,7 +982,7 @@ const CustomerMenu = ({
                   )}
 
                   {/* Footer Section */}
-                  <div className="mt-20 pt-16 border-t border-gray-200 dark:border-gray-700">
+                  <div className="mt-20 pt-16 border-t max-w-6xl mx-auto space-y-8 border-gray-200 dark:border-gray-700">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
 
 
@@ -1075,7 +1072,6 @@ const CustomerMenu = ({
                       </button>
                     </div>
                   </div>
-                </div>
                 </div>
               )}
             </div>
