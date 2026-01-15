@@ -473,14 +473,22 @@ const CustomerMenu = ({
   }
 
   return (
-    <div className="relative w-full flex flex-col min-h-screen bg-accent-50 dark:bg-gray-900">
+    <div 
+      className="relative w-full flex flex-col min-h-screen"
+      style={{
+        backgroundImage: 'url(/images/menu-background.png)',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat',
+        backgroundAttachment: 'fixed'
+      }}
+    >
       {/* Sticky Header / Top App Bar */}
       <header className="sticky top-0 z-20 w-full bg-white dark:bg-gray-800 shadow-sm border-b border-accent-200 dark:border-gray-700">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             {/* Logo and Title */}
             <div className="flex items-center gap-3">
-              <CafeInfo nameSize="text-xl" />
             </div>
 
             {/* Navigation */}
@@ -493,7 +501,7 @@ const CustomerMenu = ({
                     : 'text-secondary-500 dark:text-gray-400 hover:text-secondary-600 dark:hover:text-secondary-300'
                 }`}
               >
-                Menu
+              <CafeInfo nameSize="text-2xl" />
               </button>
               {customer && (
                 <button
@@ -622,8 +630,8 @@ const CustomerMenu = ({
       )}
 
       {/* Main Content */}
-      <main className="min-h-screen bg-white dark:bg-gray-900">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-12 sm:pt-12 sm:pb-16">
+      <main className="min-h-screen">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-12 sm:pt-12 sm:pb-16 bg-white">
           {activeTab === 'menu' ? (
             <div>
               {/* Hero Section with Background Image */}
