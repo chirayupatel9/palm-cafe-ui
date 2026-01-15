@@ -48,6 +48,24 @@ export function resolveTheme({ uiRole, isDarkMode, cafeBranding = null }) {
       brandingColors.accent = cafeBranding.accentColor;
     }
     
+    // Apply background color override
+    if (cafeBranding.backgroundColor) {
+      brandingColors.background = cafeBranding.backgroundColor;
+    }
+    
+    // Apply text color override
+    if (cafeBranding.textColor) {
+      brandingColors.text = {
+        ...brandingColors.text,
+        primary: cafeBranding.textColor,
+      };
+    }
+    
+    // Apply surface color override
+    if (cafeBranding.surfaceColor) {
+      brandingColors.surface = cafeBranding.surfaceColor;
+    }
+    
     // Create themed version with branding
     return createTheme(brandingColors, baseTheme);
   }
@@ -98,10 +116,26 @@ export function extractCafeBranding(cafeSettings, isDarkMode = false) {
     ? (cafeSettings.dark_accent_color || cafeSettings.accent_color || null)
     : (cafeSettings.light_accent_color || cafeSettings.accent_color || null);
   
+  // Extract background, text, and surface colors
+  const backgroundColor = isDarkMode
+    ? (cafeSettings.dark_background_color || null)
+    : (cafeSettings.light_background_color || null);
+    
+  const textColor = isDarkMode
+    ? (cafeSettings.dark_text_color || null)
+    : (cafeSettings.light_text_color || null);
+    
+  const surfaceColor = isDarkMode
+    ? (cafeSettings.dark_surface_color || null)
+    : (cafeSettings.light_surface_color || null);
+  
   return {
     logoUrl: cafeSettings.logo_url || null,
     primaryColor,
     secondaryColor,
     accentColor,
+    backgroundColor,
+    textColor,
+    surfaceColor,
   };
 }

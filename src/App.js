@@ -80,16 +80,6 @@ function MainApp() {
     // Always use hasFeature if available (from FeatureContext)
     if (typeof hasFeature === 'function') {
       const hasAccess = hasFeature(featureKey);
-      // Debug logging for PRO features to help diagnose issues
-      if (featureKey === 'analytics' || featureKey === 'inventory' || featureKey === 'users' || featureKey === 'advanced_reports') {
-        console.log(`[Frontend Feature Check] ${featureKey}:`, {
-          hasAccess,
-          featureValue: features[featureKey],
-          plan,
-          status,
-          allFeatures: features
-        });
-      }
       return hasAccess;
     }
     // Fallback to old method
