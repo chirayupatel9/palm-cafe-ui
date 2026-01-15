@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Plus, Minus, Trash2, ShoppingCart, X, Search, User, Phone, Mail, MapPin, Clock, CheckCircle, XCircle, AlertCircle, CreditCard, Gift, Star, ChevronDown, ChevronUp, Utensils, Coffee, Pizza, Sandwich, Salad, Cake, Wine, Heart, Sparkles, TrendingUp, Award, Zap, LogOut, Edit3, Save, Calendar, Menu, ShoppingBag } from 'lucide-react';
+import { Plus, Minus, Trash2, ShoppingCart, X, Search, User, Phone, Mail, MapPin, Clock, CheckCircle, XCircle, AlertCircle, CreditCard, Gift, Star, ChevronDown, ChevronUp, ChevronLeft, ChevronRight, Utensils, Coffee, Pizza, Sandwich, Salad, Cake, Wine, Heart, Sparkles, TrendingUp, Award, Zap, LogOut, Edit3, Save, Calendar, Menu, ShoppingBag } from 'lucide-react';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 import { useCurrency } from '../contexts/CurrencyContext';
@@ -54,9 +54,11 @@ const CustomerMenu = ({
   const [autocompleteSuggestions, setAutocompleteSuggestions] = useState([]);
   const [showAutocomplete, setShowAutocomplete] = useState(false);
   const [selectedSuggestionIndex, setSelectedSuggestionIndex] = useState(-1);
+  const [categoryCarouselIndex, setCategoryCarouselIndex] = useState(0);
   const categoryScrollRef = useRef(null);
   const searchInputRef = useRef(null);
   const autocompleteRef = useRef(null);
+  const categoryCarouselRef = useRef(null);
 
   // Edit profile state
   const [showEditProfile, setShowEditProfile] = useState(false);
@@ -828,6 +830,174 @@ const CustomerMenu = ({
                 </div>
               </div>
 
+              {/* Categories Showcase Section - Circular Carousel */}
+              {!searchQuery.trim() && Object.keys(groupedMenuItems).length > 0 && (
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-16">
+                  <div className="text-center mb-10">
+                    <div className="flex items-center justify-center mb-3">
+                      <div className="h-px w-12 bg-orange-500 mr-3"></div>
+                      <span className="text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400 font-medium">Explore</span>
+                      <div className="h-px w-12 bg-orange-500 ml-3"></div>
+                    </div>
+                    <h2 className="text-3xl sm:text-4xl font-serif font-bold text-gray-900 dark:text-gray-100 mb-3">
+                      Our Categories
+                    </h2>
+                    <p className="text-gray-500 dark:text-gray-400 text-sm sm:text-base max-w-xl mx-auto leading-relaxed">
+                      Discover our delicious selection organized by category
+                    </p>
+                  </div>
+
+                  {/* Categories Carousel */}
+                  <div className="relative">
+                    {/* Navigation Arrows */}
+                    {Object.keys(groupedMenuItems).length > 4 && (
+                      <>
+                        <button
+                          onClick={() => {
+                            const categories = Object.keys(groupedMenuItems);
+                            const maxIndex = Math.max(0, categories.length - 4);
+                            setCategoryCarouselIndex(prev => prev > 0 ? prev - 1 : maxIndex);
+                          }}
+                          className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 sm:-translate-x-6 z-10 w-10 h-10 sm:w-12 sm:h-12 bg-white dark:bg-gray-800 rounded-full shadow-lg flex items-center justify-center hover:bg-orange-500 hover:text-white transition-all duration-300 group"
+                          aria-label="Previous categories"
+                        >
+                          <ChevronLeft className="h-5 w-5 sm:h-6 sm:w-6 text-gray-700 dark:text-gray-300 group-hover:text-white" />
+                        </button>
+                        <button
+                          onClick={() => {
+                            const categories = Object.keys(groupedMenuItems);
+                            const maxIndex = Math.max(0, categories.length - 4);
+                            setCategoryCarouselIndex(prev => prev < maxIndex ? prev + 1 : 0);
+                          }}
+                          className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 sm:translate-x-6 z-10 w-10 h-10 sm:w-12 sm:h-12 bg-white dark:bg-gray-800 rounded-full shadow-lg flex items-center justify-center hover:bg-orange-500 hover:text-white transition-all duration-300 group"
+                          aria-label="Next categories"
+                        >
+                          <ChevronRight className="h-5 w-5 sm:h-6 sm:w-6 text-gray-700 dark:text-gray-300 group-hover:text-white" />
+                        </button>
+                      </>
+                    )}
+
+                    {/* Carousel Container */}
+                    <div 
+                      ref={categoryCarouselRef}
+                      className="overflow-hidden"
+                      onTouchStart={(e) => {
+                        if (!categoryCarouselRef.current) {
+                          categoryCarouselRef.current = {};
+                        }
+                        categoryCarouselRef.current.touchStartX = e.touches[0].clientX;
+                      }}
+                      onTouchEnd={(e) => {
+                        if (!categoryCarouselRef.current?.touchStartX) return;
+                        const touchEndX = e.changedTouches[0].clientX;
+                        const diff = categoryCarouselRef.current.touchStartX - touchEndX;
+                        const threshold = 50;
+                        
+                        if (Math.abs(diff) > threshold) {
+                          const categories = Object.keys(groupedMenuItems);
+                          const itemsPerView = 4; // Show 4 items on large screens
+                          const maxIndex = Math.max(0, categories.length - itemsPerView);
+                          
+                          if (diff > 0) {
+                            // Swipe left - next
+                            setCategoryCarouselIndex(prev => {
+                              if (categories.length <= itemsPerView) return 0;
+                              return prev < maxIndex ? prev + 1 : 0;
+                            });
+                          } else {
+                            // Swipe right - previous
+                            setCategoryCarouselIndex(prev => {
+                              if (categories.length <= itemsPerView) return 0;
+                              return prev > 0 ? prev - 1 : maxIndex;
+                            });
+                          }
+                        }
+                        if (categoryCarouselRef.current) {
+                          categoryCarouselRef.current.touchStartX = null;
+                        }
+                      }}
+                    >
+                      <div 
+                        className="flex transition-transform duration-500 ease-in-out"
+                        style={{
+                          transform: `translateX(-${categoryCarouselIndex * (100 / Math.min(4, Object.keys(groupedMenuItems).length))}%)`
+                        }}
+                      >
+                        {Object.keys(groupedMenuItems).map((categoryName, index) => {
+                          // Temporary category images - using food-related Unsplash images
+                          const categoryImages = [
+                            'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=400&h=400&fit=crop',
+                            'https://images.unsplash.com/photo-1493770348161-369560ae357d?w=400&h=400&fit=crop',
+                            'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=400&h=400&fit=crop',
+                            'https://images.unsplash.com/photo-1476224203421-9ac39bcb3327?w=400&h=400&fit=crop',
+                            'https://images.unsplash.com/photo-1499028344343-cd173ffc68a9?w=400&h=400&fit=crop',
+                            'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=400&h=400&fit=crop',
+                            'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&h=400&fit=crop',
+                            'https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=400&h=400&fit=crop',
+                          ];
+                          const categoryImage = categoryImages[index % categoryImages.length];
+                          const itemCount = groupedMenuItems[categoryName].length;
+
+                          return (
+                            <div
+                              key={categoryName}
+                              className="flex-shrink-0 w-full sm:w-1/2 lg:w-1/4 px-2 sm:px-3 flex justify-center"
+                            >
+                              <button
+                                onClick={() => {
+                                  setSelectedCategory(categoryName);
+                                  document.getElementById('menu-items-section')?.scrollIntoView({ behavior: 'smooth' });
+                                }}
+                                className="group relative w-32 h-32 sm:w-40 sm:h-40 lg:w-44 lg:h-44 overflow-hidden rounded-full bg-white dark:bg-gray-800 shadow-lg hover:shadow-xl transition-all duration-300"
+                              >
+                                {/* Circular Category Image */}
+                                <div className="relative w-full h-full overflow-hidden rounded-full">
+                                  <img
+                                    src={categoryImage}
+                                    alt={categoryName}
+                                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                                  />
+                                  {/* Overlay gradient */}
+                                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent rounded-full"></div>
+                                </div>
+
+                                {/* Category Info - Bottom */}
+                                <div className="absolute bottom-0 left-0 right-0 pb-3 sm:pb-4 text-center">
+                                  <h3 className="text-sm sm:text-base font-bold text-white mb-0.5 group-hover:text-orange-300 transition-colors drop-shadow-lg">
+                                    {categoryName}
+                                  </h3>
+                                  <p className="text-xs sm:text-sm text-white/90 drop-shadow-md">
+                                    {itemCount} {itemCount === 1 ? 'item' : 'items'}
+                                  </p>
+                                </div>
+                              </button>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+
+                    {/* Carousel Dots Indicator */}
+                    {Object.keys(groupedMenuItems).length > 1 && (
+                      <div className="flex justify-center gap-2 mt-6">
+                        {Object.keys(groupedMenuItems).map((_, index) => (
+                          <button
+                            key={index}
+                            onClick={() => setCategoryCarouselIndex(index)}
+                            className={`h-2 rounded-full transition-all duration-300 ${
+                              categoryCarouselIndex === index
+                                ? 'w-8 bg-orange-500'
+                                : 'w-2 bg-gray-300 dark:bg-gray-600'
+                            }`}
+                            aria-label={`Go to category ${index + 1}`}
+                          />
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
               {Object.keys(groupedMenuItems).length === 0 ? (
                 <div className="text-center py-12">
                   <img
@@ -857,7 +1027,7 @@ const CustomerMenu = ({
                   </button>
                 </div>
               ) : (
-                <div className="w-full space-y-5">
+                <div id="menu-items-section" className="w-full space-y-5">
                   {/* Search Results Header */}
                   {searchQuery.trim() && (
                     <div className="max-w-6xl mx-auto px-4">
@@ -878,7 +1048,7 @@ const CustomerMenu = ({
                       </div>
                     </div>
                   )}
-
+                  
                   {/* Individual Category Sections - Show first */}
                   {Object.entries(searchQuery.trim() ? filteredMenuItems : groupedMenuItems)
                     .filter(([categoryName]) => selectedCategory === 'All' || categoryName === selectedCategory)
