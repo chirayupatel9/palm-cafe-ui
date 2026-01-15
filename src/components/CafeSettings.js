@@ -2,15 +2,19 @@ import React, { useState, useEffect } from 'react';
 import { useCafeSettings } from '../contexts/CafeSettingsContext';
 import ColorSchemePreview from './ColorSchemePreview';
 import ColorSchemeTest from './ColorSchemeTest';
-import { getLogoUrl } from '../utils/imageUtils';
+import { getLogoUrl, getImageUrl } from '../utils/imageUtils';
 
 const CafeSettings = () => {
-  const { cafeSettings, updateCafeSettings, updateLogo } = useCafeSettings();
+  const { cafeSettings, updateCafeSettings, updateLogo, updateHeroImage, updatePromoBannerImage, removeHeroImage, removePromoBannerImage } = useCafeSettings();
   const [showDebugTest, setShowDebugTest] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showMessage, setShowMessage] = useState(false);
   const [message, setMessage] = useState({ type: '', text: '' });
   const [selectedFile, setSelectedFile] = useState(null);
+  const [selectedHeroFile, setSelectedHeroFile] = useState(null);
+  const [selectedPromoBannerFile, setSelectedPromoBannerFile] = useState(null);
+  const [uploadingHero, setUploadingHero] = useState(false);
+  const [uploadingPromoBanner, setUploadingPromoBanner] = useState(false);
 
   // Form state
   const [cafeName, setCafeName] = useState('');
@@ -335,6 +339,110 @@ const CafeSettings = () => {
     } catch (error) {
       setMessage({ type: 'error', text: 'An error occurred while uploading logo' });
       setShowMessage(true);
+    }
+  };
+
+  const handleHeroImageUpload = async () => {
+    if (!selectedHeroFile) {
+      setMessage({ type: 'error', text: 'Please select a file first' });
+      setShowMessage(true);
+      return;
+    }
+
+    setUploadingHero(true);
+    const formData = new FormData();
+    formData.append('hero_image', selectedHeroFile);
+
+    try {
+      const result = await updateHeroImage(formData);
+      if (result.success) {
+        setMessage({ type: 'success', text: 'Hero image uploaded successfully!' });
+        setSelectedHeroFile(null);
+      } else {
+        setMessage({ type: 'error', text: result.error || 'Failed to upload hero image' });
+      }
+      setShowMessage(true);
+      setTimeout(() => setShowMessage(false), 3000);
+    } catch (error) {
+      setMessage({ type: 'error', text: 'An error occurred while uploading hero image' });
+      setShowMessage(true);
+    } finally {
+      setUploadingHero(false);
+    }
+  };
+
+  const handlePromoBannerUpload = async () => {
+    if (!selectedPromoBannerFile) {
+      setMessage({ type: 'error', text: 'Please select a file first' });
+      setShowMessage(true);
+      return;
+    }
+
+    setUploadingPromoBanner(true);
+    const formData = new FormData();
+    formData.append('promo_banner_image', selectedPromoBannerFile);
+
+    try {
+      const result = await updatePromoBannerImage(formData);
+      if (result.success) {
+        setMessage({ type: 'success', text: 'Promo banner image uploaded successfully!' });
+        setSelectedPromoBannerFile(null);
+      } else {
+        setMessage({ type: 'error', text: result.error || 'Failed to upload promo banner image' });
+      }
+      setShowMessage(true);
+      setTimeout(() => setShowMessage(false), 3000);
+    } catch (error) {
+      setMessage({ type: 'error', text: 'An error occurred while uploading promo banner image' });
+      setShowMessage(true);
+    } finally {
+      setUploadingPromoBanner(false);
+    }
+  };
+
+  const handleRemoveHeroImage = async () => {
+    if (!window.confirm('Are you sure you want to remove the hero image?')) {
+      return;
+    }
+
+    setUploadingHero(true);
+    try {
+      const result = await removeHeroImage();
+      if (result.success) {
+        setMessage({ type: 'success', text: 'Hero image removed successfully!' });
+      } else {
+        setMessage({ type: 'error', text: result.error || 'Failed to remove hero image' });
+      }
+      setShowMessage(true);
+      setTimeout(() => setShowMessage(false), 3000);
+    } catch (error) {
+      setMessage({ type: 'error', text: 'An error occurred while removing hero image' });
+      setShowMessage(true);
+    } finally {
+      setUploadingHero(false);
+    }
+  };
+
+  const handleRemovePromoBannerImage = async () => {
+    if (!window.confirm('Are you sure you want to remove the promo banner image?')) {
+      return;
+    }
+
+    setUploadingPromoBanner(true);
+    try {
+      const result = await removePromoBannerImage();
+      if (result.success) {
+        setMessage({ type: 'success', text: 'Promo banner image removed successfully!' });
+      } else {
+        setMessage({ type: 'error', text: result.error || 'Failed to remove promo banner image' });
+      }
+      setShowMessage(true);
+      setTimeout(() => setShowMessage(false), 3000);
+    } catch (error) {
+      setMessage({ type: 'error', text: 'An error occurred while removing promo banner image' });
+      setShowMessage(true);
+    } finally {
+      setUploadingPromoBanner(false);
     }
   };
 
@@ -848,6 +956,106 @@ const CafeSettings = () => {
                   </div>
                 </div>
               </form>
+            </div>
+
+            {/* Branding Section */}
+            <div className="card">
+              <h2 className="text-xl font-semibold mb-4">Branding</h2>
+              <p className="text-sm text-secondary-600 dark:text-gray-400 mb-6">
+                Manage images displayed on the customer-facing menu page
+              </p>
+
+              {/* Hero Image */}
+              <div className="mb-6">
+                <label className="block text-sm font-medium mb-2">Hero Image</label>
+                <p className="text-xs text-secondary-500 dark:text-gray-500 mb-3">
+                  Shown as the main background image on the customer menu
+                </p>
+                <div className="space-y-3">
+                  {cafeSettings?.hero_image_url && (
+                    <div className="relative">
+                      <img
+                        src={getImageUrl(cafeSettings.hero_image_url)}
+                        alt="Hero Image"
+                        className="w-full h-48 object-cover border rounded-lg"
+                      />
+                      <button
+                        type="button"
+                        onClick={handleRemoveHeroImage}
+                        disabled={uploadingHero}
+                        className="mt-2 px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg text-sm disabled:opacity-50"
+                      >
+                        {uploadingHero ? 'Removing...' : 'Remove'}
+                      </button>
+                    </div>
+                  )}
+                  <div className="flex items-center space-x-4">
+                    <div className="flex-1">
+                      <input
+                        type="file"
+                        onChange={(e) => setSelectedHeroFile(e.target.files[0])}
+                        accept="image/*"
+                        className="input-field"
+                        disabled={uploadingHero}
+                      />
+                    </div>
+                    <button
+                      type="button"
+                      onClick={handleHeroImageUpload}
+                      disabled={!selectedHeroFile || uploadingHero}
+                      className="btn-primary disabled:opacity-50"
+                    >
+                      {uploadingHero ? 'Uploading...' : 'Upload'}
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Promotional Banner Image */}
+              <div>
+                <label className="block text-sm font-medium mb-2">Promotional Banner Image</label>
+                <p className="text-xs text-secondary-500 dark:text-gray-500 mb-3">
+                  Shown as the promotional banner on the customer menu
+                </p>
+                <div className="space-y-3">
+                  {cafeSettings?.promo_banner_image_url && (
+                    <div className="relative">
+                      <img
+                        src={getImageUrl(cafeSettings.promo_banner_image_url)}
+                        alt="Promo Banner"
+                        className="w-full h-48 object-cover border rounded-lg"
+                      />
+                      <button
+                        type="button"
+                        onClick={handleRemovePromoBannerImage}
+                        disabled={uploadingPromoBanner}
+                        className="mt-2 px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg text-sm disabled:opacity-50"
+                      >
+                        {uploadingPromoBanner ? 'Removing...' : 'Remove'}
+                      </button>
+                    </div>
+                  )}
+                  <div className="flex items-center space-x-4">
+                    <div className="flex-1">
+                      <input
+                        type="file"
+                        onChange={(e) => setSelectedPromoBannerFile(e.target.files[0])}
+                        accept="image/*"
+                        className="input-field"
+                        disabled={uploadingPromoBanner}
+                      />
+                    </div>
+                    <button
+                      type="button"
+                      onClick={handlePromoBannerUpload}
+                      disabled={!selectedPromoBannerFile || uploadingPromoBanner}
+                      className="btn-primary disabled:opacity-50"
+                    >
+                      {uploadingPromoBanner ? 'Uploading...' : 'Upload'}
+                    </button>
+                  </div>
+                </div>
+              </div>
             </div>
 
             {/* Color Scheme Settings */}

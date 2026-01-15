@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { Plus, Minus, Trash2, ShoppingCart, X, Search, User, Phone, Mail, MapPin, Clock, CheckCircle, XCircle, AlertCircle, CreditCard, Gift, Star, ChevronDown, ChevronUp, ChevronLeft, ChevronRight, Utensils, Coffee, Pizza, Sandwich, Salad, Cake, Wine, Heart, Sparkles, TrendingUp, Award, Zap, LogOut, Edit3, Save, Calendar, Menu, ShoppingBag } from 'lucide-react';
 import axios from 'axios';
 import toast from 'react-hot-toast';
@@ -72,8 +72,8 @@ const CustomerMenu = ({
 
   // Most ordered items and cafe info state
   const [mostOrderedItems, setMostOrderedItems] = useState([]);
-  const [cafePublicInfo, setCafePublicInfo] = useState(null);
   const [loadingMostOrdered, setLoadingMostOrdered] = useState(false);
+  const [cafeBranding, setCafeBranding] = useState({ hero_image_url: null, promo_banner_image_url: null });
 
   // Helper function to ensure price is a number
   const ensureNumber = (value) => {
@@ -98,7 +98,7 @@ const CustomerMenu = ({
     fetchTaxSettings();
     fetchPaymentMethods();
     fetchMostOrderedItems();
-    fetchCafePublicInfo();
+    fetchCafeBranding();
   }, []);
 
   // Generate autocomplete suggestions
@@ -306,17 +306,20 @@ const CustomerMenu = ({
     }
   };
 
-  // Fetch cafe public info
-  const fetchCafePublicInfo = async () => {
+  // Fetch cafe branding (hero image, promo banner)
+  const fetchCafeBranding = async () => {
     try {
-      const response = await axios.get('/menu/public-info');
+      const response = await axios.get('/menu/branding');
       if (response.data) {
-        setCafePublicInfo(response.data);
+        setCafeBranding({
+          hero_image_url: response.data.hero_image_url || null,
+          promo_banner_image_url: response.data.promo_banner_image_url || null
+        });
       }
     } catch (error) {
-      console.error('Error fetching cafe public info:', error);
-      // Gracefully handle error - fields will be hidden if missing
-      setCafePublicInfo(null);
+      console.error('Error fetching cafe branding:', error);
+      // Gracefully handle error - use null values (will show fallback)
+      setCafeBranding({ hero_image_url: null, promo_banner_image_url: null });
     }
   };
 
@@ -574,6 +577,38 @@ const CustomerMenu = ({
     }));
   };
 
+  // Compute gallery items from menu items with images
+  const galleryItems = useMemo(() => {
+    if (!groupedMenuItems || Object.keys(groupedMenuItems).length === 0) {
+      return [];
+    }
+    
+    // Get all menu items with images
+    const allItemsWithImages = Object.values(groupedMenuItems)
+      .flat()
+      .filter(item => item.image_url);
+    
+    // Shuffle and take up to 6 random items
+    const shuffled = [...allItemsWithImages].sort(() => Math.random() - 0.5);
+    const items = shuffled.slice(0, 6);
+    
+    // If we don't have 6 items with images, fill with placeholders
+    while (items.length < 6) {
+      const categories = Object.keys(groupedMenuItems);
+      if (categories.length === 0) break;
+      const randomCategory = categories[
+        Math.floor(Math.random() * categories.length)
+      ];
+      items.push({
+        image_url: null,
+        category_name: randomCategory,
+        name: 'Menu Item'
+      });
+    }
+    
+    return items;
+  }, [groupedMenuItems]);
+
   if (loading) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-background-light dark:bg-background-dark">
@@ -649,7 +684,9 @@ const CustomerMenu = ({
                 <div
                   className="relative h-[400px] sm:h-[500px] bg-cover bg-center bg-no-repeat"
                   style={{
-                    backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('https://images.unsplash.com/photo-1504674900247-0877df9cc836?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80')`
+                    backgroundImage: cafeBranding.hero_image_url
+                      ? `linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('${getImageUrl(cafeBranding.hero_image_url)}')`
+                      : `linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), linear-gradient(135deg, #667eea 0%, #764ba2 100%)`
                   }}
                 >
                   {/* Header Overlay - Fixed at top */}
@@ -924,18 +961,20 @@ const CustomerMenu = ({
                         }}
                       >
                         {Object.keys(groupedMenuItems).map((categoryName, index) => {
-                          // Temporary category images - using food-related Unsplash images
-                          const categoryImages = [
-                            'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=400&h=400&fit=crop',
-                            'https://images.unsplash.com/photo-1493770348161-369560ae357d?w=400&h=400&fit=crop',
-                            'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=400&h=400&fit=crop',
-                            'https://images.unsplash.com/photo-1476224203421-9ac39bcb3327?w=400&h=400&fit=crop',
-                            'https://images.unsplash.com/photo-1499028344343-cd173ffc68a9?w=400&h=400&fit=crop',
-                            'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=400&h=400&fit=crop',
-                            'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&h=400&fit=crop',
-                            'https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=400&h=400&fit=crop',
-                          ];
-                          const categoryImage = categoryImages[index % categoryImages.length];
+                          // Get a menu item image from this category (use first item with image for consistency)
+                          const categoryItems = groupedMenuItems[categoryName];
+                          const itemsWithImages = categoryItems.filter(item => item.image_url);
+                          let categoryImage;
+                          
+                          if (itemsWithImages.length > 0) {
+                            // Use first item with image for consistent display (or use index % length for variety)
+                            const selectedItem = itemsWithImages[index % itemsWithImages.length];
+                            categoryImage = getImageUrl(selectedItem.image_url);
+                          } else {
+                            // Fallback to placeholder if no images in category
+                            categoryImage = getPlaceholderImage(categoryName);
+                          }
+                          
                           const itemCount = groupedMenuItems[categoryName].length;
 
                           return (
@@ -1090,18 +1129,9 @@ const CustomerMenu = ({
                           {/* Menu Items Grid - Horizontal Layout */}
                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-8">
                             {items.map((item, itemIndex) => {
-                              // Placeholder images from Unsplash for items without images
-                              const placeholderImages = [
-                                'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=200&h=200&fit=crop',
-                                'https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=200&h=200&fit=crop',
-                                'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=200&h=200&fit=crop',
-                                'https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?w=200&h=200&fit=crop',
-                                'https://images.unsplash.com/photo-1476224203421-9ac39bcb3327?w=200&h=200&fit=crop',
-                                'https://images.unsplash.com/photo-1499028344343-cd173ffc68a9?w=200&h=200&fit=crop',
-                              ];
                               const itemImage = item.image_url
                                 ? getImageUrl(item.image_url)
-                                : placeholderImages[itemIndex % placeholderImages.length];
+                                : getPlaceholderImage(item.category_name, item.name);
 
                               return (
                                 <div
@@ -1175,18 +1205,9 @@ const CustomerMenu = ({
                       {/* All Menu Items Grid - Horizontal Layout */}
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-8">
                         {Object.values(groupedMenuItems).flat().map((item, index) => {
-                          // Placeholder images from Unsplash for items without images
-                          const placeholderImages = [
-                            'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=200&h=200&fit=crop',
-                            'https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=200&h=200&fit=crop',
-                            'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=200&h=200&fit=crop',
-                            'https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?w=200&h=200&fit=crop',
-                            'https://images.unsplash.com/photo-1476224203421-9ac39bcb3327?w=200&h=200&fit=crop',
-                            'https://images.unsplash.com/photo-1499028344343-cd173ffc68a9?w=200&h=200&fit=crop',
-                          ];
                           const itemImage = item.image_url
                             ? getImageUrl(item.image_url)
-                            : placeholderImages[index % placeholderImages.length];
+                            : getPlaceholderImage(item.category_name, item.name);
 
                           return (
                             <div
@@ -1235,16 +1256,18 @@ const CustomerMenu = ({
                     </div>
                   )}
 
-                  {/* Promotional Banner - Pay for one Get two */}
-                  <div className="relative w-full -mt-8 sm:-mt-12 mb-16">
-                    <div
-                      className="relative max-w-full mx-auto h-[500px] sm:h-[600px] bg-cover bg-center bg-no-repeat"
-                      style={{
-                        backgroundImage: `url('https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80')`
-                      }}
-                    >
+                  {/* Promotional Banner - Only show if image exists */}
+                  {cafeBranding.promo_banner_image_url && (
+                    <div className="relative w-full -mt-8 sm:-mt-12 mb-16">
+                      <div
+                        className="relative max-w-full mx-auto h-[500px] sm:h-[600px] bg-cover bg-center bg-no-repeat"
+                        style={{
+                          backgroundImage: `url('${getImageUrl(cafeBranding.promo_banner_image_url)}')`
+                        }}
+                      >
+                      </div>
                     </div>
-                  </div>
+                  )}
 
                   {/* Special Proposals Section */}
                   {mostOrderedItems.length > 0 && (
@@ -1266,15 +1289,9 @@ const CustomerMenu = ({
                       {/* Special Items Cards */}
                       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                         {mostOrderedItems.map((item, index) => {
-                          // Placeholder images from Unsplash for special items
-                          const specialPlaceholders = [
-                            'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=400&h=300&fit=crop',
-                            'https://images.unsplash.com/photo-1493770348161-369560ae357d?w=400&h=300&fit=crop',
-                            'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=400&h=300&fit=crop',
-                          ];
                           const specialImage = item.image_url
                             ? getImageUrl(item.image_url)
-                            : specialPlaceholders[index % specialPlaceholders.length];
+                            : getPlaceholderImage(item.category_name, item.name);
 
                           return (
                             <div
@@ -1343,41 +1360,41 @@ const CustomerMenu = ({
                         <p className="text-gray-600 dark:text-gray-400 text-sm leading-relaxed mb-4">
                           Have questions or want to make a reservation? We'd love to hear from you. Reach out to us for any inquiries.
                         </p>
-                        {cafePublicInfo && (
+                        {cafeSettings && (
                           <div className="space-y-3 text-sm">
-                            {cafePublicInfo.name && (
+                            {cafeSettings.cafe_name && (
                               <div className="flex items-start gap-2">
                                 <MapPin className="h-4 w-4 text-orange-500 mt-1 flex-shrink-0" />
-                                <span className="text-gray-700 dark:text-gray-300 font-medium">{cafePublicInfo.name}</span>
+                                <span className="text-gray-700 dark:text-gray-300 font-medium">{cafeSettings.cafe_name}</span>
                               </div>
                             )}
-                            {cafePublicInfo.address && (
+                            {cafeSettings.address && (
                               <div className="flex items-start gap-2">
                                 <MapPin className="h-4 w-4 text-orange-500 mt-1 flex-shrink-0" />
-                                <span className="text-gray-600 dark:text-gray-400">{cafePublicInfo.address}</span>
+                                <span className="text-gray-600 dark:text-gray-400">{cafeSettings.address}</span>
                               </div>
                             )}
-                            {cafePublicInfo.phone && (
+                            {cafeSettings.phone && (
                               <div className="flex items-center gap-2">
                                 <Phone className="h-4 w-4 text-orange-500 flex-shrink-0" />
-                                <a href={`tel:${cafePublicInfo.phone}`} className="text-gray-600 dark:text-gray-400 hover:text-orange-500 transition-colors">
-                                  {cafePublicInfo.phone}
+                                <a href={`tel:${cafeSettings.phone}`} className="text-gray-600 dark:text-gray-400 hover:text-orange-500 transition-colors">
+                                  {cafeSettings.phone}
                                 </a>
                               </div>
                             )}
-                            {cafePublicInfo.email && (
+                            {cafeSettings.email && (
                               <div className="flex items-center gap-2">
                                 <Mail className="h-4 w-4 text-orange-500 flex-shrink-0" />
-                                <a href={`mailto:${cafePublicInfo.email}`} className="text-gray-600 dark:text-gray-400 hover:text-orange-500 transition-colors">
-                                  {cafePublicInfo.email}
+                                <a href={`mailto:${cafeSettings.email}`} className="text-gray-600 dark:text-gray-400 hover:text-orange-500 transition-colors">
+                                  {cafeSettings.email}
                                 </a>
                               </div>
                             )}
-                            {cafePublicInfo.website && (
+                            {cafeSettings.website && (
                               <div className="flex items-center gap-2">
                                 <MapPin className="h-4 w-4 text-orange-500 flex-shrink-0" />
-                                <a href={cafePublicInfo.website} target="_blank" rel="noopener noreferrer" className="text-gray-600 dark:text-gray-400 hover:text-orange-500 transition-colors">
-                                  {cafePublicInfo.website}
+                                <a href={cafeSettings.website} target="_blank" rel="noopener noreferrer" className="text-gray-600 dark:text-gray-400 hover:text-orange-500 transition-colors">
+                                  {cafeSettings.website}
                                 </a>
                               </div>
                             )}
@@ -1389,22 +1406,21 @@ const CustomerMenu = ({
                       <div>
                         <h3 className="text-xl font-serif font-bold text-orange-500 mb-4">Gallery</h3>
                         <div className="grid grid-cols-3 gap-2 mb-4">
-                          {[
-                            'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=100&h=100&fit=crop',
-                            'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=100&h=100&fit=crop',
-                            'https://images.unsplash.com/photo-1493770348161-369560ae357d?w=100&h=100&fit=crop',
-                            'https://images.unsplash.com/photo-1476224203421-9ac39bcb3327?w=100&h=100&fit=crop',
-                            'https://images.unsplash.com/photo-1499028344343-cd173ffc68a9?w=100&h=100&fit=crop',
-                            'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=100&h=100&fit=crop',
-                          ].map((url, idx) => (
-                            <div key={idx} className="aspect-square rounded-lg overflow-hidden">
-                              <img
-                                src={url}
-                                alt={`Gallery ${idx + 1}`}
-                                className="w-full h-full object-cover hover:scale-110 transition-transform duration-300"
-                              />
-                            </div>
-                          ))}
+                          {galleryItems.map((item, idx) => {
+                            const imageUrl = item.image_url 
+                              ? getImageUrl(item.image_url)
+                              : getPlaceholderImage(item.category_name, item.name);
+                            
+                            return (
+                              <div key={`gallery-${idx}-${item.id || idx}`} className="aspect-square rounded-lg overflow-hidden">
+                                <img
+                                  src={imageUrl}
+                                  alt={item.name || `Gallery ${idx + 1}`}
+                                  className="w-full h-full object-cover hover:scale-110 transition-transform duration-300"
+                                />
+                              </div>
+                            );
+                          })}
                         </div>
                         <button className="text-orange-500 hover:text-orange-600 text-sm font-medium flex items-center gap-1 transition-colors">
                           See More

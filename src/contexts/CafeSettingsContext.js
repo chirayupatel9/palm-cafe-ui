@@ -177,14 +177,64 @@ export const CafeSettingsProvider = ({ children }) => {
     }
   };
 
-  const updateLogo = async (logoUrl) => {
+  const updateLogo = async (formData) => {
     try {
-      const response = await axios.post('/cafe-settings/logo', { logo_url: logoUrl });
+      const response = await axios.post('/cafe-settings/logo', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
       setCafeSettings(prev => ({ ...prev, logo_url: response.data.logo_url }));
       return { success: true };
     } catch (err) {
       console.error('Error updating logo:', err);
-      return { success: false, error: err.response?.data?.message || 'Failed to update logo' };
+      return { success: false, error: err.response?.data?.error || 'Failed to update logo' };
+    }
+  };
+
+  const updateHeroImage = async (formData) => {
+    try {
+      const response = await axios.post('/cafe-settings/hero-image', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+      setCafeSettings(prev => ({ ...prev, hero_image_url: response.data.hero_image_url }));
+      return { success: true };
+    } catch (err) {
+      console.error('Error updating hero image:', err);
+      return { success: false, error: err.response?.data?.error || 'Failed to update hero image' };
+    }
+  };
+
+  const updatePromoBannerImage = async (formData) => {
+    try {
+      const response = await axios.post('/cafe-settings/promo-banner-image', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+      setCafeSettings(prev => ({ ...prev, promo_banner_image_url: response.data.promo_banner_image_url }));
+      return { success: true };
+    } catch (err) {
+      console.error('Error updating promo banner image:', err);
+      return { success: false, error: err.response?.data?.error || 'Failed to update promo banner image' };
+    }
+  };
+
+  const removeHeroImage = async () => {
+    try {
+      await axios.delete('/cafe-settings/hero-image');
+      setCafeSettings(prev => ({ ...prev, hero_image_url: null }));
+      return { success: true };
+    } catch (err) {
+      console.error('Error removing hero image:', err);
+      return { success: false, error: err.response?.data?.error || 'Failed to remove hero image' };
+    }
+  };
+
+  const removePromoBannerImage = async () => {
+    try {
+      await axios.delete('/cafe-settings/promo-banner-image');
+      setCafeSettings(prev => ({ ...prev, promo_banner_image_url: null }));
+      return { success: true };
+    } catch (err) {
+      console.error('Error removing promo banner image:', err);
+      return { success: false, error: err.response?.data?.error || 'Failed to remove promo banner image' };
     }
   };
 
@@ -198,7 +248,11 @@ export const CafeSettingsProvider = ({ children }) => {
     error,
     fetchCafeSettings,
     updateCafeSettings,
-    updateLogo
+    updateLogo,
+    updateHeroImage,
+    updatePromoBannerImage,
+    removeHeroImage,
+    removePromoBannerImage
   };
 
   return (
