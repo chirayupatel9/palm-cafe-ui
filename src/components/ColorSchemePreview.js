@@ -1,10 +1,22 @@
 import React from 'react';
-import { useColorScheme } from '../contexts/ColorSchemeContext';
+import { useTheme } from '../contexts/ThemeContext';
+import { useCafeSettings } from '../contexts/CafeSettingsContext';
 import { useDarkMode } from '../contexts/DarkModeContext';
 
 const ColorSchemePreview = () => {
-  const { currentColors } = useColorScheme();
+  const { theme } = useTheme();
+  const { cafeSettings } = useCafeSettings();
   const { isDarkMode } = useDarkMode();
+  
+  // Extract current colors from theme or cafeSettings
+  const currentColors = {
+    primary: theme?.colors?.primary || (isDarkMode ? (cafeSettings?.dark_primary_color || '#60A5FA') : (cafeSettings?.light_primary_color || '#3B82F6')),
+    secondary: theme?.colors?.secondary || (isDarkMode ? (cafeSettings?.dark_secondary_color || '#9CA3AF') : (cafeSettings?.light_secondary_color || '#6B7280')),
+    accent: theme?.colors?.accent || (isDarkMode ? (cafeSettings?.dark_accent_color || '#34D399') : (cafeSettings?.light_accent_color || '#10B981')),
+    background: theme?.colors?.background || (isDarkMode ? (cafeSettings?.dark_background_color || '#111827') : (cafeSettings?.light_background_color || '#FFFFFF')),
+    surface: theme?.colors?.surface || (isDarkMode ? (cafeSettings?.dark_surface_color || '#1F2937') : (cafeSettings?.light_surface_color || '#F9FAFB')),
+    text: theme?.colors?.text?.primary || (isDarkMode ? (cafeSettings?.dark_text_color || '#F9FAFB') : (cafeSettings?.light_text_color || '#1F2937'))
+  };
 
   const colorTypes = [
     { key: 'primary', label: 'Primary' },
