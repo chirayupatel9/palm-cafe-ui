@@ -22,7 +22,7 @@ const CafeInfo = ({
         />
       )}
       {showName && (
-        <h1 className={`font-bold text-secondary-700 dark:text-gray-100 ${nameSize} ${nameClassName}`}>
+        <h1 className={`font-bold ${nameSize} ${nameClassName}`}>
           {cafeSettings.cafe_name}
         </h1>
       )}

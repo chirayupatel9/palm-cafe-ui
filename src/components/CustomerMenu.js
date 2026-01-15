@@ -51,8 +51,12 @@ const CustomerMenu = ({
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [searchExpanded, setSearchExpanded] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
+  const [autocompleteSuggestions, setAutocompleteSuggestions] = useState([]);
+  const [showAutocomplete, setShowAutocomplete] = useState(false);
+  const [selectedSuggestionIndex, setSelectedSuggestionIndex] = useState(-1);
   const categoryScrollRef = useRef(null);
   const searchInputRef = useRef(null);
+  const autocompleteRef = useRef(null);
 
   // Edit profile state
   const [showEditProfile, setShowEditProfile] = useState(false);
@@ -95,10 +99,51 @@ const CustomerMenu = ({
     fetchCafePublicInfo();
   }, []);
 
+  // Generate autocomplete suggestions
+  useEffect(() => {
+    if (!searchQuery.trim()) {
+      setAutocompleteSuggestions([]);
+      setShowAutocomplete(false);
+      return;
+    }
+
+    const query = searchQuery.toLowerCase().trim();
+    const suggestions = [];
+    const seen = new Set();
+
+    // Get all menu items
+    Object.values(groupedMenuItems).flat().forEach(item => {
+      const nameMatch = item.name.toLowerCase().includes(query);
+      const categoryMatch = item.category_name && item.category_name.toLowerCase().includes(query);
+
+      if ((nameMatch || categoryMatch) && !seen.has(item.name)) {
+        seen.add(item.name);
+        suggestions.push({
+          name: item.name,
+          category: item.category_name,
+          item: item
+        });
+      }
+    });
+
+    // Sort by relevance (exact matches first, then by name)
+    suggestions.sort((a, b) => {
+      const aStarts = a.name.toLowerCase().startsWith(query);
+      const bStarts = b.name.toLowerCase().startsWith(query);
+      if (aStarts && !bStarts) return -1;
+      if (!aStarts && bStarts) return 1;
+      return a.name.localeCompare(b.name);
+    });
+
+    setAutocompleteSuggestions(suggestions.slice(0, 5)); // Limit to 5 suggestions
+    setShowAutocomplete(suggestions.length > 0);
+  }, [searchQuery, groupedMenuItems]);
+
   // Filter menu items based on search query
   useEffect(() => {
     if (!searchQuery.trim()) {
       setFilteredMenuItems(groupedMenuItems);
+      setSelectedCategory('All');
       return;
     }
 
@@ -118,6 +163,7 @@ const CustomerMenu = ({
     });
 
     setFilteredMenuItems(filtered);
+    setSelectedCategory('All'); // Reset category filter when searching
   }, [searchQuery, groupedMenuItems]);
 
   // Focus search input when expanded
@@ -126,6 +172,38 @@ const CustomerMenu = ({
       searchInputRef.current.focus();
     }
   }, [searchExpanded]);
+
+  // Handle keyboard navigation for autocomplete
+  const handleSearchKeyDown = (e) => {
+    if (!showAutocomplete || autocompleteSuggestions.length === 0) return;
+
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      setSelectedSuggestionIndex(prev =>
+        prev < autocompleteSuggestions.length - 1 ? prev + 1 : prev
+      );
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      setSelectedSuggestionIndex(prev => prev > 0 ? prev - 1 : -1);
+    } else if (e.key === 'Enter' && selectedSuggestionIndex >= 0) {
+      e.preventDefault();
+      const suggestion = autocompleteSuggestions[selectedSuggestionIndex];
+      setSearchQuery(suggestion.name);
+      setShowAutocomplete(false);
+      setSelectedSuggestionIndex(-1);
+    } else if (e.key === 'Escape') {
+      setShowAutocomplete(false);
+      setSelectedSuggestionIndex(-1);
+    }
+  };
+
+  // Handle suggestion click
+  const handleSuggestionClick = (suggestion) => {
+    setSearchQuery(suggestion.name);
+    setShowAutocomplete(false);
+    setSelectedSuggestionIndex(-1);
+    searchInputRef.current?.focus();
+  };
 
   const fetchMenuItems = async () => {
     try {
@@ -513,103 +591,13 @@ const CustomerMenu = ({
   return (
     <div
       className="relative w-full flex flex-col min-h-screen bg-white/80"
-      
+
     >
       {/* Sticky Header / Top App Bar */}
       <div>
 
         <header className="max-w-full mx-auto bg-white rounded-t-xl dark:bg-gray-800 shadow-sm sticky top-0 z-20 w-full">
-          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex items-center justify-between h-16">
-              {/* Logo and Title */}
-              <div className="flex items-center gap-3">
-              </div>
 
-              {/* Navigation */}
-              <nav className="hidden md:flex items-center gap-8">
-                <button
-                  onClick={() => setActiveTab('menu')}
-                  className={`text-sm font-medium transition-colors ${activeTab === 'menu'
-                    ? 'text-secondary-600 dark:text-secondary-400 font-semibold'
-                    : 'text-secondary-500 dark:text-gray-400 hover:text-secondary-600 dark:hover:text-secondary-300'
-                    }`}
-                >
-                  <CafeInfo nameSize="text-2xl" />
-                </button>
-                {customer && (
-                  <button
-                    onClick={() => setActiveTab('history')}
-                    className={`text-sm font-medium transition-colors ${activeTab === 'history'
-                      ? 'text-secondary-600 dark:text-secondary-400 font-semibold'
-                      : 'text-secondary-500 dark:text-gray-400 hover:text-secondary-600 dark:hover:text-secondary-300'
-                      }`}
-                  >
-                    My Orders
-                  </button>
-                )}
-              </nav>
-
-              {/* Right Side Icons */}
-              <div className="flex items-center gap-3">
-                {/* Search */}
-                <div className="relative">
-                  <button
-                    onClick={() => setSearchExpanded(true)}
-                    className="flex items-center justify-center h-10 w-10 hover:bg-accent-100 dark:hover:bg-gray-700 rounded-full transition-colors"
-                  >
-                    <Search className="h-5 w-5 text-secondary-600 dark:text-gray-300" />
-                  </button>
-
-                  {/* Expanded Search Bar - Absolute positioned overlay */}
-                  {searchExpanded && (
-                    <div className="absolute right-0 top-1/2 -translate-y-1/2 w-64 md:w-80 z-30">
-                      <div className="relative">
-                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-secondary-400" />
-                        <input
-                          ref={searchInputRef}
-                          type="text"
-                          placeholder="Search menu..."
-                          value={searchQuery}
-                          onChange={(e) => setSearchQuery(e.target.value)}
-                          onBlur={(e) => {
-                            // Don't close if clicking on the clear button
-                            if (!e.relatedTarget?.closest('.search-clear-btn') && !searchQuery) {
-                              setSearchExpanded(false);
-                            }
-                          }}
-                          className="w-full pl-10 pr-10 py-2 rounded-lg bg-white dark:bg-gray-800 border-2 border-secondary-300 dark:border-gray-600 text-secondary-900 dark:text-white placeholder:text-secondary-400 focus:outline-none focus:ring-2 focus:ring-secondary-500 focus:border-secondary-500 shadow-lg transition-all"
-                        />
-                        <button
-                          onMouseDown={(e) => e.preventDefault()}
-                          onClick={() => {
-                            setSearchQuery('');
-                            setSearchExpanded(false);
-                          }}
-                          className="search-clear-btn absolute right-3 top-1/2 transform -translate-y-1/2 text-secondary-400 dark:text-gray-400 hover:text-secondary-600 dark:hover:text-gray-200"
-                        >
-                          <X className="h-4 w-4" />
-                        </button>
-                      </div>
-                    </div>
-                  )}
-                </div>
-
-                {/* Cart */}
-                
-
-                {/* User Profile - Only show when logged in */}
-                {customer && (
-                  <button
-                    onClick={() => setShowProfile(true)}
-                    className="flex items-center justify-center h-10 w-10 rounded-full bg-secondary-500 text-white hover:bg-secondary-600 transition-colors"
-                    title={customer.name}
-                  >
-                    <User className="h-5 w-5" />
-                  </button>
-                )}
-              </div>
-            </div>
-          </div>
         </header>
         {/* Mobile Category Scroller */}
       </div>
@@ -662,6 +650,67 @@ const CustomerMenu = ({
                     backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('https://images.unsplash.com/photo-1504674900247-0877df9cc836?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80')`
                   }}
                 >
+                  {/* Header Overlay - Fixed at top */}
+                  <div className="absolute top-0 left-0 right-0 z-30 pointer-events-none">
+                    <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+                      <div className="flex items-center justify-between h-16 pointer-events-auto">
+                        {/* Logo and Title */}
+                        <div className="flex items-center gap-3">
+                        </div>
+
+                        {/* Navigation */}
+                        <nav className="hidden md:flex items-center gap-8">
+                          <button
+                            onClick={() => setActiveTab('menu')}
+                            className={`text-sm font-medium transition-colors text-white ${activeTab === 'menu'
+                              ? 'font-semibold'
+                              : 'hover:text-orange-300'
+                              }`}
+                          >
+                            <CafeInfo nameSize="text-2xl" />
+                          </button>
+                          {customer && (
+                            <button
+                              onClick={() => setActiveTab('history')}
+                              className={`text-sm font-medium transition-colors text-white ${activeTab === 'history'
+                                ? 'font-semibold'
+                                : 'hover:text-orange-300'
+                                }`}
+                            >
+                              My Orders
+                            </button>
+                          )}
+                        </nav>
+
+                        {/* Right Side Icons */}
+                        <div className="flex items-center gap-3">
+                          {/* Cart */}
+                          <button
+                            onClick={() => setShowCart(true)}
+                            className="relative w-10 h-10 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center text-white transition-colors"
+                          >
+                            <ShoppingBag className="h-5 w-5" />
+                            {cart.length > 0 && (
+                              <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-orange-500 text-xs font-bold text-white">
+                                {cart.reduce((total, item) => total + item.quantity, 0)}
+                              </span>
+                            )}
+                          </button>
+
+                          {/* User Profile - Only show when logged in */}
+                          {customer && (
+                            <button
+                              onClick={() => setShowProfile(true)}
+                              className="flex items-center justify-center h-10 w-10 rounded-full bg-white/20 hover:bg-white/30 text-white transition-colors"
+                              title={customer.name}
+                            >
+                              <User className="h-5 w-5" />
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                   <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-4">
 
                     <h1 className="text-4xl sm:text-5xl md:text-6xl font-serif font-bold mb-4 text-white">
@@ -670,29 +719,111 @@ const CustomerMenu = ({
                     <p className="text-white/80 max-w-2xl mx-auto text-base sm:text-lg leading-relaxed mb-8">
                       Quaerat debitis, vel, sapiente dicta sequi labore porro pariatur harum expedita.
                     </p>
-                    <div className="flex items-center gap-4">
-                      <button
-                        onClick={() => document.getElementById('all-dishes-section')?.scrollIntoView({ behavior: 'smooth' })}
-                        className="px-8 py-3 bg-orange-500 hover:bg-orange-600 text-white font-semibold rounded-full transition-colors"
-                      >
-                        Explore our menu
-                      </button>
+                    <div className="flex flex-col items-center gap-4 w-full">
+                      {/* Search Bar Container */}
+                      <div className="relative w-full max-w-2xl">
+                        {!searchExpanded ? (
+                          /* Search Button - Initial State */
+                          <button
+                            onClick={() => setSearchExpanded(true)}
+                            className="w-full px-6 py-4 bg-white/95 hover:bg-white text-gray-700 font-medium rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 flex items-center justify-center gap-3 group"
+                          >
+                            <Search className="h-5 w-5 text-gray-400 group-hover:text-orange-500 transition-colors" />
+                            <span className="text-gray-500 group-hover:text-gray-700">Search menu...</span>
+                          </button>
+                        ) : (
+                          /* Expanded Search Bar */
+                          <div className="relative w-full animate-in fade-in slide-in-from-top-2 duration-300">
+                            <div className="relative">
+                              <Search className="absolute left-5 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400 z-10" />
+                              <input
+                                ref={searchInputRef}
+                                type="text"
+                                placeholder="Search menu items, categories..."
+                                value={searchQuery}
+                                onChange={(e) => {
+                                  setSearchQuery(e.target.value);
+                                  setSelectedSuggestionIndex(-1);
+                                }}
+                                onKeyDown={handleSearchKeyDown}
+                                onFocus={() => {
+                                  if (autocompleteSuggestions.length > 0) {
+                                    setShowAutocomplete(true);
+                                  }
+                                }}
+                                onBlur={(e) => {
+                                  // Don't close if clicking on autocomplete or clear button
+                                  if (
+                                    !e.relatedTarget?.closest('.autocomplete-suggestion') &&
+                                    !e.relatedTarget?.closest('.search-clear-btn') &&
+                                    !searchQuery
+                                  ) {
+                                    setTimeout(() => {
+                                      setSearchExpanded(false);
+                                      setShowAutocomplete(false);
+                                    }, 200);
+                                  }
+                                }}
+                                className="w-full pl-14 pr-14 py-4 rounded-full bg-white dark:bg-gray-800 border-2 border-orange-300 dark:border-gray-600 text-gray-900 dark:text-white placeholder:text-gray-400 focus:outline-none focus:ring-4 focus:ring-orange-200 focus:border-orange-500 shadow-2xl transition-all text-base"
+                                autoFocus
+                              />
+                              {searchQuery && (
+                                <button
+                                  onMouseDown={(e) => e.preventDefault()}
+                                  onClick={() => {
+                                    setSearchQuery('');
+                                    setShowAutocomplete(false);
+                                    setSelectedSuggestionIndex(-1);
+                                    setSearchExpanded(false);
+                                  }}
+                                  className="search-clear-btn absolute right-5 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-400 hover:text-orange-500 dark:hover:text-orange-400 transition-colors p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700"
+                                >
+                                  <X className="h-5 w-5" />
+                                </button>
+                              )}
+
+                              {/* Autocomplete Suggestions */}
+                              {showAutocomplete && autocompleteSuggestions.length > 0 && (
+                                <div
+                                  ref={autocompleteRef}
+                                  className="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-gray-800 rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-700 overflow-hidden z-50 max-h-80 overflow-y-auto"
+                                >
+                                  {autocompleteSuggestions.map((suggestion, index) => (
+                                    <button
+                                      key={`${suggestion.name}-${index}`}
+                                      type="button"
+                                      onClick={() => handleSuggestionClick(suggestion)}
+                                      onMouseDown={(e) => e.preventDefault()}
+                                      className={`autocomplete-suggestion w-full px-5 py-3 text-left hover:bg-orange-50 dark:hover:bg-gray-700 transition-colors flex items-center justify-between ${selectedSuggestionIndex === index
+                                          ? 'bg-orange-50 dark:bg-gray-700'
+                                          : ''
+                                        }`}
+                                    >
+                                      <div className="flex-1">
+                                        <div className="font-medium text-gray-900 dark:text-white">
+                                          {suggestion.name}
+                                        </div>
+                                        {suggestion.category && (
+                                          <div className="text-sm text-gray-500 dark:text-gray-400">
+                                            {suggestion.category}
+                                          </div>
+                                        )}
+                                      </div>
+                                      <Search className="h-4 w-4 text-gray-400" />
+                                    </button>
+                                  ))}
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </div>
                   {/* Side Icons */}
                   <div className="absolute right-4 top-1/2 transform -translate-y-1/2 flex flex-col gap-4 hidden sm:flex">
+
                     
-                    <button
-                  onClick={() => setShowCart(true)}
-                  className="w-10 h-10 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center text-white transition-colors"
-                >
-                  <ShoppingBag className="h-5 w-5" />
-                  {cart.length > 0 && (
-                    <span className="absolute top-1 right-1 flex h-5 w-5 items-center justify-center rounded-full bg-secondary-500 text-xs font-bold text-white">
-                      {cart.reduce((total, item) => total + item.quantity, 0)}
-                    </span>
-                  )}
-                </button>
                   </div>
                 </div>
               </div>
@@ -707,10 +838,49 @@ const CustomerMenu = ({
                   <h3 className="text-xl font-semibold mb-2 text-gray-900 dark:text-gray-100">No menu items available</h3>
                   <p className="text-base text-gray-500 dark:text-gray-400">Add items in Menu Management to get started</p>
                 </div>
+              ) : searchQuery.trim() && Object.keys(filteredMenuItems).length === 0 ? (
+                <div className="text-center py-12 max-w-6xl mx-auto">
+                  <Search className="h-16 w-16 mx-auto mb-4 text-gray-400" />
+                  <h3 className="text-xl font-semibold mb-2 text-gray-900 dark:text-gray-100">No results found</h3>
+                  <p className="text-base text-gray-500 dark:text-gray-400 mb-4">
+                    We couldn't find any items matching "{searchQuery}"
+                  </p>
+                  <button
+                    onClick={() => {
+                      setSearchQuery('');
+                      setShowAutocomplete(false);
+                      setSelectedSuggestionIndex(-1);
+                    }}
+                    className="px-6 py-2 bg-orange-500 hover:bg-orange-600 text-white font-medium rounded-full transition-colors"
+                  >
+                    Clear search
+                  </button>
+                </div>
               ) : (
                 <div className="w-full space-y-5">
+                  {/* Search Results Header */}
+                  {searchQuery.trim() && (
+                    <div className="max-w-6xl mx-auto px-4">
+                      <div className="flex items-center justify-between mb-4">
+                        <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                          Search Results for "{searchQuery}"
+                        </h3>
+                        <button
+                          onClick={() => {
+                            setSearchQuery('');
+                            setShowAutocomplete(false);
+                            setSelectedSuggestionIndex(-1);
+                          }}
+                          className="text-sm text-orange-500 hover:text-orange-600 transition-colors"
+                        >
+                          Clear search
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
                   {/* Individual Category Sections - Show first */}
-                  {Object.entries(groupedMenuItems)
+                  {Object.entries(searchQuery.trim() ? filteredMenuItems : groupedMenuItems)
                     .filter(([categoryName]) => selectedCategory === 'All' || categoryName === selectedCategory)
                     .map(([categoryName, items], index) => {
                       const categoryNumber = String(index + 1).padStart(2, '0');
@@ -756,7 +926,7 @@ const CustomerMenu = ({
                                 <div
                                   key={item.id}
                                   className="group flex items-start gap-4 p-4 bg-white dark:bg-gray-800 rounded-lg hover:shadow-md hover:bg-orange-100 transition-shadow mask-hover"
-                                  
+
                                 >
                                   {/* Menu Item Thumbnail */}
                                   <div className="flex-shrink-0 w-20 h-20 sm:w-24 sm:h-24 rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-700">
@@ -801,8 +971,8 @@ const CustomerMenu = ({
                       );
                     })}
 
-                  {/* All Dishes Section - Show at the end when "All" is selected */}
-                  {selectedCategory === 'All' && (
+                  {/* All Dishes Section - Show at the end when "All" is selected and not searching */}
+                  {selectedCategory === 'All' && !searchQuery.trim() && (
                     <div id="all-dishes-section" className="max-w-6xl mx-auto space-y-8">
                       {/* Divider */}
                       <div className="border-t border-dashed border-gray-300 dark:border-gray-600 mb-12"></div>
