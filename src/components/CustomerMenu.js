@@ -852,7 +852,7 @@ const CustomerMenu = ({
                   )}
 
                   {/* Promotional Banner - Pay for one Get two */}
-                  <div className="relative -mx-4 sm:-mx-6 lg:-mx-8 mt-16 mb-16 p-2">
+                  <div className="relative -mx-4 sm:-mx-6 lg:-mx-8 mt-16 mb-16">
                     <div
                       className="relative h-[500px] sm:h-[600px] bg-cover bg-center bg-no-repeat rounded-xl mask2"
                       style={{
