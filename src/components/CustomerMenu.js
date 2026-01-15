@@ -10,20 +10,20 @@ import CustomerProfile from './CustomerProfile';
 import CafeInfo from './CafeInfo';
 import { getImageUrl, getPlaceholderImage, getCategoryBackground } from '../utils/imageUtils';
 
-const CustomerMenu = ({ 
-  customer, 
-  cart, 
-  setCart, 
-  activeTab, 
-  setActiveTab, 
-  showCart, 
-  setShowCart, 
-  onAddToCart, 
-  onPlaceOrder, 
-  showLoginModal, 
-  setShowLoginModal, 
+const CustomerMenu = ({
+  customer,
+  cart,
+  setCart,
+  activeTab,
+  setActiveTab,
+  showCart,
+  setShowCart,
+  onAddToCart,
+  onPlaceOrder,
+  showLoginModal,
+  setShowLoginModal,
   onCustomerUpdate,
-  onLogout 
+  onLogout
 }) => {
   const { formatCurrency } = useCurrency();
   const { cafeSettings } = useCafeSettings();
@@ -473,7 +473,7 @@ const CustomerMenu = ({
   }
 
   return (
-    <div 
+    <div
       className="relative w-full flex flex-col min-h-screen"
       style={{
         backgroundImage: 'url(/images/menu-background.png)',
@@ -484,113 +484,103 @@ const CustomerMenu = ({
       }}
     >
       {/* Sticky Header / Top App Bar */}
-      <header className="sticky top-0 z-20 w-full bg-white dark:bg-gray-800 shadow-sm border-b border-accent-200 dark:border-gray-700">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            {/* Logo and Title */}
-            <div className="flex items-center gap-3">
-            </div>
+      <div className='pt-4'>
 
-            {/* Navigation */}
-            <nav className="hidden md:flex items-center gap-8">
-              <button
-                onClick={() => setActiveTab('menu')}
-                className={`text-sm font-medium transition-colors ${
-                  activeTab === 'menu'
-                    ? 'text-secondary-600 dark:text-secondary-400 font-semibold'
-                    : 'text-secondary-500 dark:text-gray-400 hover:text-secondary-600 dark:hover:text-secondary-300'
-                }`}
-              >
-              <CafeInfo nameSize="text-2xl" />
-              </button>
-              {customer && (
-                <button
-                  onClick={() => setActiveTab('history')}
-                  className={`text-sm font-medium transition-colors ${
-                    activeTab === 'history'
-                      ? 'text-secondary-600 dark:text-secondary-400 font-semibold'
-                      : 'text-secondary-500 dark:text-gray-400 hover:text-secondary-600 dark:hover:text-secondary-300'
-                  }`}
-                >
-                  My Orders
-                </button>
-              )}
-            </nav>
-
-            {/* Right Side Icons */}
-            <div className="flex items-center gap-3">
-              {/* Search */}
-              <div className="relative">
-                <button
-                  onClick={() => setSearchExpanded(true)}
-                  className="flex items-center justify-center h-10 w-10 hover:bg-accent-100 dark:hover:bg-gray-700 rounded-full transition-colors"
-                >
-                  <Search className="h-5 w-5 text-secondary-600 dark:text-gray-300" />
-                </button>
-
-                {/* Expanded Search Bar - Absolute positioned overlay */}
-                {searchExpanded && (
-                  <div className="absolute right-0 top-1/2 -translate-y-1/2 w-64 md:w-80 z-30">
-                    <div className="relative">
-                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-secondary-400" />
-                      <input
-                        ref={searchInputRef}
-                        type="text"
-                        placeholder="Search menu..."
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        onBlur={(e) => {
-                          // Don't close if clicking on the clear button
-                          if (!e.relatedTarget?.closest('.search-clear-btn') && !searchQuery) {
-                            setSearchExpanded(false);
-                          }
-                        }}
-                        className="w-full pl-10 pr-10 py-2 rounded-lg bg-white dark:bg-gray-800 border-2 border-secondary-300 dark:border-gray-600 text-secondary-900 dark:text-white placeholder:text-secondary-400 focus:outline-none focus:ring-2 focus:ring-secondary-500 focus:border-secondary-500 shadow-lg transition-all"
-                      />
-                      <button
-                        onMouseDown={(e) => e.preventDefault()}
-                        onClick={() => {
-                          setSearchQuery('');
-                          setSearchExpanded(false);
-                        }}
-                        className="search-clear-btn absolute right-3 top-1/2 transform -translate-y-1/2 text-secondary-400 dark:text-gray-400 hover:text-secondary-600 dark:hover:text-gray-200"
-                      >
-                        <X className="h-4 w-4" />
-                      </button>
-                    </div>
-                  </div>
-                )}
+        <header className="max-w-5xl mx-auto bg-white rounded-t-xl dark:bg-gray-800 shadow-sm sticky top-0 z-20 w-full">
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex items-center justify-between h-16">
+              {/* Logo and Title */}
+              <div className="flex items-center gap-3">
               </div>
 
-              {/* Cart */}
-              <button
-                onClick={() => setShowCart(true)}
-                className="relative flex cursor-pointer items-center justify-center rounded-full h-10 w-10 text-secondary-600 dark:text-gray-300 hover:bg-accent-100 dark:hover:bg-gray-700 transition-colors"
-              >
-                <ShoppingCart className="h-5 w-5" />
-                {cart.length > 0 && (
-                  <span className="absolute top-1 right-1 flex h-5 w-5 items-center justify-center rounded-full bg-secondary-500 text-xs font-bold text-white">
-                    {cart.reduce((total, item) => total + item.quantity, 0)}
-                  </span>
-                )}
-              </button>
-
-              {/* User Profile - Only show when logged in */}
-              {customer && (
+              {/* Navigation */}
+              <nav className="hidden md:flex items-center gap-8">
                 <button
-                  onClick={() => setShowProfile(true)}
-                  className="flex items-center justify-center h-10 w-10 rounded-full bg-secondary-500 text-white hover:bg-secondary-600 transition-colors"
-                  title={customer.name}
+                  onClick={() => setActiveTab('menu')}
+                  className={`text-sm font-medium transition-colors ${activeTab === 'menu'
+                    ? 'text-secondary-600 dark:text-secondary-400 font-semibold'
+                    : 'text-secondary-500 dark:text-gray-400 hover:text-secondary-600 dark:hover:text-secondary-300'
+                    }`}
                 >
-                  <User className="h-5 w-5" />
+                  <CafeInfo nameSize="text-2xl" />
                 </button>
-              )}
+                {customer && (
+                  <button
+                    onClick={() => setActiveTab('history')}
+                    className={`text-sm font-medium transition-colors ${activeTab === 'history'
+                      ? 'text-secondary-600 dark:text-secondary-400 font-semibold'
+                      : 'text-secondary-500 dark:text-gray-400 hover:text-secondary-600 dark:hover:text-secondary-300'
+                      }`}
+                  >
+                    My Orders
+                  </button>
+                )}
+              </nav>
+
+              {/* Right Side Icons */}
+              <div className="flex items-center gap-3">
+                {/* Search */}
+                <div className="relative">
+                  <button
+                    onClick={() => setSearchExpanded(true)}
+                    className="flex items-center justify-center h-10 w-10 hover:bg-accent-100 dark:hover:bg-gray-700 rounded-full transition-colors"
+                  >
+                    <Search className="h-5 w-5 text-secondary-600 dark:text-gray-300" />
+                  </button>
+
+                  {/* Expanded Search Bar - Absolute positioned overlay */}
+                  {searchExpanded && (
+                    <div className="absolute right-0 top-1/2 -translate-y-1/2 w-64 md:w-80 z-30">
+                      <div className="relative">
+                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-secondary-400" />
+                        <input
+                          ref={searchInputRef}
+                          type="text"
+                          placeholder="Search menu..."
+                          value={searchQuery}
+                          onChange={(e) => setSearchQuery(e.target.value)}
+                          onBlur={(e) => {
+                            // Don't close if clicking on the clear button
+                            if (!e.relatedTarget?.closest('.search-clear-btn') && !searchQuery) {
+                              setSearchExpanded(false);
+                            }
+                          }}
+                          className="w-full pl-10 pr-10 py-2 rounded-lg bg-white dark:bg-gray-800 border-2 border-secondary-300 dark:border-gray-600 text-secondary-900 dark:text-white placeholder:text-secondary-400 focus:outline-none focus:ring-2 focus:ring-secondary-500 focus:border-secondary-500 shadow-lg transition-all"
+                        />
+                        <button
+                          onMouseDown={(e) => e.preventDefault()}
+                          onClick={() => {
+                            setSearchQuery('');
+                            setSearchExpanded(false);
+                          }}
+                          className="search-clear-btn absolute right-3 top-1/2 transform -translate-y-1/2 text-secondary-400 dark:text-gray-400 hover:text-secondary-600 dark:hover:text-gray-200"
+                        >
+                          <X className="h-4 w-4" />
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Cart */}
+                
+
+                {/* User Profile - Only show when logged in */}
+                {customer && (
+                  <button
+                    onClick={() => setShowProfile(true)}
+                    className="flex items-center justify-center h-10 w-10 rounded-full bg-secondary-500 text-white hover:bg-secondary-600 transition-colors"
+                    title={customer.name}
+                  >
+                    <User className="h-5 w-5" />
+                  </button>
+                )}
+              </div>
             </div>
           </div>
-        </div>
-      </header>
-
-      {/* Mobile Category Scroller */}
+        </header>
+        {/* Mobile Category Scroller */}
+      </div>
       {activeTab === 'menu' && (
         <div className="lg:hidden sticky top-16 z-10 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm py-3 -mx-4 px-4 border-b border-accent-200 dark:border-gray-700">
           <div
@@ -600,11 +590,10 @@ const CustomerMenu = ({
           >
             <button
               onClick={() => setSelectedCategory('All')}
-              className={`flex h-10 shrink-0 items-center justify-center gap-x-2 rounded-full pl-5 pr-5 cursor-pointer transition-colors ${
-                selectedCategory === 'All'
-                  ? 'bg-secondary-500 text-white'
-                  : 'bg-accent-100 dark:bg-gray-700 text-secondary-700 dark:text-gray-200'
-              }`}
+              className={`flex h-10 shrink-0 items-center justify-center gap-x-2 rounded-full pl-5 pr-5 cursor-pointer transition-colors ${selectedCategory === 'All'
+                ? 'bg-secondary-500 text-white'
+                : 'bg-accent-100 dark:bg-gray-700 text-secondary-700 dark:text-gray-200'
+                }`}
             >
               <p className={`text-sm ${selectedCategory === 'All' ? 'font-bold' : 'font-medium'}`}>
                 All
@@ -614,11 +603,10 @@ const CustomerMenu = ({
               <button
                 key={categoryName}
                 onClick={() => setSelectedCategory(categoryName)}
-                className={`flex h-10 shrink-0 items-center justify-center gap-x-2 rounded-full pl-5 pr-5 cursor-pointer transition-colors ${
-                  selectedCategory === categoryName
-                    ? 'bg-secondary-500 text-white'
-                    : 'bg-accent-100 dark:bg-gray-700 text-secondary-700 dark:text-gray-200'
-                }`}
+                className={`flex h-10 shrink-0 items-center justify-center gap-x-2 rounded-full pl-5 pr-5 cursor-pointer transition-colors ${selectedCategory === categoryName
+                  ? 'bg-secondary-500 text-white'
+                  : 'bg-accent-100 dark:bg-gray-700 text-secondary-700 dark:text-gray-200'
+                  }`}
               >
                 <p className={`text-sm ${selectedCategory === categoryName ? 'font-bold' : 'font-medium'}`}>
                   {categoryName}
@@ -631,23 +619,19 @@ const CustomerMenu = ({
 
       {/* Main Content */}
       <main className="min-h-screen">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-12 sm:pt-12 sm:pb-16 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-12 sm:pt-12 sm:pb-16 bg-white rounded-xl">
           {activeTab === 'menu' ? (
             <div>
               {/* Hero Section with Background Image */}
-              <div className="relative -mx-4 sm:-mx-6 lg:-mx-8 -mt-8 sm:-mt-12 mb-16">
+              <div className="relative -mx-4 sm:-mx-6 lg:-mx-8 -mt-8 sm:-mt-12 mb-16 p-2 ">
                 <div
-                  className="relative h-[400px] sm:h-[500px] bg-cover bg-center bg-no-repeat"
+                  className="relative h-[400px] sm:h-[500px] bg-cover bg-center bg-no-repeat rounded-xl mask1"
                   style={{
                     backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('https://images.unsplash.com/photo-1504674900247-0877df9cc836?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80')`
                   }}
                 >
                   <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-4">
-                    <div className="flex items-center justify-center mb-4">
-                      <div className="h-px w-12 bg-orange-500 mr-3"></div>
-                      <span className="text-sm uppercase tracking-wider text-white/80 font-medium">Menu</span>
-                      <div className="h-px w-12 bg-orange-500 ml-3"></div>
-                    </div>
+
                     <h1 className="text-4xl sm:text-5xl md:text-6xl font-serif font-bold mb-4 text-white">
                       Discover Our menu
                     </h1>
@@ -655,12 +639,9 @@ const CustomerMenu = ({
                       Quaerat debitis, vel, sapiente dicta sequi labore porro pariatur harum expedita.
                     </p>
                     <div className="flex items-center gap-4">
-                      <button className="px-8 py-3 bg-orange-500 hover:bg-orange-600 text-white font-semibold rounded-full transition-colors">
-                        Order
-                      </button>
                       <button
                         onClick={() => document.getElementById('all-dishes-section')?.scrollIntoView({ behavior: 'smooth' })}
-                        className="px-8 py-3 bg-transparent border-2 border-white/50 hover:border-white text-white font-semibold rounded-full transition-colors"
+                        className="px-8 py-3 bg-orange-500 hover:bg-orange-600 text-white font-semibold rounded-full transition-colors"
                       >
                         Explore our menu
                       </button>
@@ -668,21 +649,27 @@ const CustomerMenu = ({
                   </div>
                   {/* Side Icons */}
                   <div className="absolute right-4 top-1/2 transform -translate-y-1/2 flex flex-col gap-4 hidden sm:flex">
-                    <button className="w-10 h-10 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center text-white transition-colors">
-                      <Heart className="h-5 w-5" />
-                    </button>
-                    <button className="w-10 h-10 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center text-white transition-colors">
-                      <ShoppingBag className="h-5 w-5" />
-                    </button>
+                    
+                    <button
+                  onClick={() => setShowCart(true)}
+                  className="w-10 h-10 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center text-white transition-colors"
+                >
+                  <ShoppingBag className="h-5 w-5" />
+                  {cart.length > 0 && (
+                    <span className="absolute top-1 right-1 flex h-5 w-5 items-center justify-center rounded-full bg-secondary-500 text-xs font-bold text-white">
+                      {cart.reduce((total, item) => total + item.quantity, 0)}
+                    </span>
+                  )}
+                </button>
                   </div>
                 </div>
               </div>
 
               {Object.keys(groupedMenuItems).length === 0 ? (
                 <div className="text-center py-12">
-                  <img 
-                    src="/images/palm-cafe-logo.png" 
-                    alt="Palm Cafe Logo" 
+                  <img
+                    src="/images/palm-cafe-logo.png"
+                    alt="Palm Cafe Logo"
                     className="h-24 w-24 mx-auto mb-6 opacity-50"
                   />
                   <h3 className="text-xl font-semibold mb-2 text-gray-900 dark:text-gray-100">No menu items available</h3>
@@ -712,7 +699,8 @@ const CustomerMenu = ({
                               {categoryName}
                             </h2>
                             <p className="text-gray-500 dark:text-gray-400 text-sm sm:text-base max-w-xl mx-auto leading-relaxed">
-                              Porro eveniet, autem ipsam corrupti consectetur cum. Repudiandae dignissimos fugiat sit nam.
+                              {/* Porro eveniet, autem ipsam corrupti consectetur cum. Repudiandae dignissimos fugiat sit nam. */}
+                              {/* {categoryDescription} */}
                             </p>
                           </div>
 
@@ -733,46 +721,46 @@ const CustomerMenu = ({
                                 : placeholderImages[itemIndex % placeholderImages.length];
 
                               return (
-                              <div
-                                key={item.id}
-                                className="group flex items-start gap-4 p-4 bg-white dark:bg-gray-800 rounded-lg hover:shadow-md transition-shadow"
-                              >
-                                {/* Menu Item Thumbnail */}
-                                <div className="flex-shrink-0 w-20 h-20 sm:w-24 sm:h-24 rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-700">
-                                  <img
-                                    src={itemImage}
-                                    alt={item.name}
-                                    className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                                  />
-                                </div>
+                                <div
+                                  key={item.id}
+                                  className="group flex items-start gap-4 p-4 bg-white dark:bg-gray-800 rounded-lg hover:shadow-md transition-shadow"
+                                >
+                                  {/* Menu Item Thumbnail */}
+                                  <div className="flex-shrink-0 w-20 h-20 sm:w-24 sm:h-24 rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-700">
+                                    <img
+                                      src={itemImage}
+                                      alt={item.name}
+                                      className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                                    />
+                                  </div>
 
-                                {/* Item Details */}
-                                <div className="flex-1 min-w-0">
-                                  <h5 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-gray-100 mb-1">
-                                    {item.name}
-                                  </h5>
-                                  <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 leading-relaxed line-clamp-2 mb-2">
-                                    {item.description || 'Consectetur adipisicing elit. Soluta, impedit, saepe.'}
-                                  </p>
-                                </div>
+                                  {/* Item Details */}
+                                  <div className="flex-1 min-w-0">
+                                    <h5 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-gray-100 mb-1">
+                                      {item.name}
+                                    </h5>
+                                    <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 leading-relaxed line-clamp-2 mb-2">
+                                      {item.description || 'Consectetur adipisicing elit. Soluta, impedit, saepe.'}
+                                    </p>
+                                  </div>
 
-                                {/* Price and Add to Cart */}
-                                <div className="flex flex-col items-end gap-2">
-                                  <span className="text-base sm:text-lg font-bold text-orange-500 whitespace-nowrap">
-                                    {formatCurrency(ensureNumber(item.price))}
-                                  </span>
-                                  <button
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      addToCart(item);
-                                    }}
-                                    className="w-10 h-10 rounded-full bg-orange-500 hover:bg-orange-600 text-white flex items-center justify-center transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-110 active:scale-95"
-                                    aria-label={`Add ${item.name} to cart`}
-                                  >
-                                    <ShoppingBag className="h-4 w-4" />
-                                  </button>
+                                  {/* Price and Add to Cart */}
+                                  <div className="flex flex-col items-end gap-2">
+                                    <span className="text-base sm:text-lg font-bold text-orange-500 whitespace-nowrap">
+                                      {formatCurrency(ensureNumber(item.price))}
+                                    </span>
+                                    <button
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        addToCart(item);
+                                      }}
+                                      className="w-10 h-10 rounded-full bg-orange-500 hover:bg-orange-600 text-white flex items-center justify-center transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-110 active:scale-95"
+                                      aria-label={`Add ${item.name} to cart`}
+                                    >
+                                      <ShoppingBag className="h-4 w-4" />
+                                    </button>
+                                  </div>
                                 </div>
-                              </div>
                               );
                             })}
                           </div>
@@ -817,46 +805,46 @@ const CustomerMenu = ({
                             : placeholderImages[index % placeholderImages.length];
 
                           return (
-                          <div
-                            key={`all-${item.id}`}
-                            className="group flex items-start gap-4 p-4 bg-white dark:bg-gray-800 rounded-lg hover:shadow-md transition-shadow"
-                          >
-                            {/* Menu Item Thumbnail */}
-                            <div className="flex-shrink-0 w-20 h-20 sm:w-24 sm:h-24 rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-700">
-                              <img
-                                src={itemImage}
-                                alt={item.name}
-                                className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                              />
-                            </div>
+                            <div
+                              key={`all-${item.id}`}
+                              className="group flex items-start gap-4 p-4 bg-white dark:bg-gray-800 rounded-lg hover:shadow-md transition-shadow"
+                            >
+                              {/* Menu Item Thumbnail */}
+                              <div className="flex-shrink-0 w-20 h-20 sm:w-24 sm:h-24 rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-700">
+                                <img
+                                  src={itemImage}
+                                  alt={item.name}
+                                  className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                                />
+                              </div>
 
-                            {/* Item Details */}
-                            <div className="flex-1 min-w-0">
-                              <h5 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-gray-100 mb-1">
-                                {item.name}
-                              </h5>
-                              <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 leading-relaxed line-clamp-2 mb-2">
-                                {item.description || 'Consectetur adipisicing elit. Soluta, impedit, saepe.'}
-                              </p>
-                            </div>
+                              {/* Item Details */}
+                              <div className="flex-1 min-w-0">
+                                <h5 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-gray-100 mb-1">
+                                  {item.name}
+                                </h5>
+                                <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 leading-relaxed line-clamp-2 mb-2">
+                                  {item.description || 'Consectetur adipisicing elit. Soluta, impedit, saepe.'}
+                                </p>
+                              </div>
 
-                            {/* Price and Add to Cart */}
-                            <div className="flex flex-col items-end gap-2">
-                              <span className="text-base sm:text-lg font-bold text-orange-500 whitespace-nowrap">
-                                {formatCurrency(ensureNumber(item.price))}
-                              </span>
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  addToCart(item);
-                                }}
-                                className="w-10 h-10 rounded-full bg-orange-500 hover:bg-orange-600 text-white flex items-center justify-center transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-110 active:scale-95"
-                                aria-label={`Add ${item.name} to cart`}
-                              >
-                                <ShoppingBag className="h-4 w-4" />
-                              </button>
+                              {/* Price and Add to Cart */}
+                              <div className="flex flex-col items-end gap-2">
+                                <span className="text-base sm:text-lg font-bold text-orange-500 whitespace-nowrap">
+                                  {formatCurrency(ensureNumber(item.price))}
+                                </span>
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    addToCart(item);
+                                  }}
+                                  className="w-10 h-10 rounded-full bg-orange-500 hover:bg-orange-600 text-white flex items-center justify-center transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-110 active:scale-95"
+                                  aria-label={`Add ${item.name} to cart`}
+                                >
+                                  <ShoppingBag className="h-4 w-4" />
+                                </button>
+                              </div>
                             </div>
-                          </div>
                           );
                         })}
                       </div>
@@ -864,13 +852,13 @@ const CustomerMenu = ({
                   )}
 
                   {/* Promotional Banner - Pay for one Get two */}
-                  <div className="relative -mx-4 sm:-mx-6 lg:-mx-8 mt-16 mb-16">
+                  <div className="relative -mx-4 sm:-mx-6 lg:-mx-8 mt-16 mb-16 p-2">
                     <div
-                      className="relative h-[300px] sm:h-[350px] bg-cover bg-center bg-no-repeat overflow-hidden"
+                      className="relative h-[500px] sm:h-[600px] bg-cover bg-center bg-no-repeat rounded-xl mask2"
                       style={{
                         backgroundImage: `url('https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80')`
                       }}
-                    >                     
+                    >
                     </div>
                   </div>
 
@@ -886,7 +874,8 @@ const CustomerMenu = ({
                         Special Proposals
                       </h2>
                       <p className="text-gray-500 dark:text-gray-400 text-sm sm:text-base max-w-xl mx-auto leading-relaxed">
-                        Porro eveniet, autem ipsam corrupti consectetur cum. Repudiandae dignissimos fugiat sit nam.
+                        {/* Porro eveniet, autem ipsam corrupti consectetur cum. Repudiandae dignissimos fugiat sit nam. */}
+                        {/* {categoryDescription} */}
                       </p>
                     </div>
 
@@ -904,50 +893,50 @@ const CustomerMenu = ({
                           : specialPlaceholders[index % specialPlaceholders.length];
 
                         return (
-                        <div
-                          key={`special-${item.id}`}
-                          className="group bg-white dark:bg-gray-800 rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-shadow"
-                        >
-                          {/* Item Image */}
-                          <div className="relative h-48 sm:h-56 overflow-hidden">
-                            <img
-                              src={specialImage}
-                              alt={item.name}
-                              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                            />
-                          </div>
+                          <div
+                            key={`special-${item.id}`}
+                            className="group bg-white dark:bg-gray-800 rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-shadow"
+                          >
+                            {/* Item Image */}
+                            <div className="relative h-48 sm:h-56 overflow-hidden">
+                              <img
+                                src={specialImage}
+                                alt={item.name}
+                                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                              />
+                            </div>
 
-                          {/* Item Details */}
-                          <div className="p-5">
-                            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">
-                              {item.name}
-                            </h3>
-                            <p className="text-sm text-gray-500 dark:text-gray-400 leading-relaxed mb-4 line-clamp-2">
-                              {item.description || 'Consectetur adipisicing elit. Soluta, impedit, saepe.'}
-                            </p>
+                            {/* Item Details */}
+                            <div className="p-5">
+                              <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">
+                                {item.name}
+                              </h3>
+                              <p className="text-sm text-gray-500 dark:text-gray-400 leading-relaxed mb-4 line-clamp-2">
+                                {item.description || 'Consectetur adipisicing elit. Soluta, impedit, saepe.'}
+                              </p>
 
-                            {/* Price and Add to Cart */}
-                            <div className="flex items-center justify-between">
-                              <div className="flex items-center gap-2">
-                                {index === 0 && (
-                                  <span className="text-sm text-gray-400 line-through">
-                                    {formatCurrency(ensureNumber(item.price) * 1.3)}
+                              {/* Price and Add to Cart */}
+                              <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-2">
+                                  {index === 0 && (
+                                    <span className="text-sm text-gray-400 line-through">
+                                      {formatCurrency(ensureNumber(item.price) * 1.3)}
+                                    </span>
+                                  )}
+                                  <span className="text-xl font-bold text-orange-500">
+                                    {formatCurrency(ensureNumber(item.price))}
                                   </span>
-                                )}
-                                <span className="text-xl font-bold text-orange-500">
-                                  {formatCurrency(ensureNumber(item.price))}
-                                </span>
+                                </div>
+                                <button
+                                  onClick={() => addToCart(item)}
+                                  className="w-10 h-10 rounded-full bg-orange-500 hover:bg-orange-600 text-white flex items-center justify-center transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-110 active:scale-95"
+                                  aria-label={`Add ${item.name} to cart`}
+                                >
+                                  <ShoppingBag className="h-4 w-4" />
+                                </button>
                               </div>
-                              <button
-                                onClick={() => addToCart(item)}
-                                className="w-10 h-10 rounded-full bg-orange-500 hover:bg-orange-600 text-white flex items-center justify-center transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-110 active:scale-95"
-                                aria-label={`Add ${item.name} to cart`}
-                              >
-                                <ShoppingBag className="h-4 w-4" />
-                              </button>
                             </div>
                           </div>
-                        </div>
                         );
                       })}
                     </div>
@@ -966,7 +955,7 @@ const CustomerMenu = ({
                   {/* Footer Section */}
                   <div className="mt-20 pt-16 border-t border-gray-200 dark:border-gray-700">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-                      
+
 
                       {/* Contact Info Column */}
                       <div>
@@ -1033,366 +1022,362 @@ const CustomerMenu = ({
         </div>
       </main>
 
-  {/* Cart Modal */ }
-{
-  showCart && (
-    <div className="fixed inset-0 bg-black/70 backdrop-blur-md flex items-center justify-center z-50 p-4">
-      <div className="bg-white dark:bg-gray-800 rounded-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden shadow-2xl">
-        {/* Cart Header */}
-        <div className="flex w-full items-center justify-between border-b border-accent-200 dark:border-gray-700 bg-accent-50 dark:bg-gray-900 px-6 py-4">
-          <div class="flex items-center gap-4">
-            <ShoppingCart className="h-6 w-6 text-secondary-600 dark:text-secondary-400" />
-            <h2 className="text-2xl font-bold tracking-tight text-secondary-700 dark:text-gray-100">Your Order</h2>
-          </div>
-          <button
-            onClick={() => setShowCart(false)}
-            className="text-secondary-600 dark:text-gray-300 hover:bg-accent-100 dark:hover:bg-gray-700 p-2 rounded-lg transition-colors"
-          >
-            <X className="h-6 w-6" />
-          </button>
-        </div>
-
-        {/* Cart Content - Two Column Layout */}
-        <div className="flex flex-col lg:grid lg:grid-cols-3 gap-8 p-6 max-h-[calc(90vh-180px)] overflow-y-auto">
-          {/* Left Column: Cart Items */}
-          <div className="lg:col-span-2 flex flex-col gap-4">
-            {cart.length === 0 ? (
-              <div className="flex flex-col items-center justify-center gap-6 rounded-lg bg-accent-50 dark:bg-gray-900 p-12 text-center shadow-sm">
-                <div className="text-secondary-600 dark:text-secondary-400">
-                  <ShoppingCart className="h-24 w-24" />
+      {/* Cart Modal */}
+      {
+        showCart && (
+          <div className="fixed inset-0 bg-black/70 backdrop-blur-md flex items-center justify-center z-50 p-4">
+            <div className="bg-white dark:bg-gray-800 rounded-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden shadow-2xl">
+              {/* Cart Header */}
+              <div className="flex w-full items-center justify-between border-b border-accent-200 dark:border-gray-700 bg-accent-50 dark:bg-gray-900 px-6 py-4">
+                <div class="flex items-center gap-4">
+                  <ShoppingCart className="h-6 w-6 text-secondary-600 dark:text-secondary-400" />
+                  <h2 className="text-2xl font-bold tracking-tight text-secondary-700 dark:text-gray-100">Your Order</h2>
                 </div>
-                <h3 className="text-2xl font-bold text-secondary-700 dark:text-gray-100">Your cart is empty</h3>
-                <p className="max-w-sm text-secondary-600 dark:text-gray-400">Looks like you haven't added anything to your order yet. Let's fix that!</p>
-              </div>
-            ) : (
-              <>
-                {cart.map((item) => (
-                  <div key={item.id} className="flex items-center gap-4 rounded-lg bg-accent-50 dark:bg-gray-900 p-4 shadow-sm border border-accent-200 dark:border-gray-700">
-                    <div
-                      className="bg-center bg-no-repeat aspect-square bg-cover rounded-lg size-16"
-                      style={{
-                        backgroundImage: `url('${
-                          item.image_url
-                            ? getImageUrl(item.image_url)
-                            : getPlaceholderImage(item.category_name, item.name)
-                        }')`
-                      }}
-                    />
-                    <div className="flex flex-1 flex-col justify-center">
-                      <p className="text-base font-bold text-secondary-700 dark:text-gray-100">{item.name}</p>
-                      <p className="text-sm text-secondary-600 dark:text-gray-400">{formatCurrency(item.price)}</p>
-                    </div>
-                    <div className="flex items-center gap-6">
-                      <div className="flex items-center gap-2">
-                        <button
-                          onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                          className="flex h-8 w-8 items-center justify-center rounded-full bg-accent-100 dark:bg-gray-700 transition-colors hover:bg-secondary-100 dark:hover:bg-secondary-900 cursor-pointer"
-                        >
-                          <Minus className="h-4 w-4" />
-                        </button>
-                        <input
-                          className="w-8 border-none bg-transparent p-0 text-center text-base font-medium focus:outline-0 focus:ring-0 text-secondary-700 dark:text-gray-100"
-                          type="number"
-                          value={item.quantity}
-                          readOnly
-                        />
-                        <button
-                          onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                          className="flex h-8 w-8 items-center justify-center rounded-full bg-accent-100 dark:bg-gray-700 transition-colors hover:bg-secondary-100 dark:hover:bg-secondary-900 cursor-pointer"
-                        >
-                          <Plus className="h-4 w-4" />
-                        </button>
-                      </div>
-                      <p className="w-16 text-right font-semibold text-secondary-700 dark:text-gray-100">{formatCurrency(item.price * item.quantity)}</p>
-                      <button
-                        onClick={() => removeFromCart(item.id)}
-                        className="text-secondary-600 dark:text-gray-400 transition-colors hover:text-red-500"
-                      >
-                        <Trash2 className="h-5 w-5" />
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </>
-            )}
-          </div>
-
-          {/* Right Column: Order Summary */}
-          {cart.length > 0 && (
-            <div className="lg:col-span-1 flex flex-col max-h-full">
-              <div className="flex flex-col gap-6 rounded-xl bg-accent-50 dark:bg-gray-900 p-6 shadow-sm border border-accent-200 dark:border-gray-700 flex-1 overflow-y-auto">
-                <h2 className="text-2xl font-bold tracking-tight text-secondary-700 dark:text-gray-100">Order Summary</h2>
-
-                <div className="flex flex-col gap-3 border-b border-accent-200 dark:border-gray-700 pb-4">
-                  <div className="flex justify-between">
-                    <p className="text-secondary-600 dark:text-gray-400">Subtotal</p>
-                    <p className="font-medium text-secondary-700 dark:text-gray-100">{formatCurrency(getSubtotal())}</p>
-                  </div>
-                  {showTaxInMenu && taxAmount > 0 && (
-                    <div className="flex justify-between">
-                      <p className="text-secondary-600 dark:text-gray-400">Taxes ({taxRate}%)</p>
-                      <p className="font-medium text-secondary-700 dark:text-gray-100">{formatCurrency(taxAmount)}</p>
-                    </div>
-                  )}
-                  {tipAmount > 0 && (
-                    <div className="flex justify-between">
-                      <p className="text-secondary-600 dark:text-gray-400">Tip</p>
-                      <p className="font-medium text-secondary-700 dark:text-gray-100">{formatCurrency(tipAmount)}</p>
-                    </div>
-                  )}
-                  {pointsToRedeem > 0 && (
-                    <div className="flex justify-between text-green-600 dark:text-green-400">
-                      <p>Points Redeemed ({pointsToRedeem} pts)</p>
-                      <p className="font-medium">-{formatCurrency(pointsToRedeem * 0.1)}</p>
-                    </div>
-                  )}
-                </div>
-
-                <div className="flex justify-between">
-                  <p className="text-lg font-bold text-secondary-700 dark:text-gray-100">Total</p>
-                  <p className="text-xl font-extrabold text-secondary-700 dark:text-gray-100">{formatCurrency(getTotal())}</p>
-                </div>
-
-                {/* Login Required Message */}
-                {!customer && (
-                  <div className="p-6 bg-secondary-50 dark:bg-secondary-900/20 border border-secondary-200 dark:border-secondary-800 rounded-lg">
-                    <div className="text-center">
-                      <div className="w-12 h-12 bg-secondary-500 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <User className="h-6 w-6 text-white" />
-                      </div>
-                      <h3 className="text-lg font-bold text-secondary-700 dark:text-gray-100 mb-2">
-                        Login Required
-                      </h3>
-                      <p className="text-secondary-600 dark:text-gray-400 mb-4 text-sm">
-                        Please login to place your order
-                      </p>
-                      <button
-                        onClick={() => {
-                          setShowCart(false);
-                          setShowLoginModal(true);
-                        }}
-                        className="w-full bg-secondary-500 text-white px-6 py-3 rounded-lg font-bold hover:bg-secondary-600 transition-colors"
-                      >
-                        Login & Continue
-                      </button>
-                    </div>
-                  </div>
-                )}
-
-                {/* Customer sections only show when logged in */}
-                {customer && (
-                  <div className="flex flex-col gap-4">
-                    {/* Customer Information */}
-                    <div className="p-4 bg-secondary-50 dark:bg-secondary-900/20 border border-secondary-200 dark:border-secondary-800 rounded-lg">
-                      <div className="flex flex-col gap-2 mb-3">
-                        <div className="flex items-center justify-between">
-                          <h3 className="font-bold text-secondary-700 dark:text-gray-100 flex items-center text-base">
-                            <User className="h-4 w-4 mr-2 text-secondary-600 dark:text-secondary-400" />
-                            Customer Info
-                          </h3>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <button
-                            onClick={openEditProfile}
-                            className="flex items-center justify-center gap-1 px-3 py-1.5 bg-secondary-500 text-white rounded-lg hover:bg-secondary-600 transition-colors text-xs flex-1"
-                          >
-                            <Edit3 className="h-3 w-3" />
-                            <span>Edit Profile</span>
-                          </button>
-                          {onLogout && (
-                            <button
-                              onClick={onLogout}
-                              className="flex items-center justify-center gap-1 px-3 py-1.5 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors text-xs flex-1"
-                            >
-                              <LogOut className="h-3 w-3" />
-                              <span>Logout</span>
-                            </button>
-                          )}
-                        </div>
-                      </div>
-                      <div className="space-y-2 text-sm">
-                        <div className="flex justify-between">
-                          <span className="text-secondary-600 dark:text-gray-400">Name:</span>
-                          <span className="font-semibold text-secondary-700 dark:text-gray-100">{customer.name}</span>
-                        </div>
-                        {customer.phone && (
-                          <div className="flex justify-between">
-                            <span className="text-secondary-600 dark:text-gray-400">Phone:</span>
-                            <span className="font-semibold text-secondary-700 dark:text-gray-100">{customer.phone}</span>
-                          </div>
-                        )}
-                        {customer.loyalty_points > 0 && (
-                          <div className="flex justify-between">
-                            <span className="text-secondary-600 dark:text-gray-400">Points:</span>
-                            <span className="flex items-center text-yellow-600 dark:text-yellow-400 font-semibold">
-                              <Star className="h-3 w-3 mr-1" />
-                              {customer.loyalty_points}
-                            </span>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* Payment Method */}
-                    <div>
-                      <h3 className="font-bold text-secondary-700 dark:text-gray-100 mb-3 text-sm">Payment Method</h3>
-                      <div className="grid grid-cols-2 gap-2">
-                        {paymentMethods.map((method) => (
-                          <button
-                            key={method.code}
-                            type="button"
-                            onClick={() => setPaymentMethod(method.code)}
-                            className={`flex items-center justify-center p-3 rounded-lg border-2 transition-colors ${
-                              paymentMethod === method.code
-                                ? 'bg-secondary-500 text-white border-secondary-500'
-                                : 'bg-white dark:bg-gray-800 text-secondary-700 dark:text-gray-100 border-accent-200 dark:border-gray-700 hover:border-secondary-500'
-                            }`}
-                          >
-                            <span className="mr-2">{method.icon}</span>
-                            <span className="font-semibold text-sm">{method.name}</span>
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-
-                    {/* Pickup Option */}
-                    <div>
-                      <h3 className="font-bold text-secondary-700 dark:text-gray-100 mb-3 text-sm">Dining Preference</h3>
-                      <div className="grid grid-cols-2 gap-2">
-                        {[
-                          { value: 'pickup', label: 'Pickup', icon: '🥡' },
-                          { value: 'dine-in', label: 'Dine-in', icon: '🍽️' }
-                        ].map((option) => (
-                          <button
-                            key={option.value}
-                            onClick={() => setPickupOption(option.value)}
-                            className={`p-3 rounded-lg border-2 transition-colors ${
-                              pickupOption === option.value
-                                ? 'bg-secondary-500 text-white border-secondary-500'
-                                : 'bg-white dark:bg-gray-800 text-secondary-700 dark:text-gray-100 border-accent-200 dark:border-gray-700 hover:border-secondary-500'
-                            }`}
-                          >
-                            <div className="flex items-center justify-center gap-2">
-                              <span className="text-lg">{option.icon}</span>
-                              <span className="font-semibold text-sm">{option.label}</span>
-                            </div>
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-
-                    {/* Table Number for Dine-in */}
-                    {pickupOption === 'dine-in' && (
-                      <div>
-                        <label className="block font-bold text-secondary-700 dark:text-gray-100 mb-2 text-sm">Table Number</label>
-                        <input
-                          type="text"
-                          placeholder="Enter table number (optional)"
-                          value={tableNumber}
-                          onChange={(e) => setTableNumber(e.target.value)}
-                          className="w-full p-3 border-2 border-accent-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-secondary-500 focus:border-secondary-500 bg-white dark:bg-gray-800 text-secondary-700 dark:text-gray-100 transition-colors"
-                        />
-                      </div>
-                    )}
-
-                    {/* Points Redemption */}
-                    {customer?.loyalty_points > 0 && (
-                      <div>
-                        <h3 className="font-bold text-secondary-700 dark:text-gray-100 mb-3 text-sm flex items-center">
-                          <Star className="h-4 w-4 mr-2 text-yellow-600 dark:text-yellow-400" />
-                          Redeem Points
-                        </h3>
-                        <div className="bg-yellow-50 dark:bg-yellow-900/20 rounded-lg p-4 mb-3 border border-yellow-200 dark:border-yellow-800">
-                          <div className="grid grid-cols-2 gap-3 text-xs">
-                            <div className="text-center">
-                              <div className="text-lg font-bold text-secondary-700 dark:text-gray-100">{customer.loyalty_points}</div>
-                              <div className="text-secondary-600 dark:text-gray-400">Available</div>
-                            </div>
-                            <div className="text-center">
-                              <div className="text-lg font-bold text-secondary-700 dark:text-gray-100">{maxRedeemablePoints}</div>
-                              <div className="text-secondary-600 dark:text-gray-400">Max Redeemable</div>
-                            </div>
-                          </div>
-                          <div className="text-center mt-2 text-xs text-secondary-600 dark:text-gray-400">
-                            1 point = {formatCurrency(0.10)}
-                          </div>
-                        </div>
-                        <input
-                          type="number"
-                          value={pointsToRedeem}
-                          onChange={(e) => handlePointsRedemption(parseInt(e.target.value) || 0)}
-                          min="0"
-                          max={maxRedeemablePoints}
-                          className="w-full p-3 border-2 border-accent-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 bg-white dark:bg-gray-800 text-secondary-700 dark:text-gray-100 transition-colors"
-                          placeholder="Enter points"
-                        />
-                      </div>
-                    )}
-
-                    {/* Tip Selection */}
-                    <div>
-                      <h3 className="font-bold text-secondary-700 dark:text-gray-100 mb-3 text-sm">Add Tip</h3>
-                      <div className="grid grid-cols-3 gap-2 mb-3">
-                        {[0, 10, 15, 18, 20, 25].map((percentage) => (
-                          <button
-                            key={percentage}
-                            onClick={() => handleTipPercentageChange(percentage)}
-                            className={`py-2 px-3 text-xs rounded-lg border-2 transition-colors font-semibold ${
-                              tipPercentage === percentage
-                                ? 'bg-secondary-500 text-white border-secondary-500'
-                                : 'bg-white dark:bg-gray-800 text-secondary-700 dark:text-gray-100 border-accent-200 dark:border-gray-700 hover:border-secondary-500'
-                            }`}
-                          >
-                            {percentage === 0 ? 'No Tip' : `${percentage}%`}
-                          </button>
-                        ))}
-                      </div>
-                      <input
-                        type="number"
-                        value={tipAmount.toFixed(2)}
-                        onChange={(e) => handleTipAmountChange(e.target.value)}
-                        className="w-full p-3 border-2 border-accent-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-secondary-500 focus:border-secondary-500 bg-white dark:bg-gray-800 text-secondary-700 dark:text-gray-100 transition-colors"
-                        placeholder="Custom tip"
-                      />
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              {/* Action Buttons - Sticky at bottom */}
-              <div className="flex flex-col gap-3 p-4 bg-accent-50 dark:bg-gray-900 border-t border-accent-200 dark:border-gray-700 rounded-b-xl">
                 <button
-                  onClick={placeOrder}
-                  disabled={orderLoading || !customer}
-                  className="w-full rounded-lg bg-secondary-500 py-3 text-base font-bold text-white transition-opacity hover:bg-secondary-600 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                  onClick={() => setShowCart(false)}
+                  className="text-secondary-600 dark:text-gray-300 hover:bg-accent-100 dark:hover:bg-gray-700 p-2 rounded-lg transition-colors"
                 >
-                  {orderLoading ? (
-                    <>
-                      <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent"></div>
-                      <span>Placing Order...</span>
-                    </>
+                  <X className="h-6 w-6" />
+                </button>
+              </div>
+
+              {/* Cart Content - Two Column Layout */}
+              <div className="flex flex-col lg:grid lg:grid-cols-3 gap-8 p-6 max-h-[calc(90vh-180px)] overflow-y-auto">
+                {/* Left Column: Cart Items */}
+                <div className="lg:col-span-2 flex flex-col gap-4">
+                  {cart.length === 0 ? (
+                    <div className="flex flex-col items-center justify-center gap-6 rounded-lg bg-accent-50 dark:bg-gray-900 p-12 text-center shadow-sm">
+                      <div className="text-secondary-600 dark:text-secondary-400">
+                        <ShoppingCart className="h-24 w-24" />
+                      </div>
+                      <h3 className="text-2xl font-bold text-secondary-700 dark:text-gray-100">Your cart is empty</h3>
+                      <p className="max-w-sm text-secondary-600 dark:text-gray-400">Looks like you haven't added anything to your order yet. Let's fix that!</p>
+                    </div>
                   ) : (
                     <>
-                      <CheckCircle className="h-5 w-5" />
-                      <span>Proceed to Checkout</span>
+                      {cart.map((item) => (
+                        <div key={item.id} className="flex items-center gap-4 rounded-lg bg-accent-50 dark:bg-gray-900 p-4 shadow-sm border border-accent-200 dark:border-gray-700">
+                          <div
+                            className="bg-center bg-no-repeat aspect-square bg-cover rounded-lg size-16"
+                            style={{
+                              backgroundImage: `url('${item.image_url
+                                ? getImageUrl(item.image_url)
+                                : getPlaceholderImage(item.category_name, item.name)
+                                }')`
+                            }}
+                          />
+                          <div className="flex flex-1 flex-col justify-center">
+                            <p className="text-base font-bold text-secondary-700 dark:text-gray-100">{item.name}</p>
+                            <p className="text-sm text-secondary-600 dark:text-gray-400">{formatCurrency(item.price)}</p>
+                          </div>
+                          <div className="flex items-center gap-6">
+                            <div className="flex items-center gap-2">
+                              <button
+                                onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                                className="flex h-8 w-8 items-center justify-center rounded-full bg-accent-100 dark:bg-gray-700 transition-colors hover:bg-secondary-100 dark:hover:bg-secondary-900 cursor-pointer"
+                              >
+                                <Minus className="h-4 w-4" />
+                              </button>
+                              <input
+                                className="w-8 border-none bg-transparent p-0 text-center text-base font-medium focus:outline-0 focus:ring-0 text-secondary-700 dark:text-gray-100"
+                                type="number"
+                                value={item.quantity}
+                                readOnly
+                              />
+                              <button
+                                onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                                className="flex h-8 w-8 items-center justify-center rounded-full bg-accent-100 dark:bg-gray-700 transition-colors hover:bg-secondary-100 dark:hover:bg-secondary-900 cursor-pointer"
+                              >
+                                <Plus className="h-4 w-4" />
+                              </button>
+                            </div>
+                            <p className="w-16 text-right font-semibold text-secondary-700 dark:text-gray-100">{formatCurrency(item.price * item.quantity)}</p>
+                            <button
+                              onClick={() => removeFromCart(item.id)}
+                              className="text-secondary-600 dark:text-gray-400 transition-colors hover:text-red-500"
+                            >
+                              <Trash2 className="h-5 w-5" />
+                            </button>
+                          </div>
+                        </div>
+                      ))}
                     </>
                   )}
-                </button>
+                </div>
 
-                <button
-                  onClick={clearCart}
-                  className="w-full rounded-lg bg-white dark:bg-gray-800 border-2 border-accent-200 dark:border-gray-700 py-2.5 text-sm font-semibold text-secondary-700 dark:text-gray-100 hover:border-secondary-500 transition-colors"
-                >
-                  Clear Cart
-                </button>
+                {/* Right Column: Order Summary */}
+                {cart.length > 0 && (
+                  <div className="lg:col-span-1 flex flex-col max-h-full">
+                    <div className="flex flex-col gap-6 rounded-xl bg-accent-50 dark:bg-gray-900 p-6 shadow-sm border border-accent-200 dark:border-gray-700 flex-1 overflow-y-auto">
+                      <h2 className="text-2xl font-bold tracking-tight text-secondary-700 dark:text-gray-100">Order Summary</h2>
+
+                      <div className="flex flex-col gap-3 border-b border-accent-200 dark:border-gray-700 pb-4">
+                        <div className="flex justify-between">
+                          <p className="text-secondary-600 dark:text-gray-400">Subtotal</p>
+                          <p className="font-medium text-secondary-700 dark:text-gray-100">{formatCurrency(getSubtotal())}</p>
+                        </div>
+                        {showTaxInMenu && taxAmount > 0 && (
+                          <div className="flex justify-between">
+                            <p className="text-secondary-600 dark:text-gray-400">Taxes ({taxRate}%)</p>
+                            <p className="font-medium text-secondary-700 dark:text-gray-100">{formatCurrency(taxAmount)}</p>
+                          </div>
+                        )}
+                        {tipAmount > 0 && (
+                          <div className="flex justify-between">
+                            <p className="text-secondary-600 dark:text-gray-400">Tip</p>
+                            <p className="font-medium text-secondary-700 dark:text-gray-100">{formatCurrency(tipAmount)}</p>
+                          </div>
+                        )}
+                        {pointsToRedeem > 0 && (
+                          <div className="flex justify-between text-green-600 dark:text-green-400">
+                            <p>Points Redeemed ({pointsToRedeem} pts)</p>
+                            <p className="font-medium">-{formatCurrency(pointsToRedeem * 0.1)}</p>
+                          </div>
+                        )}
+                      </div>
+
+                      <div className="flex justify-between">
+                        <p className="text-lg font-bold text-secondary-700 dark:text-gray-100">Total</p>
+                        <p className="text-xl font-extrabold text-secondary-700 dark:text-gray-100">{formatCurrency(getTotal())}</p>
+                      </div>
+
+                      {/* Login Required Message */}
+                      {!customer && (
+                        <div className="p-6 bg-secondary-50 dark:bg-secondary-900/20 border border-secondary-200 dark:border-secondary-800 rounded-lg">
+                          <div className="text-center">
+                            <div className="w-12 h-12 bg-secondary-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                              <User className="h-6 w-6 text-white" />
+                            </div>
+                            <h3 className="text-lg font-bold text-secondary-700 dark:text-gray-100 mb-2">
+                              Login Required
+                            </h3>
+                            <p className="text-secondary-600 dark:text-gray-400 mb-4 text-sm">
+                              Please login to place your order
+                            </p>
+                            <button
+                              onClick={() => {
+                                setShowCart(false);
+                                setShowLoginModal(true);
+                              }}
+                              className="w-full bg-secondary-500 text-white px-6 py-3 rounded-lg font-bold hover:bg-secondary-600 transition-colors"
+                            >
+                              Login & Continue
+                            </button>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Customer sections only show when logged in */}
+                      {customer && (
+                        <div className="flex flex-col gap-4">
+                          {/* Customer Information */}
+                          <div className="p-4 bg-secondary-50 dark:bg-secondary-900/20 border border-secondary-200 dark:border-secondary-800 rounded-lg">
+                            <div className="flex flex-col gap-2 mb-3">
+                              <div className="flex items-center justify-between">
+                                <h3 className="font-bold text-secondary-700 dark:text-gray-100 flex items-center text-base">
+                                  <User className="h-4 w-4 mr-2 text-secondary-600 dark:text-secondary-400" />
+                                  Customer Info
+                                </h3>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <button
+                                  onClick={openEditProfile}
+                                  className="flex items-center justify-center gap-1 px-3 py-1.5 bg-secondary-500 text-white rounded-lg hover:bg-secondary-600 transition-colors text-xs flex-1"
+                                >
+                                  <Edit3 className="h-3 w-3" />
+                                  <span>Edit Profile</span>
+                                </button>
+                                {onLogout && (
+                                  <button
+                                    onClick={onLogout}
+                                    className="flex items-center justify-center gap-1 px-3 py-1.5 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors text-xs flex-1"
+                                  >
+                                    <LogOut className="h-3 w-3" />
+                                    <span>Logout</span>
+                                  </button>
+                                )}
+                              </div>
+                            </div>
+                            <div className="space-y-2 text-sm">
+                              <div className="flex justify-between">
+                                <span className="text-secondary-600 dark:text-gray-400">Name:</span>
+                                <span className="font-semibold text-secondary-700 dark:text-gray-100">{customer.name}</span>
+                              </div>
+                              {customer.phone && (
+                                <div className="flex justify-between">
+                                  <span className="text-secondary-600 dark:text-gray-400">Phone:</span>
+                                  <span className="font-semibold text-secondary-700 dark:text-gray-100">{customer.phone}</span>
+                                </div>
+                              )}
+                              {customer.loyalty_points > 0 && (
+                                <div className="flex justify-between">
+                                  <span className="text-secondary-600 dark:text-gray-400">Points:</span>
+                                  <span className="flex items-center text-yellow-600 dark:text-yellow-400 font-semibold">
+                                    <Star className="h-3 w-3 mr-1" />
+                                    {customer.loyalty_points}
+                                  </span>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+
+                          {/* Payment Method */}
+                          <div>
+                            <h3 className="font-bold text-secondary-700 dark:text-gray-100 mb-3 text-sm">Payment Method</h3>
+                            <div className="grid grid-cols-2 gap-2">
+                              {paymentMethods.map((method) => (
+                                <button
+                                  key={method.code}
+                                  type="button"
+                                  onClick={() => setPaymentMethod(method.code)}
+                                  className={`flex items-center justify-center p-3 rounded-lg border-2 transition-colors ${paymentMethod === method.code
+                                    ? 'bg-secondary-500 text-white border-secondary-500'
+                                    : 'bg-white dark:bg-gray-800 text-secondary-700 dark:text-gray-100 border-accent-200 dark:border-gray-700 hover:border-secondary-500'
+                                    }`}
+                                >
+                                  <span className="mr-2">{method.icon}</span>
+                                  <span className="font-semibold text-sm">{method.name}</span>
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+
+                          {/* Pickup Option */}
+                          <div>
+                            <h3 className="font-bold text-secondary-700 dark:text-gray-100 mb-3 text-sm">Dining Preference</h3>
+                            <div className="grid grid-cols-2 gap-2">
+                              {[
+                                { value: 'pickup', label: 'Pickup', icon: '🥡' },
+                                { value: 'dine-in', label: 'Dine-in', icon: '🍽️' }
+                              ].map((option) => (
+                                <button
+                                  key={option.value}
+                                  onClick={() => setPickupOption(option.value)}
+                                  className={`p-3 rounded-lg border-2 transition-colors ${pickupOption === option.value
+                                    ? 'bg-secondary-500 text-white border-secondary-500'
+                                    : 'bg-white dark:bg-gray-800 text-secondary-700 dark:text-gray-100 border-accent-200 dark:border-gray-700 hover:border-secondary-500'
+                                    }`}
+                                >
+                                  <div className="flex items-center justify-center gap-2">
+                                    <span className="text-lg">{option.icon}</span>
+                                    <span className="font-semibold text-sm">{option.label}</span>
+                                  </div>
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+
+                          {/* Table Number for Dine-in */}
+                          {pickupOption === 'dine-in' && (
+                            <div>
+                              <label className="block font-bold text-secondary-700 dark:text-gray-100 mb-2 text-sm">Table Number</label>
+                              <input
+                                type="text"
+                                placeholder="Enter table number (optional)"
+                                value={tableNumber}
+                                onChange={(e) => setTableNumber(e.target.value)}
+                                className="w-full p-3 border-2 border-accent-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-secondary-500 focus:border-secondary-500 bg-white dark:bg-gray-800 text-secondary-700 dark:text-gray-100 transition-colors"
+                              />
+                            </div>
+                          )}
+
+                          {/* Points Redemption */}
+                          {customer?.loyalty_points > 0 && (
+                            <div>
+                              <h3 className="font-bold text-secondary-700 dark:text-gray-100 mb-3 text-sm flex items-center">
+                                <Star className="h-4 w-4 mr-2 text-yellow-600 dark:text-yellow-400" />
+                                Redeem Points
+                              </h3>
+                              <div className="bg-yellow-50 dark:bg-yellow-900/20 rounded-lg p-4 mb-3 border border-yellow-200 dark:border-yellow-800">
+                                <div className="grid grid-cols-2 gap-3 text-xs">
+                                  <div className="text-center">
+                                    <div className="text-lg font-bold text-secondary-700 dark:text-gray-100">{customer.loyalty_points}</div>
+                                    <div className="text-secondary-600 dark:text-gray-400">Available</div>
+                                  </div>
+                                  <div className="text-center">
+                                    <div className="text-lg font-bold text-secondary-700 dark:text-gray-100">{maxRedeemablePoints}</div>
+                                    <div className="text-secondary-600 dark:text-gray-400">Max Redeemable</div>
+                                  </div>
+                                </div>
+                                <div className="text-center mt-2 text-xs text-secondary-600 dark:text-gray-400">
+                                  1 point = {formatCurrency(0.10)}
+                                </div>
+                              </div>
+                              <input
+                                type="number"
+                                value={pointsToRedeem}
+                                onChange={(e) => handlePointsRedemption(parseInt(e.target.value) || 0)}
+                                min="0"
+                                max={maxRedeemablePoints}
+                                className="w-full p-3 border-2 border-accent-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 bg-white dark:bg-gray-800 text-secondary-700 dark:text-gray-100 transition-colors"
+                                placeholder="Enter points"
+                              />
+                            </div>
+                          )}
+
+                          {/* Tip Selection */}
+                          <div>
+                            <h3 className="font-bold text-secondary-700 dark:text-gray-100 mb-3 text-sm">Add Tip</h3>
+                            <div className="grid grid-cols-3 gap-2 mb-3">
+                              {[0, 10, 15, 18, 20, 25].map((percentage) => (
+                                <button
+                                  key={percentage}
+                                  onClick={() => handleTipPercentageChange(percentage)}
+                                  className={`py-2 px-3 text-xs rounded-lg border-2 transition-colors font-semibold ${tipPercentage === percentage
+                                    ? 'bg-secondary-500 text-white border-secondary-500'
+                                    : 'bg-white dark:bg-gray-800 text-secondary-700 dark:text-gray-100 border-accent-200 dark:border-gray-700 hover:border-secondary-500'
+                                    }`}
+                                >
+                                  {percentage === 0 ? 'No Tip' : `${percentage}%`}
+                                </button>
+                              ))}
+                            </div>
+                            <input
+                              type="number"
+                              value={tipAmount.toFixed(2)}
+                              onChange={(e) => handleTipAmountChange(e.target.value)}
+                              className="w-full p-3 border-2 border-accent-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-secondary-500 focus:border-secondary-500 bg-white dark:bg-gray-800 text-secondary-700 dark:text-gray-100 transition-colors"
+                              placeholder="Custom tip"
+                            />
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Action Buttons - Sticky at bottom */}
+                    <div className="flex flex-col gap-3 p-4 bg-accent-50 dark:bg-gray-900 border-t border-accent-200 dark:border-gray-700 rounded-b-xl">
+                      <button
+                        onClick={placeOrder}
+                        disabled={orderLoading || !customer}
+                        className="w-full rounded-lg bg-secondary-500 py-3 text-base font-bold text-white transition-opacity hover:bg-secondary-600 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                      >
+                        {orderLoading ? (
+                          <>
+                            <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent"></div>
+                            <span>Placing Order...</span>
+                          </>
+                        ) : (
+                          <>
+                            <CheckCircle className="h-5 w-5" />
+                            <span>Proceed to Checkout</span>
+                          </>
+                        )}
+                      </button>
+
+                      <button
+                        onClick={clearCart}
+                        className="w-full rounded-lg bg-white dark:bg-gray-800 border-2 border-accent-200 dark:border-gray-700 py-2.5 text-sm font-semibold text-secondary-700 dark:text-gray-100 hover:border-secondary-500 transition-colors"
+                      >
+                        Clear Cart
+                      </button>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
-          )}
-        </div>
-      </div>
-    </div>
-  )
-}
+          </div>
+        )
+      }
 
       {/* Floating Cart Summary Bar - Mobile Only */}
       {cart.length > 0 && (
