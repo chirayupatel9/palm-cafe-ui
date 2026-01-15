@@ -862,28 +862,7 @@ const CustomerMenu = ({
                       style={{
                         backgroundImage: `url('https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80')`
                       }}
-                    >
-                      {/* Dark overlay on left side */}
-                      <div className="absolute inset-0 bg-gradient-to-r from-gray-900/90 via-gray-900/70 to-transparent"></div>
-
-                      {/* Content */}
-                      <div className="absolute inset-0 flex items-center">
-                        <div className="px-8 sm:px-16 max-w-xl">
-                          <h2 className="text-4xl sm:text-5xl md:text-6xl font-serif font-bold text-orange-500 leading-tight mb-6">
-                            Pay for one<br />Get two!
-                          </h2>
-                          <button className="px-8 py-3 bg-orange-500 hover:bg-orange-600 text-white font-semibold rounded-full transition-colors uppercase tracking-wider text-sm">
-                            Reservation
-                          </button>
-                        </div>
-                      </div>
-
-                      {/* Discount Badge */}
-                      <div className="absolute right-8 sm:right-16 top-1/2 transform -translate-y-1/2">
-                        <div className="w-24 h-24 sm:w-32 sm:h-32 bg-orange-500 rounded-full flex items-center justify-center">
-                          <span className="text-white text-2xl sm:text-3xl font-bold">-50%</span>
-                        </div>
-                      </div>
+                    >                     
                     </div>
                   </div>
 
@@ -978,18 +957,8 @@ const CustomerMenu = ({
 
                   {/* Footer Section */}
                   <div className="mt-20 pt-16 border-t border-gray-200 dark:border-gray-700">
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
-                      {/* Articles Column */}
-                      <div>
-                        <h3 className="text-xl font-serif font-bold text-orange-500 mb-4">Articles</h3>
-                        <p className="text-gray-600 dark:text-gray-400 text-sm leading-relaxed mb-4">
-                          Stay updated with the latest news, recipes, and culinary tips from our kitchen. Discover new flavors and cooking inspirations.
-                        </p>
-                        <button className="text-orange-500 hover:text-orange-600 text-sm font-medium flex items-center gap-1 transition-colors">
-                          Read More
-                          <span className="text-lg">→</span>
-                        </button>
-                      </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+                      
 
                       {/* Contact Info Column */}
                       <div>
