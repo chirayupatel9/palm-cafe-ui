@@ -377,15 +377,44 @@ const SuperAdminCafeSettings = () => {
 
         <div>
           <label className="block text-sm font-medium text-secondary-700 dark:text-gray-300 mb-2">
-            Logo URL
+            Logo
           </label>
-          <input
-            type="url"
-            name="logo_url"
-            value={formData.logo_url}
-            onChange={handleInputChange}
-            className="w-full px-3 py-2 border border-accent-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-secondary-500 focus:border-secondary-500 dark:bg-gray-700 dark:text-gray-100"
-          />
+          <div className="flex items-center space-x-4">
+            {formData.logo_url && (
+              <img
+                src={formData.logo_url.startsWith('http') ? formData.logo_url : `http://localhost:5000${formData.logo_url}`}
+                alt="Cafe Logo"
+                className="w-16 h-16 object-contain border rounded-lg"
+              />
+            )}
+            <div className="flex-1">
+              <input
+                type="file"
+                accept="image/*"
+                onChange={(e) => {
+                  const file = e.target.files[0];
+                  if (file) {
+                    const formDataUpload = new FormData();
+                    formDataUpload.append('logo', file);
+                    // Upload logo first
+                    axios.post('/cafe-settings/logo', formDataUpload, {
+                      headers: { 'Content-Type': 'multipart/form-data' }
+                    }).then(response => {
+                      setFormData(prev => ({ ...prev, logo_url: response.data.logo_url }));
+                      toast.success('Logo uploaded successfully');
+                    }).catch(error => {
+                      console.error('Error uploading logo:', error);
+                      toast.error('Failed to upload logo');
+                    });
+                  }
+                }}
+                className="w-full px-3 py-2 border border-accent-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-secondary-500 focus:border-secondary-500 dark:bg-gray-700 dark:text-gray-100"
+              />
+            </div>
+          </div>
+          <p className="text-xs text-secondary-500 dark:text-gray-400 mt-1">
+            Upload a logo image file (max 5MB)
+          </p>
         </div>
 
         {/* Branding Section */}

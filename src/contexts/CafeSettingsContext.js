@@ -112,7 +112,25 @@ export const CafeSettingsProvider = ({ children }) => {
         printer_port: response.data.printer_port,
         printer_baud_rate: response.data.printer_baud_rate || 9600,
         auto_print_new_orders: Boolean(response.data.auto_print_new_orders),
-        print_order_copies: response.data.print_order_copies || 1
+        print_order_copies: response.data.print_order_copies || 1,
+        // Include color settings
+        light_primary_color: response.data.light_primary_color || '#3B82F6',
+        light_secondary_color: response.data.light_secondary_color || '#6B7280',
+        light_accent_color: response.data.light_accent_color || '#10B981',
+        light_background_color: response.data.light_background_color || '#FFFFFF',
+        light_text_color: response.data.light_text_color || '#1F2937',
+        light_surface_color: response.data.light_surface_color || '#F9FAFB',
+        dark_primary_color: response.data.dark_primary_color || '#60A5FA',
+        dark_secondary_color: response.data.dark_secondary_color || '#9CA3AF',
+        dark_accent_color: response.data.dark_accent_color || '#34D399',
+        dark_background_color: response.data.dark_background_color || '#111827',
+        dark_text_color: response.data.dark_text_color || '#F9FAFB',
+        dark_surface_color: response.data.dark_surface_color || '#1F2937',
+        primary_color: response.data.primary_color || null,
+        secondary_color: response.data.secondary_color || null,
+        accent_color: response.data.accent_color || null,
+        hero_image_url: response.data.hero_image_url || null,
+        promo_banner_image_url: response.data.promo_banner_image_url || null
       };
       
       setCafeSettings(processedData);
@@ -166,7 +184,25 @@ export const CafeSettingsProvider = ({ children }) => {
         printer_port: response.data.printer_port,
         printer_baud_rate: response.data.printer_baud_rate || 9600,
         auto_print_new_orders: Boolean(response.data.auto_print_new_orders),
-        print_order_copies: response.data.print_order_copies || 1
+        print_order_copies: response.data.print_order_copies || 1,
+        // Include color settings
+        light_primary_color: response.data.light_primary_color || '#3B82F6',
+        light_secondary_color: response.data.light_secondary_color || '#6B7280',
+        light_accent_color: response.data.light_accent_color || '#10B981',
+        light_background_color: response.data.light_background_color || '#FFFFFF',
+        light_text_color: response.data.light_text_color || '#1F2937',
+        light_surface_color: response.data.light_surface_color || '#F9FAFB',
+        dark_primary_color: response.data.dark_primary_color || '#60A5FA',
+        dark_secondary_color: response.data.dark_secondary_color || '#9CA3AF',
+        dark_accent_color: response.data.dark_accent_color || '#34D399',
+        dark_background_color: response.data.dark_background_color || '#111827',
+        dark_text_color: response.data.dark_text_color || '#F9FAFB',
+        dark_surface_color: response.data.dark_surface_color || '#1F2937',
+        primary_color: response.data.primary_color || null,
+        secondary_color: response.data.secondary_color || null,
+        accent_color: response.data.accent_color || null,
+        hero_image_url: response.data.hero_image_url || null,
+        promo_banner_image_url: response.data.promo_banner_image_url || null
       };
       
       setCafeSettings(processedData);

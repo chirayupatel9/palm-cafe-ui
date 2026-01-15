@@ -24,6 +24,18 @@ export const ColorSchemeProvider = ({ children }) => {
     surface: '#F9FAFB'
   });
 
+  // Helper function to darken a color
+  const darkenColor = (color, percent = 15) => {
+    const hex = color.replace('#', '');
+    const r = parseInt(hex.substr(0, 2), 16);
+    const g = parseInt(hex.substr(2, 2), 16);
+    const b = parseInt(hex.substr(4, 2), 16);
+    const newR = Math.max(0, Math.floor(r * (1 - percent / 100)));
+    const newG = Math.max(0, Math.floor(g * (1 - percent / 100)));
+    const newB = Math.max(0, Math.floor(b * (1 - percent / 100)));
+    return `#${newR.toString(16).padStart(2, '0')}${newG.toString(16).padStart(2, '0')}${newB.toString(16).padStart(2, '0')}`;
+  };
+
   // Update colors when cafe settings or dark mode changes
   useEffect(() => {
     const newColors = isDarkMode ? {
@@ -44,14 +56,34 @@ export const ColorSchemeProvider = ({ children }) => {
 
     setCurrentColors(newColors);
 
-    // Apply CSS custom properties to document root
+    // Apply CSS custom properties to document root immediately
+    // This ensures colors update in real-time without page reload
     const root = document.documentElement;
+    
+    // Primary colors
     root.style.setProperty('--color-primary', newColors.primary);
+    root.style.setProperty('--color-primary-dark', darkenColor(newColors.primary, 15));
+    root.style.setProperty('--color-on-primary', '#FFFFFF');
+    root.style.setProperty('--color-primary-container', isDarkMode ? newColors.surface : newColors.background);
+    root.style.setProperty('--color-on-primary-container', newColors.text);
+    
+    // Secondary colors
     root.style.setProperty('--color-secondary', newColors.secondary);
+    root.style.setProperty('--color-on-secondary', '#FFFFFF');
+    
+    // Accent colors
     root.style.setProperty('--color-accent', newColors.accent);
+    root.style.setProperty('--color-on-accent', '#FFFFFF');
+    
+    // Background and surface
     root.style.setProperty('--color-background', newColors.background);
-    root.style.setProperty('--color-text', newColors.text);
+    root.style.setProperty('--color-on-background', newColors.text);
     root.style.setProperty('--color-surface', newColors.surface);
+    root.style.setProperty('--color-on-surface', newColors.text);
+    
+    // Text colors
+    root.style.setProperty('--color-text-primary', newColors.text);
+    root.style.setProperty('--color-text', newColors.text);
   }, [cafeSettings, isDarkMode]);
 
   const getColor = (colorType) => {

@@ -206,7 +206,9 @@ function MainApp() {
       case 'customers':
         return <CustomerManagement />;
       case 'cafe-settings':
-        return cafeSettings?.admin_can_access_settings ? <CafeSettings /> : <div>Access denied</div>;
+        // Allow access if: user is admin OR admin_can_access_settings is enabled
+        const canAccessSettings = user?.role === 'admin' || cafeSettings?.admin_can_access_settings;
+        return canAccessSettings ? <CafeSettings /> : <div>Access denied</div>;
       // Legacy routes - redirect to appropriate new routes
       case 'history':
         return <InvoiceHistory cart={cart} setCart={setCart} setCurrentPage={setCurrentPage} />;
@@ -237,7 +239,7 @@ function MainApp() {
     { id: 'inventory', label: 'Inventory', icon: Package, module: 'inventory', show: checkFeatureAccess('inventory') },
     { id: 'users', label: 'User Management', icon: User, module: 'users', show: checkFeatureAccess('users') },
     { id: 'advanced-reports', label: 'Reports', icon: FileText, module: 'advanced_reports', show: checkFeatureAccess('advanced_reports') },
-    { id: 'cafe-settings', label: 'Settings', icon: Settings, module: 'settings', show: cafeSettings?.admin_can_access_settings !== false && checkFeatureAccess('settings') },
+    { id: 'cafe-settings', label: 'Settings', icon: Settings, module: 'settings', show: (user?.role === 'admin' || cafeSettings?.admin_can_access_settings !== false) && checkFeatureAccess('settings') },
   ].filter(item => item.show !== false); // Filter out items that should be hidden
 
   if (loading || cafeSettingsLoading || subscriptionLoading || featuresLoading) {

@@ -38,6 +38,11 @@ export function resolveTheme({ uiRole, isDarkMode, cafeBranding = null }) {
       brandingColors.primary = cafeBranding.primaryColor;
     }
     
+    // Apply secondary color override (if provided)
+    if (cafeBranding.secondaryColor) {
+      brandingColors.secondary = cafeBranding.secondaryColor;
+    }
+    
     // Apply accent color override (optional)
     if (cafeBranding.accentColor) {
       brandingColors.accent = cafeBranding.accentColor;
@@ -72,16 +77,31 @@ export function getUIRoleFromRoute(pathname) {
  * Extract cafe branding from cafe settings
  * 
  * @param {Object} cafeSettings - Cafe settings object
+ * @param {boolean} isDarkMode - Whether dark mode is enabled
  * @returns {Object|null} Branding object or null
  */
-export function extractCafeBranding(cafeSettings) {
+export function extractCafeBranding(cafeSettings, isDarkMode = false) {
   if (!cafeSettings) {
     return null;
   }
   
+  // Use light or dark colors based on mode
+  const primaryColor = isDarkMode 
+    ? (cafeSettings.dark_primary_color || cafeSettings.primary_color || null)
+    : (cafeSettings.light_primary_color || cafeSettings.primary_color || null);
+    
+  const secondaryColor = isDarkMode
+    ? (cafeSettings.dark_secondary_color || cafeSettings.secondary_color || null)
+    : (cafeSettings.light_secondary_color || cafeSettings.secondary_color || null);
+    
+  const accentColor = isDarkMode
+    ? (cafeSettings.dark_accent_color || cafeSettings.accent_color || null)
+    : (cafeSettings.light_accent_color || cafeSettings.accent_color || null);
+  
   return {
     logoUrl: cafeSettings.logo_url || null,
-    primaryColor: cafeSettings.primary_color || null,
-    accentColor: cafeSettings.accent_color || null,
+    primaryColor,
+    secondaryColor,
+    accentColor,
   };
 }

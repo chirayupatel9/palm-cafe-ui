@@ -1092,7 +1092,13 @@ const CafeSettings = () => {
                     <input
                       type="color"
                       value={lightPrimaryColor}
-                      onChange={(e) => setLightPrimaryColor(e.target.value)}
+                      onChange={(e) => {
+                        const newColor = e.target.value;
+                        setLightPrimaryColor(newColor);
+                        // Apply immediately for preview
+                        const root = document.documentElement;
+                        root.style.setProperty('--color-primary', newColor);
+                      }}
                       className="w-full h-10 rounded border"
                     />
                   </div>
@@ -1101,7 +1107,13 @@ const CafeSettings = () => {
                     <input
                       type="color"
                       value={lightSecondaryColor}
-                      onChange={(e) => setLightSecondaryColor(e.target.value)}
+                      onChange={(e) => {
+                        const newColor = e.target.value;
+                        setLightSecondaryColor(newColor);
+                        // Apply immediately for preview
+                        const root = document.documentElement;
+                        root.style.setProperty('--color-secondary', newColor);
+                      }}
                       className="w-full h-10 rounded border"
                     />
                   </div>
@@ -1110,7 +1122,13 @@ const CafeSettings = () => {
                     <input
                       type="color"
                       value={lightAccentColor}
-                      onChange={(e) => setLightAccentColor(e.target.value)}
+                      onChange={(e) => {
+                        const newColor = e.target.value;
+                        setLightAccentColor(newColor);
+                        // Apply immediately for preview
+                        const root = document.documentElement;
+                        root.style.setProperty('--color-accent', newColor);
+                      }}
                       className="w-full h-10 rounded border"
                     />
                   </div>
@@ -1119,7 +1137,13 @@ const CafeSettings = () => {
                     <input
                       type="color"
                       value={lightBackgroundColor}
-                      onChange={(e) => setLightBackgroundColor(e.target.value)}
+                      onChange={(e) => {
+                        const newColor = e.target.value;
+                        setLightBackgroundColor(newColor);
+                        // Apply immediately for preview
+                        const root = document.documentElement;
+                        root.style.setProperty('--color-background', newColor);
+                      }}
                       className="w-full h-10 rounded border"
                     />
                   </div>
@@ -1128,7 +1152,14 @@ const CafeSettings = () => {
                     <input
                       type="color"
                       value={lightTextColor}
-                      onChange={(e) => setLightTextColor(e.target.value)}
+                      onChange={(e) => {
+                        const newColor = e.target.value;
+                        setLightTextColor(newColor);
+                        // Apply immediately for preview
+                        const root = document.documentElement;
+                        root.style.setProperty('--color-text-primary', newColor);
+                        root.style.setProperty('--color-text', newColor);
+                      }}
                       className="w-full h-10 rounded border"
                     />
                   </div>
@@ -1137,7 +1168,13 @@ const CafeSettings = () => {
                     <input
                       type="color"
                       value={lightSurfaceColor}
-                      onChange={(e) => setLightSurfaceColor(e.target.value)}
+                      onChange={(e) => {
+                        const newColor = e.target.value;
+                        setLightSurfaceColor(newColor);
+                        // Apply immediately for preview
+                        const root = document.documentElement;
+                        root.style.setProperty('--color-surface', newColor);
+                      }}
                       className="w-full h-10 rounded border"
                     />
                   </div>
@@ -1153,7 +1190,15 @@ const CafeSettings = () => {
                     <input
                       type="color"
                       value={darkPrimaryColor}
-                      onChange={(e) => setDarkPrimaryColor(e.target.value)}
+                      onChange={(e) => {
+                        const newColor = e.target.value;
+                        setDarkPrimaryColor(newColor);
+                        // Apply immediately for preview (only if in dark mode)
+                        const root = document.documentElement;
+                        if (document.documentElement.classList.contains('dark')) {
+                          root.style.setProperty('--color-primary', newColor);
+                        }
+                      }}
                       className="w-full h-10 rounded border"
                     />
                   </div>
@@ -1162,7 +1207,15 @@ const CafeSettings = () => {
                     <input
                       type="color"
                       value={darkSecondaryColor}
-                      onChange={(e) => setDarkSecondaryColor(e.target.value)}
+                      onChange={(e) => {
+                        const newColor = e.target.value;
+                        setDarkSecondaryColor(newColor);
+                        // Apply immediately for preview (only if in dark mode)
+                        const root = document.documentElement;
+                        if (document.documentElement.classList.contains('dark')) {
+                          root.style.setProperty('--color-secondary', newColor);
+                        }
+                      }}
                       className="w-full h-10 rounded border"
                     />
                   </div>
@@ -1171,7 +1224,15 @@ const CafeSettings = () => {
                     <input
                       type="color"
                       value={darkAccentColor}
-                      onChange={(e) => setDarkAccentColor(e.target.value)}
+                      onChange={(e) => {
+                        const newColor = e.target.value;
+                        setDarkAccentColor(newColor);
+                        // Apply immediately for preview (only if in dark mode)
+                        const root = document.documentElement;
+                        if (document.documentElement.classList.contains('dark')) {
+                          root.style.setProperty('--color-accent', newColor);
+                        }
+                      }}
                       className="w-full h-10 rounded border"
                     />
                   </div>
@@ -1180,7 +1241,15 @@ const CafeSettings = () => {
                     <input
                       type="color"
                       value={darkBackgroundColor}
-                      onChange={(e) => setDarkBackgroundColor(e.target.value)}
+                      onChange={(e) => {
+                        const newColor = e.target.value;
+                        setDarkBackgroundColor(newColor);
+                        // Apply immediately for preview (only if in dark mode)
+                        const root = document.documentElement;
+                        if (document.documentElement.classList.contains('dark')) {
+                          root.style.setProperty('--color-background', newColor);
+                        }
+                      }}
                       className="w-full h-10 rounded border"
                     />
                   </div>
@@ -1189,7 +1258,16 @@ const CafeSettings = () => {
                     <input
                       type="color"
                       value={darkTextColor}
-                      onChange={(e) => setDarkTextColor(e.target.value)}
+                      onChange={(e) => {
+                        const newColor = e.target.value;
+                        setDarkTextColor(newColor);
+                        // Apply immediately for preview (only if in dark mode)
+                        const root = document.documentElement;
+                        if (document.documentElement.classList.contains('dark')) {
+                          root.style.setProperty('--color-text-primary', newColor);
+                          root.style.setProperty('--color-text', newColor);
+                        }
+                      }}
                       className="w-full h-10 rounded border"
                     />
                   </div>
@@ -1198,7 +1276,15 @@ const CafeSettings = () => {
                     <input
                       type="color"
                       value={darkSurfaceColor}
-                      onChange={(e) => setDarkSurfaceColor(e.target.value)}
+                      onChange={(e) => {
+                        const newColor = e.target.value;
+                        setDarkSurfaceColor(newColor);
+                        // Apply immediately for preview (only if in dark mode)
+                        const root = document.documentElement;
+                        if (document.documentElement.classList.contains('dark')) {
+                          root.style.setProperty('--color-surface', newColor);
+                        }
+                      }}
                       className="w-full h-10 rounded border"
                     />
                   </div>

@@ -45,8 +45,8 @@ export const ThemeProvider = ({ children }) => {
     if (uiRole === 'superadmin') {
       return null; // Super Admin never uses cafe branding
     }
-    return extractCafeBranding(cafeSettings);
-  }, [uiRole, cafeSettings]);
+    return extractCafeBranding(cafeSettings, isDarkMode);
+  }, [uiRole, cafeSettings, isDarkMode]);
   
   // Resolve final theme
   const theme = useMemo(() => {
