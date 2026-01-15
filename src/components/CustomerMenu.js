@@ -948,7 +948,7 @@ const CustomerMenu = ({
                                   setSelectedCategory(categoryName);
                                   document.getElementById('menu-items-section')?.scrollIntoView({ behavior: 'smooth' });
                                 }}
-                                className="group relative w-32 h-32 sm:w-40 sm:h-40 lg:w-44 lg:h-44 overflow-hidden rounded-full bg-white dark:bg-gray-800 shadow-lg hover:shadow-xl transition-all duration-300"
+                                className="group relative w-32 h-32 sm:w-40 sm:h-40 lg:w-44 lg:h-44 overflow-hidden rounded-full bg-white dark:bg-gray-800 transition-all duration-300"
                               >
                                 {/* Circular Category Image */}
                                 <div className="relative w-full h-full overflow-hidden rounded-full">
@@ -978,22 +978,33 @@ const CustomerMenu = ({
                     </div>
 
                     {/* Carousel Dots Indicator */}
-                    {Object.keys(groupedMenuItems).length > 1 && (
-                      <div className="flex justify-center gap-2 mt-6">
-                        {Object.keys(groupedMenuItems).map((_, index) => (
-                          <button
-                            key={index}
-                            onClick={() => setCategoryCarouselIndex(index)}
-                            className={`h-2 rounded-full transition-all duration-300 ${
-                              categoryCarouselIndex === index
-                                ? 'w-8 bg-orange-500'
-                                : 'w-2 bg-gray-300 dark:bg-gray-600'
-                            }`}
-                            aria-label={`Go to category ${index + 1}`}
-                          />
-                        ))}
-                      </div>
-                    )}
+                    {(() => {
+                      const categories = Object.keys(groupedMenuItems);
+                      const itemsPerView = 4; // Show 4 items on large screens
+                      const totalSlides = Math.max(1, categories.length - itemsPerView + 1);
+                      
+                      if (categories.length <= itemsPerView) {
+                        // If we have 4 or fewer categories, no dots needed
+                        return null;
+                      }
+                      
+                      return (
+                        <div className="flex justify-center gap-2 mt-6">
+                          {Array.from({ length: totalSlides }).map((_, index) => (
+                            <button
+                              key={index}
+                              onClick={() => setCategoryCarouselIndex(index)}
+                              className={`h-2 rounded-full transition-all duration-300 ${
+                                categoryCarouselIndex === index
+                                  ? 'w-8 bg-orange-500'
+                                  : 'w-2 bg-gray-300 dark:bg-gray-600'
+                              }`}
+                              aria-label={`Go to slide ${index + 1}`}
+                            />
+                          ))}
+                        </div>
+                      );
+                    })()}
                   </div>
                 </div>
               )}
