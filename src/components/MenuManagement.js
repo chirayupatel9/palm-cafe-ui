@@ -28,6 +28,8 @@ const MenuManagement = ({ menuItems, onUpdate, onAdd, onDelete }) => {
   });
   const [loading, setLoading] = useState(false);
   const [imageUploading, setImageUploading] = useState(false);
+  const [removingImage, setRemovingImage] = useState(false);
+  const [selectedImageFile, setSelectedImageFile] = useState(null);
   const [deleteConfirm, setDeleteConfirm] = useState(null);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -72,6 +74,7 @@ const MenuManagement = ({ menuItems, onUpdate, onAdd, onDelete }) => {
 
   const handleEdit = (item) => {
     setEditingId(item.id);
+    setSelectedImageFile(null); // Clear any selected file when editing
     setFormData({
       category_id: item.category_id || '',
       name: item.name,
@@ -154,13 +157,15 @@ const MenuManagement = ({ menuItems, onUpdate, onAdd, onDelete }) => {
   const handleCancel = () => {
     setEditingId(null);
     setShowAddForm(false);
+    setSelectedImageFile(null);
     setFormData({ 
       category_id: categories.length > 0 ? categories[0].id : '',
       name: '', 
       description: '', 
       price: '',
       sort_order: '',
-      image_url: ''
+      image_url: '',
+      featured_priority: ''
     });
   };
 
@@ -190,37 +195,113 @@ const MenuManagement = ({ menuItems, onUpdate, onAdd, onDelete }) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
-  const handleImageUpload = async (event) => {
+  const handleImageFileChange = (event) => {
     const file = event.target.files[0];
-    if (!file) return;
+    if (!file) {
+      setSelectedImageFile(null);
+      return;
+    }
 
     if (!file.type.startsWith('image/')) {
       toast.error('Please select an image file');
+      setSelectedImageFile(null);
+      return;
+    }
+
+    // Validate file size (max 5MB)
+    const maxSize = 5 * 1024 * 1024; // 5MB
+    if (file.size > maxSize) {
+      toast.error('Image size must be less than 5MB');
+      setSelectedImageFile(null);
+      return;
+    }
+
+    setSelectedImageFile(file);
+    event.target.value = ''; // Reset file input
+  };
+
+  const handleImageUpload = async () => {
+    if (!selectedImageFile) {
+      toast.error('Please select an image file first');
       return;
     }
 
     try {
       setImageUploading(true);
       const formData = new FormData();
-      formData.append('image', file);
+      formData.append('image', selectedImageFile);
 
-      const response = await axios.post('/menu/upload-image', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data'
+      // If editing an existing item, use item-specific endpoint
+      if (editingId) {
+        const response = await axios.post(`/menu/${editingId}/image`, formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        });
+
+        if (response.data.success) {
+          setFormData(prev => ({ ...prev, image_url: response.data.image_url }));
+          toast.success('Image uploaded successfully');
+          setSelectedImageFile(null);
+          // Refresh menu items to show updated image
+          if (onUpdate) {
+            // Trigger a refresh by calling onUpdate with current formData
+            await onUpdate(editingId, { ...formData, image_url: response.data.image_url });
+          }
+        } else {
+          toast.error('Failed to upload image');
         }
-      });
-
-      if (response.data.success) {
-        setFormData(prev => ({ ...prev, image_url: response.data.image_url }));
-        toast.success('Image uploaded successfully');
       } else {
-        toast.error('Failed to upload image');
+        // For new items, use generic upload endpoint
+        const response = await axios.post('/menu/upload-image', formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        });
+
+        if (response.data.success) {
+          setFormData(prev => ({ ...prev, image_url: response.data.image_url }));
+          toast.success('Image uploaded successfully');
+          setSelectedImageFile(null);
+        } else {
+          toast.error('Failed to upload image');
+        }
       }
     } catch (error) {
       console.error('Error uploading image:', error);
-      toast.error('Failed to upload image');
+      toast.error(error.response?.data?.error || 'Failed to upload image');
     } finally {
       setImageUploading(false);
+    }
+  };
+
+  const handleRemoveImage = async () => {
+    if (!editingId) {
+      // For new items, just clear the form
+      setFormData(prev => ({ ...prev, image_url: '' }));
+      setSelectedImageFile(null);
+      return;
+    }
+
+    try {
+      setRemovingImage(true);
+      const response = await axios.delete(`/menu/${editingId}/image`);
+
+      if (response.data.success) {
+        setFormData(prev => ({ ...prev, image_url: '' }));
+        toast.success('Image removed successfully');
+        // Refresh menu items to show updated state
+        if (onUpdate) {
+          await onUpdate(editingId, { ...formData, image_url: null });
+        }
+      } else {
+        toast.error('Failed to remove image');
+      }
+    } catch (error) {
+      console.error('Error removing image:', error);
+      toast.error(error.response?.data?.error || 'Failed to remove image');
+    } finally {
+      setRemovingImage(false);
     }
   };
 
@@ -572,26 +653,82 @@ const MenuManagement = ({ menuItems, onUpdate, onAdd, onDelete }) => {
                 <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-secondary-300' : 'text-secondary-700'}`}>
                   Item Image
                 </label>
-                <div className="flex items-center space-x-4">
-                  {formData.image_url && (
-                    <img
-                      src={formData.image_url}
-                      alt="Menu Item"
-                      className="w-16 h-16 object-cover border rounded-lg"
-                    />
+                <p className={`text-xs mb-3 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                  Upload an image for this menu item (max 5MB)
+                </p>
+                <div className="flex items-start space-x-4">
+                  {(formData.image_url || selectedImageFile) && (
+                    <div className="relative">
+                      <img
+                        src={selectedImageFile ? URL.createObjectURL(selectedImageFile) : getImageUrl(formData.image_url)}
+                        alt="Menu Item Preview"
+                        className="w-24 h-24 object-cover border rounded-lg"
+                      />
+                      {selectedImageFile && (
+                        <div className="absolute -top-2 -right-2 bg-blue-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs">
+                          New
+                        </div>
+                      )}
+                    </div>
                   )}
-                  <div className="flex-1">
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={handleImageUpload}
-                      className="input-field"
-                      disabled={imageUploading}
-                    />
+                  <div className="flex-1 space-y-2">
+                    <div className="flex items-center space-x-2">
+                      <label className="btn-secondary flex items-center justify-center cursor-pointer text-sm flex-shrink-0">
+                        <Upload className="h-4 w-4 mr-2" />
+                        {formData.image_url || selectedImageFile ? 'Replace' : 'Select'} Image
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={handleImageFileChange}
+                          className="hidden"
+                          disabled={imageUploading || removingImage}
+                        />
+                      </label>
+                      {selectedImageFile && (
+                        <button
+                          onClick={handleImageUpload}
+                          disabled={imageUploading}
+                          className="btn-primary flex items-center justify-center text-sm flex-shrink-0"
+                        >
+                          {imageUploading ? (
+                            <>
+                              <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent mr-2"></div>
+                              Uploading...
+                            </>
+                          ) : (
+                            <>
+                              <Upload className="h-4 w-4 mr-2" />
+                              Upload
+                            </>
+                          )}
+                        </button>
+                      )}
+                      {(formData.image_url || selectedImageFile) && (
+                        <button
+                          onClick={handleRemoveImage}
+                          disabled={removingImage || imageUploading}
+                          className="btn-secondary flex items-center justify-center text-sm flex-shrink-0 text-red-600 hover:text-red-700"
+                        >
+                          {removingImage ? (
+                            <>
+                              <div className="animate-spin rounded-full h-4 w-4 border-2 border-red-600 border-t-transparent mr-2"></div>
+                              Removing...
+                            </>
+                          ) : (
+                            <>
+                              <X className="h-4 w-4 mr-2" />
+                              Remove
+                            </>
+                          )}
+                        </button>
+                      )}
+                    </div>
+                    {selectedImageFile && (
+                      <p className="text-xs text-gray-500">
+                        Selected: {selectedImageFile.name} ({(selectedImageFile.size / 1024 / 1024).toFixed(2)} MB)
+                      </p>
+                    )}
                   </div>
-                  {imageUploading && (
-                    <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-secondary-500"></div>
-                  )}
                 </div>
               </div>
               <div className="flex flex-col sm:flex-row justify-end space-y-2 sm:space-y-0 sm:space-x-3 mt-4">
