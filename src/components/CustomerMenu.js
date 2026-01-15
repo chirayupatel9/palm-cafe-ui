@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Plus, Minus, Trash2, ShoppingCart, X, Search, User, Phone, Mail, MapPin, Clock, CheckCircle, XCircle, AlertCircle, CreditCard, Gift, Star, ChevronDown, ChevronUp, Utensils, Coffee, Pizza, Sandwich, Salad, Cake, Wine, Heart, Sparkles, TrendingUp, Award, Zap, LogOut, Edit3, Save, Calendar, Menu } from 'lucide-react';
+import { Plus, Minus, Trash2, ShoppingCart, X, Search, User, Phone, Mail, MapPin, Clock, CheckCircle, XCircle, AlertCircle, CreditCard, Gift, Star, ChevronDown, ChevronUp, Utensils, Coffee, Pizza, Sandwich, Salad, Cake, Wine, Heart, Sparkles, TrendingUp, Award, Zap, LogOut, Edit3, Save, Calendar, Menu, ShoppingBag } from 'lucide-react';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 import { useCurrency } from '../contexts/CurrencyContext';
@@ -582,148 +582,477 @@ const CustomerMenu = ({
         </div>
       </header>
 
-      {/* Main Content */}
-      <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-12">
-        <div className="flex flex-col lg:flex-row gap-8 lg:gap-12">
-          {/* Left Column: Category Navigation (Desktop) */}
-          {activeTab === 'menu' && (
-            <aside className="hidden lg:block w-1/4 xl:w-1/5">
-              <div className="sticky top-24">
-                <h2 className="text-lg font-bold mb-4 px-3 text-secondary-700 dark:text-gray-100">Categories</h2>
-                <nav className="flex flex-col gap-1">
-                  <button
-                    onClick={() => setSelectedCategory('All')}
-                    className={`flex items-center gap-3 px-3 py-2 rounded-lg text-left transition-colors font-medium ${
-                      selectedCategory === 'All'
-                        ? 'bg-secondary-100 dark:bg-secondary-900 text-secondary-700 dark:text-secondary-300 font-semibold'
-                        : 'hover:bg-accent-100 dark:hover:bg-gray-700 text-secondary-600 dark:text-gray-400 hover:text-secondary-700 dark:hover:text-gray-200'
-                    }`}
-                  >
-                    <Utensils className="h-5 w-5" />
-                    <span>All Items</span>
-                  </button>
-                  {Object.keys(groupedMenuItems).map((categoryName) => (
-                    <button
-                      key={categoryName}
-                      onClick={() => setSelectedCategory(categoryName)}
-                      className={`flex items-center gap-3 px-3 py-2 rounded-lg text-left transition-colors font-medium ${
-                        selectedCategory === categoryName
-                          ? 'bg-secondary-100 dark:bg-secondary-900 text-secondary-700 dark:text-secondary-300 font-semibold'
-                          : 'hover:bg-accent-100 dark:hover:bg-gray-700 text-secondary-600 dark:text-gray-400 hover:text-secondary-700 dark:hover:text-gray-200'
-                      }`}
-                    >
-                      {getCategoryIcon(categoryName)}
-                      <span>{categoryName}</span>
-                    </button>
-                  ))}
-                </nav>
-              </div>
-            </aside>
-          )}
-
-          {/* Mobile Category Scroller */}
-          {activeTab === 'menu' && (
-            <div className="lg:hidden sticky top-16 z-10 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm py-3 -mx-4 px-4 border-b border-accent-200 dark:border-gray-700">
-              <div
-                ref={categoryScrollRef}
-                className="flex gap-3 overflow-x-auto whitespace-nowrap scrollbar-hide"
-                style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+      {/* Mobile Category Scroller */}
+      {activeTab === 'menu' && (
+        <div className="lg:hidden sticky top-16 z-10 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm py-3 -mx-4 px-4 border-b border-accent-200 dark:border-gray-700">
+          <div
+            ref={categoryScrollRef}
+            className="flex gap-3 overflow-x-auto whitespace-nowrap scrollbar-hide"
+            style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+          >
+            <button
+              onClick={() => setSelectedCategory('All')}
+              className={`flex h-10 shrink-0 items-center justify-center gap-x-2 rounded-full pl-5 pr-5 cursor-pointer transition-colors ${
+                selectedCategory === 'All'
+                  ? 'bg-secondary-500 text-white'
+                  : 'bg-accent-100 dark:bg-gray-700 text-secondary-700 dark:text-gray-200'
+              }`}
+            >
+              <p className={`text-sm ${selectedCategory === 'All' ? 'font-bold' : 'font-medium'}`}>
+                All
+              </p>
+            </button>
+            {Object.keys(groupedMenuItems).map((categoryName) => (
+              <button
+                key={categoryName}
+                onClick={() => setSelectedCategory(categoryName)}
+                className={`flex h-10 shrink-0 items-center justify-center gap-x-2 rounded-full pl-5 pr-5 cursor-pointer transition-colors ${
+                  selectedCategory === categoryName
+                    ? 'bg-secondary-500 text-white'
+                    : 'bg-accent-100 dark:bg-gray-700 text-secondary-700 dark:text-gray-200'
+                }`}
               >
-                <button
-                  onClick={() => setSelectedCategory('All')}
-                  className={`flex h-10 shrink-0 items-center justify-center gap-x-2 rounded-full pl-5 pr-5 cursor-pointer transition-colors ${
-                    selectedCategory === 'All'
-                      ? 'bg-secondary-500 text-white'
-                      : 'bg-accent-100 dark:bg-gray-700 text-secondary-700 dark:text-gray-200'
-                  }`}
-                >
-                  <p className={`text-sm ${selectedCategory === 'All' ? 'font-bold' : 'font-medium'}`}>
-                    All
-                  </p>
-                </button>
-                {Object.keys(groupedMenuItems).map((categoryName) => (
-                  <button
-                    key={categoryName}
-                    onClick={() => setSelectedCategory(categoryName)}
-                    className={`flex h-10 shrink-0 items-center justify-center gap-x-2 rounded-full pl-5 pr-5 cursor-pointer transition-colors ${
-                      selectedCategory === categoryName
-                        ? 'bg-secondary-500 text-white'
-                        : 'bg-accent-100 dark:bg-gray-700 text-secondary-700 dark:text-gray-200'
-                    }`}
-                  >
-                    <p className={`text-sm ${selectedCategory === categoryName ? 'font-bold' : 'font-medium'}`}>
-                      {categoryName}
-                    </p>
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
+                <p className={`text-sm ${selectedCategory === categoryName ? 'font-bold' : 'font-medium'}`}>
+                  {categoryName}
+                </p>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
 
-          {/* Center/Main Column: Menu Items or Order History */}
-          <div className="w-full lg:flex-1">
-            {activeTab === 'menu' ? (
-              <div className="flex flex-col gap-10">
-                {/* Menu Items by Category */}
-                {Object.entries(groupedMenuItems)
-                  .filter(([categoryName]) => selectedCategory === 'All' || categoryName === selectedCategory)
-                  .map(([categoryName, items]) => (
-                    <section key={categoryName} id={categoryName.toLowerCase().replace(/\s+/g, '-')}>
-                      <h2 className="text-3xl font-extrabold tracking-tight mb-6 text-secondary-700 dark:text-gray-100">
-                        {categoryName}
-                      </h2>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                        {items.map((item) => (
-                          <div
-                            key={item.id}
-                            className="flex flex-col rounded-xl bg-white dark:bg-gray-800 shadow-sm overflow-hidden border border-accent-200 dark:border-gray-700 hover:shadow-md transition-shadow"
-                          >
-                            <div
-                              className="w-full h-48 bg-cover bg-center"
-                              style={{
-                                backgroundImage: `url('${
-                                  item.image_url
-                                    ? getImageUrl(item.image_url)
-                                    : getPlaceholderImage(categoryName, item.name)
-                                }')`
-                              }}
-                            />
-                            <div className="p-4 flex flex-col flex-grow">
-                              <h3 className="text-lg font-bold text-secondary-700 dark:text-gray-100">{item.name}</h3>
-                              {item.description && (
-                                <p className="text-sm text-secondary-600 dark:text-gray-400 mt-1 flex-grow line-clamp-2">
-                                  {item.description}
-                                </p>
-                              )}
-                              <p className="text-lg font-semibold mt-3 text-secondary-700 dark:text-gray-100">
-                                {formatCurrency(item.price)}
-                              </p>
-                              <div className="flex items-center justify-end mt-4">
-                                <button
-                                  onClick={() => addToCart(item)}
-                                  className="flex items-center justify-center gap-2 h-10 px-4 rounded-lg bg-secondary-500 text-white text-sm font-bold hover:bg-secondary-600 transition-colors"
-                                >
-                                  <Plus className="h-4 w-4" />
-                                  <span>Add</span>
-                                </button>
+      {/* Main Content */}
+      <main className="min-h-screen bg-white dark:bg-gray-900">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-12 sm:pt-12 sm:pb-16">
+          {activeTab === 'menu' ? (
+            <div>
+              {/* Hero Section with Background Image */}
+              <div className="relative -mx-4 sm:-mx-6 lg:-mx-8 -mt-8 sm:-mt-12 mb-16">
+                <div
+                  className="relative h-[400px] sm:h-[500px] bg-cover bg-center bg-no-repeat"
+                  style={{
+                    backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('https://images.unsplash.com/photo-1504674900247-0877df9cc836?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80')`
+                  }}
+                >
+                  <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-4">
+                    <div className="flex items-center justify-center mb-4">
+                      <div className="h-px w-12 bg-orange-500 mr-3"></div>
+                      <span className="text-sm uppercase tracking-wider text-white/80 font-medium">Menu</span>
+                      <div className="h-px w-12 bg-orange-500 ml-3"></div>
+                    </div>
+                    <h1 className="text-4xl sm:text-5xl md:text-6xl font-serif font-bold mb-4 text-white">
+                      Discover Our menu
+                    </h1>
+                    <p className="text-white/80 max-w-2xl mx-auto text-base sm:text-lg leading-relaxed mb-8">
+                      Quaerat debitis, vel, sapiente dicta sequi labore porro pariatur harum expedita.
+                    </p>
+                    <div className="flex items-center gap-4">
+                      <button className="px-8 py-3 bg-orange-500 hover:bg-orange-600 text-white font-semibold rounded-full transition-colors">
+                        Order
+                      </button>
+                      <button
+                        onClick={() => document.getElementById('all-dishes-section')?.scrollIntoView({ behavior: 'smooth' })}
+                        className="px-8 py-3 bg-transparent border-2 border-white/50 hover:border-white text-white font-semibold rounded-full transition-colors"
+                      >
+                        Explore our menu
+                      </button>
+                    </div>
+                  </div>
+                  {/* Side Icons */}
+                  <div className="absolute right-4 top-1/2 transform -translate-y-1/2 flex flex-col gap-4 hidden sm:flex">
+                    <button className="w-10 h-10 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center text-white transition-colors">
+                      <Heart className="h-5 w-5" />
+                    </button>
+                    <button className="w-10 h-10 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center text-white transition-colors">
+                      <ShoppingBag className="h-5 w-5" />
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {Object.keys(groupedMenuItems).length === 0 ? (
+                <div className="text-center py-12">
+                  <img 
+                    src="/images/palm-cafe-logo.png" 
+                    alt="Palm Cafe Logo" 
+                    className="h-24 w-24 mx-auto mb-6 opacity-50"
+                  />
+                  <h3 className="text-xl font-semibold mb-2 text-gray-900 dark:text-gray-100">No menu items available</h3>
+                  <p className="text-base text-gray-500 dark:text-gray-400">Add items in Menu Management to get started</p>
+                </div>
+              ) : (
+                <div className="space-y-16">
+                  {/* Individual Category Sections - Show first */}
+                  {Object.entries(groupedMenuItems)
+                    .filter(([categoryName]) => selectedCategory === 'All' || categoryName === selectedCategory)
+                    .map(([categoryName, items], index) => {
+                      const categoryNumber = String(index + 1).padStart(2, '0');
+                      return (
+                        <div key={categoryName} className="space-y-8">
+                          {/* Divider before category (except first one) */}
+                          {((selectedCategory === 'All' && index > 0) || (selectedCategory !== 'All' && index > 0)) && (
+                            <div className="border-t border-dashed border-gray-300 dark:border-gray-600 mb-12"></div>
+                          )}
+
+                          {/* Category Header */}
+                          <div className="text-center mb-10">
+                            <div className="flex items-center justify-center mb-3">
+                              <div className="h-px w-12 bg-orange-500 mr-3"></div>
+                              <span className="text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400 font-medium">{categoryNumber}</span>
+                            </div>
+                            <h2 className="text-3xl sm:text-4xl font-serif font-bold text-gray-900 dark:text-gray-100 mb-3">
+                              {categoryName}
+                            </h2>
+                            <p className="text-gray-500 dark:text-gray-400 text-sm sm:text-base max-w-xl mx-auto leading-relaxed">
+                              Porro eveniet, autem ipsam corrupti consectetur cum. Repudiandae dignissimos fugiat sit nam.
+                            </p>
+                          </div>
+
+                          {/* Menu Items Grid - Horizontal Layout */}
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-8">
+                            {items.map((item, itemIndex) => {
+                              // Placeholder images from Unsplash for items without images
+                              const placeholderImages = [
+                                'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=200&h=200&fit=crop',
+                                'https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=200&h=200&fit=crop',
+                                'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=200&h=200&fit=crop',
+                                'https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?w=200&h=200&fit=crop',
+                                'https://images.unsplash.com/photo-1476224203421-9ac39bcb3327?w=200&h=200&fit=crop',
+                                'https://images.unsplash.com/photo-1499028344343-cd173ffc68a9?w=200&h=200&fit=crop',
+                              ];
+                              const itemImage = item.image_url
+                                ? getImageUrl(item.image_url)
+                                : placeholderImages[itemIndex % placeholderImages.length];
+
+                              return (
+                              <div
+                                key={item.id}
+                                className="group flex items-start gap-4 p-4 bg-white dark:bg-gray-800 rounded-lg hover:shadow-md transition-shadow"
+                              >
+                                {/* Menu Item Thumbnail */}
+                                <div className="flex-shrink-0 w-20 h-20 sm:w-24 sm:h-24 rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-700">
+                                  <img
+                                    src={itemImage}
+                                    alt={item.name}
+                                    className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                                  />
+                                </div>
+
+                                {/* Item Details */}
+                                <div className="flex-1 min-w-0">
+                                  <h5 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-gray-100 mb-1">
+                                    {item.name}
+                                  </h5>
+                                  <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 leading-relaxed line-clamp-2 mb-2">
+                                    {item.description || 'Consectetur adipisicing elit. Soluta, impedit, saepe.'}
+                                  </p>
+                                </div>
+
+                                {/* Price and Add to Cart */}
+                                <div className="flex flex-col items-end gap-2">
+                                  <span className="text-base sm:text-lg font-bold text-orange-500 whitespace-nowrap">
+                                    {formatCurrency(ensureNumber(item.price))}
+                                  </span>
+                                  <button
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      addToCart(item);
+                                    }}
+                                    className="w-10 h-10 rounded-full bg-orange-500 hover:bg-orange-600 text-white flex items-center justify-center transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-110 active:scale-95"
+                                    aria-label={`Add ${item.name} to cart`}
+                                  >
+                                    <ShoppingBag className="h-4 w-4" />
+                                  </button>
+                                </div>
                               </div>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      );
+                    })}
+
+                  {/* All Dishes Section - Show at the end when "All" is selected */}
+                  {selectedCategory === 'All' && (
+                    <div id="all-dishes-section" className="space-y-8">
+                      {/* Divider */}
+                      <div className="border-t border-dashed border-gray-300 dark:border-gray-600 mb-12"></div>
+
+                      {/* Category Header */}
+                      <div className="text-center mb-10">
+                        <div className="flex items-center justify-center mb-3">
+                          <div className="h-px w-12 bg-orange-500 mr-3"></div>
+                          <span className="text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400 font-medium">Complete Selection</span>
+                        </div>
+                        <h2 className="text-3xl sm:text-4xl font-serif font-bold text-gray-900 dark:text-gray-100 mb-3">
+                          All Dishes
+                        </h2>
+                        <p className="text-gray-500 dark:text-gray-400 text-sm sm:text-base max-w-xl mx-auto leading-relaxed">
+                          Browse our complete menu selection with all available dishes.
+                        </p>
+                      </div>
+
+                      {/* All Menu Items Grid - Horizontal Layout */}
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-8">
+                        {Object.values(groupedMenuItems).flat().map((item, index) => {
+                          // Placeholder images from Unsplash for items without images
+                          const placeholderImages = [
+                            'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=200&h=200&fit=crop',
+                            'https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=200&h=200&fit=crop',
+                            'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=200&h=200&fit=crop',
+                            'https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?w=200&h=200&fit=crop',
+                            'https://images.unsplash.com/photo-1476224203421-9ac39bcb3327?w=200&h=200&fit=crop',
+                            'https://images.unsplash.com/photo-1499028344343-cd173ffc68a9?w=200&h=200&fit=crop',
+                          ];
+                          const itemImage = item.image_url
+                            ? getImageUrl(item.image_url)
+                            : placeholderImages[index % placeholderImages.length];
+
+                          return (
+                          <div
+                            key={`all-${item.id}`}
+                            className="group flex items-start gap-4 p-4 bg-white dark:bg-gray-800 rounded-lg hover:shadow-md transition-shadow"
+                          >
+                            {/* Menu Item Thumbnail */}
+                            <div className="flex-shrink-0 w-20 h-20 sm:w-24 sm:h-24 rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-700">
+                              <img
+                                src={itemImage}
+                                alt={item.name}
+                                className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                              />
+                            </div>
+
+                            {/* Item Details */}
+                            <div className="flex-1 min-w-0">
+                              <h5 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-gray-100 mb-1">
+                                {item.name}
+                              </h5>
+                              <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 leading-relaxed line-clamp-2 mb-2">
+                                {item.description || 'Consectetur adipisicing elit. Soluta, impedit, saepe.'}
+                              </p>
+                            </div>
+
+                            {/* Price and Add to Cart */}
+                            <div className="flex flex-col items-end gap-2">
+                              <span className="text-base sm:text-lg font-bold text-orange-500 whitespace-nowrap">
+                                {formatCurrency(ensureNumber(item.price))}
+                              </span>
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  addToCart(item);
+                                }}
+                                className="w-10 h-10 rounded-full bg-orange-500 hover:bg-orange-600 text-white flex items-center justify-center transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-110 active:scale-95"
+                                aria-label={`Add ${item.name} to cart`}
+                              >
+                                <ShoppingBag className="h-4 w-4" />
+                              </button>
                             </div>
                           </div>
-                        ))}
+                          );
+                        })}
                       </div>
-                    </section>
-                  ))}
-              </div>
-            ) : (
-              /* Order History Tab */
-              <CustomerOrderHistory
-                customerPhone={customer?.phone}
-                setActiveTab={setActiveTab}
-                cart={cart}
-                setCart={setCart}
-              />
-            )}
-          </div>
+                    </div>
+                  )}
+
+                  {/* Promotional Banner - Pay for one Get two */}
+                  <div className="relative -mx-4 sm:-mx-6 lg:-mx-8 mt-16 mb-16">
+                    <div
+                      className="relative h-[300px] sm:h-[350px] bg-cover bg-center bg-no-repeat overflow-hidden"
+                      style={{
+                        backgroundImage: `url('https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80')`
+                      }}
+                    >
+                      {/* Dark overlay on left side */}
+                      <div className="absolute inset-0 bg-gradient-to-r from-gray-900/90 via-gray-900/70 to-transparent"></div>
+
+                      {/* Content */}
+                      <div className="absolute inset-0 flex items-center">
+                        <div className="px-8 sm:px-16 max-w-xl">
+                          <h2 className="text-4xl sm:text-5xl md:text-6xl font-serif font-bold text-orange-500 leading-tight mb-6">
+                            Pay for one<br />Get two!
+                          </h2>
+                          <button className="px-8 py-3 bg-orange-500 hover:bg-orange-600 text-white font-semibold rounded-full transition-colors uppercase tracking-wider text-sm">
+                            Reservation
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Discount Badge */}
+                      <div className="absolute right-8 sm:right-16 top-1/2 transform -translate-y-1/2">
+                        <div className="w-24 h-24 sm:w-32 sm:h-32 bg-orange-500 rounded-full flex items-center justify-center">
+                          <span className="text-white text-2xl sm:text-3xl font-bold">-50%</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Special Proposals Section */}
+                  <div className="mt-16">
+                    <div className="text-center mb-10">
+                      <div className="flex items-center justify-center mb-3">
+                        <div className="h-px w-12 bg-orange-500 mr-3"></div>
+                        <span className="text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400 font-medium">Featured</span>
+                        <div className="h-px w-12 bg-orange-500 ml-3"></div>
+                      </div>
+                      <h2 className="text-3xl sm:text-4xl font-serif font-bold text-gray-900 dark:text-gray-100 mb-3">
+                        Special Proposals
+                      </h2>
+                      <p className="text-gray-500 dark:text-gray-400 text-sm sm:text-base max-w-xl mx-auto leading-relaxed">
+                        Porro eveniet, autem ipsam corrupti consectetur cum. Repudiandae dignissimos fugiat sit nam.
+                      </p>
+                    </div>
+
+                    {/* Special Items Cards */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                      {Object.values(groupedMenuItems).flat().slice(0, 3).map((item, index) => {
+                        // Placeholder images from Unsplash for special items
+                        const specialPlaceholders = [
+                          'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=400&h=300&fit=crop',
+                          'https://images.unsplash.com/photo-1493770348161-369560ae357d?w=400&h=300&fit=crop',
+                          'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=400&h=300&fit=crop',
+                        ];
+                        const specialImage = item.image_url
+                          ? getImageUrl(item.image_url)
+                          : specialPlaceholders[index % specialPlaceholders.length];
+
+                        return (
+                        <div
+                          key={`special-${item.id}`}
+                          className="group bg-white dark:bg-gray-800 rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-shadow"
+                        >
+                          {/* Item Image */}
+                          <div className="relative h-48 sm:h-56 overflow-hidden">
+                            <img
+                              src={specialImage}
+                              alt={item.name}
+                              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                            />
+                          </div>
+
+                          {/* Item Details */}
+                          <div className="p-5">
+                            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">
+                              {item.name}
+                            </h3>
+                            <p className="text-sm text-gray-500 dark:text-gray-400 leading-relaxed mb-4 line-clamp-2">
+                              {item.description || 'Consectetur adipisicing elit. Soluta, impedit, saepe.'}
+                            </p>
+
+                            {/* Price and Add to Cart */}
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center gap-2">
+                                {index === 0 && (
+                                  <span className="text-sm text-gray-400 line-through">
+                                    {formatCurrency(ensureNumber(item.price) * 1.3)}
+                                  </span>
+                                )}
+                                <span className="text-xl font-bold text-orange-500">
+                                  {formatCurrency(ensureNumber(item.price))}
+                                </span>
+                              </div>
+                              <button
+                                onClick={() => addToCart(item)}
+                                className="w-10 h-10 rounded-full bg-orange-500 hover:bg-orange-600 text-white flex items-center justify-center transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-110 active:scale-95"
+                                aria-label={`Add ${item.name} to cart`}
+                              >
+                                <ShoppingBag className="h-4 w-4" />
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                        );
+                      })}
+                    </div>
+
+                    {/* View All Products Button */}
+                    <div className="text-center mt-10">
+                      <button
+                        onClick={() => document.getElementById('all-dishes-section')?.scrollIntoView({ behavior: 'smooth' })}
+                        className="inline-flex items-center gap-2 px-8 py-3 bg-orange-500 hover:bg-orange-600 text-white font-semibold rounded-full transition-colors"
+                      >
+                        All Products
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Footer Section */}
+                  <div className="mt-20 pt-16 border-t border-gray-200 dark:border-gray-700">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
+                      {/* Articles Column */}
+                      <div>
+                        <h3 className="text-xl font-serif font-bold text-orange-500 mb-4">Articles</h3>
+                        <p className="text-gray-600 dark:text-gray-400 text-sm leading-relaxed mb-4">
+                          Stay updated with the latest news, recipes, and culinary tips from our kitchen. Discover new flavors and cooking inspirations.
+                        </p>
+                        <button className="text-orange-500 hover:text-orange-600 text-sm font-medium flex items-center gap-1 transition-colors">
+                          Read More
+                          <span className="text-lg">→</span>
+                        </button>
+                      </div>
+
+                      {/* Contact Info Column */}
+                      <div>
+                        <h3 className="text-xl font-serif font-bold text-orange-500 mb-4">Contact Info</h3>
+                        <p className="text-gray-600 dark:text-gray-400 text-sm leading-relaxed mb-4">
+                          Have questions or want to make a reservation? We'd love to hear from you. Reach out to us for any inquiries.
+                        </p>
+                        <button className="text-orange-500 hover:text-orange-600 text-sm font-medium flex items-center gap-1 transition-colors">
+                          Read More
+                          <span className="text-lg">→</span>
+                        </button>
+                      </div>
+
+                      {/* Gallery Column */}
+                      <div>
+                        <h3 className="text-xl font-serif font-bold text-orange-500 mb-4">Gallery</h3>
+                        <div className="grid grid-cols-3 gap-2 mb-4">
+                          {[
+                            'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=100&h=100&fit=crop',
+                            'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=100&h=100&fit=crop',
+                            'https://images.unsplash.com/photo-1493770348161-369560ae357d?w=100&h=100&fit=crop',
+                            'https://images.unsplash.com/photo-1476224203421-9ac39bcb3327?w=100&h=100&fit=crop',
+                            'https://images.unsplash.com/photo-1499028344343-cd173ffc68a9?w=100&h=100&fit=crop',
+                            'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=100&h=100&fit=crop',
+                          ].map((url, idx) => (
+                            <div key={idx} className="aspect-square rounded-lg overflow-hidden">
+                              <img
+                                src={url}
+                                alt={`Gallery ${idx + 1}`}
+                                className="w-full h-full object-cover hover:scale-110 transition-transform duration-300"
+                              />
+                            </div>
+                          ))}
+                        </div>
+                        <button className="text-orange-500 hover:text-orange-600 text-sm font-medium flex items-center gap-1 transition-colors">
+                          See More
+                          <span className="text-lg">→</span>
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Back to Top */}
+                    <div className="text-center mt-12">
+                      <button
+                        onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+                        className="text-orange-500 hover:text-orange-600 text-sm font-medium transition-colors"
+                      >
+                        Back to top ↑
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          ) : (
+            /* Order History Tab */
+            <CustomerOrderHistory
+              customerPhone={customer?.phone}
+              setActiveTab={setActiveTab}
+              cart={cart}
+              setCart={setCart}
+            />
+          )}
         </div>
       </main>
 
