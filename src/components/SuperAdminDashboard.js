@@ -2,9 +2,10 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
 import { 
   Building, Users, ShoppingCart, TrendingUp, Clock, 
-  CheckCircle, XCircle, ArrowRight, Settings, BarChart3 
+  CheckCircle, XCircle, ArrowRight, Settings, BarChart3, LogIn
 } from 'lucide-react';
 import { CardSkeleton } from './ui/Skeleton';
 
@@ -13,7 +14,10 @@ const SuperAdminDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [selectedCafe, setSelectedCafe] = useState(null);
   const [cafeMetrics, setCafeMetrics] = useState(null);
+  const [impersonationSlug, setImpersonationSlug] = useState('');
+  const [impersonating, setImpersonating] = useState(false);
   const navigate = useNavigate();
+  const { startImpersonation, impersonation: impersonationState } = useAuth();
 
   useEffect(() => {
     fetchCafesOverview();
@@ -76,6 +80,23 @@ const SuperAdminDashboard = () => {
     );
   }
 
+  const handleImpersonate = async () => {
+    if (!impersonationSlug.trim()) {
+      toast.error('Please enter a cafe slug');
+      return;
+    }
+
+    setImpersonating(true);
+    const result = await startImpersonation(impersonationSlug.trim());
+    setImpersonating(false);
+
+    if (result.success) {
+      setImpersonationSlug('');
+      // Redirect to cafe admin view
+      navigate('/');
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div>
@@ -86,6 +107,54 @@ const SuperAdminDashboard = () => {
           System-wide metrics and cafe performance
         </p>
       </div>
+
+      {/* Impersonation Section */}
+      {!impersonationState?.isImpersonating && (
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 border-l-4 border-blue-500">
+          <div className="flex items-center justify-between">
+            <div className="flex-1">
+              <h3 className="text-lg font-semibold text-secondary-700 dark:text-gray-100 mb-2 flex items-center gap-2">
+                <LogIn className="h-5 w-5 text-blue-500" />
+                Login as Cafe
+              </h3>
+              <p className="text-sm text-secondary-600 dark:text-gray-400 mb-4">
+                Impersonate a cafe owner/admin to view the application from their perspective. All actions will be logged for audit purposes.
+              </p>
+              <div className="flex items-center gap-3">
+                <input
+                  type="text"
+                  value={impersonationSlug}
+                  onChange={(e) => setImpersonationSlug(e.target.value)}
+                  placeholder="Enter cafe slug (e.g., 'my-cafe')"
+                  className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                  onKeyPress={(e) => {
+                    if (e.key === 'Enter') {
+                      handleImpersonate();
+                    }
+                  }}
+                />
+                <button
+                  onClick={handleImpersonate}
+                  disabled={impersonating || !impersonationSlug.trim()}
+                  className="px-6 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                >
+                  {impersonating ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
+                      <span>Starting...</span>
+                    </>
+                  ) : (
+                    <>
+                      <LogIn className="h-4 w-4" />
+                      <span>Login as Cafe</span>
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* System Overview Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">

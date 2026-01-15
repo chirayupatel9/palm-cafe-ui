@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import axios from 'axios';
 import DarkModeToggle from './DarkModeToggle';
+import ImpersonationBanner from './ImpersonationBanner';
 import CafeManagement from './CafeManagement';
 import SuperAdminDashboard from './SuperAdminDashboard';
 import SuperAdminUserManagement from './SuperAdminUserManagement';
@@ -17,7 +18,7 @@ import SuperAdminCafeUsers from './SuperAdminCafeUsers';
 const SuperadminApp = () => {
   const [loading, setLoading] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const { user, logout } = useAuth();
+  const { user, logout, impersonation } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const params = useParams();
@@ -142,11 +143,12 @@ const SuperadminApp = () => {
 
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div className={`min-h-screen bg-gray-50 dark:bg-gray-900 ${impersonation?.isImpersonating ? 'pt-16' : ''}`}>
       <Toaster position="top-right" />
+      <ImpersonationBanner />
     
       {/* Header */}
-      <header className="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700">
+      <header className={`bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700 ${user?.role === 'superadmin' && !user?.cafe_id ? '' : ''}`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center">

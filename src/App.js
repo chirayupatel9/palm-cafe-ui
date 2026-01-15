@@ -33,6 +33,7 @@ import ReceptionRegister from './components/ReceptionRegister';
 import ChefApp from './components/ChefApp';
 import ReceptionApp from './components/ReceptionApp';
 import SuperadminApp from './components/SuperadminApp';
+import ImpersonationBanner from './components/ImpersonationBanner';
 import ProtectedRoute from './components/ProtectedRoute';
 import RoleBasedRedirect from './components/RoleBasedRedirect';
 import DashboardRedirect from './components/DashboardRedirect';
@@ -69,7 +70,7 @@ function MainApp() {
   const [loading, setLoading] = useState(true);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [cart, setCart] = useState([]);
-  const { user, logout } = useAuth();
+  const { user, logout, impersonation } = useAuth();
   const { cafeSettings, loading: cafeSettingsLoading } = useCafeSettings();
   const { hasModuleAccess, loading: subscriptionLoading, subscription, isActive, getStatus } = useSubscription();
   const { hasFeature, loading: featuresLoading, features, plan, status } = useFeatures();
@@ -250,7 +251,7 @@ function MainApp() {
   }
 
   return (
-    <div className="min-h-screen surface-page">
+    <div className={`min-h-screen surface-page ${impersonation?.isImpersonating ? 'pt-16' : ''}`}>
       <Toaster position="top-right" />
     
     {/* Header - Distinct navigation surface */}
@@ -430,6 +431,7 @@ function App() {
               <ThemeProvider>
                 <SubscriptionProvider>
                   <FeatureProvider>
+                    <ImpersonationBanner />
                 <Routes>
                   <Route path="/" element={<LandingPage />} />
                   <Route path="/login" element={<Login />} />

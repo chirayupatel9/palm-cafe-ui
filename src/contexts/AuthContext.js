@@ -16,6 +16,7 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [token, setToken] = useState(localStorage.getItem('token'));
+  const [impersonation, setImpersonation] = useState(null);
 
   // Set up axios interceptor for authentication
   useEffect(() => {
@@ -33,7 +34,10 @@ export const AuthProvider = ({ children }) => {
         try {
           const response = await axios.get('/auth/profile');
           const userData = response.data.user;
+          const impersonationData = response.data.impersonation || { isImpersonating: false };
+          
           setUser(userData);
+          setImpersonation(impersonationData);
           
           // Update document title with cafe name if available
           if (userData.cafe_name) {
@@ -58,6 +62,7 @@ export const AuthProvider = ({ children }) => {
       } else {
         // Reset title when logged out
         document.title = 'Palm Cafe Management System';
+        setImpersonation(null);
       }
       setLoading(false);
     };
@@ -72,6 +77,7 @@ export const AuthProvider = ({ children }) => {
       
       setUser(userData);
       setToken(authToken);
+      setImpersonation({ isImpersonating: false });
       localStorage.setItem('token', authToken);
       
       // Update document title with cafe name if available
@@ -88,6 +94,60 @@ export const AuthProvider = ({ children }) => {
       return { 
         success: false, 
         error: error.response?.data?.error || 'Login failed' 
+      };
+    }
+  };
+
+  const startImpersonation = async (cafeSlug) => {
+    try {
+      const response = await axios.post('/superadmin/impersonate-cafe', { cafeSlug });
+      const { user: userData, token: authToken, impersonation: impersonationData } = response.data;
+      
+      setUser(userData);
+      setToken(authToken);
+      setImpersonation(impersonationData);
+      localStorage.setItem('token', authToken);
+      
+      // Update document title
+      if (userData.cafe_name) {
+        document.title = userData.cafe_name;
+      }
+      
+      toast.success(response.data.message || 'Impersonation started');
+      return { success: true, user: userData, impersonation: impersonationData };
+    } catch (error) {
+      toast.error(error.response?.data?.error || 'Failed to start impersonation');
+      return { 
+        success: false, 
+        error: error.response?.data?.error || 'Failed to start impersonation' 
+      };
+    }
+  };
+
+  const exitImpersonation = async () => {
+    try {
+      const response = await axios.post('/superadmin/exit-impersonation');
+      const { user: userData, token: authToken } = response.data;
+      
+      setUser(userData);
+      setToken(authToken);
+      setImpersonation({ isImpersonating: false });
+      localStorage.setItem('token', authToken);
+      
+      // Update document title
+      if (userData.role === 'superadmin') {
+        document.title = 'Super Admin Dashboard';
+      } else {
+        document.title = 'Cafe Management System';
+      }
+      
+      toast.success(response.data.message || 'Impersonation ended');
+      return { success: true, user: userData };
+    } catch (error) {
+      toast.error(error.response?.data?.error || 'Failed to exit impersonation');
+      return { 
+        success: false, 
+        error: error.response?.data?.error || 'Failed to exit impersonation' 
       };
     }
   };
@@ -161,6 +221,7 @@ export const AuthProvider = ({ children }) => {
   const logout = () => {
     setUser(null);
     setToken(null);
+    setImpersonation(null);
     localStorage.removeItem('token');
     delete axios.defaults.headers.common['Authorization'];
     // Reset title on logout
@@ -171,6 +232,7 @@ export const AuthProvider = ({ children }) => {
     user,
     token,
     loading,
+    impersonation,
     login,
     register,
     registerAdmin,
@@ -178,6 +240,8 @@ export const AuthProvider = ({ children }) => {
     registerReception,
     registerSuperadmin,
     logout,
+    startImpersonation,
+    exitImpersonation,
     isAuthenticated: !!user
   };
 
