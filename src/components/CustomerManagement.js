@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { useCafeSettings } from '../contexts/CafeSettingsContext';
+import { getImageUrl } from '../utils/imageUtils';
 import axios from 'axios';
 import { toast } from 'react-hot-toast';
 import { useAuth } from '../contexts/AuthContext';
@@ -26,6 +28,7 @@ import { EmptyCustomers } from './ui/EmptyState';
 const CustomerManagement = () => {
   const { isAuthenticated, user, loading: authLoading } = useAuth();
   const { isDarkMode } = useDarkMode();
+  const { cafeSettings } = useCafeSettings();
   const [customers, setCustomers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
@@ -223,8 +226,8 @@ const CustomerManagement = () => {
     return (
       <div className="flex flex-col items-center justify-center py-12">
         <img 
-          src="/images/palm-cafe-logo.png" 
-          alt="Palm Cafe Logo" 
+          src={cafeSettings.logo_url ? getImageUrl(cafeSettings.logo_url) : '/images/palm-cafe-logo.png'} 
+          alt={`${cafeSettings.cafe_name || 'Cafe'} Logo`} 
           className="h-16 w-16 mb-4 opacity-50"
         />
         <h2 className="text-xl font-semibold text-secondary-700 dark:text-secondary-300 mb-2">Authentication Required</h2>

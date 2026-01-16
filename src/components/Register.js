@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
+import CafeInfo from './CafeInfo';
 
 const Register = () => {
   return (
@@ -8,11 +9,7 @@ const Register = () => {
       <div className="max-w-md w-full space-y-8">
         <div>
           <div className="flex justify-center">
-            <img 
-              src="/images/palm-cafe-logo.png" 
-              alt="Palm Cafe Logo" 
-              className="h-16 w-16"
-            />
+            <CafeInfo logoSize="h-16 w-16" nameSize="text-xl" />
           </div>
           <h2 className="mt-6 text-center text-3xl font-extrabold text-secondary-700 dark:text-gray-100">
             Admin Registration

@@ -540,8 +540,8 @@ const KitchenOrders = ({ cart, setCart }) => {
     return (
       <div className="flex flex-col items-center justify-center py-12">
         <img 
-          src="/images/palm-cafe-logo.png" 
-          alt="Palm Cafe Logo" 
+          src={cafeSettings.logo_url ? getImageUrl(cafeSettings.logo_url) : '/images/palm-cafe-logo.png'} 
+          alt={`${cafeSettings.cafe_name || 'Cafe'} Logo`} 
           className="h-16 w-16 mb-4 opacity-50"
         />
         <h2 className="text-xl font-semibold text-secondary-700 dark:text-secondary-300 mb-2">Authentication Required</h2>
@@ -563,11 +563,17 @@ const KitchenOrders = ({ cart, setCart }) => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center">
-          <img 
-            src="/images/palm-cafe-logo.png" 
-            alt="Palm Cafe Logo" 
-            className="h-12 w-12 mr-4"
-          />
+          {cafeSettings.logo_url ? (
+            <img 
+              src={getImageUrl(cafeSettings.logo_url)} 
+              alt={`${cafeSettings.cafe_name || 'Cafe'} Logo`} 
+              className="h-12 w-12 mr-4"
+            />
+          ) : (
+            <div className="h-12 w-12 mr-4 bg-primary-600 rounded flex items-center justify-center text-white font-bold">
+              {cafeSettings.cafe_name ? cafeSettings.cafe_name.charAt(0).toUpperCase() : 'C'}
+            </div>
+          )}
           <div>
             <h1 className="text-2xl font-bold text-secondary-700 dark:text-secondary-300">Kitchen Orders</h1>
             <p className="text-gray-600 dark:text-gray-400">Manage and track order preparation</p>

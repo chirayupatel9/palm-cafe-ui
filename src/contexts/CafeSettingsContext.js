@@ -13,7 +13,7 @@ export const useCafeSettings = () => {
 
 export const CafeSettingsProvider = ({ children }) => {
   const [cafeSettings, setCafeSettings] = useState({
-    cafe_name: 'Our Cafe',
+    cafe_name: null,
     logo_url: null,
     address: '',
     phone: '',

@@ -69,7 +69,7 @@ export const AuthProvider = ({ children }) => {
         }
       } else {
         // Reset title when logged out
-        document.title = 'Palm Cafe Management System';
+        document.title = 'Cafe Management System';
         setImpersonation(null);
       }
       setLoading(false);
@@ -233,7 +233,7 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem('token');
     delete axios.defaults.headers.common['Authorization'];
     // Reset title on logout
-    document.title = 'Palm Cafe Management System';
+    document.title = 'Cafe Management System';
   };
 
   const value = {

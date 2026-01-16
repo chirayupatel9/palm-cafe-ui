@@ -6,6 +6,8 @@ import { useCurrency } from '../contexts/CurrencyContext';
 import { useAuth } from '../contexts/AuthContext';
 import { useDarkMode } from '../contexts/DarkModeContext';
 import { useFeatures } from '../contexts/FeatureContext';
+import { useCafeSettings } from '../contexts/CafeSettingsContext';
+import { getImageUrl } from '../utils/imageUtils';
 import LockedFeature from './ui/LockedFeature';
 
 const InventoryManagement = () => {
@@ -13,6 +15,7 @@ const InventoryManagement = () => {
   const { isAuthenticated, user, loading: authLoading } = useAuth();
   const { isDarkMode } = useDarkMode();
   const { hasFeature, loading: featuresLoading } = useFeatures();
+  const { cafeSettings } = useCafeSettings();
   const [inventory, setInventory] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showAddForm, setShowAddForm] = useState(false);
@@ -275,8 +278,8 @@ const InventoryManagement = () => {
     return (
       <div className="flex flex-col items-center justify-center py-12">
         <img 
-          src="/images/palm-cafe-logo.png" 
-          alt="Palm Cafe Logo" 
+          src={cafeSettings.logo_url ? getImageUrl(cafeSettings.logo_url) : '/images/palm-cafe-logo.png'} 
+          alt={`${cafeSettings.cafe_name || 'Cafe'} Logo`} 
           className="h-12 w-12 mb-3"
         />
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-secondary-500"></div>
@@ -317,8 +320,8 @@ const InventoryManagement = () => {
     return (
       <div className="flex flex-col items-center justify-center py-12">
         <img 
-          src="/images/palm-cafe-logo.png" 
-          alt="Palm Cafe Logo" 
+          src={cafeSettings.logo_url ? getImageUrl(cafeSettings.logo_url) : '/images/palm-cafe-logo.png'} 
+          alt={`${cafeSettings.cafe_name || 'Cafe'} Logo`} 
           className="h-16 w-16 mb-4 opacity-50"
         />
         <h2 className={`text-xl font-semibold mb-2 ${isDarkMode ? 'text-gray-300' : 'text-secondary-700'}`}>Authentication Required</h2>
@@ -340,11 +343,17 @@ const InventoryManagement = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center">
-          <img 
-            src="/images/palm-cafe-logo.png" 
-            alt="Palm Cafe Logo" 
-            className="h-12 w-12 mr-4"
-          />
+          {cafeSettings.logo_url ? (
+            <img 
+              src={getImageUrl(cafeSettings.logo_url)} 
+              alt={`${cafeSettings.cafe_name || 'Cafe'} Logo`} 
+              className="h-12 w-12 mr-4"
+            />
+          ) : (
+            <div className="h-12 w-12 mr-4 bg-primary-600 rounded flex items-center justify-center text-white font-bold">
+              {cafeSettings.cafe_name ? cafeSettings.cafe_name.charAt(0).toUpperCase() : 'C'}
+            </div>
+          )}
           <div>
             <h1 className={`text-2xl font-bold ${isDarkMode ? 'text-gray-100' : 'text-secondary-700'}`}>Inventory Management</h1>
             <p className={isDarkMode ? 'text-gray-400' : 'text-gray-600'}>Track stock levels, set reorder points, and manage suppliers</p>

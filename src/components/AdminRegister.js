@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useCafeSettings } from '../contexts/CafeSettingsContext';
+import { getImageUrl } from '../utils/imageUtils';
 import { Link, useNavigate } from 'react-router-dom';
 import { Eye, EyeOff, UserPlus, Shield, ArrowLeft } from 'lucide-react';
 import toast from 'react-hot-toast';
@@ -102,17 +103,23 @@ const AdminRegister = () => {
       <div className="max-w-md w-full space-y-8">
         <div>
           <div className="flex justify-center">
-            <img 
-              src="/images/palm-cafe-logo.png" 
-              alt="Palm Cafe Logo" 
-              className="h-16 w-16"
-            />
+            {cafeSettings.logo_url ? (
+              <img 
+                src={getImageUrl(cafeSettings.logo_url)} 
+                alt={`${cafeSettings.cafe_name || 'Cafe'} Logo`} 
+                className="h-16 w-16"
+              />
+            ) : (
+              <div className="h-16 w-16 bg-primary-600 rounded flex items-center justify-center text-white font-bold text-xl">
+                {cafeSettings.cafe_name ? cafeSettings.cafe_name.charAt(0).toUpperCase() : 'C'}
+              </div>
+            )}
           </div>
           <h2 className="mt-6 text-center text-3xl font-extrabold text-secondary-700 dark:text-gray-100">
             Register New Admin
           </h2>
           <p className="mt-2 text-center text-sm text-secondary-600 dark:text-gray-400">
-            Create a new admin account for {cafeSettings?.cafe_name || 'Our Cafe'}
+            Create a new admin account{cafeSettings?.cafe_name ? ` for ${cafeSettings.cafe_name}` : ''}
           </p>
           <div className="mt-4 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
             <div className="flex items-center text-sm text-blue-700 dark:text-blue-300">

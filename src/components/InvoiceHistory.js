@@ -264,7 +264,7 @@ const InvoiceHistory = ({ cart, setCart, setCurrentPage }) => {
         {cafeSettings.logo_url && (
           <img 
             src={getImageUrl(cafeSettings.logo_url)} 
-            alt={`${cafeSettings.cafe_name} Logo`} 
+            alt={`${cafeSettings.cafe_name || 'Cafe'} Logo`} 
             className="h-12 w-12 mb-3"
           />
         )}
@@ -282,7 +282,7 @@ const InvoiceHistory = ({ cart, setCart, setCurrentPage }) => {
           {cafeSettings.logo_url && (
             <img 
               src={getImageUrl(cafeSettings.logo_url)} 
-              alt={`${cafeSettings.cafe_name} Logo`}
+              alt={`${cafeSettings.cafe_name || 'Cafe'} Logo`}
               className="h-10 w-10 mr-3"
             />
           )}
@@ -478,7 +478,7 @@ const InvoiceHistory = ({ cart, setCart, setCurrentPage }) => {
                 {cafeSettings.logo_url && (
                   <img 
                     src={getImageUrl(cafeSettings.logo_url)} 
-                    alt={`${cafeSettings.cafe_name} Logo`} 
+                    alt={`${cafeSettings.cafe_name || 'Cafe'} Logo`} 
                     className="h-16 w-16 mx-auto mb-4 opacity-50"
                   />
                 )}

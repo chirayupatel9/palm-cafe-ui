@@ -148,7 +148,7 @@ const CustomerApp = () => {
                  )}
                </div>
                <h2 className={`text-2xl font-bold text-center mb-2 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                 Welcome to {cafeBranding.cafe_name || 'Our Cafe'}
+                 Welcome{cafeBranding.cafe_name ? ` to ${cafeBranding.cafe_name}` : ''}
                </h2>
                <p className={`text-center text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
                  Enter your phone number to continue

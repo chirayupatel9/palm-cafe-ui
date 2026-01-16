@@ -1,10 +1,13 @@
 import React, { useState } from 'react';
 import { User, Mail, Lock, Phone, ArrowLeft } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
+import { useCafeSettings } from '../contexts/CafeSettingsContext';
+import { getImageUrl } from '../utils/imageUtils';
 import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 
 const ReceptionRegister = () => {
+  const { cafeSettings } = useCafeSettings();
   const [formData, setFormData] = useState({
     username: '',
     email: '',
@@ -70,8 +73,8 @@ const ReceptionRegister = () => {
         {/* Header */}
         <div className="text-center">
           <img 
-            src="/images/palm-cafe-logo.png" 
-            alt="Palm Cafe Logo" 
+            src={cafeSettings.logo_url ? getImageUrl(cafeSettings.logo_url) : '/images/palm-cafe-logo.png'} 
+            alt={`${cafeSettings.cafe_name || 'Cafe'} Logo`} 
             className="h-16 w-16 mx-auto mb-4"
           />
           <h2 className="text-3xl font-bold text-secondary-700 dark:text-secondary-300 mb-2">

@@ -2,8 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { DollarSign, Edit, Save, X, Calendar, Globe, Flag } from 'lucide-react';
 import axios from 'axios';
 import { useCurrency } from '../contexts/CurrencyContext';
+import { useCafeSettings } from '../contexts/CafeSettingsContext';
+import { getImageUrl } from '../utils/imageUtils';
 
 const CurrencySettings = () => {
+  const { cafeSettings } = useCafeSettings();
   const [currentSettings, setCurrentSettings] = useState(null);
   const [history, setHistory] = useState([]);
   const [availableCurrencies, setAvailableCurrencies] = useState([]);
@@ -117,8 +120,8 @@ const CurrencySettings = () => {
     return (
       <div className="flex flex-col items-center justify-center py-12">
         <img 
-          src="/images/palm-cafe-logo.png" 
-          alt="Palm Cafe Logo" 
+          src={cafeSettings.logo_url ? getImageUrl(cafeSettings.logo_url) : '/images/palm-cafe-logo.png'} 
+          alt={`${cafeSettings.cafe_name || 'Cafe'} Logo`} 
           className="h-12 w-12 mb-3"
         />
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-secondary-500"></div>
@@ -132,11 +135,17 @@ const CurrencySettings = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center space-y-2 sm:space-y-0">
         <div className="flex items-center">
-          <img 
-            src="/images/palm-cafe-logo.png" 
-            alt="Palm Cafe Logo" 
-            className="h-10 w-10 mr-3"
-          />
+          {cafeSettings.logo_url ? (
+            <img 
+              src={getImageUrl(cafeSettings.logo_url)} 
+              alt={`${cafeSettings.cafe_name || 'Cafe'} Logo`} 
+              className="h-10 w-10 mr-3"
+            />
+          ) : (
+            <div className="h-10 w-10 mr-3 bg-primary-600 rounded flex items-center justify-center text-white font-bold">
+              {cafeSettings.cafe_name ? cafeSettings.cafe_name.charAt(0).toUpperCase() : 'C'}
+            </div>
+          )}
           <div>
             <h2 className="text-xl sm:text-2xl font-bold text-secondary-700 dark:text-secondary-300 flex items-center">
               <Globe className="h-6 w-6 mr-2" />
@@ -310,11 +319,17 @@ const CurrencySettings = () => {
         
         {history.length === 0 ? (
           <div className="text-center py-8 text-gray-500 dark:text-gray-400">
-            <img 
-              src="/images/palm-cafe-logo.png" 
-              alt="Palm Cafe Logo" 
-              className="h-12 w-12 mx-auto mb-3 opacity-50"
-            />
+            {cafeSettings.logo_url ? (
+              <img 
+                src={getImageUrl(cafeSettings.logo_url)} 
+                alt={`${cafeSettings.cafe_name || 'Cafe'} Logo`} 
+                className="h-12 w-12 mx-auto mb-3 opacity-50"
+              />
+            ) : (
+              <div className="h-12 w-12 mx-auto mb-3 bg-primary-600 rounded flex items-center justify-center text-white font-bold opacity-50">
+                {cafeSettings.cafe_name ? cafeSettings.cafe_name.charAt(0).toUpperCase() : 'C'}
+              </div>
+            )}
             <p>No currency history available</p>
           </div>
         ) : (

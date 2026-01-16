@@ -333,7 +333,7 @@ const CafeManagement = () => {
                     value={formData.name}
                     onChange={handleInputChange}
                     required
-                    placeholder="Palm Cafe"
+                    placeholder="My Cafe"
                     className="input-field"
                   />
                 </div>

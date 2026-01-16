@@ -18,11 +18,11 @@ const CafeInfo = ({
       {showLogo && cafeSettings.logo_url && (
         <img 
           src={getImageUrl(cafeSettings.logo_url)} 
-          alt={`${cafeSettings.cafe_name} Logo`} 
+          alt={`${cafeSettings.cafe_name || 'Cafe'} Logo`} 
           className={`${logoSize} mr-3 ${logoClassName}`}
         />
       )}
-      {showName && (
+      {showName && cafeSettings.cafe_name && (
         <h1 className={`font-bold ${nameSize} ${nameClassName}`}>
           {cafeSettings.cafe_name}
         </h1>

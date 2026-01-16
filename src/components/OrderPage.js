@@ -385,7 +385,7 @@ const OrderPage = ({ menuItems, cart: externalCart, setCart: setExternalCart }) 
               {cafeSettings.logo_url && (
                 <img 
                   src={getImageUrl(cafeSettings.logo_url)} 
-                  alt={`${cafeSettings.cafe_name} Logo`} 
+                  alt={`${cafeSettings.cafe_name || 'Cafe'} Logo`} 
                   className="h-24 w-24 mx-auto mb-6 opacity-50"
                 />
               )}
@@ -514,7 +514,7 @@ const OrderPage = ({ menuItems, cart: externalCart, setCart: setExternalCart }) 
                   {cafeSettings.logo_url && (
                     <img 
                       src={getImageUrl(cafeSettings.logo_url)} 
-                      alt={`${cafeSettings.cafe_name} Logo`} 
+                      alt={`${cafeSettings.cafe_name || 'Cafe'} Logo`} 
                       className="h-8 w-8 mr-2"
                     />
                   )}
@@ -778,7 +778,7 @@ const OrderPage = ({ menuItems, cart: externalCart, setCart: setExternalCart }) 
                       </div>
                     </div>
                     
-                    <div className="text-sm font-medium text-gray-700">{cafeSettings?.cafe_name || 'Our Cafe'}</div>
+                    <div className="text-sm font-medium text-gray-700">{cafeSettings?.cafe_name || 'Cafe'}</div>
                     
                     <div className="h-2 -mx-4 -mb-4 rounded-b-lg" style={{ backgroundColor: 'var(--color-primary)' }}></div>
                   </div>
@@ -983,7 +983,7 @@ const OrderPage = ({ menuItems, cart: externalCart, setCart: setExternalCart }) 
               {cafeSettings.logo_url && (
                 <img 
                   src={getImageUrl(cafeSettings.logo_url)} 
-                  alt={`${cafeSettings.cafe_name} Logo`} 
+                  alt={`${cafeSettings.cafe_name || 'Cafe'} Logo`} 
                   className="h-8 w-8 mr-2"
                 />
               )}
@@ -1244,7 +1244,7 @@ const OrderPage = ({ menuItems, cart: externalCart, setCart: setExternalCart }) 
                     </div>
                   </div>
                   
-                  <div className="text-sm font-medium text-gray-700">{cafeSettings?.cafe_name || 'Our Cafe'}</div>
+                  <div className="text-sm font-medium text-gray-700">{cafeSettings?.cafe_name || 'Cafe'}</div>
                   
                   <div className="h-2 -mx-4 -mb-4 rounded-b-lg" style={{ backgroundColor: 'var(--color-primary)' }}></div>
                 </div>

@@ -58,7 +58,7 @@ const TitleUpdater = () => {
         document.title = 'Cafe Management System';
       }
     } else {
-      document.title = 'Palm Cafe Management System';
+      document.title = 'Cafe Management System';
     }
   }, [user]);
   
@@ -410,7 +410,7 @@ function App() {
     // Only set default title if no user is logged in
     // AuthContext will update it when user logs in
     if (!localStorage.getItem('token')) {
-      document.title = 'Palm Cafe Management System';
+      document.title = 'Cafe Management System';
     }
   }, []);
 

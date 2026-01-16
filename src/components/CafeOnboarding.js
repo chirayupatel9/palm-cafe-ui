@@ -275,7 +275,7 @@ const CafeOnboarding = () => {
         {/* Header */}
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-secondary-700 dark:text-secondary-300 mb-2">
-            Welcome to Palm Cafe!
+            Welcome!
           </h1>
           <p className="text-secondary-600 dark:text-gray-400">
             Let's set up your cafe in just a few steps

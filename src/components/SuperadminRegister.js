@@ -76,7 +76,7 @@ const SuperadminRegister = ({ onBack }) => {
             {cafeSettings.logo_url && (
               <img 
                 src={getImageUrl(cafeSettings.logo_url)} 
-                alt={`${cafeSettings.cafe_name} Logo`} 
+                alt={`${cafeSettings.cafe_name || 'Cafe'} Logo`} 
                 className="h-16 w-16"
               />
             )}
@@ -85,7 +85,7 @@ const SuperadminRegister = ({ onBack }) => {
             Register New Superadmin
           </h2>
           <p className="mt-2 text-center text-sm text-secondary-600 dark:text-gray-400">
-            Create a new superadmin account for {cafeSettings.cafe_name}
+            Create a new superadmin account{cafeSettings.cafe_name ? ` for ${cafeSettings.cafe_name}` : ''}
           </p>
         </div>
         

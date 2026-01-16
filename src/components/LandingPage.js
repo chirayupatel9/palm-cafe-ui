@@ -16,13 +16,13 @@ const LandingPage = () => {
             {cafeSettings.logo_url && (
               <img 
                 src={getImageUrl(cafeSettings.logo_url)} 
-                alt={`${cafeSettings.cafe_name} Logo`} 
+                alt={`${cafeSettings.cafe_name || 'Cafe'} Logo`} 
                 className="h-24 w-24"
               />
             )}
           </div>
           <h1 className="text-4xl sm:text-5xl font-bold mb-4" style={{ color: 'var(--color-text)' }}>
-            Welcome to {cafeSettings.cafe_name}
+            Welcome{cafeSettings.cafe_name ? ` to ${cafeSettings.cafe_name}` : ''}
           </h1>
           <p className="text-xl max-w-2xl mx-auto" style={{ color: 'var(--color-secondary)' }}>
             Choose your experience - order delicious food as a customer or manage operations as an admin
@@ -125,7 +125,7 @@ const LandingPage = () => {
         {/* Footer */}
         <div className="text-center mt-12">
           <p className="text-sm" style={{ color: 'var(--color-secondary)' }}>
-            © 2024 {cafeSettings.cafe_name}. All rights reserved.
+            © 2024 {cafeSettings.cafe_name || 'Cafe'}. All rights reserved.
           </p>
         </div>
       </div>

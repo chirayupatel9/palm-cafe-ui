@@ -4,6 +4,7 @@ import toast from 'react-hot-toast';
 import axios from 'axios';
 import { useCurrency } from '../contexts/CurrencyContext';
 import { useDarkMode } from '../contexts/DarkModeContext';
+import { useCafeSettings } from '../contexts/CafeSettingsContext';
 import { getImageUrl, getPlaceholderImage } from '../utils/imageUtils';
 import { TableSkeleton, CardSkeleton } from './ui/Skeleton';
 import { EmptyMenu } from './ui/EmptyState';
@@ -12,6 +13,7 @@ import ConfirmModal from './ui/ConfirmModal';
 const MenuManagement = ({ menuItems, onUpdate, onAdd, onDelete }) => {
   const { formatCurrency } = useCurrency();
   const { isDarkMode } = useDarkMode();
+  const { cafeSettings } = useCafeSettings();
   const [activeTab, setActiveTab] = useState('menu-items');
   const [editingId, setEditingId] = useState(null);
   const [showAddForm, setShowAddForm] = useState(false);
@@ -313,7 +315,7 @@ const MenuManagement = ({ menuItems, onUpdate, onAdd, onDelete }) => {
       const url = window.URL.createObjectURL(response.data);
       const a = document.createElement('a');
       a.href = url;
-      a.download = 'palm-cafe-menu.xlsx';
+      a.download = `${cafeSettings.cafe_name || 'cafe'}-menu.xlsx`;
       document.body.appendChild(a);
       a.click();
       window.URL.revokeObjectURL(url);
@@ -530,11 +532,17 @@ const MenuManagement = ({ menuItems, onUpdate, onAdd, onDelete }) => {
           {/* Header */}
           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center space-y-4 sm:space-y-0">
             <div className="flex items-center">
-              <img 
-                src="/images/palm-cafe-logo.png" 
-                alt="Palm Cafe Logo" 
-                className="h-10 w-10 mr-3"
-              />
+              {cafeSettings.logo_url ? (
+                <img 
+                  src={getImageUrl(cafeSettings.logo_url)} 
+                  alt={`${cafeSettings.cafe_name || 'Cafe'} Logo`} 
+                  className="h-10 w-10 mr-3"
+                />
+              ) : (
+                <div className="h-10 w-10 mr-3 bg-primary-600 rounded flex items-center justify-center text-white font-bold">
+                  {cafeSettings.cafe_name ? cafeSettings.cafe_name.charAt(0).toUpperCase() : 'C'}
+                </div>
+              )}
               <div>
                 <h3 className={`text-xl sm:text-2xl font-bold ${isDarkMode ? 'text-secondary-300' : 'text-secondary-700'}`}>Menu Items</h3>
                 <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Manage your cafe's menu items</p>
@@ -1116,11 +1124,17 @@ const MenuManagement = ({ menuItems, onUpdate, onAdd, onDelete }) => {
           {/* Header */}
           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center space-y-4 sm:space-y-0">
             <div className="flex items-center">
-              <img 
-                src="/images/palm-cafe-logo.png" 
-                alt="Palm Cafe Logo" 
-                className="h-10 w-10 mr-3"
-              />
+              {cafeSettings.logo_url ? (
+                <img 
+                  src={getImageUrl(cafeSettings.logo_url)} 
+                  alt={`${cafeSettings.cafe_name || 'Cafe'} Logo`} 
+                  className="h-10 w-10 mr-3"
+                />
+              ) : (
+                <div className="h-10 w-10 mr-3 bg-primary-600 rounded flex items-center justify-center text-white font-bold">
+                  {cafeSettings.cafe_name ? cafeSettings.cafe_name.charAt(0).toUpperCase() : 'C'}
+                </div>
+              )}
               <div>
                 <h3 className={`text-xl sm:text-2xl font-bold flex items-center ${isDarkMode ? 'text-secondary-300' : 'text-secondary-700'}`}>
                   <FolderOpen className="h-6 w-6 mr-2" />
@@ -1198,11 +1212,17 @@ const MenuManagement = ({ menuItems, onUpdate, onAdd, onDelete }) => {
             <h3 className={`text-lg font-semibold mb-4 ${isDarkMode ? 'text-secondary-300' : 'text-secondary-700'}`}>Current Categories</h3>
             {categories.length === 0 ? (
               <div className={`text-center py-8 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                <img 
-                  src="/images/palm-cafe-logo.png" 
-                  alt="Palm Cafe Logo" 
-                  className="h-16 w-16 mx-auto mb-4 opacity-50"
-                />
+                {cafeSettings.logo_url ? (
+                  <img 
+                    src={getImageUrl(cafeSettings.logo_url)} 
+                    alt={`${cafeSettings.cafe_name || 'Cafe'} Logo`} 
+                    className="h-16 w-16 mx-auto mb-4 opacity-50"
+                  />
+                ) : (
+                  <div className="h-16 w-16 mx-auto mb-4 bg-primary-600 rounded flex items-center justify-center text-white font-bold opacity-50">
+                    {cafeSettings.cafe_name ? cafeSettings.cafe_name.charAt(0).toUpperCase() : 'C'}
+                  </div>
+                )}
                 <p>No categories found</p>
                 <p className="text-sm">Add your first category to get started</p>
               </div>

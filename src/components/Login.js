@@ -55,13 +55,13 @@ const Login = () => {
             {cafeSettings.logo_url && (
               <img 
                 src={getImageUrl(cafeSettings.logo_url)} 
-                alt={`${cafeSettings.cafe_name} Logo`} 
+                alt={`${cafeSettings.cafe_name || 'Cafe'} Logo`} 
                 className="h-16 w-16"
               />
             )}
           </div>
           <h2 className="mt-6 text-center text-3xl font-extrabold text-secondary-700 dark:text-gray-100">
-            Welcome back to {cafeSettings.cafe_name}
+            Welcome back{cafeSettings.cafe_name ? ` to ${cafeSettings.cafe_name}` : ''}
           </h2>
           <p className="mt-2 text-center text-sm text-secondary-600 dark:text-gray-400">
             Sign in to your account
