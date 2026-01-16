@@ -370,6 +370,75 @@ const MenuManagement = ({ menuItems, onUpdate, onAdd, onDelete }) => {
     }
   };
 
+  const handleZipImport = async (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    if (!file.name.endsWith('.zip')) {
+      toast.error('Please select a ZIP file (.zip)');
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const formData = new FormData();
+      formData.append('file', file);
+
+      const response = await axios.post('/menu/import-zip', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      });
+
+      // Show detailed import results
+      const { successCount, failureCount, imageStats, errors } = response.data;
+      
+      let message = `Import completed: ${successCount} items imported`;
+      if (failureCount > 0) {
+        message += `, ${failureCount} failed`;
+      }
+      if (imageStats) {
+        message += `. Images: ${imageStats.attached} attached`;
+        if (imageStats.missing > 0) {
+          message += `, ${imageStats.missing} missing`;
+        }
+        if (imageStats.invalid > 0) {
+          message += `, ${imageStats.invalid} invalid`;
+        }
+      }
+      
+      toast.success(message, { duration: 5000 });
+      
+      if (errors && errors.length > 0) {
+        console.warn('Import errors:', errors);
+        // Show errors in a toast or console
+        errors.slice(0, 5).forEach(error => {
+          toast.error(error, { duration: 3000 });
+        });
+        if (errors.length > 5) {
+          toast.error(`... and ${errors.length - 5} more errors. Check console for details.`, { duration: 4000 });
+        }
+      }
+      
+      // Auto-generate categories from imported menu items
+      try {
+        await axios.post('/categories/generate');
+      } catch (error) {
+        console.error('Error auto-generating categories:', error);
+      }
+      
+      // Refresh the menu items
+      window.location.reload();
+    } catch (error) {
+      console.error('Error importing menu ZIP:', error);
+      const errorMessage = error.response?.data?.error || 'Failed to import menu ZIP';
+      toast.error(errorMessage);
+    } finally {
+      setLoading(false);
+      event.target.value = ''; // Reset file input
+    }
+  };
+
   // Category Management Functions
   const generateCategoriesFromMenu = async () => {
     try {
@@ -549,7 +618,7 @@ const MenuManagement = ({ menuItems, onUpdate, onAdd, onDelete }) => {
               </div>
             </div>
             <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3">
-              <label className="btn-secondary flex items-center justify-center cursor-pointer text-sm">
+              <label className="btn-secondary flex items-center justify-center cursor-pointer text-sm" title="Import Excel file (without images)">
                 <Upload className="h-4 w-4 mr-2" />
                 Import Excel
                 <input
@@ -560,10 +629,22 @@ const MenuManagement = ({ menuItems, onUpdate, onAdd, onDelete }) => {
                   disabled={loading}
                 />
               </label>
+              <label className="btn-secondary flex items-center justify-center cursor-pointer text-sm" title="Import ZIP file with Excel and images folder">
+                <FolderOpen className="h-4 w-4 mr-2" />
+                Import ZIP
+                <input
+                  type="file"
+                  accept=".zip"
+                  onChange={handleZipImport}
+                  className="hidden"
+                  disabled={loading}
+                />
+              </label>
               <button
                 onClick={handleExport}
                 disabled={loading}
                 className="btn-secondary flex items-center justify-center text-sm"
+                title="Export menu to Excel (includes image filenames)"
               >
                 <Download className="h-4 w-4 mr-2" />
                 Export Excel
