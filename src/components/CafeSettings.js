@@ -1188,11 +1188,13 @@ const CafeSettings = () => {
             </div>
 
             {/* Color Scheme Settings */}
+            {/* COMMENTED OUT - Color scheme selection temporarily disabled */}
+            {/*
             <div className="card">
               <h2 className="text-xl font-semibold mb-4">Color Scheme</h2>
               
               {/* Predefined Color Schemes */}
-              <div className="mb-6">
+              {/* <div className="mb-6">
                 <label className="block text-sm font-medium mb-3">Quick Color Schemes</label>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                   {Object.entries(predefinedSchemes).map(([key, scheme]) => (
@@ -1210,10 +1212,10 @@ const CafeSettings = () => {
                     </button>
                   ))}
                 </div>
-              </div>
+              </div> */}
 
               {/* Light Mode Colors */}
-              <div className="mb-6">
+              {/* <div className="mb-6">
                 <h3 className="text-lg font-medium mb-3">Light Mode Colors</h3>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                   <div>
@@ -1308,10 +1310,10 @@ const CafeSettings = () => {
                     />
                   </div>
                 </div>
-              </div>
+              </div> */}
 
               {/* Dark Mode Colors */}
-              <div>
+              {/* <div>
                 <h3 className="text-lg font-medium mb-3">Dark Mode Colors</h3>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                   <div>
@@ -1418,11 +1420,13 @@ const CafeSettings = () => {
                     />
                   </div>
                 </div>
-              </div>
-            </div>
+              </div> */}
+            {/* </div> */}
           </div>
 
           {/* Preview Sidebar */}
+          {/* COMMENTED OUT - Color scheme preview temporarily disabled */}
+          {/*
           <div className="space-y-6">
             <ColorSchemePreview />
             
@@ -1433,6 +1437,7 @@ const CafeSettings = () => {
               </div>
             )}
           </div>
+          */}
         </div>
       </div>
     </div>
