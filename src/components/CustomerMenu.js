@@ -306,7 +306,7 @@ const CustomerMenu = ({
     }
   };
 
-  // Fetch cafe branding (hero image, promo banner, logo)
+  // Fetch cafe branding (hero image, promo banner, logo, and basic cafe info)
   const fetchCafeBranding = async () => {
     try {
       const response = await axios.get('/menu/branding');
@@ -314,13 +314,25 @@ const CustomerMenu = ({
         setCafeBranding({
           hero_image_url: response.data.hero_image_url || null,
           promo_banner_image_url: response.data.promo_banner_image_url || null,
-          logo_url: response.data.logo_url || null
+          logo_url: response.data.logo_url || null,
+          cafe_name: response.data.cafe_name || null,
+          address: response.data.address || null,
+          phone: response.data.phone || null,
+          email: response.data.email || null
         });
       }
     } catch (error) {
       console.error('Error fetching cafe branding:', error);
       // Gracefully handle error - use null values (will show fallback)
-      setCafeBranding({ hero_image_url: null, promo_banner_image_url: null, logo_url: null });
+      setCafeBranding({ 
+        hero_image_url: null, 
+        promo_banner_image_url: null, 
+        logo_url: null,
+        cafe_name: null,
+        address: null,
+        phone: null,
+        email: null
+      });
     }
   };
 
@@ -1054,7 +1066,7 @@ const CustomerMenu = ({
                   {cafeBranding.logo_url && (
                     <img
                       src={getImageUrl(cafeBranding.logo_url)}
-                      alt={`${cafeSettings.cafe_name} Logo`}
+                      alt={`${cafeBranding.cafe_name || 'Cafe'} Logo`}
                       className="h-24 w-24 mx-auto mb-6 opacity-50"
                     />
                   )}
@@ -1363,33 +1375,33 @@ const CustomerMenu = ({
                         <p className="text-gray-600 dark:text-gray-400 text-sm leading-relaxed mb-4">
                           Have questions or want to make a reservation? We'd love to hear from you. Reach out to us for any inquiries.
                         </p>
-                        {cafeSettings && (
+                        {cafeBranding && (
                           <div className="space-y-3 text-sm">
-                            {cafeSettings.cafe_name && (
+                            {cafeBranding.cafe_name && (
                               <div className="flex items-start gap-2">
                                 <MapPin className="h-4 w-4 text-orange-500 mt-1 flex-shrink-0" />
-                                <span className="text-gray-700 dark:text-gray-300 font-medium">{cafeSettings.cafe_name}</span>
+                                <span className="text-gray-700 dark:text-gray-300 font-medium">{cafeBranding.cafe_name}</span>
                               </div>
                             )}
-                            {cafeSettings.address && (
+                            {cafeBranding.address && (
                               <div className="flex items-start gap-2">
                                 <MapPin className="h-4 w-4 text-orange-500 mt-1 flex-shrink-0" />
-                                <span className="text-gray-600 dark:text-gray-400">{cafeSettings.address}</span>
+                                <span className="text-gray-600 dark:text-gray-400">{cafeBranding.address}</span>
                               </div>
                             )}
-                            {cafeSettings.phone && (
+                            {cafeBranding.phone && (
                               <div className="flex items-center gap-2">
                                 <Phone className="h-4 w-4 text-orange-500 flex-shrink-0" />
-                                <a href={`tel:${cafeSettings.phone}`} className="text-gray-600 dark:text-gray-400 hover:text-orange-500 transition-colors">
-                                  {cafeSettings.phone}
+                                <a href={`tel:${cafeBranding.phone}`} className="text-gray-600 dark:text-gray-400 hover:text-orange-500 transition-colors">
+                                  {cafeBranding.phone}
                                 </a>
                               </div>
                             )}
-                            {cafeSettings.email && (
+                            {cafeBranding.email && (
                               <div className="flex items-center gap-2">
                                 <Mail className="h-4 w-4 text-orange-500 flex-shrink-0" />
-                                <a href={`mailto:${cafeSettings.email}`} className="text-gray-600 dark:text-gray-400 hover:text-orange-500 transition-colors">
-                                  {cafeSettings.email}
+                                <a href={`mailto:${cafeBranding.email}`} className="text-gray-600 dark:text-gray-400 hover:text-orange-500 transition-colors">
+                                  {cafeBranding.email}
                                 </a>
                               </div>
                             )}

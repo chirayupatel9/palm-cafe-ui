@@ -30,6 +30,12 @@ export const AuthProvider = ({ children }) => {
   // Check if user is authenticated on app load
   useEffect(() => {
     const checkAuth = async () => {
+      // Skip auth check on customer routes (public routes don't need admin auth)
+      if (window.location.pathname === '/customer' || window.location.pathname.startsWith('/customer/')) {
+        setLoading(false);
+        return;
+      }
+
       if (token) {
         try {
           const response = await axios.get('/auth/profile');

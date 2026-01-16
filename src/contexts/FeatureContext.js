@@ -20,6 +20,12 @@ export const FeatureProvider = ({ children }) => {
   const [status, setStatus] = useState('active');
 
   useEffect(() => {
+    // Skip features fetch on customer routes
+    if (window.location.pathname === '/customer' || window.location.pathname.startsWith('/customer/')) {
+      setLoading(false);
+      return;
+    }
+
     if (user && user.cafe_id && user.role !== 'superadmin') {
       fetchFeatures();
     } else if (user?.role === 'superadmin') {

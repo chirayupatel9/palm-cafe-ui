@@ -73,6 +73,12 @@ export const CafeSettingsProvider = ({ children }) => {
 
   const fetchCafeSettings = async () => {
     try {
+      // Skip cafe-settings fetch on customer routes - they use branding endpoint instead
+      if (window.location.pathname === '/customer' || window.location.pathname.startsWith('/customer/')) {
+        setLoading(false);
+        return;
+      }
+
       setLoading(true);
       const response = await axios.get('/cafe-settings');
       

@@ -1,20 +1,41 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Toaster } from 'react-hot-toast';
 import CustomerLogin from './CustomerLogin';
 import CustomerMenu from './CustomerMenu';
 import { LogOut, User, ShoppingCart, History, LogIn, X } from 'lucide-react';
 import { useDarkMode } from '../contexts/DarkModeContext';
-import { useCafeSettings } from '../contexts/CafeSettingsContext';
 import { getImageUrl } from '../utils/imageUtils';
+import axios from 'axios';
 
 const CustomerApp = () => {
   const { isDarkMode } = useDarkMode();
-  const { cafeSettings } = useCafeSettings();
+  const [cafeBranding, setCafeBranding] = useState({
+    logo_url: null,
+    cafe_name: null
+  });
   const [customer, setCustomer] = useState(null);
   const [cart, setCart] = useState([]);
   const [activeTab, setActiveTab] = useState('menu');
   const [showCart, setShowCart] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
+
+  // Fetch cafe branding (logo and name for login modal)
+  useEffect(() => {
+    const fetchCafeBranding = async () => {
+      try {
+        const response = await axios.get('/menu/branding');
+        if (response.data) {
+          setCafeBranding({
+            logo_url: response.data.logo_url || null,
+            cafe_name: response.data.cafe_name || null
+          });
+        }
+      } catch (error) {
+        console.error('Error fetching cafe branding:', error);
+      }
+    };
+    fetchCafeBranding();
+  }, []);
 
   const handleLogin = (customerData) => {
     setCustomer(customerData);
@@ -84,18 +105,18 @@ const CustomerApp = () => {
              {/* Modal Header */}
              <div className={`relative p-6 border-b ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}`}>
                <div className="flex items-center justify-center mb-4">
-                 {cafeSettings.logo_url && (
+                 {cafeBranding.logo_url && (
                    <div className="w-16 h-16 bg-secondary-500 rounded-full flex items-center justify-center shadow-lg">
                      <img 
-                       src={getImageUrl(cafeSettings.logo_url)} 
-                       alt={`${cafeSettings.cafe_name} Logo`} 
+                       src={getImageUrl(cafeBranding.logo_url)} 
+                       alt={`${cafeBranding.cafe_name || 'Cafe'} Logo`} 
                        className="w-10 h-10"
                      />
                    </div>
                  )}
                </div>
                <h2 className={`text-2xl font-bold text-center mb-2 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                 Welcome to {cafeSettings.cafe_name}
+                 Welcome to {cafeBranding.cafe_name || 'Our Cafe'}
                </h2>
                <p className={`text-center text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
                  Enter your phone number to continue

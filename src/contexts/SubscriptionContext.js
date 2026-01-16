@@ -20,6 +20,12 @@ export const SubscriptionProvider = ({ children }) => {
   const [planFeatures, setPlanFeatures] = useState({});
 
   useEffect(() => {
+    // Skip subscription fetch on customer routes
+    if (window.location.pathname === '/customer' || window.location.pathname.startsWith('/customer/')) {
+      setLoading(false);
+      return;
+    }
+
     if (user && user.cafe_id && user.role !== 'superadmin') {
       fetchSubscription();
     } else {
