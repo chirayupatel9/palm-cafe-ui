@@ -6,6 +6,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { useDarkMode } from '../contexts/DarkModeContext';
 import { useCafeSettings } from '../contexts/CafeSettingsContext';
 import { useCurrency } from '../contexts/CurrencyContext';
+import { getImageUrl } from '../utils/imageUtils';
 import useOrders from '../hooks/useOrders';
 import PrintModal from './PrintModal';
 

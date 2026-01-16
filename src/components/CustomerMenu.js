@@ -7,7 +7,6 @@ import { useCafeSettings } from '../contexts/CafeSettingsContext';
 import { useDarkMode } from '../contexts/DarkModeContext';
 import CustomerOrderHistory from './CustomerOrderHistory';
 import CustomerProfile from './CustomerProfile';
-import CafeInfo from './CafeInfo';
 import { getImageUrl, getPlaceholderImage, getCategoryBackground } from '../utils/imageUtils';
 
 const CustomerMenu = ({
@@ -714,6 +713,18 @@ const CustomerMenu = ({
                       <div className="flex items-center justify-between h-16 pointer-events-auto">
                         {/* Logo and Title */}
                         <div className="flex items-center gap-3">
+                          {cafeBranding.logo_url && (
+                            <img 
+                              src={getImageUrl(cafeBranding.logo_url)} 
+                              alt={`${cafeBranding.cafe_name || 'Cafe'} Logo`} 
+                              className="h-10 w-10 rounded-full"
+                            />
+                          )}
+                          {cafeBranding.cafe_name && (
+                            <h1 className="text-2xl font-bold text-white">
+                              {cafeBranding.cafe_name}
+                            </h1>
+                          )}
                         </div>
 
                         {/* Navigation */}
@@ -725,7 +736,7 @@ const CustomerMenu = ({
                               : 'hover:text-orange-300'
                               }`}
                           >
-                            <CafeInfo nameSize="text-2xl" />
+                            Menu
                           </button>
                           {customer && (
                             <button
