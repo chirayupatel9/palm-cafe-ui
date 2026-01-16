@@ -382,11 +382,13 @@ const OrderPage = ({ menuItems, cart: externalCart, setCart: setExternalCart }) 
           
           {Object.keys(groupedMenuItems).length === 0 ? (
             <div className="text-center py-12" style={{ color: 'var(--color-on-surface-variant)' }}>
-              <img 
-                src="/images/palm-cafe-logo.png" 
-                alt="Palm Cafe Logo" 
-                className="h-24 w-24 mx-auto mb-6 opacity-50"
-              />
+              {cafeSettings.logo_url && (
+                <img 
+                  src={getImageUrl(cafeSettings.logo_url)} 
+                  alt={`${cafeSettings.cafe_name} Logo`} 
+                  className="h-24 w-24 mx-auto mb-6 opacity-50"
+                />
+              )}
               <h3 className="text-xl font-semibold mb-2" style={{ color: 'var(--color-on-surface)' }}>No menu items available</h3>
               <p className="text-base">Add items in Menu Management to get started</p>
             </div>
@@ -509,11 +511,13 @@ const OrderPage = ({ menuItems, cart: externalCart, setCart: setExternalCart }) 
             <div className="p-4">
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center">
-                  <img 
-                    src="/images/palm-cafe-logo.png" 
-                    alt="Palm Cafe Logo" 
-                    className="h-8 w-8 mr-2"
-                  />
+                  {cafeSettings.logo_url && (
+                    <img 
+                      src={getImageUrl(cafeSettings.logo_url)} 
+                      alt={`${cafeSettings.cafe_name} Logo`} 
+                      className="h-8 w-8 mr-2"
+                    />
+                  )}
                   <h2 className="text-xl font-semibold text-secondary-700 dark:text-secondary-300">
                     Cart ({currentCart.length})
                   </h2>
@@ -976,11 +980,13 @@ const OrderPage = ({ menuItems, cart: externalCart, setCart: setExternalCart }) 
         <div className="card-elevated sticky top-6" style={{ boxShadow: 'var(--elevation-3)' }}>
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center">
-              <img 
-                src="/images/palm-cafe-logo.png" 
-                alt="Palm Cafe Logo" 
-                className="h-8 w-8 mr-2"
-              />
+              {cafeSettings.logo_url && (
+                <img 
+                  src={getImageUrl(cafeSettings.logo_url)} 
+                  alt={`${cafeSettings.cafe_name} Logo`} 
+                  className="h-8 w-8 mr-2"
+                />
+              )}
               <h2 className="text-xl font-semibold text-secondary-700 dark:text-secondary-300">Cart</h2>
             </div>
             {currentCart.length > 0 && (

@@ -3,10 +3,13 @@ import { Download, Calendar, User, DollarSign, Percent, Heart, BarChart3, Plus, 
 import axios from 'axios';
 import toast from 'react-hot-toast';
 import { useCurrency } from '../contexts/CurrencyContext';
+import { useCafeSettings } from '../contexts/CafeSettingsContext';
+import { getImageUrl } from '../utils/imageUtils';
 import DailyReports from './DailyReports';
 
 const InvoiceHistory = ({ cart, setCart, setCurrentPage }) => {
   const { formatCurrency, currencySettings } = useCurrency();
+  const { cafeSettings } = useCafeSettings();
   const [invoices, setInvoices] = useState([]);
   const [statistics, setStatistics] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -258,11 +261,13 @@ const InvoiceHistory = ({ cart, setCart, setCurrentPage }) => {
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center py-12">
-        <img 
-          src="/images/palm-cafe-logo.png" 
-          alt="Palm Cafe Logo" 
-          className="h-12 w-12 mb-3"
-        />
+        {cafeSettings.logo_url && (
+          <img 
+            src={getImageUrl(cafeSettings.logo_url)} 
+            alt={`${cafeSettings.cafe_name} Logo`} 
+            className="h-12 w-12 mb-3"
+          />
+        )}
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-secondary-500"></div>
         <p className="mt-3 text-sm text-secondary-600">Loading invoice history...</p>
       </div>
@@ -274,11 +279,13 @@ const InvoiceHistory = ({ cart, setCart, setCurrentPage }) => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center space-y-2 sm:space-y-0">
         <div className="flex items-center">
-          <img 
-            src="/images/palm-cafe-logo.png" 
-            alt="Palm Cafe Logo" 
-            className="h-10 w-10 mr-3"
-          />
+          {cafeSettings.logo_url && (
+            <img 
+              src={getImageUrl(cafeSettings.logo_url)} 
+              alt={`${cafeSettings.cafe_name} Logo`}
+              className="h-10 w-10 mr-3"
+            />
+          )}
           <div>
             <h2 className="text-xl sm:text-2xl font-bold text-secondary-700 dark:text-secondary-300">Reports & Invoices</h2>
             <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">View order history, download invoices, and access operational reports</p>
@@ -468,11 +475,13 @@ const InvoiceHistory = ({ cart, setCart, setCurrentPage }) => {
            <div className="card">
             {invoices.length === 0 ? (
               <div className="text-center py-8 sm:py-12 text-gray-500 dark:text-gray-400">
-                <img 
-                  src="/images/palm-cafe-logo.png" 
-                  alt="Palm Cafe Logo" 
-                  className="h-16 w-16 mx-auto mb-4 opacity-50"
-                />
+                {cafeSettings.logo_url && (
+                  <img 
+                    src={getImageUrl(cafeSettings.logo_url)} 
+                    alt={`${cafeSettings.cafe_name} Logo`} 
+                    className="h-16 w-16 mx-auto mb-4 opacity-50"
+                  />
+                )}
                 <h3 className="text-lg font-medium text-secondary-700 dark:text-secondary-300 mb-2">No invoices yet</h3>
                 <p className="text-sm text-gray-600 dark:text-gray-400">Invoices are automatically created when orders are completed. Completed orders will appear here with their invoice details.</p>
               </div>
