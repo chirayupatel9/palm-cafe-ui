@@ -12,14 +12,24 @@ const useOrders = (autoRefresh = true, refreshInterval = 30000, enableWebSocket 
   const abortControllerRef = useRef(null);
 
   // WebSocket connection for real-time updates
+  // Only connect if WebSocket is enabled and we have a valid URL
+  const wsUrl = enableWebSocket 
+    ? (process.env.REACT_APP_WS_URL || 
+       (process.env.REACT_APP_API_URL?.replace(/^http/, 'ws')) || 
+       'ws://localhost:5000') + '/ws/orders'
+    : null;
+  
   const { sendMessage, isConnected } = useWebSocket(
-    enableWebSocket ? `${process.env.REACT_APP_WS_URL || process.env.REACT_APP_API_URL?.replace('http', 'ws') || 'ws://localhost:5000'}/ws/orders` : null,
+    wsUrl,
     {
       onMessage: (data) => {
         handleWebSocketMessage(data);
       },
       onError: (error) => {
-        console.error('WebSocket error:', error);
+        // Only log in development to reduce console noise
+        if (process.env.NODE_ENV === 'development') {
+          console.error('WebSocket error:', error);
+        }
       }
     }
   );
