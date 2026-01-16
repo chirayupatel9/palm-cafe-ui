@@ -267,6 +267,11 @@ const CafeSettings = () => {
       setWebsite(cafeSettings.website || '');
       setOpeningHours(cafeSettings.opening_hours || '');
       setDescription(cafeSettings.description || '');
+      
+      // Update document title to match cafe settings name
+      if (cafeSettings.cafe_name) {
+        document.title = cafeSettings.cafe_name;
+      }
 
       setShowKitchenTab(cafeSettings.show_kitchen_tab !== false);
       setShowCustomersTab(cafeSettings.show_customers_tab !== false);
