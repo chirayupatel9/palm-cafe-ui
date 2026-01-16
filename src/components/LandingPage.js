@@ -66,7 +66,7 @@ const LandingPage = () => {
               </ul>
               
               <Link
-                to="/customer"
+                to="/cafe/default"
                 className="w-full flex items-center justify-center px-6 py-3 text-white font-medium rounded-lg transition-colors group"
                 style={{ backgroundColor: 'var(--color-accent)' }}
               >

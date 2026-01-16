@@ -84,7 +84,7 @@ export function getUIRoleFromRoute(pathname) {
   if (pathname.startsWith('/superadmin')) {
     return 'superadmin';
   }
-  if (pathname.startsWith('/customer')) {
+  if (pathname.startsWith('/customer') || pathname.startsWith('/cafe/')) {
     return 'customer';
   }
   // Default to cafe role for admin/chef/reception routes

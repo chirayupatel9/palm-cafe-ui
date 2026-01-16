@@ -21,7 +21,9 @@ export const FeatureProvider = ({ children }) => {
 
   useEffect(() => {
     // Skip features fetch on customer routes
-    if (window.location.pathname === '/customer' || window.location.pathname.startsWith('/customer/')) {
+    if (window.location.pathname === '/customer' || 
+        window.location.pathname.startsWith('/customer/') ||
+        window.location.pathname.startsWith('/cafe/')) {
       setLoading(false);
       return;
     }

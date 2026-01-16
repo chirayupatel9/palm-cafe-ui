@@ -11,6 +11,7 @@ import CafeInfo from './CafeInfo';
 import { getImageUrl, getPlaceholderImage, getCategoryBackground } from '../utils/imageUtils';
 
 const CustomerMenu = ({
+  cafeSlug,
   customer,
   cart,
   setCart,
@@ -210,7 +211,8 @@ const CustomerMenu = ({
   const fetchMenuItems = async () => {
     try {
       setLoading(true);
-      const response = await axios.get('/menu');
+      const slugParam = cafeSlug ? `?cafeSlug=${cafeSlug}` : '';
+      const response = await axios.get(`/menu${slugParam}`);
       setMenuItems(response.data);
 
       // Group menu items by category
@@ -234,7 +236,8 @@ const CustomerMenu = ({
   // Fetch tax settings
   const fetchTaxSettings = async () => {
     try {
-      const response = await axios.get('/tax-settings/menu');
+      const slugParam = cafeSlug ? `?cafeSlug=${cafeSlug}` : '';
+      const response = await axios.get(`/tax-settings/menu${slugParam}`);
       const settings = response.data;
       setShowTaxInMenu(settings.show_tax_in_menu);
       setTaxRate(settings.tax_rate || 0);
@@ -272,7 +275,8 @@ const CustomerMenu = ({
   // Fetch payment methods
   const fetchPaymentMethods = async () => {
     try {
-      const response = await axios.get('/payment-methods');
+      const slugParam = cafeSlug ? `?cafeSlug=${cafeSlug}` : '';
+      const response = await axios.get(`/payment-methods${slugParam}`);
       setPaymentMethods(response.data);
 
       // Set default payment method to first available one
@@ -293,7 +297,8 @@ const CustomerMenu = ({
   const fetchMostOrderedItems = async () => {
     try {
       setLoadingMostOrdered(true);
-      const response = await axios.get('/menu/featured?limit=6');
+      const slugParam = cafeSlug ? `&cafeSlug=${cafeSlug}` : '?cafeSlug=default';
+      const response = await axios.get(`/menu/featured?limit=6${slugParam}`);
       if (response.data && response.data.items) {
         setMostOrderedItems(response.data.items);
       }
@@ -309,7 +314,8 @@ const CustomerMenu = ({
   // Fetch cafe branding (hero image, promo banner, logo, and basic cafe info)
   const fetchCafeBranding = async () => {
     try {
-      const response = await axios.get('/menu/branding');
+      const slugParam = cafeSlug ? `?cafeSlug=${cafeSlug}` : '';
+      const response = await axios.get(`/menu/branding${slugParam}`);
       if (response.data) {
         setCafeBranding({
           hero_image_url: response.data.hero_image_url || null,

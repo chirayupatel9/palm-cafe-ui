@@ -31,7 +31,9 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const checkAuth = async () => {
       // Skip auth check on customer routes (public routes don't need admin auth)
-      if (window.location.pathname === '/customer' || window.location.pathname.startsWith('/customer/')) {
+      if (window.location.pathname === '/customer' || 
+          window.location.pathname.startsWith('/customer/') ||
+          window.location.pathname.startsWith('/cafe/')) {
         setLoading(false);
         return;
       }

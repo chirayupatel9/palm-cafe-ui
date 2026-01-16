@@ -1,11 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { useCafeSettings } from '../contexts/CafeSettingsContext';
+import { useAuth } from '../contexts/AuthContext';
 import ColorSchemePreview from './ColorSchemePreview';
 import ColorSchemeTest from './ColorSchemeTest';
 import { getImageUrl } from '../utils/imageUtils';
+import { Copy, ExternalLink, Check } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 const CafeSettings = () => {
   const { cafeSettings, updateCafeSettings, updateLogo, updateHeroImage, updatePromoBannerImage, removeHeroImage, removePromoBannerImage, removeLogo } = useCafeSettings();
+  const { user } = useAuth();
+  const [copied, setCopied] = useState(false);
   const [showDebugTest, setShowDebugTest] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showMessage, setShowMessage] = useState(false);
@@ -576,6 +581,87 @@ const CafeSettings = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Main Settings */}
           <div className="lg:col-span-2 space-y-6">
+            {/* Cafe Slug & Public URL Section */}
+            {(user?.role === 'admin' || user?.role === 'superadmin') && user?.cafe_slug && (
+              <div className="card">
+                <h2 className="text-xl font-semibold mb-4">Public Cafe URL</h2>
+                <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+                  Share this URL with your customers to access your cafe menu and place orders.
+                </p>
+                
+                <div className="space-y-4">
+                  {/* Slug Display */}
+                  <div>
+                    <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
+                      Cafe Slug
+                    </label>
+                    <div className="flex items-center space-x-2">
+                      <input
+                        type="text"
+                        value={user.cafe_slug}
+                        readOnly
+                        className="input-field bg-gray-50 dark:bg-gray-700 cursor-not-allowed font-mono"
+                      />
+                    </div>
+                    <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">
+                      This is your public cafe identifier. It cannot be changed after creation.
+                    </p>
+                  </div>
+
+                  {/* Public URL Display */}
+                  <div>
+                    <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
+                      Public Customer URL
+                    </label>
+                    <div className="flex items-center space-x-2">
+                      <input
+                        type="text"
+                        value={`${window.location.origin}/cafe/${user.cafe_slug}`}
+                        readOnly
+                        className="input-field bg-gray-50 dark:bg-gray-700 cursor-not-allowed font-mono text-sm"
+                      />
+                      <button
+                        onClick={() => {
+                          const url = `${window.location.origin}/cafe/${user.cafe_slug}`;
+                          navigator.clipboard.writeText(url);
+                          setCopied(true);
+                          toast.success('URL copied to clipboard!');
+                          setTimeout(() => setCopied(false), 2000);
+                        }}
+                        className="px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-lg transition-colors flex items-center space-x-2"
+                        title="Copy URL"
+                      >
+                        {copied ? (
+                          <>
+                            <Check className="h-4 w-4" />
+                            <span>Copied!</span>
+                          </>
+                        ) : (
+                          <>
+                            <Copy className="h-4 w-4" />
+                            <span>Copy</span>
+                          </>
+                        )}
+                      </button>
+                      <a
+                        href={`/cafe/${user.cafe_slug}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg transition-colors flex items-center space-x-2"
+                        title="Open in new tab"
+                      >
+                        <ExternalLink className="h-4 w-4" />
+                        <span>Open</span>
+                      </a>
+                    </div>
+                    <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">
+                      Share this link with your customers to access your cafe menu.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+
             {/* Basic Information */}
             <div className="card">
               <h2 className="text-xl font-semibold mb-4">Basic Information</h2>

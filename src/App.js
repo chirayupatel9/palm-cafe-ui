@@ -25,6 +25,7 @@ import CafeAnalytics from './components/CafeAnalytics';
 import CafeInfo from './components/CafeInfo';
 import CustomerApp from './components/CustomerApp';
 import LandingPage from './components/LandingPage';
+import CafeNotFound from './components/CafeNotFound';
 import DarkModeToggle from './components/DarkModeToggle';
 import Login from './components/Login';
 import AdminRegister from './components/AdminRegister';
@@ -442,7 +443,12 @@ function App() {
                       <ReceptionRegister />
                     </ProtectedRoute>
                   } />
-                  <Route path="/customer" element={<CustomerApp />} />
+                  {/* Customer routes - slug-based */}
+                  <Route path="/cafe/:slug" element={<CustomerApp />} />
+                  <Route path="/cafe/:slug/menu" element={<CustomerApp />} />
+                  <Route path="/cafe/:slug/order" element={<CustomerApp />} />
+                  {/* Legacy customer route - redirect to default */}
+                  <Route path="/customer" element={<Navigate to="/cafe/default" replace />} />
                   <Route path="/admin" element={
                     <ProtectedRoute>
                       <OnboardingGuard>

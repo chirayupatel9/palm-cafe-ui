@@ -74,7 +74,9 @@ export const CafeSettingsProvider = ({ children }) => {
   const fetchCafeSettings = async () => {
     try {
       // Skip cafe-settings fetch on customer routes - they use branding endpoint instead
-      if (window.location.pathname === '/customer' || window.location.pathname.startsWith('/customer/')) {
+      if (window.location.pathname === '/customer' || 
+          window.location.pathname.startsWith('/customer/') ||
+          window.location.pathname.startsWith('/cafe/')) {
         setLoading(false);
         return;
       }
