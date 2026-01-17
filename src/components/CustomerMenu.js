@@ -756,48 +756,10 @@ const CustomerMenu = ({
         </div>
       )}
 
-      {/* Desktop Category Navigation - Horizontal Scroll */}
-      {activeTab === 'menu' && (
-        <div className="hidden lg:block sticky top-0 z-20 bg-white/95 /* dark:bg-gray-800/95 */ backdrop-blur-sm py-3 px-4 border-b border-accent-200 /* dark:border-gray-700 */ shadow-sm">
-          <div
-            ref={categoryScrollRef}
-            className="flex gap-3 overflow-x-auto whitespace-nowrap scrollbar-hide"
-            style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
-          >
-            <button
-              onClick={() => setSelectedCategory('All')}
-              className={`flex min-h-[44px] h-11 shrink-0 items-center justify-center gap-x-2 rounded-full pl-5 pr-5 cursor-pointer transition-colors ${selectedCategory === 'All'
-                ? 'bg-secondary-500 text-white'
-                : 'bg-accent-100 /* dark:bg-gray-700 */ text-secondary-700 /* dark:text-gray-200 */'
-                }`}
-              aria-label="Show all categories"
-            >
-              <p className={`text-sm ${selectedCategory === 'All' ? 'font-bold' : 'font-medium'}`}>
-                All
-              </p>
-            </button>
-            {Object.keys(groupedMenuItems).map((categoryName) => (
-              <button
-                key={categoryName}
-                onClick={() => setSelectedCategory(categoryName)}
-                className={`flex min-h-[44px] h-11 shrink-0 items-center justify-center gap-x-2 rounded-full pl-5 pr-5 cursor-pointer transition-colors ${selectedCategory === categoryName
-                  ? 'bg-secondary-500 text-white'
-                  : 'bg-accent-100 /* dark:bg-gray-700 */ text-secondary-700 /* dark:text-gray-200 */'
-                  }`}
-                aria-label={`Filter by ${categoryName}`}
-              >
-                <p className={`text-sm ${selectedCategory === categoryName ? 'font-bold' : 'font-medium'}`}>
-                  {categoryName}
-                </p>
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
 
       {/* Main Content */}
       <main className="min-h-screen w-full overflow-x-hidden">
-        <div className="w-full max-w-full sm:pt-8 pb-12 sm:pb-16 bg-white">
+        <div className="w-full max-w-full pb-12 sm:pb-16 bg-white">
           {activeTab === 'menu' ? (
             <div>
               {/* Hero Section with Background Image */}
@@ -886,7 +848,7 @@ const CustomerMenu = ({
                       </div>
                     </div>
                   </div>
-                  <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-4 pt-16 sm:pt-0">
+                  <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-4 sm:pt-0">
                     <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-serif font-bold mb-3 sm:mb-4 text-white">
                       Discover Our menu
                     </h1>
