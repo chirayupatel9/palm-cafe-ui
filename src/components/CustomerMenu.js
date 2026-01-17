@@ -49,6 +49,7 @@ const CustomerMenu = ({
   const [pickupOption, setPickupOption] = useState('pickup');
   const [tableNumber, setTableNumber] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
+  const [categoryMenuOpen, setCategoryMenuOpen] = useState(false); // Hamburger menu state
   const [searchExpanded, setSearchExpanded] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
   const [autocompleteSuggestions, setAutocompleteSuggestions] = useState([]);
@@ -193,6 +194,20 @@ const CustomerMenu = ({
       searchInputRef.current.focus();
     }
   }, [searchExpanded]);
+
+  // Close category menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (categoryMenuOpen && !event.target.closest('.category-menu-container')) {
+        setCategoryMenuOpen(false);
+      }
+    };
+
+    if (categoryMenuOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => document.removeEventListener('mousedown', handleClickOutside);
+    }
+  }, [categoryMenuOpen]);
 
   // Handle keyboard navigation for autocomplete
   const handleSearchKeyDown = (e) => {
@@ -666,9 +681,89 @@ const CustomerMenu = ({
     <div
       className="relative w-full flex flex-col min-h-screen bg-white/80 overflow-x-hidden"
     >
-      {/* Mobile Category Scroller - Sticky at top on mobile */}
+      {/* Mobile Category Menu - Hamburger Menu */}
       {activeTab === 'menu' && (
-        <div className="lg:hidden sticky top-0 z-20 bg-white/95 dark:bg-gray-800/95 backdrop-blur-sm py-3 px-4 border-b border-accent-200 dark:border-gray-700 shadow-sm">
+        <div className="lg:hidden sticky top-0 z-20 bg-white/95 dark:bg-gray-800/95 backdrop-blur-sm border-b border-accent-200 dark:border-gray-700 shadow-sm category-menu-container">
+          {/* Hamburger Button - Always Visible */}
+          <div className="flex items-center justify-between px-4 py-3">
+            <button
+              onClick={() => setCategoryMenuOpen(!categoryMenuOpen)}
+              className="flex min-h-[44px] min-w-[44px] items-center justify-center gap-2 rounded-lg px-3 py-2 bg-accent-100 dark:bg-gray-700 text-secondary-700 dark:text-gray-200 hover:bg-accent-200 dark:hover:bg-gray-600 transition-colors"
+              aria-label="Toggle category menu"
+            >
+              <Menu className="h-5 w-5" />
+              <span className="text-sm font-medium">
+                {selectedCategory === 'All' ? 'All Categories' : selectedCategory}
+              </span>
+            </button>
+            
+            {/* Selected Category Badge */}
+            {selectedCategory !== 'All' && (
+              <button
+                onClick={() => {
+                  setSelectedCategory('All');
+                  setCategoryMenuOpen(false);
+                }}
+                className="flex min-h-[44px] items-center justify-center gap-1 rounded-full px-3 py-2 bg-secondary-500 text-white text-sm font-medium hover:bg-secondary-600 transition-colors"
+                aria-label="Clear category filter"
+              >
+                <X className="h-4 w-4" />
+                <span>Clear</span>
+              </button>
+            )}
+          </div>
+
+          {/* Category List - Shown when hamburger is clicked */}
+          {categoryMenuOpen && (
+            <div className="px-4 pb-3 border-t border-accent-200 dark:border-gray-700 bg-white dark:bg-gray-800">
+              <div
+                ref={categoryScrollRef}
+                className="flex flex-col gap-2 max-h-[60vh] overflow-y-auto pt-3"
+              >
+                <button
+                  onClick={() => {
+                    setSelectedCategory('All');
+                    setCategoryMenuOpen(false);
+                  }}
+                  className={`flex min-h-[44px] items-center justify-start gap-x-2 rounded-lg px-4 py-2 cursor-pointer transition-colors text-left ${
+                    selectedCategory === 'All'
+                      ? 'bg-secondary-500 text-white'
+                      : 'bg-accent-100 dark:bg-gray-700 text-secondary-700 dark:text-gray-200 hover:bg-accent-200 dark:hover:bg-gray-600'
+                  }`}
+                  aria-label="Show all categories"
+                >
+                  <p className={`text-sm font-medium ${selectedCategory === 'All' ? 'font-bold' : ''}`}>
+                    All
+                  </p>
+                </button>
+                {Object.keys(groupedMenuItems).map((categoryName) => (
+                  <button
+                    key={categoryName}
+                    onClick={() => {
+                      setSelectedCategory(categoryName);
+                      setCategoryMenuOpen(false);
+                    }}
+                    className={`flex min-h-[44px] items-center justify-start gap-x-2 rounded-lg px-4 py-2 cursor-pointer transition-colors text-left ${
+                      selectedCategory === categoryName
+                        ? 'bg-secondary-500 text-white'
+                        : 'bg-accent-100 dark:bg-gray-700 text-secondary-700 dark:text-gray-200 hover:bg-accent-200 dark:hover:bg-gray-600'
+                    }`}
+                    aria-label={`Filter by ${categoryName}`}
+                  >
+                    <p className={`text-sm font-medium ${selectedCategory === categoryName ? 'font-bold' : ''}`}>
+                      {categoryName}
+                    </p>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Desktop Category Navigation - Horizontal Scroll */}
+      {activeTab === 'menu' && (
+        <div className="hidden lg:block sticky top-0 z-20 bg-white/95 dark:bg-gray-800/95 backdrop-blur-sm py-3 px-4 border-b border-accent-200 dark:border-gray-700 shadow-sm">
           <div
             ref={categoryScrollRef}
             className="flex gap-3 overflow-x-auto whitespace-nowrap scrollbar-hide"
@@ -912,8 +1007,8 @@ const CustomerMenu = ({
                 </div>
               </div>
 
-              {/* Categories Showcase Section - Circular Carousel */}
-              {!searchQuery.trim() && Object.keys(groupedMenuItems).length > 0 && (
+              {/* Categories Showcase Section - Circular Carousel - Only show when "All" is selected */}
+              {!searchQuery.trim() && selectedCategory === 'All' && Object.keys(groupedMenuItems).length > 0 && (
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-16">
                   <div className="text-center mb-10">
                     <div className="flex items-center justify-center mb-3">
