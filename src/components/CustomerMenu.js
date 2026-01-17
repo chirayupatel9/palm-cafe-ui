@@ -54,7 +54,7 @@ const CustomerMenu = ({
   const [showAutocomplete, setShowAutocomplete] = useState(false);
   const [selectedSuggestionIndex, setSelectedSuggestionIndex] = useState(-1);
   const [categoryCarouselIndex, setCategoryCarouselIndex] = useState(0);
-  const [itemsPerView, setItemsPerView] = useState(2); // Responsive items per view
+  const [itemsPerView, setItemsPerView] = useState(3); // Responsive items per view (default to 3 for mobile)
   const [galleryExpanded, setGalleryExpanded] = useState(false);
   const categoryScrollRef = useRef(null);
   const searchInputRef = useRef(null);
@@ -70,7 +70,7 @@ const CustomerMenu = ({
       } else if (width >= 640) {
         setItemsPerView(3); // Tablet: 3 items
       } else {
-        setItemsPerView(2); // Mobile: 2 items
+        setItemsPerView(3); // Mobile: 3 items (increased from 2)
       }
     };
 
@@ -1095,7 +1095,7 @@ const CustomerMenu = ({
                           return (
                             <div
                               key={categoryName}
-                              className="flex-shrink-0 w-1/2 sm:w-1/3 md:w-1/4 px-2 sm:px-3 flex justify-center"
+                              className="flex-shrink-0 w-1/3 sm:w-1/3 md:w-1/4 px-2 sm:px-3 flex justify-center"
                             >
                               <button
                                 onClick={() => {
