@@ -790,7 +790,7 @@ const CustomerMenu = ({
 
                         {/* Navigation */}
                         <nav className="hidden md:flex items-center gap-8">
-                          <button
+                          {/* <button
                             onClick={() => setActiveTab('menu')}
                             className={`text-sm font-medium transition-colors text-white ${activeTab === 'menu'
                               ? 'font-semibold'
@@ -798,7 +798,7 @@ const CustomerMenu = ({
                               }`}
                           >
                             Menu
-                          </button>
+                          </button> */}
                           {customer && (
                             <button
                               onClick={() => setActiveTab('history')}
