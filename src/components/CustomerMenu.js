@@ -1504,7 +1504,7 @@ const CustomerMenu = ({
 
 
                       {/* Contact Info Column */}
-                      <div>
+                      <div className="px-4 sm:px-6">
                         <h3 className="text-xl font-serif font-bold text-orange-500 mb-4">Contact Info</h3>
                         <p className="text-gray-600 /* dark:text-gray-400 */ text-sm leading-relaxed mb-4">
                           Have questions or want to make a reservation? We'd love to hear from you. Reach out to us for any inquiries.
@@ -1552,7 +1552,7 @@ const CustomerMenu = ({
                       </div>
 
                       {/* Gallery Column */}
-                      <div>
+                      <div className="px-4 sm:px-6">
                         <h3 className="text-xl font-serif font-bold text-orange-500 mb-4">Gallery</h3>
                         <div className="grid grid-cols-3 gap-2 mb-4">
                           {galleryItems.map((item, idx) => {
