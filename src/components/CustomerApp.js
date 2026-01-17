@@ -130,10 +130,10 @@ const CustomerApp = () => {
         onLogout={handleLogout}
       />
 
-             {/* Login Modal */}
+             {/* Login Modal - Full screen on mobile */}
        {showLoginModal && (
-         <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4 animate-fadeIn backdrop-blur-sm">
-           <div className={`${isDarkMode ? 'bg-gray-800' : 'bg-white'} rounded-2xl shadow-material-5 max-w-md w-full mx-4 transform transition-all duration-300 animate-slideIn hover-lift`}>
+         <div className="fixed inset-0 bg-black bg-opacity-60 flex items-end lg:items-center justify-center z-50 p-0 lg:p-4 animate-fadeIn backdrop-blur-sm">
+           <div className={`${isDarkMode ? 'bg-gray-800' : 'bg-white'} rounded-t-2xl lg:rounded-2xl shadow-material-5 max-w-md lg:max-w-md w-full lg:mx-4 h-[90vh] lg:h-auto flex flex-col transform transition-all duration-300 animate-slideIn hover-lift`}>
              {/* Modal Header */}
              <div className={`relative p-6 border-b ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}`}>
                <div className="flex items-center justify-center mb-4">
@@ -157,25 +157,26 @@ const CustomerApp = () => {
                {/* Close Button */}
                <button
                  onClick={() => setShowLoginModal(false)}
-                 className={`absolute top-4 right-4 p-2 rounded-full transition-colors ${
+                 className={`absolute top-4 right-4 p-2 rounded-full transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center ${
                    isDarkMode 
                      ? 'hover:bg-gray-700 text-gray-400' 
                      : 'hover:bg-gray-100 text-gray-500'
                  }`}
+                 aria-label="Close"
                >
                  <X className="h-5 w-5" />
                </button>
              </div>
 
              {/* Modal Body */}
-             <div className="p-6">
+             <div className="p-4 sm:p-6 flex-1 overflow-y-auto">
                <CustomerLogin onLogin={handleLogin} />
                
                {/* Continue Browsing Option */}
                <div className={`mt-6 pt-4 border-t ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}`}>
                  <button
                    onClick={() => setShowLoginModal(false)}
-                   className={`w-full text-sm transition-colors flex items-center justify-center ${
+                   className={`w-full text-sm transition-colors flex items-center justify-center min-h-[44px] ${
                      isDarkMode 
                        ? 'text-gray-400 hover:text-gray-200' 
                        : 'text-gray-500 hover:text-gray-700'

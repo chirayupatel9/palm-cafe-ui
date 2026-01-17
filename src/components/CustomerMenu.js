@@ -55,10 +55,29 @@ const CustomerMenu = ({
   const [showAutocomplete, setShowAutocomplete] = useState(false);
   const [selectedSuggestionIndex, setSelectedSuggestionIndex] = useState(-1);
   const [categoryCarouselIndex, setCategoryCarouselIndex] = useState(0);
+  const [itemsPerView, setItemsPerView] = useState(2); // Responsive items per view
   const categoryScrollRef = useRef(null);
   const searchInputRef = useRef(null);
   const autocompleteRef = useRef(null);
   const categoryCarouselRef = useRef(null);
+
+  // Calculate items per view based on screen size
+  useEffect(() => {
+    const updateItemsPerView = () => {
+      const width = window.innerWidth;
+      if (width >= 1024) {
+        setItemsPerView(4); // Desktop: 4 items
+      } else if (width >= 640) {
+        setItemsPerView(3); // Tablet: 3 items
+      } else {
+        setItemsPerView(2); // Mobile: 2 items
+      }
+    };
+
+    updateItemsPerView();
+    window.addEventListener('resize', updateItemsPerView);
+    return () => window.removeEventListener('resize', updateItemsPerView);
+  }, []);
 
   // Edit profile state
   const [showEditProfile, setShowEditProfile] = useState(false);
@@ -645,19 +664,11 @@ const CustomerMenu = ({
 
   return (
     <div
-      className="relative w-full flex flex-col min-h-screen bg-white/80"
-
+      className="relative w-full flex flex-col min-h-screen bg-white/80 overflow-x-hidden"
     >
-      {/* Sticky Header / Top App Bar */}
-      <div>
-
-        <header className="max-w-full mx-auto bg-white rounded-t-xl dark:bg-gray-800 shadow-sm sticky top-0 z-20 w-full">
-
-        </header>
-        {/* Mobile Category Scroller */}
-      </div>
+      {/* Mobile Category Scroller - Sticky at top on mobile */}
       {activeTab === 'menu' && (
-        <div className="lg:hidden sticky top-16 z-10 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm py-3 -mx-4 px-4 border-b border-accent-200 dark:border-gray-700">
+        <div className="lg:hidden sticky top-0 z-20 bg-white/95 dark:bg-gray-800/95 backdrop-blur-sm py-3 px-4 border-b border-accent-200 dark:border-gray-700 shadow-sm">
           <div
             ref={categoryScrollRef}
             className="flex gap-3 overflow-x-auto whitespace-nowrap scrollbar-hide"
@@ -665,10 +676,11 @@ const CustomerMenu = ({
           >
             <button
               onClick={() => setSelectedCategory('All')}
-              className={`flex h-10 shrink-0 items-center justify-center gap-x-2 rounded-full pl-5 pr-5 cursor-pointer transition-colors ${selectedCategory === 'All'
+              className={`flex min-h-[44px] h-11 shrink-0 items-center justify-center gap-x-2 rounded-full pl-5 pr-5 cursor-pointer transition-colors ${selectedCategory === 'All'
                 ? 'bg-secondary-500 text-white'
                 : 'bg-accent-100 dark:bg-gray-700 text-secondary-700 dark:text-gray-200'
                 }`}
+              aria-label="Show all categories"
             >
               <p className={`text-sm ${selectedCategory === 'All' ? 'font-bold' : 'font-medium'}`}>
                 All
@@ -678,10 +690,11 @@ const CustomerMenu = ({
               <button
                 key={categoryName}
                 onClick={() => setSelectedCategory(categoryName)}
-                className={`flex h-10 shrink-0 items-center justify-center gap-x-2 rounded-full pl-5 pr-5 cursor-pointer transition-colors ${selectedCategory === categoryName
+                className={`flex min-h-[44px] h-11 shrink-0 items-center justify-center gap-x-2 rounded-full pl-5 pr-5 cursor-pointer transition-colors ${selectedCategory === categoryName
                   ? 'bg-secondary-500 text-white'
                   : 'bg-accent-100 dark:bg-gray-700 text-secondary-700 dark:text-gray-200'
                   }`}
+                aria-label={`Filter by ${categoryName}`}
               >
                 <p className={`text-sm ${selectedCategory === categoryName ? 'font-bold' : 'font-medium'}`}>
                   {categoryName}
@@ -693,14 +706,14 @@ const CustomerMenu = ({
       )}
 
       {/* Main Content */}
-      <main className="min-h-screen">
-        <div className="w-full pt-8 pb-12 sm:pt-12 sm:pb-16 bg-white">
+      <main className="min-h-screen w-full overflow-x-hidden">
+        <div className="w-full max-w-full pt-4 sm:pt-8 pb-12 sm:pb-16 bg-white">
           {activeTab === 'menu' ? (
             <div>
               {/* Hero Section with Background Image */}
-              <div className="relative w-full -mt-8 sm:-mt-12 mb-16">
+              <div className="relative w-full mb-8 sm:mb-16">
                 <div
-                  className="relative h-[400px] sm:h-[500px] bg-cover bg-center bg-no-repeat"
+                  className="relative h-[300px] sm:h-[400px] md:h-[500px] bg-cover bg-center bg-no-repeat"
                   style={{
                     backgroundImage: cafeBranding.hero_image_url
                       ? `linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('${getImageUrl(cafeBranding.hero_image_url)}')`
@@ -756,7 +769,8 @@ const CustomerMenu = ({
                           {/* Cart */}
                           <button
                             onClick={() => setShowCart(true)}
-                            className="relative w-10 h-10 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center text-white transition-colors"
+                            className="relative min-w-[44px] min-h-[44px] w-11 h-11 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center text-white transition-colors"
+                            aria-label="View cart"
                           >
                             <ShoppingBag className="h-5 w-5" />
                             {cart.length > 0 && (
@@ -770,8 +784,9 @@ const CustomerMenu = ({
                           {customer && (
                             <button
                               onClick={() => setShowProfile(true)}
-                              className="flex items-center justify-center h-10 w-10 rounded-full bg-white/20 hover:bg-white/30 text-white transition-colors"
+                              className="flex items-center justify-center min-h-[44px] min-w-[44px] h-11 w-11 rounded-full bg-white/20 hover:bg-white/30 text-white transition-colors"
                               title={customer.name}
+                              aria-label="View profile"
                             >
                               <User className="h-5 w-5" />
                             </button>
@@ -780,12 +795,11 @@ const CustomerMenu = ({
                       </div>
                     </div>
                   </div>
-                  <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-4">
-
-                    <h1 className="text-4xl sm:text-5xl md:text-6xl font-serif font-bold mb-4 text-white">
+                  <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-4 pt-16 sm:pt-0">
+                    <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-serif font-bold mb-3 sm:mb-4 text-white">
                       Discover Our menu
                     </h1>
-                    <p className="text-white/80 max-w-2xl mx-auto text-base sm:text-lg leading-relaxed mb-8">
+                    <p className="text-white/80 max-w-2xl mx-auto text-sm sm:text-base md:text-lg leading-relaxed mb-6 sm:mb-8 px-2">
                       Quaerat debitis, vel, sapiente dicta sequi labore porro pariatur harum expedita.
                     </p>
                     <div className="flex flex-col items-center gap-4 w-full">
@@ -795,10 +809,11 @@ const CustomerMenu = ({
                           /* Search Button - Initial State */
                           <button
                             onClick={() => setSearchExpanded(true)}
-                            className="w-full px-6 py-4 bg-white/95 hover:bg-white text-gray-700 font-medium rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 flex items-center justify-center gap-3 group"
+                            className="w-full px-4 sm:px-6 py-3 sm:py-4 min-h-[44px] bg-white/95 hover:bg-white text-gray-700 font-medium rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 flex items-center justify-center gap-3 group"
+                            aria-label="Search menu"
                           >
                             <Search className="h-5 w-5 text-gray-400 group-hover:text-orange-500 transition-colors" />
-                            <span className="text-gray-500 group-hover:text-gray-700">Search menu...</span>
+                            <span className="text-gray-500 group-hover:text-gray-700 text-sm sm:text-base">Search menu...</span>
                           </button>
                         ) : (
                           /* Expanded Search Bar */
@@ -833,7 +848,7 @@ const CustomerMenu = ({
                                     }, 200);
                                   }
                                 }}
-                                className="w-full pl-14 pr-14 py-4 rounded-full bg-white dark:bg-gray-800 border-2 border-orange-300 dark:border-gray-600 text-gray-900 dark:text-white placeholder:text-gray-400 focus:outline-none focus:ring-4 focus:ring-orange-200 focus:border-orange-500 shadow-2xl transition-all text-base"
+                                className="w-full pl-12 sm:pl-14 pr-12 sm:pr-14 py-3 sm:py-4 min-h-[44px] rounded-full bg-white dark:bg-gray-800 border-2 border-orange-300 dark:border-gray-600 text-gray-900 dark:text-white placeholder:text-gray-400 focus:outline-none focus:ring-4 focus:ring-orange-200 focus:border-orange-500 shadow-2xl transition-all text-sm sm:text-base"
                                 autoFocus
                               />
                               {searchQuery && (
@@ -915,34 +930,41 @@ const CustomerMenu = ({
                   </div>
 
                   {/* Categories Carousel */}
-                  <div className="relative">
+                  <div className="relative px-8 sm:px-12">
                     {/* Navigation Arrows */}
-                    {Object.keys(groupedMenuItems).length > 4 && (
-                      <>
-                        <button
-                          onClick={() => {
-                            const categories = Object.keys(groupedMenuItems);
-                            const maxIndex = Math.max(0, categories.length - 4);
-                            setCategoryCarouselIndex(prev => prev > 0 ? prev - 1 : maxIndex);
-                          }}
-                          className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 sm:-translate-x-6 z-10 w-10 h-10 sm:w-12 sm:h-12 bg-white dark:bg-gray-800 rounded-full shadow-lg flex items-center justify-center hover:bg-orange-500 hover:text-white transition-all duration-300 group"
-                          aria-label="Previous categories"
-                        >
-                          <ChevronLeft className="h-5 w-5 sm:h-6 sm:w-6 text-gray-700 dark:text-gray-300 group-hover:text-white" />
-                        </button>
-                        <button
-                          onClick={() => {
-                            const categories = Object.keys(groupedMenuItems);
-                            const maxIndex = Math.max(0, categories.length - 4);
-                            setCategoryCarouselIndex(prev => prev < maxIndex ? prev + 1 : 0);
-                          }}
-                          className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 sm:translate-x-6 z-10 w-10 h-10 sm:w-12 sm:h-12 bg-white dark:bg-gray-800 rounded-full shadow-lg flex items-center justify-center hover:bg-orange-500 hover:text-white transition-all duration-300 group"
-                          aria-label="Next categories"
-                        >
-                          <ChevronRight className="h-5 w-5 sm:h-6 sm:w-6 text-gray-700 dark:text-gray-300 group-hover:text-white" />
-                        </button>
-                      </>
-                    )}
+                    {(() => {
+                      const categories = Object.keys(groupedMenuItems);
+                      // Responsive items per view: 2 on mobile, 3 on tablet, 4 on desktop
+                      // Show arrows if we have more categories than items per view
+                      if (categories.length <= itemsPerView) return null;
+                      
+                      // Calculate max index based on current itemsPerView
+                      const totalSlides = Math.ceil(categories.length / itemsPerView);
+                      const maxIndex = Math.max(0, totalSlides - 1);
+                      
+                      return (
+                        <>
+                          <button
+                            onClick={() => {
+                              setCategoryCarouselIndex(prev => prev > 0 ? prev - 1 : maxIndex);
+                            }}
+                            className="absolute left-0 top-1/2 -translate-y-1/2 z-10 min-w-[44px] min-h-[44px] w-11 h-11 sm:w-12 sm:h-12 bg-white dark:bg-gray-800 rounded-full shadow-lg flex items-center justify-center hover:bg-orange-500 hover:text-white transition-all duration-300 group"
+                            aria-label="Previous categories"
+                          >
+                            <ChevronLeft className="h-5 w-5 sm:h-6 sm:w-6 text-gray-700 dark:text-gray-300 group-hover:text-white" />
+                          </button>
+                          <button
+                            onClick={() => {
+                              setCategoryCarouselIndex(prev => prev < maxIndex ? prev + 1 : 0);
+                            }}
+                            className="absolute right-0 top-1/2 -translate-y-1/2 z-10 min-w-[44px] min-h-[44px] w-11 h-11 sm:w-12 sm:h-12 bg-white dark:bg-gray-800 rounded-full shadow-lg flex items-center justify-center hover:bg-orange-500 hover:text-white transition-all duration-300 group"
+                            aria-label="Next categories"
+                          >
+                            <ChevronRight className="h-5 w-5 sm:h-6 sm:w-6 text-gray-700 dark:text-gray-300 group-hover:text-white" />
+                          </button>
+                        </>
+                      );
+                    })()}
 
                     {/* Carousel Container */}
                     <div 
@@ -962,8 +984,8 @@ const CustomerMenu = ({
                         
                         if (Math.abs(diff) > threshold) {
                           const categories = Object.keys(groupedMenuItems);
-                          const itemsPerView = 4; // Show 4 items on large screens
-                          const maxIndex = Math.max(0, categories.length - itemsPerView);
+                          const totalSlides = Math.ceil(categories.length / itemsPerView);
+                          const maxIndex = Math.max(0, totalSlides - 1);
                           
                           if (diff > 0) {
                             // Swipe left - next
@@ -987,7 +1009,10 @@ const CustomerMenu = ({
                       <div 
                         className="flex transition-transform duration-500 ease-in-out"
                         style={{
-                          transform: `translateX(-${categoryCarouselIndex * (100 / Math.min(4, Object.keys(groupedMenuItems).length))}%)`
+                          // Move by one item width at a time based on current screen size
+                          // Each item width = 100% / itemsPerView
+                          // Mobile: 50% per item (2 items), Tablet: 33.33% per item (3 items), Desktop: 25% per item (4 items)
+                          transform: `translateX(-${categoryCarouselIndex * (100 / itemsPerView)}%)`
                         }}
                       >
                         {Object.keys(groupedMenuItems).map((categoryName, index) => {
@@ -1010,14 +1035,15 @@ const CustomerMenu = ({
                           return (
                             <div
                               key={categoryName}
-                              className="flex-shrink-0 w-full sm:w-1/2 lg:w-1/4 px-2 sm:px-3 flex justify-center"
+                              className="flex-shrink-0 w-1/2 sm:w-1/3 md:w-1/4 px-2 sm:px-3 flex justify-center"
                             >
                               <button
                                 onClick={() => {
                                   setSelectedCategory(categoryName);
                                   document.getElementById('menu-items-section')?.scrollIntoView({ behavior: 'smooth' });
                                 }}
-                                className="group relative w-32 h-32 sm:w-40 sm:h-40 lg:w-44 lg:h-44 overflow-hidden rounded-full bg-white dark:bg-gray-800 transition-all duration-300"
+                                className="group relative w-28 h-28 sm:w-36 sm:h-36 md:w-40 md:h-40 lg:w-44 lg:h-44 overflow-hidden rounded-full bg-white dark:bg-gray-800 transition-all duration-300 min-w-[112px] min-h-[112px]"
+                                aria-label={`View ${categoryName} category`}
                               >
                                 {/* Circular Category Image */}
                                 <div className="relative w-full h-full overflow-hidden rounded-full">
@@ -1049,12 +1075,20 @@ const CustomerMenu = ({
                     {/* Carousel Dots Indicator */}
                     {(() => {
                       const categories = Object.keys(groupedMenuItems);
-                      const itemsPerView = 4; // Show 4 items on large screens
-                      const totalSlides = Math.max(1, categories.length - itemsPerView + 1);
+                      // Calculate total slides based on current itemsPerView
+                      const totalSlides = Math.max(1, Math.ceil(categories.length / itemsPerView));
                       
                       if (categories.length <= itemsPerView) {
-                        // If we have 4 or fewer categories, no dots needed
+                        // If we have fewer or equal categories than items per view, no dots needed
                         return null;
+                      }
+                      
+                      // Calculate max valid index (last slide that shows items)
+                      const maxValidIndex = Math.max(0, totalSlides - 1);
+                      
+                      // Ensure current index doesn't exceed max
+                      if (categoryCarouselIndex > maxValidIndex) {
+                        setCategoryCarouselIndex(maxValidIndex);
                       }
                       
                       return (
@@ -1063,13 +1097,15 @@ const CustomerMenu = ({
                             <button
                               key={index}
                               onClick={() => setCategoryCarouselIndex(index)}
-                              className={`h-2 rounded-full transition-all duration-300 ${
+                              className="relative h-2 rounded-full transition-all duration-300 min-h-[44px] min-w-[44px] flex items-center justify-center"
+                              aria-label={`Go to slide ${index + 1}`}
+                            >
+                              <span className={`absolute h-2 rounded-full transition-all duration-300 ${
                                 categoryCarouselIndex === index
                                   ? 'w-8 bg-orange-500'
                                   : 'w-2 bg-gray-300 dark:bg-gray-600'
-                              }`}
-                              aria-label={`Go to slide ${index + 1}`}
-                            />
+                              }`} />
+                            </button>
                           ))}
                         </div>
                       );
@@ -1486,27 +1522,28 @@ const CustomerMenu = ({
         </div>
       </main>
 
-      {/* Cart Modal */}
+      {/* Cart Modal - Full screen on mobile, centered modal on desktop */}
       {
         showCart && (
-          <div className="fixed inset-0 bg-black/70 backdrop-blur-md flex items-center justify-center z-50 p-4">
-            <div className="bg-white dark:bg-gray-800 rounded-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden shadow-2xl">
+          <div className="fixed inset-0 bg-black/70 backdrop-blur-md flex items-end lg:items-center justify-center z-50 p-0 lg:p-4">
+            <div className="bg-white dark:bg-gray-800 rounded-t-2xl lg:rounded-2xl w-full lg:max-w-4xl max-h-[90vh] lg:max-h-[90vh] overflow-hidden shadow-2xl flex flex-col h-[90vh] lg:h-auto">
               {/* Cart Header */}
-              <div className="flex w-full items-center justify-between border-b border-accent-200 dark:border-gray-700 bg-accent-50 dark:bg-gray-900 px-6 py-4">
-                <div class="flex items-center gap-4">
+              <div className="flex w-full items-center justify-between border-b border-accent-200 dark:border-gray-700 bg-accent-50 dark:bg-gray-900 px-4 sm:px-6 py-4 flex-shrink-0">
+                <div className="flex items-center gap-4">
                   <ShoppingCart className="h-6 w-6 text-secondary-600 dark:text-secondary-400" />
-                  <h2 className="text-2xl font-bold tracking-tight text-secondary-700 dark:text-gray-100">Your Order</h2>
+                  <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-secondary-700 dark:text-gray-100">Your Order</h2>
                 </div>
                 <button
                   onClick={() => setShowCart(false)}
-                  className="text-secondary-600 dark:text-gray-300 hover:bg-accent-100 dark:hover:bg-gray-700 p-2 rounded-lg transition-colors"
+                  className="text-secondary-600 dark:text-gray-300 hover:bg-accent-100 dark:hover:bg-gray-700 p-2 rounded-lg transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center"
+                  aria-label="Close cart"
                 >
                   <X className="h-6 w-6" />
                 </button>
               </div>
 
               {/* Cart Content - Two Column Layout */}
-              <div className="flex flex-col lg:grid lg:grid-cols-3 gap-8 p-6 max-h-[calc(90vh-180px)] overflow-y-auto">
+              <div className="flex flex-col lg:grid lg:grid-cols-3 gap-4 sm:gap-8 p-4 sm:p-6 flex-1 overflow-y-auto">
                 {/* Left Column: Cart Items */}
                 <div className="lg:col-span-2 flex flex-col gap-4">
                   {cart.length === 0 ? (
@@ -1520,45 +1557,51 @@ const CustomerMenu = ({
                   ) : (
                     <>
                       {cart.map((item) => (
-                        <div key={item.id} className="flex items-center gap-4 rounded-lg bg-accent-50 dark:bg-gray-900 p-4 shadow-sm border border-accent-200 dark:border-gray-700">
-                          <div
-                            className="bg-center bg-no-repeat aspect-square bg-cover rounded-lg size-16"
-                            style={{
-                              backgroundImage: `url('${item.image_url
-                                ? getImageUrl(item.image_url)
-                                : getPlaceholderImage(item.category_name, item.name)
-                                }')`
-                            }}
-                          />
-                          <div className="flex flex-1 flex-col justify-center">
-                            <p className="text-base font-bold text-secondary-700 dark:text-gray-100">{item.name}</p>
-                            <p className="text-sm text-secondary-600 dark:text-gray-400">{formatCurrency(item.price)}</p>
+                        <div key={item.id} className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 rounded-lg bg-accent-50 dark:bg-gray-900 p-3 sm:p-4 shadow-sm border border-accent-200 dark:border-gray-700">
+                          <div className="flex items-center gap-3 sm:gap-4 w-full sm:w-auto">
+                            <div
+                              className="bg-center bg-no-repeat aspect-square bg-cover rounded-lg size-16 flex-shrink-0"
+                              style={{
+                                backgroundImage: `url('${item.image_url
+                                  ? getImageUrl(item.image_url)
+                                  : getPlaceholderImage(item.category_name, item.name)
+                                  }')`
+                              }}
+                            />
+                            <div className="flex flex-1 flex-col justify-center min-w-0">
+                              <p className="text-sm sm:text-base font-bold text-secondary-700 dark:text-gray-100 truncate">{item.name}</p>
+                              <p className="text-xs sm:text-sm text-secondary-600 dark:text-gray-400">{formatCurrency(item.price)}</p>
+                            </div>
                           </div>
-                          <div className="flex items-center gap-6">
+                          <div className="flex items-center justify-between sm:justify-end gap-3 sm:gap-6 w-full sm:w-auto">
                             <div className="flex items-center gap-2">
                               <button
                                 onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                                className="flex h-8 w-8 items-center justify-center rounded-full bg-accent-100 dark:bg-gray-700 transition-colors hover:bg-secondary-100 dark:hover:bg-secondary-900 cursor-pointer"
+                                className="flex h-11 w-11 items-center justify-center rounded-full bg-accent-100 dark:bg-gray-700 transition-colors hover:bg-secondary-100 dark:hover:bg-secondary-900 cursor-pointer min-h-[44px] min-w-[44px]"
+                                aria-label="Decrease quantity"
                               >
-                                <Minus className="h-4 w-4" />
+                                <Minus className="h-5 w-5" />
                               </button>
                               <input
-                                className="w-8 border-none bg-transparent p-0 text-center text-base font-medium focus:outline-0 focus:ring-0 text-secondary-700 dark:text-gray-100"
+                                className="w-12 sm:w-16 border-none bg-transparent p-0 text-center text-base font-medium focus:outline-0 focus:ring-0 text-secondary-700 dark:text-gray-100"
                                 type="number"
                                 value={item.quantity}
                                 readOnly
+                                aria-label="Quantity"
                               />
                               <button
                                 onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                                className="flex h-8 w-8 items-center justify-center rounded-full bg-accent-100 dark:bg-gray-700 transition-colors hover:bg-secondary-100 dark:hover:bg-secondary-900 cursor-pointer"
+                                className="flex h-11 w-11 items-center justify-center rounded-full bg-accent-100 dark:bg-gray-700 transition-colors hover:bg-secondary-100 dark:hover:bg-secondary-900 cursor-pointer min-h-[44px] min-w-[44px]"
+                                aria-label="Increase quantity"
                               >
-                                <Plus className="h-4 w-4" />
+                                <Plus className="h-5 w-5" />
                               </button>
                             </div>
-                            <p className="w-16 text-right font-semibold text-secondary-700 dark:text-gray-100">{formatCurrency(item.price * item.quantity)}</p>
+                            <p className="text-right font-semibold text-secondary-700 dark:text-gray-100 text-sm sm:text-base whitespace-nowrap">{formatCurrency(item.price * item.quantity)}</p>
                             <button
                               onClick={() => removeFromCart(item.id)}
-                              className="text-secondary-600 dark:text-gray-400 transition-colors hover:text-red-500"
+                              className="text-secondary-600 dark:text-gray-400 transition-colors hover:text-red-500 min-h-[44px] min-w-[44px] flex items-center justify-center"
+                              aria-label="Remove item"
                             >
                               <Trash2 className="h-5 w-5" />
                             </button>
@@ -1809,11 +1852,11 @@ const CustomerMenu = ({
                     </div>
 
                     {/* Action Buttons - Sticky at bottom */}
-                    <div className="flex flex-col gap-3 p-4 bg-accent-50 dark:bg-gray-900 border-t border-accent-200 dark:border-gray-700 rounded-b-xl">
+                    <div className="flex flex-col gap-3 p-4 bg-accent-50 dark:bg-gray-900 border-t border-accent-200 dark:border-gray-700 rounded-b-xl flex-shrink-0">
                       <button
                         onClick={placeOrder}
                         disabled={orderLoading || !customer}
-                        className="w-full rounded-lg bg-secondary-500 py-3 text-base font-bold text-white transition-opacity hover:bg-secondary-600 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                        className="w-full rounded-lg bg-secondary-500 py-3 min-h-[44px] text-base font-bold text-white transition-opacity hover:bg-secondary-600 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                       >
                         {orderLoading ? (
                           <>
@@ -1830,7 +1873,7 @@ const CustomerMenu = ({
 
                       <button
                         onClick={clearCart}
-                        className="w-full rounded-lg bg-white dark:bg-gray-800 border-2 border-accent-200 dark:border-gray-700 py-2.5 text-sm font-semibold text-secondary-700 dark:text-gray-100 hover:border-secondary-500 transition-colors"
+                        className="w-full rounded-lg bg-white dark:bg-gray-800 border-2 border-accent-200 dark:border-gray-700 py-2.5 min-h-[44px] text-sm font-semibold text-secondary-700 dark:text-gray-100 hover:border-secondary-500 transition-colors"
                       >
                         Clear Cart
                       </button>
@@ -1858,7 +1901,8 @@ const CustomerMenu = ({
               </div>
               <button
                 onClick={() => setShowCart(true)}
-                className="flex items-center justify-center gap-2 rounded-lg bg-secondary-500 h-12 px-6 hover:bg-secondary-600 transition-colors"
+                className="flex items-center justify-center gap-2 rounded-lg bg-secondary-500 min-h-[44px] h-12 px-6 hover:bg-secondary-600 transition-colors"
+                aria-label="View cart"
               >
                 <ShoppingCart className="h-5 w-5 text-white" />
                 <span className="text-white text-base font-bold">View Cart</span>
@@ -1869,24 +1913,25 @@ const CustomerMenu = ({
       )}
 
 
-      {/* Edit Profile Modal */}
+      {/* Edit Profile Modal - Full screen on mobile */}
       {showEditProfile && (
-        <div className="fixed inset-0 bg-black/70 backdrop-blur-md flex items-center justify-center z-50 p-4">
-          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-md w-full">
-            <div className="flex items-center justify-between border-b border-accent-200 dark:border-gray-700 bg-accent-50 dark:bg-gray-900 px-6 py-4">
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-md flex items-end lg:items-center justify-center z-50 p-0 lg:p-4">
+          <div className="bg-white dark:bg-gray-800 rounded-t-2xl lg:rounded-2xl shadow-2xl max-w-md lg:max-w-md w-full h-[90vh] lg:h-auto flex flex-col">
+            <div className="flex items-center justify-between border-b border-accent-200 dark:border-gray-700 bg-accent-50 dark:bg-gray-900 px-4 sm:px-6 py-4 flex-shrink-0">
               <div className="flex items-center gap-4">
                 <Edit3 className="h-6 w-6 text-secondary-600 dark:text-secondary-400" />
-                <h2 className="text-2xl font-bold tracking-tight text-secondary-700 dark:text-gray-100">Edit Profile</h2>
+                <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-secondary-700 dark:text-gray-100">Edit Profile</h2>
               </div>
               <button
                 onClick={() => setShowEditProfile(false)}
-                className="text-secondary-600 dark:text-gray-300 hover:bg-accent-100 dark:hover:bg-gray-700 p-2 rounded-lg transition-colors"
+                className="text-secondary-600 dark:text-gray-300 hover:bg-accent-100 dark:hover:bg-gray-700 p-2 rounded-lg transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center"
+                aria-label="Close"
               >
                 <X className="h-6 w-6" />
               </button>
             </div>
 
-            <div className="p-6">
+            <div className="p-4 sm:p-6 flex-1 overflow-y-auto">
               <form onSubmit={handleProfileUpdate} className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-secondary-700 dark:text-gray-100 mb-2">
@@ -1940,18 +1985,18 @@ const CustomerMenu = ({
                   />
                 </div>
 
-                <div className="flex gap-3 pt-4">
+                <div className="flex flex-col sm:flex-row gap-3 pt-4">
                   <button
                     type="button"
                     onClick={() => setShowEditProfile(false)}
-                    className="flex-1 px-4 py-3 bg-white dark:bg-gray-800 border-2 border-accent-200 dark:border-gray-700 text-secondary-700 dark:text-gray-100 rounded-lg font-medium hover:border-secondary-500 transition-colors"
+                    className="flex-1 px-4 py-3 min-h-[44px] bg-white dark:bg-gray-800 border-2 border-accent-200 dark:border-gray-700 text-secondary-700 dark:text-gray-100 rounded-lg font-medium hover:border-secondary-500 transition-colors"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
                     disabled={profileLoading}
-                    className="flex-1 px-4 py-3 bg-secondary-500 text-white rounded-lg font-medium hover:bg-secondary-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                    className="flex-1 px-4 py-3 min-h-[44px] bg-secondary-500 text-white rounded-lg font-medium hover:bg-secondary-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                   >
                     {profileLoading ? (
                       <>

@@ -17,8 +17,8 @@ export const DarkModeProvider = ({ children }) => {
     if (saved !== null) {
       return JSON.parse(saved);
     }
-    // Check system preference
-    return window.matchMedia('(prefers-color-scheme: dark)').matches;
+    // Default to light mode (ignore system preference on first load)
+    return false;
   });
 
   useEffect(() => {

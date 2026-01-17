@@ -1,6 +1,6 @@
 import React, { useState, useCallback } from 'react';
 import axios from 'axios';
-import { LogOut, User, ShoppingCart, Settings, Receipt, Plus, Users } from 'lucide-react';
+import { LogOut, User, ShoppingCart, Settings, Receipt, Plus, Users, Menu, X } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useCafeSettings } from '../contexts/CafeSettingsContext';
 import OrderPage from './OrderPage';
@@ -16,6 +16,7 @@ const ReceptionApp = () => {
   const [currentPage, setCurrentPage] = useState('order');
   const [cart, setCart] = useState([]);
   const [menuItems, setMenuItems] = useState([]);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   // Fetch menu items function
   const fetchMenuItems = useCallback(async () => {
@@ -91,18 +92,104 @@ const ReceptionApp = () => {
               {/* Logout button */}
               <button
                 onClick={handleLogout}
-                className="p-2 rounded-md text-secondary-600 hover:text-secondary-700 hover:bg-accent-100 dark:text-gray-400 dark:hover:text-gray-300 dark:hover:bg-gray-700"
+                className="p-2 rounded-md text-secondary-600 hover:text-secondary-700 hover:bg-accent-100 dark:text-gray-400 dark:hover:text-gray-300 dark:hover:bg-gray-700 min-h-[44px] min-w-[44px] flex items-center justify-center"
                 title="Logout"
+                aria-label="Logout"
               >
                 <LogOut className="h-5 w-5" />
+              </button>
+              
+              {/* Mobile menu button */}
+              <button
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                className="lg:hidden p-2 rounded-md text-secondary-600 hover:text-secondary-700 hover:bg-accent-100 dark:text-gray-400 dark:hover:text-gray-300 dark:hover:bg-gray-700 min-h-[44px] min-w-[44px] flex items-center justify-center"
+                aria-label="Toggle menu"
+              >
+                {mobileMenuOpen ? (
+                  <X className="h-6 w-6" />
+                ) : (
+                  <Menu className="h-6 w-6" />
+                )}
               </button>
             </div>
           </div>
         </div>
       </header>
 
-      {/* Navigation */}
-      <nav className="bg-white dark:bg-gray-800 shadow-sm border-b border-accent-200 dark:border-gray-700">
+      {/* Mobile Navigation Menu */}
+      {mobileMenuOpen && (
+        <div className="lg:hidden bg-white dark:bg-gray-800 border-b border-accent-200 dark:border-gray-700 shadow-sm">
+          <div className="px-4 py-2 space-y-1">
+            {cafeSettings?.reception_can_create_orders && (
+              <button
+                onClick={() => {
+                  setCurrentPage('order');
+                  setMobileMenuOpen(false);
+                }}
+                className={`w-full flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all min-h-[44px] ${
+                  currentPage === 'order'
+                    ? 'bg-secondary-600 text-white font-semibold shadow-sm'
+                    : 'text-secondary-600 dark:text-gray-300 hover:bg-accent-100 dark:hover:bg-gray-700'
+                }`}
+              >
+                <Plus className="h-4 w-4 mr-3" />
+                New Order
+              </button>
+            )}
+            {cafeSettings?.reception_show_kitchen_tab && (
+              <button
+                onClick={() => {
+                  setCurrentPage('kitchen');
+                  setMobileMenuOpen(false);
+                }}
+                className={`w-full flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all min-h-[44px] ${
+                  currentPage === 'kitchen'
+                    ? 'bg-secondary-600 text-white font-semibold shadow-sm'
+                    : 'text-secondary-600 dark:text-gray-300 hover:bg-accent-100 dark:hover:bg-gray-700'
+                }`}
+              >
+                <Settings className="h-4 w-4 mr-3" />
+                Kitchen Orders
+              </button>
+            )}
+            {cafeSettings?.reception_can_view_customers && (
+              <button
+                onClick={() => {
+                  setCurrentPage('customers');
+                  setMobileMenuOpen(false);
+                }}
+                className={`w-full flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all min-h-[44px] ${
+                  currentPage === 'customers'
+                    ? 'bg-secondary-600 text-white font-semibold shadow-sm'
+                    : 'text-secondary-600 dark:text-gray-300 hover:bg-accent-100 dark:hover:bg-gray-700'
+                }`}
+              >
+                <Users className="h-4 w-4 mr-3" />
+                Customers
+              </button>
+            )}
+            {cafeSettings?.reception_show_history_tab && (
+              <button
+                onClick={() => {
+                  setCurrentPage('history');
+                  setMobileMenuOpen(false);
+                }}
+                className={`w-full flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all min-h-[44px] ${
+                  currentPage === 'history'
+                    ? 'bg-secondary-600 text-white font-semibold shadow-sm'
+                    : 'text-secondary-600 dark:text-gray-300 hover:bg-accent-100 dark:hover:bg-gray-700'
+                }`}
+              >
+                <Receipt className="h-4 w-4 mr-3" />
+                Order History
+              </button>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Desktop Navigation */}
+      <nav className="hidden lg:block bg-white dark:bg-gray-800 shadow-sm border-b border-accent-200 dark:border-gray-700">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex space-x-8">
             {cafeSettings?.reception_can_create_orders && (

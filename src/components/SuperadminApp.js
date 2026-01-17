@@ -188,7 +188,8 @@ const SuperadminApp = () => {
               {/* Mobile menu button */}
               <button
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="lg:hidden p-2 rounded-md text-secondary-600 hover:text-secondary-700 hover:bg-gray-100"
+                className="lg:hidden p-2 rounded-md text-secondary-600 hover:text-secondary-700 hover:bg-gray-100 min-h-[44px] min-w-[44px] flex items-center justify-center"
+                aria-label="Toggle menu"
               >
                 {mobileMenuOpen ? (
                   <X className="h-6 w-6" />

@@ -274,12 +274,12 @@ const CafeManagement = () => {
         </div>
       )}
 
-      {/* Modal for Create/Edit */}
+      {/* Modal for Create/Edit - Full screen on mobile */}
       {showModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="sticky top-0 bg-white dark:bg-gray-800 border-b border-accent-200 dark:border-gray-700 px-6 py-4 flex justify-between items-center">
-              <h3 className="text-xl font-bold text-secondary-700 dark:text-gray-100">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-end lg:items-center justify-center z-50 p-0 lg:p-4">
+          <div className="bg-white dark:bg-gray-800 rounded-t-lg lg:rounded-lg shadow-xl max-w-2xl w-full h-[90vh] lg:h-auto max-h-[90vh] flex flex-col">
+            <div className="sticky top-0 bg-white dark:bg-gray-800 border-b border-accent-200 dark:border-gray-700 px-4 sm:px-6 py-4 flex justify-between items-center flex-shrink-0">
+              <h3 className="text-lg sm:text-xl font-bold text-secondary-700 dark:text-gray-100">
                 Create New Cafe
               </h3>
               <button
@@ -290,7 +290,8 @@ const CafeManagement = () => {
                   setShowModal(false);
                   initialFormDataRef.current = null;
                 }}
-                className="text-secondary-500 hover:text-secondary-700 dark:text-gray-400 dark:hover:text-gray-200"
+                className="text-secondary-500 hover:text-secondary-700 dark:text-gray-400 dark:hover:text-gray-200 min-h-[44px] min-w-[44px] flex items-center justify-center"
+                aria-label="Close"
               >
                 <X className="h-6 w-6" />
               </button>
@@ -302,7 +303,8 @@ const CafeManagement = () => {
                 <p className="text-sm text-yellow-800 dark:text-yellow-200">You have unsaved changes</p>
               </div>
             )}
-            <form onSubmit={handleSubmit} className="p-6 space-form">
+            <div className="flex-1 overflow-y-auto">
+            <form onSubmit={handleSubmit} className="p-4 sm:p-6 space-form">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-secondary-700 dark:text-gray-300 mb-1">
@@ -455,7 +457,7 @@ const CafeManagement = () => {
                 </div>
               </div>
 
-              <div className="flex justify-end space-x-3 pt-6 border-t border-gray-200 dark:border-gray-700">
+              <div className="flex flex-col sm:flex-row justify-end gap-3 pt-6 border-t border-gray-200 dark:border-gray-700">
                 <button
                   type="button"
                   onClick={() => {
@@ -465,13 +467,13 @@ const CafeManagement = () => {
                     setShowModal(false);
                     initialFormDataRef.current = null;
                   }}
-                  className="btn-secondary"
+                  className="btn-secondary min-h-[44px]"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="btn-primary flex items-center justify-center"
+                  className="btn-primary flex items-center justify-center min-h-[44px]"
                   disabled={isSubmitting}
                 >
                   {isSubmitting ? (
@@ -485,6 +487,7 @@ const CafeManagement = () => {
                 </button>
               </div>
             </form>
+            </div>
           </div>
         </div>
       )}

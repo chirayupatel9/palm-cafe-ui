@@ -110,27 +110,28 @@ const PrintModal = ({ isOpen, onClose, order, onPrintSuccess }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-4xl w-full mx-4 max-h-[90vh] overflow-hidden">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-end lg:items-center justify-center z-50 p-0 lg:p-4">
+      <div className="bg-white dark:bg-gray-800 rounded-t-lg lg:rounded-lg shadow-xl max-w-4xl w-full lg:mx-4 h-[90vh] lg:h-auto max-h-[90vh] flex flex-col">
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
+        <div className="flex items-center justify-between p-4 sm:p-6 border-b border-gray-200 dark:border-gray-700 flex-shrink-0">
           <div className="flex items-center space-x-3">
             <Printer className="h-6 w-6 text-secondary-600" />
-            <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
+            <h2 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-gray-100">
               Print Order #{order?.order_number}
             </h2>
           </div>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+            className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 min-h-[44px] min-w-[44px] flex items-center justify-center"
+            aria-label="Close"
           >
             <X className="h-6 w-6" />
           </button>
         </div>
 
-        <div className="flex h-[calc(90vh-120px)]">
+        <div className="flex flex-col lg:flex-row flex-1 overflow-hidden">
           {/* Left Panel - Printer Selection */}
-          <div className="w-1/3 border-r border-gray-200 dark:border-gray-700 p-6 overflow-y-auto">
+          <div className="w-full lg:w-1/3 border-b lg:border-b-0 lg:border-r border-gray-200 dark:border-gray-700 p-4 sm:p-6 overflow-y-auto">
             <div className="space-y-6">
               {/* Printer Detection */}
               <div>
@@ -245,7 +246,7 @@ const PrintModal = ({ isOpen, onClose, order, onPrintSuccess }) => {
                 <button
                   onClick={handlePrint}
                   disabled={isPrinting}
-                  className="w-full bg-secondary-600 hover:bg-secondary-700 disabled:bg-gray-400 text-white font-medium py-3 px-4 rounded-lg transition-colors flex items-center justify-center space-x-2"
+                  className="w-full bg-secondary-600 hover:bg-secondary-700 disabled:bg-gray-400 text-white font-medium py-3 px-4 min-h-[44px] rounded-lg transition-colors flex items-center justify-center space-x-2"
                 >
                   {isPrinting ? (
                     <>
@@ -264,7 +265,7 @@ const PrintModal = ({ isOpen, onClose, order, onPrintSuccess }) => {
           </div>
 
           {/* Right Panel - Print Preview */}
-          <div className="flex-1 p-6 overflow-y-auto">
+          <div className="flex-1 p-4 sm:p-6 overflow-y-auto">
             <div className="space-y-4">
               <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100">
                 Print Preview

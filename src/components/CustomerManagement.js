@@ -380,37 +380,37 @@ const CustomerManagement = () => {
             <table className="min-w-full" style={{ borderCollapse: 'separate', borderSpacing: 0 }}>
               <thead style={{ backgroundColor: 'var(--surface-table)' }}>
                 <tr>
-                  <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider" style={{ 
+                  <th className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-semibold uppercase tracking-wider whitespace-nowrap" style={{ 
                     color: 'var(--color-on-surface-variant)',
                     borderBottom: '2px solid var(--color-outline)'
                   }}>
                     Customer
                   </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider" style={{ 
+                  <th className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-semibold uppercase tracking-wider whitespace-nowrap" style={{ 
                     color: 'var(--color-on-surface-variant)',
                     borderBottom: '2px solid var(--color-outline)'
                   }}>
                     Contact
                   </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider" style={{ 
+                  <th className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-semibold uppercase tracking-wider whitespace-nowrap" style={{ 
                     color: 'var(--color-on-surface-variant)',
                     borderBottom: '2px solid var(--color-outline)'
                   }}>
                     Loyalty
                   </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider" style={{ 
+                  <th className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-semibold uppercase tracking-wider whitespace-nowrap" style={{ 
                     color: 'var(--color-on-surface-variant)',
                     borderBottom: '2px solid var(--color-outline)'
                   }}>
                     Visits
                   </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider" style={{ 
+                  <th className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-semibold uppercase tracking-wider whitespace-nowrap" style={{ 
                     color: 'var(--color-on-surface-variant)',
                     borderBottom: '2px solid var(--color-outline)'
                   }}>
                     Total Spent
                   </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider" style={{ 
+                  <th className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-semibold uppercase tracking-wider whitespace-nowrap" style={{ 
                     color: 'var(--color-on-surface-variant)',
                     borderBottom: '2px solid var(--color-outline)'
                   }}>
@@ -439,7 +439,7 @@ const CustomerManagement = () => {
                       e.currentTarget.style.backgroundColor = 'var(--surface-card)';
                     }}
                   >
-                    <td className="px-6 py-4 whitespace-nowrap">
+                    <td className="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap">
                       <div className="flex items-center">
                         <div className="flex-shrink-0 h-10 w-10">
                           <div className="h-10 w-10 rounded-full flex items-center justify-center transition-surface" style={{ 
@@ -460,7 +460,7 @@ const CustomerManagement = () => {
                         </div>
                       </div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
+                    <td className="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap">
                       <div className={`text-sm ${isDarkMode ? 'text-gray-100' : 'text-gray-900'}`}>
                         {customer.phone && (
                           <div className="flex items-center mb-1">
@@ -476,7 +476,7 @@ const CustomerManagement = () => {
                         )}
                       </div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
+                    <td className="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap">
                       <div className="flex items-center">
                         <Star className="h-4 w-4 text-yellow-500 mr-1" />
                         <span className={`text-sm font-medium ${isDarkMode ? 'text-gray-100' : 'text-gray-900'}`}>
@@ -498,7 +498,7 @@ const CustomerManagement = () => {
                     <td className={`px-6 py-4 whitespace-nowrap text-sm ${isDarkMode ? 'text-gray-100' : 'text-gray-900'}`}>
                       {formatCurrency(customer.total_spent)}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
+                    <td className="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap">
                       {getStatusIcon(customer.is_active)}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">

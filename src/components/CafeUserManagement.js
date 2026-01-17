@@ -310,11 +310,11 @@ const CafeUserManagement = () => {
         )}
       </div>
 
-      {/* Create User Modal */}
+      {/* Create User Modal - Full screen on mobile */}
       {showCreateModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full">
-            <div className="p-6 border-b border-accent-200 dark:border-gray-700">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-end lg:items-center justify-center z-50 p-0 lg:p-4">
+          <div className="bg-white dark:bg-gray-800 rounded-t-lg lg:rounded-lg shadow-xl max-w-md lg:max-w-md w-full h-[90vh] lg:h-auto flex flex-col">
+            <div className="p-4 sm:p-6 border-b border-accent-200 dark:border-gray-700 flex-shrink-0">
               <div className="flex justify-between items-center">
                 <h3 className="text-lg font-semibold text-secondary-700 dark:text-gray-100">
                   Add User
@@ -324,14 +324,15 @@ const CafeUserManagement = () => {
                     setShowCreateModal(false);
                     setFormData({ username: '', email: '', password: '', role: 'admin' });
                   }}
-                  className="text-secondary-500 hover:text-secondary-700 dark:text-gray-400 dark:hover:text-gray-200"
+                  className="text-secondary-500 hover:text-secondary-700 dark:text-gray-400 dark:hover:text-gray-200 min-h-[44px] min-w-[44px] flex items-center justify-center"
+                  aria-label="Close"
                 >
                   <X className="h-6 w-6" />
                 </button>
               </div>
             </div>
 
-            <form onSubmit={handleCreate} className="p-6 space-y-4">
+            <form onSubmit={handleCreate} className="p-4 sm:p-6 space-y-4 flex-1 overflow-y-auto">
               <div>
                 <label className="block text-sm font-medium text-secondary-700 dark:text-gray-300 mb-2">
                   Username <span className="text-red-500">*</span>
@@ -395,20 +396,20 @@ const CafeUserManagement = () => {
                 </select>
               </div>
 
-              <div className="flex justify-end space-x-3 pt-4 border-t border-accent-200 dark:border-gray-700">
+              <div className="flex flex-col sm:flex-row justify-end gap-3 pt-4 border-t border-accent-200 dark:border-gray-700">
                 <button
                   type="button"
                   onClick={() => {
                     setShowCreateModal(false);
                     setFormData({ username: '', email: '', password: '', role: 'admin' });
                   }}
-                  className="px-4 py-2 border border-accent-300 dark:border-gray-600 text-secondary-700 dark:text-gray-300 rounded-lg hover:bg-accent-50 dark:hover:bg-gray-700 transition-colors"
+                  className="px-4 py-2 min-h-[44px] border border-accent-300 dark:border-gray-600 text-secondary-700 dark:text-gray-300 rounded-lg hover:bg-accent-50 dark:hover:bg-gray-700 transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-secondary-600 hover:bg-secondary-700 text-white rounded-lg transition-colors"
+                  className="px-4 py-2 min-h-[44px] bg-secondary-600 hover:bg-secondary-700 text-white rounded-lg transition-colors"
                 >
                   Add User
                 </button>
@@ -418,11 +419,11 @@ const CafeUserManagement = () => {
         </div>
       )}
 
-      {/* Edit User Modal */}
+      {/* Edit User Modal - Full screen on mobile */}
       {showEditModal && editingUser && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full">
-            <div className="p-6 border-b border-accent-200 dark:border-gray-700">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-end lg:items-center justify-center z-50 p-0 lg:p-4">
+          <div className="bg-white dark:bg-gray-800 rounded-t-lg lg:rounded-lg shadow-xl max-w-md lg:max-w-md w-full h-[90vh] lg:h-auto flex flex-col">
+            <div className="p-4 sm:p-6 border-b border-accent-200 dark:border-gray-700 flex-shrink-0">
               <div className="flex justify-between items-center">
                 <h3 className="text-lg font-semibold text-secondary-700 dark:text-gray-100">
                   Edit User
@@ -433,14 +434,15 @@ const CafeUserManagement = () => {
                     setEditingUser(null);
                     setFormData({ username: '', email: '', password: '', role: 'admin' });
                   }}
-                  className="text-secondary-500 hover:text-secondary-700 dark:text-gray-400 dark:hover:text-gray-200"
+                  className="text-secondary-500 hover:text-secondary-700 dark:text-gray-400 dark:hover:text-gray-200 min-h-[44px] min-w-[44px] flex items-center justify-center"
+                  aria-label="Close"
                 >
                   <X className="h-6 w-6" />
                 </button>
               </div>
             </div>
 
-            <form onSubmit={handleUpdate} className="p-6 space-y-4">
+            <form onSubmit={handleUpdate} className="p-4 sm:p-6 space-y-4 flex-1 overflow-y-auto">
               <div>
                 <label className="block text-sm font-medium text-secondary-700 dark:text-gray-300 mb-2">
                   Username <span className="text-red-500">*</span>
@@ -503,7 +505,7 @@ const CafeUserManagement = () => {
                 </select>
               </div>
 
-              <div className="flex justify-end space-x-3 pt-4 border-t border-accent-200 dark:border-gray-700">
+              <div className="flex flex-col sm:flex-row justify-end gap-3 pt-4 border-t border-accent-200 dark:border-gray-700">
                 <button
                   type="button"
                   onClick={() => {
@@ -511,13 +513,13 @@ const CafeUserManagement = () => {
                     setEditingUser(null);
                     setFormData({ username: '', email: '', password: '', role: 'admin' });
                   }}
-                  className="px-4 py-2 border border-accent-300 dark:border-gray-600 text-secondary-700 dark:text-gray-300 rounded-lg hover:bg-accent-50 dark:hover:bg-gray-700 transition-colors"
+                  className="px-4 py-2 min-h-[44px] border border-accent-300 dark:border-gray-600 text-secondary-700 dark:text-gray-300 rounded-lg hover:bg-accent-50 dark:hover:bg-gray-700 transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-secondary-600 hover:bg-secondary-700 text-white rounded-lg transition-colors"
+                  className="px-4 py-2 min-h-[44px] bg-secondary-600 hover:bg-secondary-700 text-white rounded-lg transition-colors"
                 >
                   Update User
                 </button>

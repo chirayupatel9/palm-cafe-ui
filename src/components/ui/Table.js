@@ -34,7 +34,7 @@ const Table = ({
             {columns.map((column, index) => (
               <th
                 key={column.key || index}
-                className={`px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider ${
+                className={`px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-semibold uppercase tracking-wider ${
                   column.align === 'right' ? 'text-right' : ''
                 }`}
                 style={{ 
