@@ -58,6 +58,7 @@ const CustomerMenu = ({
   const [selectedSuggestionIndex, setSelectedSuggestionIndex] = useState(-1);
   const [categoryCarouselIndex, setCategoryCarouselIndex] = useState(0);
   const [itemsPerView, setItemsPerView] = useState(2); // Responsive items per view
+  const [galleryExpanded, setGalleryExpanded] = useState(false);
   const categoryScrollRef = useRef(null);
   const searchInputRef = useRef(null);
   const autocompleteRef = useRef(null);
@@ -630,8 +631,8 @@ const CustomerMenu = ({
     }));
   };
 
-  // Compute gallery items from menu items with images
-  const galleryItems = useMemo(() => {
+  // Compute all gallery items from menu items with images
+  const allGalleryItems = useMemo(() => {
     if (!groupedMenuItems || Object.keys(groupedMenuItems).length === 0) {
       return [];
     }
@@ -641,12 +642,21 @@ const CustomerMenu = ({
       .flat()
       .filter(item => item.image_url);
     
+    return allItemsWithImages;
+  }, [groupedMenuItems]);
+
+  // Gallery items to display (6 initially, all when expanded)
+  const galleryItems = useMemo(() => {
+    if (galleryExpanded) {
+      return allGalleryItems;
+    }
+    
     // Shuffle and take up to 6 random items
-    const shuffled = [...allItemsWithImages].sort(() => Math.random() - 0.5);
+    const shuffled = [...allGalleryItems].sort(() => Math.random() - 0.5);
     const items = shuffled.slice(0, 6);
     
     // If we don't have 6 items with images, fill with placeholders
-    while (items.length < 6) {
+    while (items.length < 6 && allGalleryItems.length < 6) {
       const categories = Object.keys(groupedMenuItems);
       if (categories.length === 0) break;
       const randomCategory = categories[
@@ -660,7 +670,7 @@ const CustomerMenu = ({
     }
     
     return items;
-  }, [groupedMenuItems]);
+  }, [allGalleryItems, galleryExpanded, groupedMenuItems]);
 
   if (loading) {
     return (
@@ -1571,10 +1581,15 @@ const CustomerMenu = ({
                             );
                           })}
                         </div>
-                        <button className="text-orange-500 hover:text-orange-600 text-sm font-medium flex items-center gap-1 transition-colors">
-                          See More
-                          <span className="text-lg">→</span>
-                        </button>
+                        {allGalleryItems.length > 6 && (
+                          <button 
+                            onClick={() => setGalleryExpanded(!galleryExpanded)}
+                            className="text-orange-500 hover:text-orange-600 text-sm font-medium flex items-center gap-1 transition-colors"
+                          >
+                            {galleryExpanded ? 'See Less' : 'See More'}
+                            <span className="text-lg">{galleryExpanded ? '↑' : '→'}</span>
+                          </button>
+                        )}
                       </div>
                     </div>
 
