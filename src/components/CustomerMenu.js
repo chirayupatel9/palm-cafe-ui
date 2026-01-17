@@ -27,7 +27,8 @@ const CustomerMenu = ({
 }) => {
   const { formatCurrency } = useCurrency();
   const { cafeSettings } = useCafeSettings();
-  const { isDarkMode } = useDarkMode();
+  // const { isDarkMode } = useDarkMode();
+  const isDarkMode = false; // Dark mode disabled
   const [menuItems, setMenuItems] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -663,7 +664,7 @@ const CustomerMenu = ({
 
   if (loading) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-background-light dark:bg-background-dark">
+      <div className="min-h-screen flex flex-col items-center justify-center bg-background-light /* dark:bg-background-dark */">
         <div className="relative z-10 flex flex-col items-center">
           <div className="w-20 h-20 bg-primary rounded-2xl flex items-center justify-center mb-6 shadow-2xl">
             <Utensils className="h-10 w-10 text-white animate-pulse" />
@@ -671,7 +672,7 @@ const CustomerMenu = ({
           <div className="relative">
             <div className="animate-spin rounded-full h-16 w-16 border-4 border-primary/20 border-t-primary"></div>
           </div>
-          <p className="mt-6 text-xl font-medium text-text-light dark:text-text-dark">Loading menu...</p>
+          <p className="mt-6 text-xl font-medium text-text-light /* dark:text-text-dark */">Loading menu...</p>
         </div>
       </div>
     );
@@ -681,44 +682,28 @@ const CustomerMenu = ({
     <div
       className="relative w-full flex flex-col min-h-screen bg-white/80 overflow-x-hidden"
     >
-      {/* Mobile Category Menu - Hamburger Menu */}
+      {/* Mobile Category Menu - Hamburger Menu Overlay on Hero */}
       {activeTab === 'menu' && (
-        <div className="lg:hidden sticky top-0 z-20 bg-white/95 dark:bg-gray-800/95 backdrop-blur-sm border-b border-accent-200 dark:border-gray-700 shadow-sm category-menu-container">
-          {/* Hamburger Button - Always Visible */}
-          <div className="flex items-center justify-between px-4 py-3">
-            <button
-              onClick={() => setCategoryMenuOpen(!categoryMenuOpen)}
-              className="flex min-h-[44px] min-w-[44px] items-center justify-center gap-2 rounded-lg px-3 py-2 bg-accent-100 dark:bg-gray-700 text-secondary-700 dark:text-gray-200 hover:bg-accent-200 dark:hover:bg-gray-600 transition-colors"
-              aria-label="Toggle category menu"
-            >
-              <Menu className="h-5 w-5" />
-              <span className="text-sm font-medium">
-                {selectedCategory === 'All' ? 'All Categories' : selectedCategory}
-              </span>
-            </button>
-            
-            {/* Selected Category Badge */}
-            {selectedCategory !== 'All' && (
-              <button
-                onClick={() => {
-                  setSelectedCategory('All');
-                  setCategoryMenuOpen(false);
-                }}
-                className="flex min-h-[44px] items-center justify-center gap-1 rounded-full px-3 py-2 bg-secondary-500 text-white text-sm font-medium hover:bg-secondary-600 transition-colors"
-                aria-label="Clear category filter"
-              >
-                <X className="h-4 w-4" />
-                <span>Clear</span>
-              </button>
+        <div className="lg:hidden fixed top-4 left-4 z-50 category-menu-container">
+          {/* Hamburger Button - Floating on Hero */}
+          <button
+            onClick={() => setCategoryMenuOpen(!categoryMenuOpen)}
+            className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full bg-white/90 /* dark:bg-gray-800/90 */ backdrop-blur-sm shadow-lg hover:bg-white /* dark:hover:bg-gray-800 */ transition-colors"
+            aria-label="Toggle category menu"
+          >
+            {categoryMenuOpen ? (
+              <X className="h-6 w-6 text-gray-700 /* dark:text-gray-200 */" />
+            ) : (
+              <Menu className="h-6 w-6 text-gray-700 /* dark:text-gray-200 */" />
             )}
-          </div>
+          </button>
 
           {/* Category List - Shown when hamburger is clicked */}
           {categoryMenuOpen && (
-            <div className="px-4 pb-3 border-t border-accent-200 dark:border-gray-700 bg-white dark:bg-gray-800">
+            <div className="absolute top-14 left-0 w-64 bg-white /* dark:bg-gray-800 */ rounded-lg shadow-xl border border-accent-200 /* dark:border-gray-700 */ overflow-hidden">
               <div
                 ref={categoryScrollRef}
-                className="flex flex-col gap-2 max-h-[60vh] overflow-y-auto pt-3"
+                className="flex flex-col gap-1 max-h-[60vh] overflow-y-auto p-2"
               >
                 <button
                   onClick={() => {
@@ -728,7 +713,7 @@ const CustomerMenu = ({
                   className={`flex min-h-[44px] items-center justify-start gap-x-2 rounded-lg px-4 py-2 cursor-pointer transition-colors text-left ${
                     selectedCategory === 'All'
                       ? 'bg-secondary-500 text-white'
-                      : 'bg-accent-100 dark:bg-gray-700 text-secondary-700 dark:text-gray-200 hover:bg-accent-200 dark:hover:bg-gray-600'
+                      : 'bg-accent-100 /* dark:bg-gray-700 */ text-secondary-700 /* dark:text-gray-200 */ hover:bg-accent-200 /* dark:hover:bg-gray-600 */'
                   }`}
                   aria-label="Show all categories"
                 >
@@ -746,7 +731,7 @@ const CustomerMenu = ({
                     className={`flex min-h-[44px] items-center justify-start gap-x-2 rounded-lg px-4 py-2 cursor-pointer transition-colors text-left ${
                       selectedCategory === categoryName
                         ? 'bg-secondary-500 text-white'
-                        : 'bg-accent-100 dark:bg-gray-700 text-secondary-700 dark:text-gray-200 hover:bg-accent-200 dark:hover:bg-gray-600'
+                        : 'bg-accent-100 /* dark:bg-gray-700 */ text-secondary-700 /* dark:text-gray-200 */ hover:bg-accent-200 /* dark:hover:bg-gray-600 */'
                     }`}
                     aria-label={`Filter by ${categoryName}`}
                   >
@@ -763,7 +748,7 @@ const CustomerMenu = ({
 
       {/* Desktop Category Navigation - Horizontal Scroll */}
       {activeTab === 'menu' && (
-        <div className="hidden lg:block sticky top-0 z-20 bg-white/95 dark:bg-gray-800/95 backdrop-blur-sm py-3 px-4 border-b border-accent-200 dark:border-gray-700 shadow-sm">
+        <div className="hidden lg:block sticky top-0 z-20 bg-white/95 /* dark:bg-gray-800/95 */ backdrop-blur-sm py-3 px-4 border-b border-accent-200 /* dark:border-gray-700 */ shadow-sm">
           <div
             ref={categoryScrollRef}
             className="flex gap-3 overflow-x-auto whitespace-nowrap scrollbar-hide"
@@ -773,7 +758,7 @@ const CustomerMenu = ({
               onClick={() => setSelectedCategory('All')}
               className={`flex min-h-[44px] h-11 shrink-0 items-center justify-center gap-x-2 rounded-full pl-5 pr-5 cursor-pointer transition-colors ${selectedCategory === 'All'
                 ? 'bg-secondary-500 text-white'
-                : 'bg-accent-100 dark:bg-gray-700 text-secondary-700 dark:text-gray-200'
+                : 'bg-accent-100 /* dark:bg-gray-700 */ text-secondary-700 /* dark:text-gray-200 */'
                 }`}
               aria-label="Show all categories"
             >
@@ -787,7 +772,7 @@ const CustomerMenu = ({
                 onClick={() => setSelectedCategory(categoryName)}
                 className={`flex min-h-[44px] h-11 shrink-0 items-center justify-center gap-x-2 rounded-full pl-5 pr-5 cursor-pointer transition-colors ${selectedCategory === categoryName
                   ? 'bg-secondary-500 text-white'
-                  : 'bg-accent-100 dark:bg-gray-700 text-secondary-700 dark:text-gray-200'
+                  : 'bg-accent-100 /* dark:bg-gray-700 */ text-secondary-700 /* dark:text-gray-200 */'
                   }`}
                 aria-label={`Filter by ${categoryName}`}
               >
@@ -802,7 +787,7 @@ const CustomerMenu = ({
 
       {/* Main Content */}
       <main className="min-h-screen w-full overflow-x-hidden">
-        <div className="w-full max-w-full pt-4 sm:pt-8 pb-12 sm:pb-16 bg-white">
+        <div className="w-full max-w-full sm:pt-8 pb-12 sm:pb-16 bg-white">
           {activeTab === 'menu' ? (
             <div>
               {/* Hero Section with Background Image */}
@@ -820,7 +805,8 @@ const CustomerMenu = ({
                     <div className="container mx-auto px-4 sm:px-6 lg:px-8">
                       <div className="flex items-center justify-between h-16 pointer-events-auto">
                         {/* Logo and Title */}
-                        <div className="flex items-center gap-3">
+                        
+                        <div className="flex flex-1 justify-center items-center gap-3">
                           {cafeBranding.logo_url && (
                             <img 
                               src={getImageUrl(cafeBranding.logo_url)} 
@@ -943,7 +929,7 @@ const CustomerMenu = ({
                                     }, 200);
                                   }
                                 }}
-                                className="w-full pl-12 sm:pl-14 pr-12 sm:pr-14 py-3 sm:py-4 min-h-[44px] rounded-full bg-white dark:bg-gray-800 border-2 border-orange-300 dark:border-gray-600 text-gray-900 dark:text-white placeholder:text-gray-400 focus:outline-none focus:ring-4 focus:ring-orange-200 focus:border-orange-500 shadow-2xl transition-all text-sm sm:text-base"
+                                className="w-full pl-12 sm:pl-14 pr-12 sm:pr-14 py-3 sm:py-4 min-h-[44px] rounded-full bg-white /* dark:bg-gray-800 */ border-2 border-orange-300 /* dark:border-gray-600 */ text-gray-900 /* dark:text-white */ placeholder:text-gray-400 focus:outline-none focus:ring-4 focus:ring-orange-200 focus:border-orange-500 shadow-2xl transition-all text-sm sm:text-base"
                                 autoFocus
                               />
                               {searchQuery && (
@@ -955,7 +941,7 @@ const CustomerMenu = ({
                                     setSelectedSuggestionIndex(-1);
                                     setSearchExpanded(false);
                                   }}
-                                  className="search-clear-btn absolute right-5 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-400 hover:text-orange-500 dark:hover:text-orange-400 transition-colors p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700"
+                                  className="search-clear-btn absolute right-5 top-1/2 transform -translate-y-1/2 text-gray-400 /* dark:text-gray-400 */ hover:text-orange-500 /* dark:hover:text-orange-400 */ transition-colors p-1 rounded-full hover:bg-gray-100 /* dark:hover:bg-gray-700 */"
                                 >
                                   <X className="h-5 w-5" />
                                 </button>
@@ -965,7 +951,7 @@ const CustomerMenu = ({
                               {showAutocomplete && autocompleteSuggestions.length > 0 && (
                                 <div
                                   ref={autocompleteRef}
-                                  className="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-gray-800 rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-700 overflow-hidden z-50 max-h-80 overflow-y-auto"
+                                  className="absolute top-full left-0 right-0 mt-2 bg-white /* dark:bg-gray-800 */ rounded-2xl shadow-2xl border border-gray-200 /* dark:border-gray-700 */ overflow-hidden z-50 max-h-80 overflow-y-auto"
                                 >
                                   {autocompleteSuggestions.map((suggestion, index) => (
                                     <button
@@ -973,17 +959,17 @@ const CustomerMenu = ({
                                       type="button"
                                       onClick={() => handleSuggestionClick(suggestion)}
                                       onMouseDown={(e) => e.preventDefault()}
-                                      className={`autocomplete-suggestion w-full px-5 py-3 text-left hover:bg-orange-50 dark:hover:bg-gray-700 transition-colors flex items-center justify-between ${selectedSuggestionIndex === index
-                                          ? 'bg-orange-50 dark:bg-gray-700'
+                                      className={`autocomplete-suggestion w-full px-5 py-3 text-left hover:bg-orange-50 /* dark:hover:bg-gray-700 */ transition-colors flex items-center justify-between ${selectedSuggestionIndex === index
+                                          ? 'bg-orange-50 /* dark:bg-gray-700 */'
                                           : ''
                                         }`}
                                     >
                                       <div className="flex-1">
-                                        <div className="font-medium text-gray-900 dark:text-white">
+                                        <div className="font-medium text-gray-900 /* dark:text-white */">
                                           {suggestion.name}
                                         </div>
                                         {suggestion.category && (
-                                          <div className="text-sm text-gray-500 dark:text-gray-400">
+                                          <div className="text-sm text-gray-500 /* dark:text-gray-400 */">
                                             {suggestion.category}
                                           </div>
                                         )}
@@ -1013,13 +999,13 @@ const CustomerMenu = ({
                   <div className="text-center mb-10">
                     <div className="flex items-center justify-center mb-3">
                       <div className="h-px w-12 bg-orange-500 mr-3"></div>
-                      <span className="text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400 font-medium">Explore</span>
+                      <span className="text-xs uppercase tracking-wider text-gray-500 /* dark:text-gray-400 */ font-medium">Explore</span>
                       <div className="h-px w-12 bg-orange-500 ml-3"></div>
                     </div>
-                    <h2 className="text-3xl sm:text-4xl font-serif font-bold text-gray-900 dark:text-gray-100 mb-3">
+                    <h2 className="text-3xl sm:text-4xl font-serif font-bold text-gray-900 /* dark:text-gray-100 */ mb-3">
                       Our Categories
                     </h2>
-                    <p className="text-gray-500 dark:text-gray-400 text-sm sm:text-base max-w-xl mx-auto leading-relaxed">
+                    <p className="text-gray-500 /* dark:text-gray-400 */ text-sm sm:text-base max-w-xl mx-auto leading-relaxed">
                       Discover our delicious selection organized by category
                     </p>
                   </div>
@@ -1043,19 +1029,19 @@ const CustomerMenu = ({
                             onClick={() => {
                               setCategoryCarouselIndex(prev => prev > 0 ? prev - 1 : maxIndex);
                             }}
-                            className="absolute left-0 top-1/2 -translate-y-1/2 z-10 min-w-[44px] min-h-[44px] w-11 h-11 sm:w-12 sm:h-12 bg-white dark:bg-gray-800 rounded-full shadow-lg flex items-center justify-center hover:bg-orange-500 hover:text-white transition-all duration-300 group"
+                            className="absolute left-0 top-1/2 -translate-y-1/2 z-10 min-w-[44px] min-h-[44px] w-11 h-11 sm:w-12 sm:h-12 bg-white /* dark:bg-gray-800 */ rounded-full shadow-lg flex items-center justify-center hover:bg-orange-500 hover:text-white transition-all duration-300 group"
                             aria-label="Previous categories"
                           >
-                            <ChevronLeft className="h-5 w-5 sm:h-6 sm:w-6 text-gray-700 dark:text-gray-300 group-hover:text-white" />
+                            <ChevronLeft className="h-5 w-5 sm:h-6 sm:w-6 text-gray-700 /* dark:text-gray-300 */ group-hover:text-white" />
                           </button>
                           <button
                             onClick={() => {
                               setCategoryCarouselIndex(prev => prev < maxIndex ? prev + 1 : 0);
                             }}
-                            className="absolute right-0 top-1/2 -translate-y-1/2 z-10 min-w-[44px] min-h-[44px] w-11 h-11 sm:w-12 sm:h-12 bg-white dark:bg-gray-800 rounded-full shadow-lg flex items-center justify-center hover:bg-orange-500 hover:text-white transition-all duration-300 group"
+                            className="absolute right-0 top-1/2 -translate-y-1/2 z-10 min-w-[44px] min-h-[44px] w-11 h-11 sm:w-12 sm:h-12 bg-white /* dark:bg-gray-800 */ rounded-full shadow-lg flex items-center justify-center hover:bg-orange-500 hover:text-white transition-all duration-300 group"
                             aria-label="Next categories"
                           >
-                            <ChevronRight className="h-5 w-5 sm:h-6 sm:w-6 text-gray-700 dark:text-gray-300 group-hover:text-white" />
+                            <ChevronRight className="h-5 w-5 sm:h-6 sm:w-6 text-gray-700 /* dark:text-gray-300 */ group-hover:text-white" />
                           </button>
                         </>
                       );
@@ -1137,7 +1123,7 @@ const CustomerMenu = ({
                                   setSelectedCategory(categoryName);
                                   document.getElementById('menu-items-section')?.scrollIntoView({ behavior: 'smooth' });
                                 }}
-                                className="group relative w-28 h-28 sm:w-36 sm:h-36 md:w-40 md:h-40 lg:w-44 lg:h-44 overflow-hidden rounded-full bg-white dark:bg-gray-800 transition-all duration-300 min-w-[112px] min-h-[112px]"
+                                className="group relative w-28 h-28 sm:w-36 sm:h-36 md:w-40 md:h-40 lg:w-44 lg:h-44 overflow-hidden rounded-full bg-white /* dark:bg-gray-800 */ transition-all duration-300 min-w-[112px] min-h-[112px]"
                                 aria-label={`View ${categoryName} category`}
                               >
                                 {/* Circular Category Image */}
@@ -1198,7 +1184,7 @@ const CustomerMenu = ({
                               <span className={`absolute h-2 rounded-full transition-all duration-300 ${
                                 categoryCarouselIndex === index
                                   ? 'w-8 bg-orange-500'
-                                  : 'w-2 bg-gray-300 dark:bg-gray-600'
+                                  : 'w-2 bg-gray-300 /* dark:bg-gray-600 */'
                               }`} />
                             </button>
                           ))}
@@ -1218,14 +1204,14 @@ const CustomerMenu = ({
                       className="h-24 w-24 mx-auto mb-6 opacity-50"
                     />
                   )}
-                  <h3 className="text-xl font-semibold mb-2 text-gray-900 dark:text-gray-100">No menu items available</h3>
-                  <p className="text-base text-gray-500 dark:text-gray-400">Add items in Menu Management to get started</p>
+                  <h3 className="text-xl font-semibold mb-2 text-gray-900 /* dark:text-gray-100 */">No menu items available</h3>
+                  <p className="text-base text-gray-500 /* dark:text-gray-400 */">Add items in Menu Management to get started</p>
                 </div>
               ) : searchQuery.trim() && Object.keys(filteredMenuItems).length === 0 ? (
                 <div className="text-center py-12 max-w-6xl mx-auto">
                   <Search className="h-16 w-16 mx-auto mb-4 text-gray-400" />
-                  <h3 className="text-xl font-semibold mb-2 text-gray-900 dark:text-gray-100">No results found</h3>
-                  <p className="text-base text-gray-500 dark:text-gray-400 mb-4">
+                  <h3 className="text-xl font-semibold mb-2 text-gray-900 /* dark:text-gray-100 */">No results found</h3>
+                  <p className="text-base text-gray-500 /* dark:text-gray-400 */ mb-4">
                     We couldn't find any items matching "{searchQuery}"
                   </p>
                   <button
@@ -1245,7 +1231,7 @@ const CustomerMenu = ({
                   {searchQuery.trim() && (
                     <div className="max-w-6xl mx-auto px-4">
                       <div className="flex items-center justify-between mb-4">
-                        <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                        <h3 className="text-lg font-semibold text-gray-900 /* dark:text-gray-100 */">
                           Search Results for "{searchQuery}"
                         </h3>
                         <button
@@ -1271,19 +1257,19 @@ const CustomerMenu = ({
                         <div key={categoryName} className="max-w-6xl mx-auto space-y-8space-y-5">
                           {/* Divider before category (except first one) */}
                           {((selectedCategory === 'All' && index > 0) || (selectedCategory !== 'All' && index > 0)) && (
-                            <div className="border-t border-dashed border-gray-300 dark:border-gray-600 mb-12"></div>
+                            <div className="border-t border-dashed border-gray-300 /* dark:border-gray-600 */ mb-12"></div>
                           )}
 
                           {/* Category Header */}
                           <div className="text-center mb-10">
                             <div className="flex items-center justify-center mb-3">
                               <div className="h-px w-12 bg-orange-500 mr-3"></div>
-                              <span className="text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400 font-medium">{categoryNumber}</span>
+                              <span className="text-xs uppercase tracking-wider text-gray-500 /* dark:text-gray-400 */ font-medium">{categoryNumber}</span>
                             </div>
-                            <h2 className="text-3xl sm:text-4xl font-serif font-bold text-gray-900 dark:text-gray-100 mb-3">
+                            <h2 className="text-3xl sm:text-4xl font-serif font-bold text-gray-900 /* dark:text-gray-100 */ mb-3">
                               {categoryName}
                             </h2>
-                            <p className="text-gray-500 dark:text-gray-400 text-sm sm:text-base max-w-xl mx-auto leading-relaxed">
+                            <p className="text-gray-500 /* dark:text-gray-400 */ text-sm sm:text-base max-w-xl mx-auto leading-relaxed">
                               {/* Porro eveniet, autem ipsam corrupti consectetur cum. Repudiandae dignissimos fugiat sit nam. */}
                               {/* {categoryDescription} */}
                             </p>
@@ -1299,11 +1285,11 @@ const CustomerMenu = ({
                               return (
                                 <div
                                   key={item.id}
-                                  className="group flex items-start gap-4 p-4 bg-white dark:bg-gray-800 rounded-lg hover:shadow-md hover:bg-orange-100 transition-shadow mask-hover"
+                                  className="group flex items-start gap-4 p-4 bg-white /* dark:bg-gray-800 */ rounded-lg hover:shadow-md hover:bg-orange-100 transition-shadow mask-hover"
 
                                 >
                                   {/* Menu Item Thumbnail */}
-                                  <div className="flex-shrink-0 w-20 h-20 sm:w-24 sm:h-24 rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-700">
+                                  <div className="flex-shrink-0 w-20 h-20 sm:w-24 sm:h-24 rounded-lg overflow-hidden bg-gray-100 /* dark:bg-gray-700 */">
                                     <img
                                       src={itemImage}
                                       alt={item.name}
@@ -1313,10 +1299,10 @@ const CustomerMenu = ({
 
                                   {/* Item Details */}
                                   <div className="flex-1 min-w-0">
-                                    <h5 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-gray-100 mb-1">
+                                    <h5 className="text-base sm:text-lg font-semibold text-gray-900 /* dark:text-gray-100 */ mb-1">
                                       {item.name}
                                     </h5>
-                                    <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 leading-relaxed line-clamp-2 mb-2">
+                                    <p className="text-xs sm:text-sm text-gray-500 /* dark:text-gray-400 */ leading-relaxed line-clamp-2 mb-2">
                                       {item.description || 'Consectetur adipisicing elit. Soluta, impedit, saepe.'}
                                     </p>
                                   </div>
@@ -1349,18 +1335,18 @@ const CustomerMenu = ({
                   {selectedCategory === 'All' && !searchQuery.trim() && (
                     <div id="all-dishes-section" className="max-w-6xl mx-auto space-y-8">
                       {/* Divider */}
-                      <div className="border-t border-dashed border-gray-300 dark:border-gray-600 mb-12"></div>
+                      <div className="border-t border-dashed border-gray-300 /* dark:border-gray-600 */ mb-12"></div>
 
                       {/* Category Header */}
                       <div className="text-center mb-10">
                         <div className="flex items-center justify-center mb-3">
                           <div className="h-px w-12 bg-orange-500 mr-3"></div>
-                          <span className="text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400 font-medium">Complete Selection</span>
+                          <span className="text-xs uppercase tracking-wider text-gray-500 /* dark:text-gray-400 */ font-medium">Complete Selection</span>
                         </div>
-                        <h2 className="text-3xl sm:text-4xl font-serif font-bold text-gray-900 dark:text-gray-100 mb-3">
+                        <h2 className="text-3xl sm:text-4xl font-serif font-bold text-gray-900 /* dark:text-gray-100 */ mb-3">
                           All Dishes
                         </h2>
-                        <p className="text-gray-500 dark:text-gray-400 text-sm sm:text-base max-w-xl mx-auto leading-relaxed">
+                        <p className="text-gray-500 /* dark:text-gray-400 */ text-sm sm:text-base max-w-xl mx-auto leading-relaxed">
                           Browse our complete menu selection with all available dishes.
                         </p>
                       </div>
@@ -1375,10 +1361,10 @@ const CustomerMenu = ({
                           return (
                             <div
                               key={`all-${item.id}`}
-                              className="group flex items-start gap-4 p-4 bg-white dark:bg-gray-800 rounded-lg hover:shadow-md transition-shadow"
+                              className="group flex items-start gap-4 p-4 bg-white /* dark:bg-gray-800 */ rounded-lg hover:shadow-md transition-shadow"
                             >
                               {/* Menu Item Thumbnail */}
-                              <div className="flex-shrink-0 w-20 h-20 sm:w-24 sm:h-24 rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-700">
+                              <div className="flex-shrink-0 w-20 h-20 sm:w-24 sm:h-24 rounded-lg overflow-hidden bg-gray-100 /* dark:bg-gray-700 */">
                                 <img
                                   src={itemImage}
                                   alt={item.name}
@@ -1388,10 +1374,10 @@ const CustomerMenu = ({
 
                               {/* Item Details */}
                               <div className="flex-1 min-w-0">
-                                <h5 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-gray-100 mb-1">
+                                <h5 className="text-base sm:text-lg font-semibold text-gray-900 /* dark:text-gray-100 */ mb-1">
                                   {item.name}
                                 </h5>
-                                <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 leading-relaxed line-clamp-2 mb-2">
+                                <p className="text-xs sm:text-sm text-gray-500 /* dark:text-gray-400 */ leading-relaxed line-clamp-2 mb-2">
                                   {item.description || 'Consectetur adipisicing elit. Soluta, impedit, saepe.'}
                                 </p>
                               </div>
@@ -1438,13 +1424,13 @@ const CustomerMenu = ({
                       <div className="text-center mb-10">
                         <div className="flex items-center justify-center mb-3">
                           <div className="h-px w-12 bg-orange-500 mr-3"></div>
-                          <span className="text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400 font-medium">Featured</span>
+                          <span className="text-xs uppercase tracking-wider text-gray-500 /* dark:text-gray-400 */ font-medium">Featured</span>
                           <div className="h-px w-12 bg-orange-500 ml-3"></div>
                         </div>
-                        <h2 className="text-3xl sm:text-4xl font-serif font-bold text-gray-900 dark:text-gray-100 mb-3">
+                        <h2 className="text-3xl sm:text-4xl font-serif font-bold text-gray-900 /* dark:text-gray-100 */ mb-3">
                           Special Proposals
                         </h2>
-                        <p className="text-gray-500 dark:text-gray-400 text-sm sm:text-base max-w-xl mx-auto leading-relaxed">
+                        <p className="text-gray-500 /* dark:text-gray-400 */ text-sm sm:text-base max-w-xl mx-auto leading-relaxed">
                           Our most popular items, loved by our customers
                         </p>
                       </div>
@@ -1459,7 +1445,7 @@ const CustomerMenu = ({
                           return (
                             <div
                               key={`special-${item.id}`}
-                              className="group bg-white dark:bg-gray-800 rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-shadow"
+                              className="group bg-white /* dark:bg-gray-800 */ rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-shadow"
                             >
                               {/* Item Image */}
                               <div className="relative h-48 sm:h-56 overflow-hidden">
@@ -1472,10 +1458,10 @@ const CustomerMenu = ({
 
                               {/* Item Details */}
                               <div className="p-5">
-                                <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">
+                                <h3 className="text-lg font-semibold text-gray-900 /* dark:text-gray-100 */ mb-2">
                                   {item.name}
                                 </h3>
-                                <p className="text-sm text-gray-500 dark:text-gray-400 leading-relaxed mb-4 line-clamp-2">
+                                <p className="text-sm text-gray-500 /* dark:text-gray-400 */ leading-relaxed mb-4 line-clamp-2">
                                   {item.description || 'A customer favorite'}
                                 </p>
 
@@ -1513,14 +1499,14 @@ const CustomerMenu = ({
                   )}
 
                   {/* Footer Section */}
-                  <div className="mt-20 pt-16 border-t max-w-6xl mx-auto space-y-8 border-gray-200 dark:border-gray-700">
+                  <div className="mt-20 pt-16 border-t max-w-6xl mx-auto space-y-8 border-gray-200 /* dark:border-gray-700 */">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
 
 
                       {/* Contact Info Column */}
                       <div>
                         <h3 className="text-xl font-serif font-bold text-orange-500 mb-4">Contact Info</h3>
-                        <p className="text-gray-600 dark:text-gray-400 text-sm leading-relaxed mb-4">
+                        <p className="text-gray-600 /* dark:text-gray-400 */ text-sm leading-relaxed mb-4">
                           Have questions or want to make a reservation? We'd love to hear from you. Reach out to us for any inquiries.
                         </p>
                         {cafeBranding && (
@@ -1528,19 +1514,19 @@ const CustomerMenu = ({
                             {cafeBranding.cafe_name && (
                               <div className="flex items-start gap-2">
                                 <MapPin className="h-4 w-4 text-orange-500 mt-1 flex-shrink-0" />
-                                <span className="text-gray-700 dark:text-gray-300 font-medium">{cafeBranding.cafe_name}</span>
+                                <span className="text-gray-700 /* dark:text-gray-300 */ font-medium">{cafeBranding.cafe_name}</span>
                               </div>
                             )}
                             {cafeBranding.address && (
                               <div className="flex items-start gap-2">
                                 <MapPin className="h-4 w-4 text-orange-500 mt-1 flex-shrink-0" />
-                                <span className="text-gray-600 dark:text-gray-400">{cafeBranding.address}</span>
+                                <span className="text-gray-600 /* dark:text-gray-400 */">{cafeBranding.address}</span>
                               </div>
                             )}
                             {cafeBranding.phone && (
                               <div className="flex items-center gap-2">
                                 <Phone className="h-4 w-4 text-orange-500 flex-shrink-0" />
-                                <a href={`tel:${cafeBranding.phone}`} className="text-gray-600 dark:text-gray-400 hover:text-orange-500 transition-colors">
+                                <a href={`tel:${cafeBranding.phone}`} className="text-gray-600 /* dark:text-gray-400 */ hover:text-orange-500 transition-colors">
                                   {cafeBranding.phone}
                                 </a>
                               </div>
@@ -1548,7 +1534,7 @@ const CustomerMenu = ({
                             {cafeBranding.email && (
                               <div className="flex items-center gap-2">
                                 <Mail className="h-4 w-4 text-orange-500 flex-shrink-0" />
-                                <a href={`mailto:${cafeBranding.email}`} className="text-gray-600 dark:text-gray-400 hover:text-orange-500 transition-colors">
+                                <a href={`mailto:${cafeBranding.email}`} className="text-gray-600 /* dark:text-gray-400 */ hover:text-orange-500 transition-colors">
                                   {cafeBranding.email}
                                 </a>
                               </div>
@@ -1556,7 +1542,7 @@ const CustomerMenu = ({
                             {cafeSettings.website && (
                               <div className="flex items-center gap-2">
                                 <MapPin className="h-4 w-4 text-orange-500 flex-shrink-0" />
-                                <a href={cafeSettings.website} target="_blank" rel="noopener noreferrer" className="text-gray-600 dark:text-gray-400 hover:text-orange-500 transition-colors">
+                                <a href={cafeSettings.website} target="_blank" rel="noopener noreferrer" className="text-gray-600 /* dark:text-gray-400 */ hover:text-orange-500 transition-colors">
                                   {cafeSettings.website}
                                 </a>
                               </div>
@@ -1621,16 +1607,16 @@ const CustomerMenu = ({
       {
         showCart && (
           <div className="fixed inset-0 bg-black/70 backdrop-blur-md flex items-end lg:items-center justify-center z-50 p-0 lg:p-4">
-            <div className="bg-white dark:bg-gray-800 rounded-t-2xl lg:rounded-2xl w-full lg:max-w-4xl max-h-[90vh] lg:max-h-[90vh] overflow-hidden shadow-2xl flex flex-col h-[90vh] lg:h-auto">
+            <div className="bg-white /* dark:bg-gray-800 */ rounded-t-2xl lg:rounded-2xl w-full lg:max-w-4xl max-h-[90vh] lg:max-h-[90vh] overflow-hidden shadow-2xl flex flex-col h-[90vh] lg:h-auto">
               {/* Cart Header */}
-              <div className="flex w-full items-center justify-between border-b border-accent-200 dark:border-gray-700 bg-accent-50 dark:bg-gray-900 px-4 sm:px-6 py-4 flex-shrink-0">
+              <div className="flex w-full items-center justify-between border-b border-accent-200 /* dark:border-gray-700 */ bg-accent-50 /* dark:bg-gray-900 */ px-4 sm:px-6 py-4 flex-shrink-0">
                 <div className="flex items-center gap-4">
-                  <ShoppingCart className="h-6 w-6 text-secondary-600 dark:text-secondary-400" />
-                  <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-secondary-700 dark:text-gray-100">Your Order</h2>
+                  <ShoppingCart className="h-6 w-6 text-secondary-600 /* dark:text-secondary-400 */" />
+                  <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-secondary-700 /* dark:text-gray-100 */">Your Order</h2>
                 </div>
                 <button
                   onClick={() => setShowCart(false)}
-                  className="text-secondary-600 dark:text-gray-300 hover:bg-accent-100 dark:hover:bg-gray-700 p-2 rounded-lg transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center"
+                  className="text-secondary-600 /* dark:text-gray-300 */ hover:bg-accent-100 /* dark:hover:bg-gray-700 */ p-2 rounded-lg transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center"
                   aria-label="Close cart"
                 >
                   <X className="h-6 w-6" />
@@ -1642,17 +1628,17 @@ const CustomerMenu = ({
                 {/* Left Column: Cart Items */}
                 <div className="lg:col-span-2 flex flex-col gap-4">
                   {cart.length === 0 ? (
-                    <div className="flex flex-col items-center justify-center gap-6 rounded-lg bg-accent-50 dark:bg-gray-900 p-12 text-center shadow-sm">
-                      <div className="text-secondary-600 dark:text-secondary-400">
+                    <div className="flex flex-col items-center justify-center gap-6 rounded-lg bg-accent-50 /* dark:bg-gray-900 */ p-12 text-center shadow-sm">
+                      <div className="text-secondary-600 /* dark:text-secondary-400 */">
                         <ShoppingCart className="h-24 w-24" />
                       </div>
-                      <h3 className="text-2xl font-bold text-secondary-700 dark:text-gray-100">Your cart is empty</h3>
-                      <p className="max-w-sm text-secondary-600 dark:text-gray-400">Looks like you haven't added anything to your order yet. Let's fix that!</p>
+                      <h3 className="text-2xl font-bold text-secondary-700 /* dark:text-gray-100 */">Your cart is empty</h3>
+                      <p className="max-w-sm text-secondary-600 /* dark:text-gray-400 */">Looks like you haven't added anything to your order yet. Let's fix that!</p>
                     </div>
                   ) : (
                     <>
                       {cart.map((item) => (
-                        <div key={item.id} className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 rounded-lg bg-accent-50 dark:bg-gray-900 p-3 sm:p-4 shadow-sm border border-accent-200 dark:border-gray-700">
+                        <div key={item.id} className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 rounded-lg bg-accent-50 /* dark:bg-gray-900 */ p-3 sm:p-4 shadow-sm border border-accent-200 /* dark:border-gray-700 */">
                           <div className="flex items-center gap-3 sm:gap-4 w-full sm:w-auto">
                             <div
                               className="bg-center bg-no-repeat aspect-square bg-cover rounded-lg size-16 flex-shrink-0"
@@ -1664,21 +1650,21 @@ const CustomerMenu = ({
                               }}
                             />
                             <div className="flex flex-1 flex-col justify-center min-w-0">
-                              <p className="text-sm sm:text-base font-bold text-secondary-700 dark:text-gray-100 truncate">{item.name}</p>
-                              <p className="text-xs sm:text-sm text-secondary-600 dark:text-gray-400">{formatCurrency(item.price)}</p>
+                              <p className="text-sm sm:text-base font-bold text-secondary-700 /* dark:text-gray-100 */ truncate">{item.name}</p>
+                              <p className="text-xs sm:text-sm text-secondary-600 /* dark:text-gray-400 */">{formatCurrency(item.price)}</p>
                             </div>
                           </div>
                           <div className="flex items-center justify-between sm:justify-end gap-3 sm:gap-6 w-full sm:w-auto">
                             <div className="flex items-center gap-2">
                               <button
                                 onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                                className="flex h-11 w-11 items-center justify-center rounded-full bg-accent-100 dark:bg-gray-700 transition-colors hover:bg-secondary-100 dark:hover:bg-secondary-900 cursor-pointer min-h-[44px] min-w-[44px]"
+                                className="flex h-11 w-11 items-center justify-center rounded-full bg-accent-100 /* dark:bg-gray-700 */ transition-colors hover:bg-secondary-100 /* dark:hover:bg-secondary-900 */ cursor-pointer min-h-[44px] min-w-[44px]"
                                 aria-label="Decrease quantity"
                               >
                                 <Minus className="h-5 w-5" />
                               </button>
                               <input
-                                className="w-12 sm:w-16 border-none bg-transparent p-0 text-center text-base font-medium focus:outline-0 focus:ring-0 text-secondary-700 dark:text-gray-100"
+                                className="w-12 sm:w-16 border-none bg-transparent p-0 text-center text-base font-medium focus:outline-0 focus:ring-0 text-secondary-700 /* dark:text-gray-100 */"
                                 type="number"
                                 value={item.quantity}
                                 readOnly
@@ -1686,16 +1672,16 @@ const CustomerMenu = ({
                               />
                               <button
                                 onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                                className="flex h-11 w-11 items-center justify-center rounded-full bg-accent-100 dark:bg-gray-700 transition-colors hover:bg-secondary-100 dark:hover:bg-secondary-900 cursor-pointer min-h-[44px] min-w-[44px]"
+                                className="flex h-11 w-11 items-center justify-center rounded-full bg-accent-100 /* dark:bg-gray-700 */ transition-colors hover:bg-secondary-100 /* dark:hover:bg-secondary-900 */ cursor-pointer min-h-[44px] min-w-[44px]"
                                 aria-label="Increase quantity"
                               >
                                 <Plus className="h-5 w-5" />
                               </button>
                             </div>
-                            <p className="text-right font-semibold text-secondary-700 dark:text-gray-100 text-sm sm:text-base whitespace-nowrap">{formatCurrency(item.price * item.quantity)}</p>
+                            <p className="text-right font-semibold text-secondary-700 /* dark:text-gray-100 */ text-sm sm:text-base whitespace-nowrap">{formatCurrency(item.price * item.quantity)}</p>
                             <button
                               onClick={() => removeFromCart(item.id)}
-                              className="text-secondary-600 dark:text-gray-400 transition-colors hover:text-red-500 min-h-[44px] min-w-[44px] flex items-center justify-center"
+                              className="text-secondary-600 /* dark:text-gray-400 */ transition-colors hover:text-red-500 min-h-[44px] min-w-[44px] flex items-center justify-center"
                               aria-label="Remove item"
                             >
                               <Trash2 className="h-5 w-5" />
@@ -1710,28 +1696,28 @@ const CustomerMenu = ({
                 {/* Right Column: Order Summary */}
                 {cart.length > 0 && (
                   <div className="lg:col-span-1 flex flex-col max-h-full">
-                    <div className="flex flex-col gap-6 rounded-xl bg-accent-50 dark:bg-gray-900 p-6 shadow-sm border border-accent-200 dark:border-gray-700 flex-1 overflow-y-auto">
-                      <h2 className="text-2xl font-bold tracking-tight text-secondary-700 dark:text-gray-100">Order Summary</h2>
+                    <div className="flex flex-col gap-6 rounded-xl bg-accent-50 /* dark:bg-gray-900 */ p-6 shadow-sm border border-accent-200 /* dark:border-gray-700 */ flex-1 overflow-y-auto">
+                      <h2 className="text-2xl font-bold tracking-tight text-secondary-700 /* dark:text-gray-100 */">Order Summary</h2>
 
-                      <div className="flex flex-col gap-3 border-b border-accent-200 dark:border-gray-700 pb-4">
+                      <div className="flex flex-col gap-3 border-b border-accent-200 /* dark:border-gray-700 */ pb-4">
                         <div className="flex justify-between">
-                          <p className="text-secondary-600 dark:text-gray-400">Subtotal</p>
-                          <p className="font-medium text-secondary-700 dark:text-gray-100">{formatCurrency(getSubtotal())}</p>
+                          <p className="text-secondary-600 /* dark:text-gray-400 */">Subtotal</p>
+                          <p className="font-medium text-secondary-700 /* dark:text-gray-100 */">{formatCurrency(getSubtotal())}</p>
                         </div>
                         {showTaxInMenu && taxAmount > 0 && (
                           <div className="flex justify-between">
-                            <p className="text-secondary-600 dark:text-gray-400">Taxes ({taxRate}%)</p>
-                            <p className="font-medium text-secondary-700 dark:text-gray-100">{formatCurrency(taxAmount)}</p>
+                            <p className="text-secondary-600 /* dark:text-gray-400 */">Taxes ({taxRate}%)</p>
+                            <p className="font-medium text-secondary-700 /* dark:text-gray-100 */">{formatCurrency(taxAmount)}</p>
                           </div>
                         )}
                         {tipAmount > 0 && (
                           <div className="flex justify-between">
-                            <p className="text-secondary-600 dark:text-gray-400">Tip</p>
-                            <p className="font-medium text-secondary-700 dark:text-gray-100">{formatCurrency(tipAmount)}</p>
+                            <p className="text-secondary-600 /* dark:text-gray-400 */">Tip</p>
+                            <p className="font-medium text-secondary-700 /* dark:text-gray-100 */">{formatCurrency(tipAmount)}</p>
                           </div>
                         )}
                         {pointsToRedeem > 0 && (
-                          <div className="flex justify-between text-green-600 dark:text-green-400">
+                          <div className="flex justify-between text-green-600 /* dark:text-green-400 */">
                             <p>Points Redeemed ({pointsToRedeem} pts)</p>
                             <p className="font-medium">-{formatCurrency(pointsToRedeem * 0.1)}</p>
                           </div>
@@ -1739,21 +1725,21 @@ const CustomerMenu = ({
                       </div>
 
                       <div className="flex justify-between">
-                        <p className="text-lg font-bold text-secondary-700 dark:text-gray-100">Total</p>
-                        <p className="text-xl font-extrabold text-secondary-700 dark:text-gray-100">{formatCurrency(getTotal())}</p>
+                        <p className="text-lg font-bold text-secondary-700 /* dark:text-gray-100 */">Total</p>
+                        <p className="text-xl font-extrabold text-secondary-700 /* dark:text-gray-100 */">{formatCurrency(getTotal())}</p>
                       </div>
 
                       {/* Login Required Message */}
                       {!customer && (
-                        <div className="p-6 bg-secondary-50 dark:bg-secondary-900/20 border border-secondary-200 dark:border-secondary-800 rounded-lg">
+                        <div className="p-6 bg-secondary-50 /* dark:bg-secondary-900/20 */ border border-secondary-200 /* dark:border-secondary-800 */ rounded-lg">
                           <div className="text-center">
                             <div className="w-12 h-12 bg-secondary-500 rounded-full flex items-center justify-center mx-auto mb-4">
                               <User className="h-6 w-6 text-white" />
                             </div>
-                            <h3 className="text-lg font-bold text-secondary-700 dark:text-gray-100 mb-2">
+                            <h3 className="text-lg font-bold text-secondary-700 /* dark:text-gray-100 */ mb-2">
                               Login Required
                             </h3>
-                            <p className="text-secondary-600 dark:text-gray-400 mb-4 text-sm">
+                            <p className="text-secondary-600 /* dark:text-gray-400 */ mb-4 text-sm">
                               Please login to place your order
                             </p>
                             <button
@@ -1773,11 +1759,11 @@ const CustomerMenu = ({
                       {customer && (
                         <div className="flex flex-col gap-4">
                           {/* Customer Information */}
-                          <div className="p-4 bg-secondary-50 dark:bg-secondary-900/20 border border-secondary-200 dark:border-secondary-800 rounded-lg">
+                          <div className="p-4 bg-secondary-50 /* dark:bg-secondary-900/20 */ border border-secondary-200 /* dark:border-secondary-800 */ rounded-lg">
                             <div className="flex flex-col gap-2 mb-3">
                               <div className="flex items-center justify-between">
-                                <h3 className="font-bold text-secondary-700 dark:text-gray-100 flex items-center text-base">
-                                  <User className="h-4 w-4 mr-2 text-secondary-600 dark:text-secondary-400" />
+                                <h3 className="font-bold text-secondary-700 /* dark:text-gray-100 */ flex items-center text-base">
+                                  <User className="h-4 w-4 mr-2 text-secondary-600 /* dark:text-secondary-400 */" />
                                   Customer Info
                                 </h3>
                               </div>
@@ -1802,19 +1788,19 @@ const CustomerMenu = ({
                             </div>
                             <div className="space-y-2 text-sm">
                               <div className="flex justify-between">
-                                <span className="text-secondary-600 dark:text-gray-400">Name:</span>
-                                <span className="font-semibold text-secondary-700 dark:text-gray-100">{customer.name}</span>
+                                <span className="text-secondary-600 /* dark:text-gray-400 */">Name:</span>
+                                <span className="font-semibold text-secondary-700 /* dark:text-gray-100 */">{customer.name}</span>
                               </div>
                               {customer.phone && (
                                 <div className="flex justify-between">
-                                  <span className="text-secondary-600 dark:text-gray-400">Phone:</span>
-                                  <span className="font-semibold text-secondary-700 dark:text-gray-100">{customer.phone}</span>
+                                  <span className="text-secondary-600 /* dark:text-gray-400 */">Phone:</span>
+                                  <span className="font-semibold text-secondary-700 /* dark:text-gray-100 */">{customer.phone}</span>
                                 </div>
                               )}
                               {customer.loyalty_points > 0 && (
                                 <div className="flex justify-between">
-                                  <span className="text-secondary-600 dark:text-gray-400">Points:</span>
-                                  <span className="flex items-center text-yellow-600 dark:text-yellow-400 font-semibold">
+                                  <span className="text-secondary-600 /* dark:text-gray-400 */">Points:</span>
+                                  <span className="flex items-center text-yellow-600 /* dark:text-yellow-400 */ font-semibold">
                                     <Star className="h-3 w-3 mr-1" />
                                     {customer.loyalty_points}
                                   </span>
@@ -1825,7 +1811,7 @@ const CustomerMenu = ({
 
                           {/* Payment Method */}
                           <div>
-                            <h3 className="font-bold text-secondary-700 dark:text-gray-100 mb-3 text-sm">Payment Method</h3>
+                            <h3 className="font-bold text-secondary-700 /* dark:text-gray-100 */ mb-3 text-sm">Payment Method</h3>
                             <div className="grid grid-cols-2 gap-2">
                               {paymentMethods.map((method) => (
                                 <button
@@ -1834,7 +1820,7 @@ const CustomerMenu = ({
                                   onClick={() => setPaymentMethod(method.code)}
                                   className={`flex items-center justify-center p-3 rounded-lg border-2 transition-colors ${paymentMethod === method.code
                                     ? 'bg-secondary-500 text-white border-secondary-500'
-                                    : 'bg-white dark:bg-gray-800 text-secondary-700 dark:text-gray-100 border-accent-200 dark:border-gray-700 hover:border-secondary-500'
+                                    : 'bg-white /* dark:bg-gray-800 */ text-secondary-700 /* dark:text-gray-100 */ border-accent-200 /* dark:border-gray-700 */ hover:border-secondary-500'
                                     }`}
                                 >
                                   <span className="mr-2">{method.icon}</span>
@@ -1846,7 +1832,7 @@ const CustomerMenu = ({
 
                           {/* Pickup Option */}
                           <div>
-                            <h3 className="font-bold text-secondary-700 dark:text-gray-100 mb-3 text-sm">Dining Preference</h3>
+                            <h3 className="font-bold text-secondary-700 /* dark:text-gray-100 */ mb-3 text-sm">Dining Preference</h3>
                             <div className="grid grid-cols-2 gap-2">
                               {[
                                 { value: 'pickup', label: 'Pickup', icon: '🥡' },
@@ -1857,7 +1843,7 @@ const CustomerMenu = ({
                                   onClick={() => setPickupOption(option.value)}
                                   className={`p-3 rounded-lg border-2 transition-colors ${pickupOption === option.value
                                     ? 'bg-secondary-500 text-white border-secondary-500'
-                                    : 'bg-white dark:bg-gray-800 text-secondary-700 dark:text-gray-100 border-accent-200 dark:border-gray-700 hover:border-secondary-500'
+                                    : 'bg-white /* dark:bg-gray-800 */ text-secondary-700 /* dark:text-gray-100 */ border-accent-200 /* dark:border-gray-700 */ hover:border-secondary-500'
                                     }`}
                                 >
                                   <div className="flex items-center justify-center gap-2">
@@ -1872,13 +1858,13 @@ const CustomerMenu = ({
                           {/* Table Number for Dine-in */}
                           {pickupOption === 'dine-in' && (
                             <div>
-                              <label className="block font-bold text-secondary-700 dark:text-gray-100 mb-2 text-sm">Table Number</label>
+                              <label className="block font-bold text-secondary-700 /* dark:text-gray-100 */ mb-2 text-sm">Table Number</label>
                               <input
                                 type="text"
                                 placeholder="Enter table number (optional)"
                                 value={tableNumber}
                                 onChange={(e) => setTableNumber(e.target.value)}
-                                className="w-full p-3 border-2 border-accent-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-secondary-500 focus:border-secondary-500 bg-white dark:bg-gray-800 text-secondary-700 dark:text-gray-100 transition-colors"
+                                className="w-full p-3 border-2 border-accent-200 /* dark:border-gray-700 */ rounded-lg focus:ring-2 focus:ring-secondary-500 focus:border-secondary-500 bg-white /* dark:bg-gray-800 */ text-secondary-700 /* dark:text-gray-100 */ transition-colors"
                               />
                             </div>
                           )}
@@ -1886,22 +1872,22 @@ const CustomerMenu = ({
                           {/* Points Redemption */}
                           {customer?.loyalty_points > 0 && (
                             <div>
-                              <h3 className="font-bold text-secondary-700 dark:text-gray-100 mb-3 text-sm flex items-center">
-                                <Star className="h-4 w-4 mr-2 text-yellow-600 dark:text-yellow-400" />
+                              <h3 className="font-bold text-secondary-700 /* dark:text-gray-100 */ mb-3 text-sm flex items-center">
+                                <Star className="h-4 w-4 mr-2 text-yellow-600 /* dark:text-yellow-400 */" />
                                 Redeem Points
                               </h3>
-                              <div className="bg-yellow-50 dark:bg-yellow-900/20 rounded-lg p-4 mb-3 border border-yellow-200 dark:border-yellow-800">
+                              <div className="bg-yellow-50 /* dark:bg-yellow-900/20 */ rounded-lg p-4 mb-3 border border-yellow-200 /* dark:border-yellow-800 */">
                                 <div className="grid grid-cols-2 gap-3 text-xs">
                                   <div className="text-center">
-                                    <div className="text-lg font-bold text-secondary-700 dark:text-gray-100">{customer.loyalty_points}</div>
-                                    <div className="text-secondary-600 dark:text-gray-400">Available</div>
+                                    <div className="text-lg font-bold text-secondary-700 /* dark:text-gray-100 */">{customer.loyalty_points}</div>
+                                    <div className="text-secondary-600 /* dark:text-gray-400 */">Available</div>
                                   </div>
                                   <div className="text-center">
-                                    <div className="text-lg font-bold text-secondary-700 dark:text-gray-100">{maxRedeemablePoints}</div>
-                                    <div className="text-secondary-600 dark:text-gray-400">Max Redeemable</div>
+                                    <div className="text-lg font-bold text-secondary-700 /* dark:text-gray-100 */">{maxRedeemablePoints}</div>
+                                    <div className="text-secondary-600 /* dark:text-gray-400 */">Max Redeemable</div>
                                   </div>
                                 </div>
-                                <div className="text-center mt-2 text-xs text-secondary-600 dark:text-gray-400">
+                                <div className="text-center mt-2 text-xs text-secondary-600 /* dark:text-gray-400 */">
                                   1 point = {formatCurrency(0.10)}
                                 </div>
                               </div>
@@ -1911,7 +1897,7 @@ const CustomerMenu = ({
                                 onChange={(e) => handlePointsRedemption(parseInt(e.target.value) || 0)}
                                 min="0"
                                 max={maxRedeemablePoints}
-                                className="w-full p-3 border-2 border-accent-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 bg-white dark:bg-gray-800 text-secondary-700 dark:text-gray-100 transition-colors"
+                                className="w-full p-3 border-2 border-accent-200 /* dark:border-gray-700 */ rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 bg-white /* dark:bg-gray-800 */ text-secondary-700 /* dark:text-gray-100 */ transition-colors"
                                 placeholder="Enter points"
                               />
                             </div>
@@ -1919,7 +1905,7 @@ const CustomerMenu = ({
 
                           {/* Tip Selection */}
                           <div>
-                            <h3 className="font-bold text-secondary-700 dark:text-gray-100 mb-3 text-sm">Add Tip</h3>
+                            <h3 className="font-bold text-secondary-700 /* dark:text-gray-100 */ mb-3 text-sm">Add Tip</h3>
                             <div className="grid grid-cols-3 gap-2 mb-3">
                               {[0, 10, 15, 18, 20, 25].map((percentage) => (
                                 <button
@@ -1927,7 +1913,7 @@ const CustomerMenu = ({
                                   onClick={() => handleTipPercentageChange(percentage)}
                                   className={`py-2 px-3 text-xs rounded-lg border-2 transition-colors font-semibold ${tipPercentage === percentage
                                     ? 'bg-secondary-500 text-white border-secondary-500'
-                                    : 'bg-white dark:bg-gray-800 text-secondary-700 dark:text-gray-100 border-accent-200 dark:border-gray-700 hover:border-secondary-500'
+                                    : 'bg-white /* dark:bg-gray-800 */ text-secondary-700 /* dark:text-gray-100 */ border-accent-200 /* dark:border-gray-700 */ hover:border-secondary-500'
                                     }`}
                                 >
                                   {percentage === 0 ? 'No Tip' : `${percentage}%`}
@@ -1938,7 +1924,7 @@ const CustomerMenu = ({
                               type="number"
                               value={tipAmount.toFixed(2)}
                               onChange={(e) => handleTipAmountChange(e.target.value)}
-                              className="w-full p-3 border-2 border-accent-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-secondary-500 focus:border-secondary-500 bg-white dark:bg-gray-800 text-secondary-700 dark:text-gray-100 transition-colors"
+                              className="w-full p-3 border-2 border-accent-200 /* dark:border-gray-700 */ rounded-lg focus:ring-2 focus:ring-secondary-500 focus:border-secondary-500 bg-white /* dark:bg-gray-800 */ text-secondary-700 /* dark:text-gray-100 */ transition-colors"
                               placeholder="Custom tip"
                             />
                           </div>
@@ -1947,7 +1933,7 @@ const CustomerMenu = ({
                     </div>
 
                     {/* Action Buttons - Sticky at bottom */}
-                    <div className="flex flex-col gap-3 p-4 bg-accent-50 dark:bg-gray-900 border-t border-accent-200 dark:border-gray-700 rounded-b-xl flex-shrink-0">
+                    <div className="flex flex-col gap-3 p-4 bg-accent-50 /* dark:bg-gray-900 */ border-t border-accent-200 /* dark:border-gray-700 */ rounded-b-xl flex-shrink-0">
                       <button
                         onClick={placeOrder}
                         disabled={orderLoading || !customer}
@@ -1968,7 +1954,7 @@ const CustomerMenu = ({
 
                       <button
                         onClick={clearCart}
-                        className="w-full rounded-lg bg-white dark:bg-gray-800 border-2 border-accent-200 dark:border-gray-700 py-2.5 min-h-[44px] text-sm font-semibold text-secondary-700 dark:text-gray-100 hover:border-secondary-500 transition-colors"
+                        className="w-full rounded-lg bg-white /* dark:bg-gray-800 */ border-2 border-accent-200 /* dark:border-gray-700 */ py-2.5 min-h-[44px] text-sm font-semibold text-secondary-700 /* dark:text-gray-100 */ hover:border-secondary-500 transition-colors"
                       >
                         Clear Cart
                       </button>
@@ -1983,14 +1969,14 @@ const CustomerMenu = ({
 
       {/* Floating Cart Summary Bar - Mobile Only */}
       {cart.length > 0 && (
-        <footer className="lg:hidden fixed bottom-0 left-0 right-0 z-20 bg-white dark:bg-gray-800 border-t border-accent-200 dark:border-gray-700 shadow-lg">
+        <footer className="lg:hidden fixed bottom-0 left-0 right-0 z-20 bg-white /* dark:bg-gray-800 */ border-t border-accent-200 /* dark:border-gray-700 */ shadow-lg">
           <div className="container mx-auto px-4 py-4">
             <div className="flex items-center justify-between gap-4">
               <div className="flex flex-col">
-                <p className="text-secondary-600 dark:text-gray-400 text-sm font-medium">
+                <p className="text-secondary-600 /* dark:text-gray-400 */ text-sm font-medium">
                   {cart.reduce((total, item) => total + item.quantity, 0)} items
                 </p>
-                <p className="text-secondary-700 dark:text-gray-100 text-lg font-bold">
+                <p className="text-secondary-700 /* dark:text-gray-100 */ text-lg font-bold">
                   {formatCurrency(getSubtotal())}
                 </p>
               </div>
@@ -2011,15 +1997,15 @@ const CustomerMenu = ({
       {/* Edit Profile Modal - Full screen on mobile */}
       {showEditProfile && (
         <div className="fixed inset-0 bg-black/70 backdrop-blur-md flex items-end lg:items-center justify-center z-50 p-0 lg:p-4">
-          <div className="bg-white dark:bg-gray-800 rounded-t-2xl lg:rounded-2xl shadow-2xl max-w-md lg:max-w-md w-full h-[90vh] lg:h-auto flex flex-col">
-            <div className="flex items-center justify-between border-b border-accent-200 dark:border-gray-700 bg-accent-50 dark:bg-gray-900 px-4 sm:px-6 py-4 flex-shrink-0">
+          <div className="bg-white /* dark:bg-gray-800 */ rounded-t-2xl lg:rounded-2xl shadow-2xl max-w-md lg:max-w-md w-full h-[90vh] lg:h-auto flex flex-col">
+            <div className="flex items-center justify-between border-b border-accent-200 /* dark:border-gray-700 */ bg-accent-50 /* dark:bg-gray-900 */ px-4 sm:px-6 py-4 flex-shrink-0">
               <div className="flex items-center gap-4">
-                <Edit3 className="h-6 w-6 text-secondary-600 dark:text-secondary-400" />
-                <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-secondary-700 dark:text-gray-100">Edit Profile</h2>
+                <Edit3 className="h-6 w-6 text-secondary-600 /* dark:text-secondary-400 */" />
+                <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-secondary-700 /* dark:text-gray-100 */">Edit Profile</h2>
               </div>
               <button
                 onClick={() => setShowEditProfile(false)}
-                className="text-secondary-600 dark:text-gray-300 hover:bg-accent-100 dark:hover:bg-gray-700 p-2 rounded-lg transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center"
+                className="text-secondary-600 /* dark:text-gray-300 */ hover:bg-accent-100 /* dark:hover:bg-gray-700 */ p-2 rounded-lg transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center"
                 aria-label="Close"
               >
                 <X className="h-6 w-6" />
@@ -2029,54 +2015,54 @@ const CustomerMenu = ({
             <div className="p-4 sm:p-6 flex-1 overflow-y-auto">
               <form onSubmit={handleProfileUpdate} className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-secondary-700 dark:text-gray-100 mb-2">
+                  <label className="block text-sm font-medium text-secondary-700 /* dark:text-gray-100 */ mb-2">
                     Full Name *
                   </label>
                   <input
                     type="text"
                     value={editProfileData.name}
                     onChange={(e) => handleProfileInputChange('name', e.target.value)}
-                    className="w-full px-4 py-3 border-2 border-accent-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-secondary-500 focus:border-secondary-500 transition-colors bg-white dark:bg-gray-800 text-secondary-700 dark:text-gray-100"
+                    className="w-full px-4 py-3 border-2 border-accent-200 /* dark:border-gray-700 */ rounded-lg focus:ring-2 focus:ring-secondary-500 focus:border-secondary-500 transition-colors bg-white /* dark:bg-gray-800 */ text-secondary-700 /* dark:text-gray-100 */"
                     placeholder="Enter your full name"
                     required
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-secondary-700 dark:text-gray-100 mb-2">
+                  <label className="block text-sm font-medium text-secondary-700 /* dark:text-gray-100 */ mb-2">
                     Email Address
                   </label>
                   <input
                     type="email"
                     value={editProfileData.email}
                     onChange={(e) => handleProfileInputChange('email', e.target.value)}
-                    className="w-full px-4 py-3 border-2 border-accent-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-secondary-500 focus:border-secondary-500 transition-colors bg-white dark:bg-gray-800 text-secondary-700 dark:text-gray-100"
+                    className="w-full px-4 py-3 border-2 border-accent-200 /* dark:border-gray-700 */ rounded-lg focus:ring-2 focus:ring-secondary-500 focus:border-secondary-500 transition-colors bg-white /* dark:bg-gray-800 */ text-secondary-700 /* dark:text-gray-100 */"
                     placeholder="Enter your email address"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-secondary-700 dark:text-gray-100 mb-2">
+                  <label className="block text-sm font-medium text-secondary-700 /* dark:text-gray-100 */ mb-2">
                     Address
                   </label>
                   <textarea
                     value={editProfileData.address}
                     onChange={(e) => handleProfileInputChange('address', e.target.value)}
-                    className="w-full px-4 py-3 border-2 border-accent-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-secondary-500 focus:border-secondary-500 transition-colors bg-white dark:bg-gray-800 text-secondary-700 dark:text-gray-100 resize-none"
+                    className="w-full px-4 py-3 border-2 border-accent-200 /* dark:border-gray-700 */ rounded-lg focus:ring-2 focus:ring-secondary-500 focus:border-secondary-500 transition-colors bg-white /* dark:bg-gray-800 */ text-secondary-700 /* dark:text-gray-100 */ resize-none"
                     placeholder="Enter your address"
                     rows={3}
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-secondary-700 dark:text-gray-100 mb-2">
+                  <label className="block text-sm font-medium text-secondary-700 /* dark:text-gray-100 */ mb-2">
                     Date of Birth
                   </label>
                   <input
                     type="date"
                     value={editProfileData.date_of_birth}
                     onChange={(e) => handleProfileInputChange('date_of_birth', e.target.value)}
-                    className="w-full px-4 py-3 border-2 border-accent-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-secondary-500 focus:border-secondary-500 transition-colors bg-white dark:bg-gray-800 text-secondary-700 dark:text-gray-100"
+                    className="w-full px-4 py-3 border-2 border-accent-200 /* dark:border-gray-700 */ rounded-lg focus:ring-2 focus:ring-secondary-500 focus:border-secondary-500 transition-colors bg-white /* dark:bg-gray-800 */ text-secondary-700 /* dark:text-gray-100 */"
                   />
                 </div>
 
@@ -2084,7 +2070,7 @@ const CustomerMenu = ({
                   <button
                     type="button"
                     onClick={() => setShowEditProfile(false)}
-                    className="flex-1 px-4 py-3 min-h-[44px] bg-white dark:bg-gray-800 border-2 border-accent-200 dark:border-gray-700 text-secondary-700 dark:text-gray-100 rounded-lg font-medium hover:border-secondary-500 transition-colors"
+                    className="flex-1 px-4 py-3 min-h-[44px] bg-white /* dark:bg-gray-800 */ border-2 border-accent-200 /* dark:border-gray-700 */ text-secondary-700 /* dark:text-gray-100 */ rounded-lg font-medium hover:border-secondary-500 transition-colors"
                   >
                     Cancel
                   </button>
