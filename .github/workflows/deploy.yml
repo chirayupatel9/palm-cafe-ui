@@ -15,4 +15,4 @@ jobs:
         git pull origin master
         npm install
         CI=false npm run build
-        sudo cp -r build/* /var/www/palmcafe
+        sudo cp -r build/* /var/www/app.cafe.nevyaa.com/
