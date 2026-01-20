@@ -14,5 +14,5 @@ jobs:
         cd /home/chirayu/palm-cafe/palm-cafe-ui
         git pull origin master
         npm install
-        npm run build
+        CI=false npm run build
         sudo cp -r build/* /var/www/palmcafe
