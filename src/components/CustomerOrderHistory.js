@@ -31,9 +31,15 @@ const CustomerOrderHistory = ({ customerPhone, setActiveTab, cart, setCart }) =>
   }, [orders]);
 
   const fetchOrderHistory = async () => {
+    const phone = (customerPhone && String(customerPhone).trim() !== '' && String(customerPhone) !== 'undefined') ? customerPhone : null;
+    if (!phone) {
+      setOrders([]);
+      setLoading(false);
+      return;
+    }
     try {
       setLoading(true);
-      const response = await axios.get(`/customer/orders?customer_phone=${encodeURIComponent(customerPhone)}`);
+      const response = await axios.get(`/customer/orders?customer_phone=${encodeURIComponent(phone)}`);
       const data = response.data;
       setOrders(Array.isArray(data) ? data : []);
     } catch (error) {

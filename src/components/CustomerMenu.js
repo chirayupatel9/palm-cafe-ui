@@ -473,10 +473,11 @@ const CustomerMenu = ({
     setOrderLoading(true);
 
     try {
+      const validPhone = (customer.phone && String(customer.phone).trim() !== '' && String(customer.phone) !== 'undefined') ? customer.phone : null;
       const orderData = {
         customerName: customer.name,
-        customerPhone: customer.phone || '',
-        customerEmail: customer.email || '',
+        ...(validPhone !== null && { customerPhone: validPhone }),
+        customerEmail: (customer.email && String(customer.email) !== 'undefined') ? customer.email : '',
         tableNumber: tableNumber,
         paymentMethod: paymentMethod,
         pickupOption: pickupOption,
@@ -557,8 +558,12 @@ const CustomerMenu = ({
 
   // Check order status
   const checkOrderStatus = async (orderNumber) => {
+    const phone = customer?.phone;
+    if (!phone || String(phone).trim() === '' || String(phone) === 'undefined') {
+      return;
+    }
     try {
-      const response = await axios.get(`/customer/orders?customer_phone=${customer?.phone}`);
+      const response = await axios.get(`/customer/orders?customer_phone=${encodeURIComponent(phone)}`);
       const order = response.data.find(o => o.order_number === orderNumber);
       if (order) {
         setOrderStatus(order.status);
