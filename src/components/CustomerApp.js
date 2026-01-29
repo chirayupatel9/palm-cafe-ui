@@ -75,7 +75,8 @@ const CustomerApp = () => {
   const [activeTab, setActiveTab] = useState('menu');
   const [showCart, setShowCart] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
-  const [loginIntent, setLoginIntent] = useState(null); // 'orders' = open order history after login
+  const [loginIntent, setLoginIntent] = useState(null); // 'orders' = open profile orders after login
+  const [openProfileOrdersAfterLogin, setOpenProfileOrdersAfterLogin] = useState(false);
 
   // Validate slug and fetch cafe branding
   useEffect(() => {
@@ -141,8 +142,9 @@ const CustomerApp = () => {
     setCustomer(customerData);
     setShowLoginModal(false);
     if (loginIntent === 'orders') {
-      setActiveTab('history');
       setLoginIntent(null);
+      setActiveTab('menu');
+      setOpenProfileOrdersAfterLogin(true);
     } else {
       setShowCart(true);
     }
@@ -242,6 +244,8 @@ const CustomerApp = () => {
         onOpenLoginForOrders={openLoginForOrders}
         onCustomerUpdate={handleCustomerUpdate}
         onLogout={handleLogout}
+        openProfileOrdersAfterLogin={openProfileOrdersAfterLogin}
+        onClearOpenProfileOrdersAfterLogin={() => setOpenProfileOrdersAfterLogin(false)}
       />
 
              {/* Login Modal - Full screen on mobile */}

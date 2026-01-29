@@ -23,7 +23,9 @@ const CustomerMenu = ({
   setShowLoginModal,
   onOpenLoginForOrders,
   onCustomerUpdate,
-  onLogout
+  onLogout,
+  openProfileOrdersAfterLogin,
+  onClearOpenProfileOrdersAfterLogin
 }) => {
   const { formatCurrency } = useCurrency();
   const { cafeSettings } = useCafeSettings();
@@ -62,6 +64,18 @@ const CustomerMenu = ({
   const searchInputRef = useRef(null);
   const autocompleteRef = useRef(null);
   const categoryCarouselRef = useRef(null);
+
+  // After login via "Login / My Orders", open profile on orders section (defer so state has propagated)
+  useEffect(() => {
+    if (!openProfileOrdersAfterLogin || !customer) return;
+    const id = setTimeout(() => {
+      setActiveTab('menu');
+      setShowProfile(true);
+      setProfileOpenSection('orders');
+      onClearOpenProfileOrdersAfterLogin?.();
+    }, 0);
+    return () => clearTimeout(id);
+  }, [openProfileOrdersAfterLogin, customer, onClearOpenProfileOrdersAfterLogin]);
 
   // Calculate items per view based on screen size
   useEffect(() => {
