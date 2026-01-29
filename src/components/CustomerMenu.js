@@ -21,6 +21,7 @@ const CustomerMenu = ({
   onPlaceOrder,
   showLoginModal,
   setShowLoginModal,
+  onOpenLoginForOrders,
   onCustomerUpdate,
   onLogout
 }) => {
@@ -816,28 +817,18 @@ const CustomerMenu = ({
                           )}
                         </div> */}
 
-                        {/* Navigation */}
-                        <nav className="hidden md:flex items-center gap-8">
-                          {/* <button
-                            onClick={() => setActiveTab('menu')}
-                            className={`text-sm font-medium transition-colors text-white ${activeTab === 'menu'
+                        {/* Navigation - My Orders always visible; login opens modal when not logged in (no cart required) */}
+                        <nav className="flex items-center gap-4 md:gap-8">
+                          <button
+                            onClick={() => customer ? setActiveTab('history') : (onOpenLoginForOrders && onOpenLoginForOrders())}
+                            className={`text-sm font-medium transition-colors text-white min-h-[44px] min-w-[44px] flex items-center justify-center px-2 ${activeTab === 'history'
                               ? 'font-semibold'
                               : 'hover:text-orange-300'
                               }`}
+                            aria-label={customer ? 'View my orders' : 'Login to view my orders'}
                           >
-                            Menu
-                          </button> */}
-                          {customer && (
-                            <button
-                              onClick={() => setActiveTab('history')}
-                              className={`text-sm font-medium transition-colors text-white ${activeTab === 'history'
-                                ? 'font-semibold'
-                                : 'hover:text-orange-300'
-                                }`}
-                            >
-                              My Orders
-                            </button>
-                          )}
+                            {customer ? 'My Orders' : 'Login / My Orders'}
+                          </button>
                         </nav>
 
                         {/* Right Side Icons */}

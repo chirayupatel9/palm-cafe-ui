@@ -75,6 +75,7 @@ const CustomerApp = () => {
   const [activeTab, setActiveTab] = useState('menu');
   const [showCart, setShowCart] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
+  const [loginIntent, setLoginIntent] = useState(null); // 'orders' = open order history after login
 
   // Validate slug and fetch cafe branding
   useEffect(() => {
@@ -139,7 +140,17 @@ const CustomerApp = () => {
   const handleLogin = (customerData) => {
     setCustomer(customerData);
     setShowLoginModal(false);
-    setShowCart(true);
+    if (loginIntent === 'orders') {
+      setActiveTab('history');
+      setLoginIntent(null);
+    } else {
+      setShowCart(true);
+    }
+  };
+
+  const openLoginForOrders = () => {
+    setLoginIntent('orders');
+    setShowLoginModal(true);
   };
 
   const handleLogout = () => {
@@ -216,8 +227,8 @@ const CustomerApp = () => {
 
       {/* Customer Menu - Contains its own header */}
       <CustomerMenu
-        cafeSlug={slug} 
-        customer={customer} 
+        cafeSlug={slug}
+        customer={customer}
         cart={cart}
         setCart={setCart}
         activeTab={activeTab}
@@ -228,6 +239,7 @@ const CustomerApp = () => {
         onPlaceOrder={handlePlaceOrder}
         showLoginModal={showLoginModal}
         setShowLoginModal={setShowLoginModal}
+        onOpenLoginForOrders={openLoginForOrders}
         onCustomerUpdate={handleCustomerUpdate}
         onLogout={handleLogout}
       />
@@ -235,9 +247,9 @@ const CustomerApp = () => {
              {/* Login Modal - Full screen on mobile */}
        {showLoginModal && (
          <div className="fixed inset-0 bg-black bg-opacity-60 flex items-end lg:items-center justify-center z-50 p-0 lg:p-4 animate-fadeIn backdrop-blur-sm">
-           <div className={`${isDarkMode ? 'bg-gray-800' : 'bg-white'} rounded-t-2xl lg:rounded-2xl shadow-material-5 max-w-md lg:max-w-md w-full lg:mx-4 h-[90vh] lg:h-auto flex flex-col transform transition-all duration-300 animate-slideIn hover-lift`}>
-             {/* Modal Header */}
-             <div className={`relative p-6 border-b ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}`}>
+           <div className={`${isDarkMode ? 'bg-gray-800' : 'bg-white'} rounded-t-2xl lg:rounded-2xl shadow-material-5 max-w-md lg:max-w-md w-full lg:mx-4 h-[90vh] max-h-[90vh] flex flex-col transform transition-all duration-300 animate-slideIn hover-lift min-h-0`}>
+             {/* Modal Header - fixed so body can scroll */}
+             <div className={`relative flex-shrink-0 p-6 border-b ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}`}>
                <div className="flex items-center justify-center mb-4">
                  {cafeBranding.logo_url && (
                    <div className="w-16 h-16 bg-secondary-500 rounded-full flex items-center justify-center shadow-lg">
@@ -258,7 +270,7 @@ const CustomerApp = () => {
                
                {/* Close Button */}
                <button
-                 onClick={() => setShowLoginModal(false)}
+                 onClick={() => { setShowLoginModal(false); setLoginIntent(null); }}
                  className={`absolute top-4 right-4 p-2 rounded-full transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center ${
                    isDarkMode 
                      ? 'hover:bg-gray-700 text-gray-400' 
@@ -270,14 +282,14 @@ const CustomerApp = () => {
                </button>
              </div>
 
-             {/* Modal Body */}
-             <div className="p-4 sm:p-6 flex-1 overflow-y-auto">
+             {/* Modal Body - scrollable when content exceeds viewport (e.g. Create Account at 1920x1080) */}
+             <div className="p-4 sm:p-6 flex-1 min-h-0 overflow-y-auto overscroll-contain">
                <CustomerLogin onLogin={handleLogin} />
                
                {/* Continue Browsing Option */}
                <div className={`mt-6 pt-4 border-t ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}`}>
                  <button
-                   onClick={() => setShowLoginModal(false)}
+                   onClick={() => { setShowLoginModal(false); setLoginIntent(null); }}
                    className={`w-full text-sm transition-colors flex items-center justify-center min-h-[44px] ${
                      isDarkMode 
                        ? 'text-gray-400 hover:text-gray-200' 
