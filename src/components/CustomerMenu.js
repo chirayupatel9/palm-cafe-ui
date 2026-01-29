@@ -51,6 +51,7 @@ const CustomerMenu = ({
   const [categoryMenuOpen, setCategoryMenuOpen] = useState(false); // Hamburger menu state
   const [searchExpanded, setSearchExpanded] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
+  const [profileOpenSection, setProfileOpenSection] = useState(null); // 'orders' = open profile on My Orders section
   const [autocompleteSuggestions, setAutocompleteSuggestions] = useState([]);
   const [showAutocomplete, setShowAutocomplete] = useState(false);
   const [selectedSuggestionIndex, setSelectedSuggestionIndex] = useState(-1);
@@ -817,11 +818,18 @@ const CustomerMenu = ({
                           )}
                         </div> */}
 
-                        {/* Navigation - My Orders always visible; login opens modal when not logged in (no cart required) */}
+                        {/* Navigation - My Orders opens profile orders section when logged in; login modal when not */}
                         <nav className="flex items-center gap-4 md:gap-8">
                           <button
-                            onClick={() => customer ? setActiveTab('history') : (onOpenLoginForOrders && onOpenLoginForOrders())}
-                            className={`text-sm font-medium transition-colors text-white min-h-[44px] min-w-[44px] flex items-center justify-center px-2 ${activeTab === 'history'
+                            onClick={() => {
+                              if (customer) {
+                                setProfileOpenSection('orders');
+                                setShowProfile(true);
+                              } else if (onOpenLoginForOrders) {
+                                onOpenLoginForOrders();
+                              }
+                            }}
+                            className={`text-sm font-medium transition-colors text-white min-h-[44px] min-w-[44px] flex items-center justify-center px-2 ${(activeTab === 'history' || (showProfile && profileOpenSection === 'orders'))
                               ? 'font-semibold'
                               : 'hover:text-orange-300'
                               }`}
@@ -850,7 +858,7 @@ const CustomerMenu = ({
                           {/* User Profile - Only show when logged in */}
                           {customer && (
                             <button
-                              onClick={() => setShowProfile(true)}
+                              onClick={() => { setProfileOpenSection(null); setShowProfile(true); }}
                               className="flex items-center justify-center min-h-[44px] min-w-[44px] h-11 w-11 rounded-full bg-white/20 hover:bg-white/30 text-white transition-colors"
                               title={customer.name}
                               aria-label="View profile"
@@ -2108,9 +2116,18 @@ const CustomerMenu = ({
             onCustomerUpdate={onCustomerUpdate}
             onLogout={() => {
               setShowProfile(false);
+              setProfileOpenSection(null);
               onLogout();
             }}
-            onClose={() => setShowProfile(false)}
+            onClose={() => { setShowProfile(false); setProfileOpenSection(null); }}
+            initialSection={profileOpenSection}
+            setActiveTab={(tab) => {
+              setShowProfile(false);
+              setProfileOpenSection(null);
+              setActiveTab(tab);
+            }}
+            cart={cart}
+            setCart={setCart}
           />
         </div>
       )}

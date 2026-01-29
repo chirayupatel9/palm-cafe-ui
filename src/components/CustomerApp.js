@@ -247,7 +247,7 @@ const CustomerApp = () => {
              {/* Login Modal - Full screen on mobile */}
        {showLoginModal && (
          <div className="fixed inset-0 bg-black bg-opacity-60 flex items-end lg:items-center justify-center z-50 p-0 lg:p-4 animate-fadeIn backdrop-blur-sm">
-           <div className={`${isDarkMode ? 'bg-gray-800' : 'bg-white'} rounded-t-2xl lg:rounded-2xl shadow-material-5 max-w-md lg:max-w-md w-full lg:mx-4 h-[90vh] max-h-[90vh] flex flex-col transform transition-all duration-300 animate-slideIn hover-lift min-h-0`}>
+           <div className={`${isDarkMode ? 'bg-gray-800' : 'bg-white'} rounded-t-2xl lg:rounded-2xl shadow-material-5 max-w-md lg:max-w-md w-full lg:mx-4 h-[90vh] max-h-[90vh] lg:h-auto lg:max-h-[90vh] flex flex-col transform transition-all duration-300 animate-slideIn hover-lift min-h-0`}>
              {/* Modal Header - fixed so body can scroll */}
              <div className={`relative flex-shrink-0 p-6 border-b ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}`}>
                <div className="flex items-center justify-center mb-4">
@@ -262,7 +262,11 @@ const CustomerApp = () => {
                  )}
                </div>
                <h2 className={`text-2xl font-bold text-center mb-2 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                 Welcome{cafeBranding.cafe_name ? ` to ${cafeBranding.cafe_name}` : ''}
+                 {(() => {
+                   const name = (cafeBranding.cafe_name || '').trim();
+                   const isPlaceholder = !name || /^default\s*cafe$/i.test(name);
+                   return isPlaceholder ? 'Welcome' : `Welcome to ${cafeBranding.cafe_name}`;
+                 })()}
                </h2>
                <p className={`text-center text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
                  Enter your phone number to continue
@@ -282,15 +286,16 @@ const CustomerApp = () => {
                </button>
              </div>
 
-             {/* Modal Body - scrollable when content exceeds viewport (e.g. Create Account at 1920x1080) */}
-             <div className="p-4 sm:p-6 flex-1 min-h-0 overflow-y-auto overscroll-contain">
-               <CustomerLogin onLogin={handleLogin} />
-               
-               {/* Continue Browsing Option */}
-               <div className={`mt-6 pt-4 border-t ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}`}>
+             {/* Modal Body - scrollable when content exceeds viewport (Create Account); no blank block when short (Login) */}
+             <div className="p-4 sm:p-6 flex-1 min-h-0 overflow-y-auto overscroll-contain flex flex-col">
+               <div className="flex-shrink-0">
+                 <CustomerLogin onLogin={handleLogin} />
+               </div>
+               {/* Continue Browsing Option - no extra space below */}
+               <div className={`flex-shrink-0 mt-6 pt-4 border-t ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}`}>
                  <button
                    onClick={() => { setShowLoginModal(false); setLoginIntent(null); }}
-                   className={`w-full text-sm transition-colors flex items-center justify-center min-h-[44px] ${
+                   className={`w-full text-sm transition-colors flex items-center justify-center min-h-[44px] py-2 ${
                      isDarkMode 
                        ? 'text-gray-400 hover:text-gray-200' 
                        : 'text-gray-500 hover:text-gray-700'

@@ -1,12 +1,13 @@
-import React, { useState } from 'react';
-import { User, Mail, Phone, MapPin, Calendar, Edit3, Save, X, LogOut, CreditCard, Bell, Home } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { User, Mail, Phone, MapPin, Calendar, Edit3, Save, X, LogOut, CreditCard, Bell, Home, Package } from 'lucide-react';
 import axios from 'axios';
 import toast from 'react-hot-toast';
+import CustomerOrderHistory from './CustomerOrderHistory';
 
-const CustomerProfile = ({ customer, onCustomerUpdate, onLogout, onClose }) => {
+const CustomerProfile = ({ customer, onCustomerUpdate, onLogout, onClose, initialSection, setActiveTab, cart, setCart }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [activeSection, setActiveSection] = useState('account');
+  const [activeSection, setActiveSection] = useState(initialSection || 'account');
   const [formData, setFormData] = useState({
     name: customer?.name || '',
     email: customer?.email || '',
@@ -66,6 +67,12 @@ const CustomerProfile = ({ customer, onCustomerUpdate, onLogout, onClose }) => {
     });
     setIsEditing(false);
   };
+
+  useEffect(() => {
+    if (initialSection) {
+      setActiveSection(initialSection);
+    }
+  }, [initialSection]);
 
   return (
     <div className="relative flex h-auto min-h-screen w-full flex-col" style={{ backgroundColor: 'var(--color-background)' }}>
@@ -155,6 +162,17 @@ const CustomerProfile = ({ customer, onCustomerUpdate, onLogout, onClose }) => {
                   >
                     <Bell className="h-5 w-5" />
                     <p className="text-sm font-medium leading-normal">Notifications</p>
+                  </button>
+                  <button
+                    onClick={() => setActiveSection('orders')}
+                    className={`flex items-center gap-3 px-3 py-2.5 rounded-lg ${
+                      activeSection === 'orders'
+                        ? 'bg-primary-container text-primary'
+                        : 'text-text-light/70 dark:text-text-dark/70 hover:bg-primary-container/50 hover:text-primary'
+                    } transition-colors`}
+                  >
+                    <Package className="h-5 w-5" />
+                    <p className="text-sm font-medium leading-normal">My Orders</p>
                   </button>
                 </div>
               </div>
@@ -352,6 +370,17 @@ const CustomerProfile = ({ customer, onCustomerUpdate, onLogout, onClose }) => {
                   <Bell className="h-16 w-16 text-text-light/40 dark:text-text-dark/40 mb-4" />
                   <p className="text-text-light dark:text-text-dark text-xl font-bold mb-2">Notification Settings</p>
                   <p className="text-text-light/60 dark:text-text-dark/60 text-center">Coming soon...</p>
+                </div>
+              )}
+
+              {activeSection === 'orders' && (
+                <div className="flex flex-col gap-6 -m-2">
+                  <CustomerOrderHistory
+                    customerPhone={customer?.phone}
+                    setActiveTab={setActiveTab || (() => {})}
+                    cart={cart || []}
+                    setCart={setCart || (() => {})}
+                  />
                 </div>
               )}
             </div>
