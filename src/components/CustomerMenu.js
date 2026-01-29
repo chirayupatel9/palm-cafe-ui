@@ -576,15 +576,38 @@ const CustomerMenu = ({
     }
   };
 
-  // Check order status periodically if there's a recent order
+  // Check order status periodically only when tab is visible (reduces unnecessary backend load)
+  const POLL_INTERVAL_MS = 30000; // 30 seconds
+  const INITIAL_POLL_DELAY_MS = 5000; // Wait 5s before first poll after placing order
   useEffect(() => {
-    if (recentOrder && orderStatus === 'pending') {
-      const interval = setInterval(() => {
-        checkOrderStatus(recentOrder.orderNumber);
-      }, 10000); // Check every 10 seconds
+    if (!recentOrder || orderStatus !== 'pending') return;
 
-      return () => clearInterval(interval);
-    }
+    let intervalId = null;
+    let initialTimeoutId = null;
+
+    const runPoll = () => {
+      if (document.visibilityState === 'visible') {
+        checkOrderStatus(recentOrder.orderNumber);
+      }
+    };
+
+    initialTimeoutId = setTimeout(() => {
+      runPoll();
+      intervalId = setInterval(runPoll, POLL_INTERVAL_MS);
+    }, INITIAL_POLL_DELAY_MS);
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        runPoll();
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      clearTimeout(initialTimeoutId);
+      if (intervalId) clearInterval(intervalId);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
   }, [recentOrder, orderStatus]);
 
   // Profile editing functions
