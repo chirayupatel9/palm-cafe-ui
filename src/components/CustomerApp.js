@@ -9,6 +9,31 @@ import { useDarkMode } from '../contexts/DarkModeContext';
 import { getImageUrl } from '../utils/imageUtils';
 import axios from 'axios';
 
+const STORAGE_PREFIX = 'palm-cafe';
+const STORAGE_MAX_AGE_MS = 10 * 60 * 1000; // 10 minutes
+
+const getCustomerStorageKey = (s) => (s ? `${STORAGE_PREFIX}-customer-${s}` : null);
+const getCartStorageKey = (s) => (s ? `${STORAGE_PREFIX}-cart-${s}` : null);
+
+const getStoredWithExpiry = (key) => {
+  const raw = localStorage.getItem(key);
+  if (!raw) return null;
+  try {
+    const parsed = JSON.parse(raw);
+    if (!parsed || typeof parsed.savedAt !== 'number') {
+      localStorage.removeItem(key);
+      return null;
+    }
+    if (Date.now() - parsed.savedAt > STORAGE_MAX_AGE_MS) {
+      localStorage.removeItem(key);
+      return null;
+    }
+    return parsed.data;
+  } catch (e) {
+    return null;
+  }
+};
+
 const CustomerApp = () => {
   const { slug } = useParams();
   const navigate = useNavigate();
@@ -51,6 +76,39 @@ const CustomerApp = () => {
     validateAndFetch();
   }, [slug]);
 
+  // Restore customer and cart from localStorage when cafe is valid (e.g. after refresh); skip if older than 10 min
+  useEffect(() => {
+    if (!slug || cafeValid !== true) return;
+    const customerKey = getCustomerStorageKey(slug);
+    const cartKey = getCartStorageKey(slug);
+    try {
+      if (customerKey) {
+        const data = getStoredWithExpiry(customerKey);
+        if (data) setCustomer(data);
+      }
+      if (cartKey) {
+        const data = getStoredWithExpiry(cartKey);
+        if (data && Array.isArray(data)) setCart(data);
+      }
+    } catch (e) {
+      console.error('Failed to restore customer/cart from storage', e);
+    }
+  }, [slug, cafeValid]);
+
+  // Persist customer to localStorage when it changes (only write; clear on logout in handleLogout)
+  useEffect(() => {
+    if (!slug || cafeValid !== true || !customer) return;
+    const key = getCustomerStorageKey(slug);
+    if (key) localStorage.setItem(key, JSON.stringify({ data: customer, savedAt: Date.now() }));
+  }, [slug, cafeValid, customer]);
+
+  // Persist cart to localStorage when it changes (only write; clear on logout in handleLogout)
+  useEffect(() => {
+    if (!slug || cafeValid !== true || !cart || cart.length === 0) return;
+    const key = getCartStorageKey(slug);
+    if (key) localStorage.setItem(key, JSON.stringify({ data: cart, savedAt: Date.now() }));
+  }, [slug, cafeValid, cart]);
+
   const handleLogin = (customerData) => {
     setCustomer(customerData);
     setShowLoginModal(false);
@@ -60,6 +118,12 @@ const CustomerApp = () => {
     setCustomer(null);
     setCart([]);
     setActiveTab('menu');
+    if (slug) {
+      const customerKey = getCustomerStorageKey(slug);
+      const cartKey = getCartStorageKey(slug);
+      if (customerKey) localStorage.removeItem(customerKey);
+      if (cartKey) localStorage.removeItem(cartKey);
+    }
   };
 
   const handleCustomerUpdate = (updatedCustomer) => {
