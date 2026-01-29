@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Toaster } from 'react-hot-toast';
+import toast, { Toaster, ToastBar } from 'react-hot-toast';
 import CustomerLogin from './CustomerLogin';
 import CustomerMenu from './CustomerMenu';
 import CafeNotFound from './CafeNotFound';
@@ -14,6 +14,33 @@ const STORAGE_MAX_AGE_MS = 10 * 60 * 1000; // 10 minutes
 
 const getCustomerStorageKey = (s) => (s ? `${STORAGE_PREFIX}-customer-${s}` : null);
 const getCartStorageKey = (s) => (s ? `${STORAGE_PREFIX}-cart-${s}` : null);
+
+const SWIPE_THRESHOLD = 60;
+
+const SwipeableToastBar = ({ t, position }) => {
+  const touchStartX = useRef(0);
+
+  const handleTouchStart = (e) => {
+    touchStartX.current = e.touches[0].clientX;
+  };
+
+  const handleTouchEnd = (e) => {
+    const endX = e.changedTouches[0].clientX;
+    if (endX - touchStartX.current > SWIPE_THRESHOLD) {
+      toast.dismiss(t.id);
+    }
+  };
+
+  return (
+    <div
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
+      style={{ touchAction: 'pan-y' }}
+    >
+      <ToastBar toast={t} position={position} />
+    </div>
+  );
+};
 
 const getStoredWithExpiry = (key) => {
   const raw = localStorage.getItem(key);
@@ -112,6 +139,7 @@ const CustomerApp = () => {
   const handleLogin = (customerData) => {
     setCustomer(customerData);
     setShowLoginModal(false);
+    setShowCart(true);
   };
 
   const handleLogout = () => {
@@ -174,7 +202,17 @@ const CustomerApp = () => {
 
   return (
     <div className={`min-h-screen ${isDarkMode ? 'bg-gray-900' : 'bg-accent-50'}`}>
-      <Toaster position="top-right" />
+      <Toaster
+        position="top-right"
+        containerStyle={{ top: 80, right: 16, left: 'auto', bottom: 'auto' }}
+        toastOptions={{ duration: 4000 }}
+        children={(t) => (
+          <SwipeableToastBar
+            t={t}
+            position={t.position || 'top-right'}
+          />
+        )}
+      />
 
       {/* Customer Menu - Contains its own header */}
       <CustomerMenu
