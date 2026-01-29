@@ -30,10 +30,21 @@ const CustomerProfile = ({ customer, onCustomerUpdate, onLogout, onClose }) => {
       return;
     }
 
+    if (!customer?.id) {
+      toast.error('Cannot update profile: customer ID is missing. Please log in again.');
+      return;
+    }
+
     setLoading(true);
 
     try {
-      const response = await axios.put(`/customer/${customer.phone}`, formData);
+      const response = await axios.put('/customer/profile', {
+        id: customer.id,
+        name: formData.name.trim(),
+        email: formData.email?.trim() || null,
+        address: formData.address?.trim() || null,
+        date_of_birth: formData.date_of_birth || null
+      });
       toast.success('Profile updated successfully!');
       onCustomerUpdate(response.data);
       setIsEditing(false);
