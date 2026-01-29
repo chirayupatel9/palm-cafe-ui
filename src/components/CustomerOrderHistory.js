@@ -15,10 +15,13 @@ const CustomerOrderHistory = ({ customerPhone, setActiveTab, cart, setCart }) =>
   const [filterStatus, setFilterStatus] = useState('All');
 
   useEffect(() => {
-    if (customerPhone) {
-      fetchOrderHistory();
-      fetchCustomerInfo();
+    if (!customerPhone) {
+      setLoading(false);
+      setOrders([]);
+      return;
     }
+    fetchOrderHistory();
+    fetchCustomerInfo();
   }, [customerPhone]);
 
   useEffect(() => {
@@ -30,11 +33,13 @@ const CustomerOrderHistory = ({ customerPhone, setActiveTab, cart, setCart }) =>
   const fetchOrderHistory = async () => {
     try {
       setLoading(true);
-      const response = await axios.get(`/customer/orders?customer_phone=${customerPhone}`);
-      setOrders(response.data);
+      const response = await axios.get(`/customer/orders?customer_phone=${encodeURIComponent(customerPhone)}`);
+      const data = response.data;
+      setOrders(Array.isArray(data) ? data : []);
     } catch (error) {
       console.error('Error fetching order history:', error);
       toast.error('Failed to load order history');
+      setOrders([]);
     } finally {
       setLoading(false);
     }
