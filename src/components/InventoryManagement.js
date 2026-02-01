@@ -265,7 +265,10 @@ const InventoryManagement = () => {
 
   const getInventoryStats = () => {
     const totalItems = inventory.length;
-    const lowStockItems = inventory.filter(item => item.quantity <= item.reorder_level).length;
+    const lowStockItems = inventory.filter(item =>
+      (item.reorder_level != null && Number(item.reorder_level) > 0) &&
+      item.quantity <= Number(item.reorder_level)
+    ).length;
     const outOfStockItems = inventory.filter(item => item.quantity <= 0).length;
     const totalValue = inventory.reduce((sum, item) => sum + (item.quantity * (item.cost_per_unit || 0)), 0);
 
