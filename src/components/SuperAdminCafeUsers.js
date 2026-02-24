@@ -331,7 +331,7 @@ const SuperAdminCafeUsers = () => {
                   value={formData.password}
                   onChange={handleInputChange}
                   required
-                  minLength={6}
+                  minLength={12}
                   className="w-full px-3 py-2 border border-accent-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-secondary-500 focus:border-secondary-500 dark:bg-gray-700 dark:text-gray-100"
                 />
               </div>
@@ -436,7 +436,7 @@ const SuperAdminCafeUsers = () => {
                   name="password"
                   value={formData.password}
                   onChange={handleInputChange}
-                  minLength={6}
+                  minLength={12}
                   className="w-full px-3 py-2 border border-accent-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-secondary-500 focus:border-secondary-500 dark:bg-gray-700 dark:text-gray-100"
                 />
               </div>

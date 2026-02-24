@@ -767,7 +767,7 @@ const MenuManagement = ({ menuItems, onUpdate, onAdd, onDelete }) => {
                         {formData.image_url || selectedImageFile ? 'Replace' : 'Select'} Image
                         <input
                           type="file"
-                          accept="image/*"
+                          accept="image/jpeg,image/png,image/webp"
                           onChange={handleImageFileChange}
                           className="hidden"
                           disabled={imageUploading || removingImage}
@@ -903,7 +903,7 @@ const MenuManagement = ({ menuItems, onUpdate, onAdd, onDelete }) => {
                                   )}
                                   <input
                                     type="file"
-                                    accept="image/*"
+                                    accept="image/jpeg,image/png,image/webp"
                                     onChange={handleImageUpload}
                                     className="text-xs"
                                     disabled={imageUploading}
@@ -1071,7 +1071,7 @@ const MenuManagement = ({ menuItems, onUpdate, onAdd, onDelete }) => {
                             )}
                             <input
                               type="file"
-                              accept="image/*"
+                              accept="image/jpeg,image/png,image/webp"
                               onChange={handleImageUpload}
                               className="text-xs"
                               disabled={imageUploading}

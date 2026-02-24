@@ -372,7 +372,7 @@ const CafeOnboarding = () => {
                     <span>Upload Logo</span>
                     <input
                       type="file"
-                      accept="image/*"
+                      accept="image/jpeg,image/png,image/webp"
                       onChange={handleLogoChange}
                       className="hidden"
                     />

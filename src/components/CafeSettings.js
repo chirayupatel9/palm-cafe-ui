@@ -1082,7 +1082,7 @@ const CafeSettings = () => {
                       <input
                         type="file"
                         onChange={(e) => setSelectedFile(e.target.files[0])}
-                        accept="image/*"
+                        accept="image/jpeg,image/png,image/webp"
                         className="input-field"
                         disabled={uploadingLogo}
                       />
@@ -1128,7 +1128,7 @@ const CafeSettings = () => {
                       <input
                         type="file"
                         onChange={(e) => setSelectedHeroFile(e.target.files[0])}
-                        accept="image/*"
+                        accept="image/jpeg,image/png,image/webp"
                         className="input-field"
                         disabled={uploadingHero}
                       />
@@ -1174,7 +1174,7 @@ const CafeSettings = () => {
                       <input
                         type="file"
                         onChange={(e) => setSelectedPromoBannerFile(e.target.files[0])}
-                        accept="image/*"
+                        accept="image/jpeg,image/png,image/webp"
                         className="input-field"
                         disabled={uploadingPromoBanner}
                       />

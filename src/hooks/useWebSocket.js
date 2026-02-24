@@ -55,10 +55,17 @@ const useWebSocket = (url, options = {}) => {
           options.onClose(event);
         }
 
+        // Token invalid — do not reconnect, redirect to login
+        if (event.code === 4001 || event.code === 1008) {
+          console.warn('WebSocket: Token invalid or unauthorised (code', event.code, '). Redirecting to login.');
+          window.location.href = '/login';
+          return;
+        }
+
         // Attempt to reconnect if not a normal closure and URL is still valid
         if (event.code !== 1000 && reconnectAttempts.current < maxReconnectAttempts && url) {
           reconnectAttempts.current++;
-          
+
           reconnectTimeoutRef.current = setTimeout(() => {
             if (url) {
               connect();

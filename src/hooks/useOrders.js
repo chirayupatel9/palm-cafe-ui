@@ -12,12 +12,15 @@ const useOrders = (autoRefresh = true, refreshInterval = 30000, enableWebSocket 
   const abortControllerRef = useRef(null);
 
   // WebSocket connection for real-time updates
-  // Only connect if WebSocket is enabled and we have a valid URL
-  const wsUrl = enableWebSocket 
-    ? (process.env.REACT_APP_WS_URL || 
-       (process.env.REACT_APP_API_URL?.replace(/^http/, 'ws')) || 
-       'ws://localhost:5000') + '/ws/orders'
-    : null;
+  // Always read the token fresh from storage so reconnections use the latest token (#1, #14).
+  const wsUrl = (() => {
+    if (!enableWebSocket) return null;
+    const token = localStorage.getItem('token');
+    const base = (process.env.REACT_APP_WS_URL ||
+      (process.env.REACT_APP_API_URL?.replace(/^http/, 'ws')) ||
+      'ws://localhost:5000') + '/ws/orders';
+    return token ? `${base}?token=${encodeURIComponent(token)}` : base;
+  })();
   
   const { sendMessage, isConnected } = useWebSocket(
     wsUrl,

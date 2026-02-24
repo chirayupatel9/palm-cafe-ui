@@ -21,8 +21,8 @@ const AdminRegister = () => {
   const { user, registerAdmin } = useAuth();
   const navigate = useNavigate();
 
-  // Check if user is authenticated and is an admin
-  if (!user) {
+  // Only superadmins may register new admins (#2)
+  if (!user || user.role !== 'superadmin') {
     return (
       <div className="min-h-screen flex items-center justify-center bg-accent-50 dark:bg-gray-900 py-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-md w-full space-y-8">
@@ -32,7 +32,7 @@ const AdminRegister = () => {
               Access Denied
             </h2>
             <p className="text-gray-600 dark:text-gray-400 mt-2">
-              You must be logged in as an admin to register new admins.
+              Only superadmins can register new admin accounts.
             </p>
             <Link
               to="/login"
@@ -60,8 +60,8 @@ const AdminRegister = () => {
       return false;
     }
     
-    if (formData.password.length < 6) {
-      toast.error('Password must be at least 6 characters long');
+    if (formData.password.length < 12) {
+      toast.error('Password must be at least 12 characters long');
       return false;
     }
     

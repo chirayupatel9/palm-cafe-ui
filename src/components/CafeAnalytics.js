@@ -163,10 +163,13 @@ const CafeAnalytics = () => {
     try {
       setLoading(true);
       setError(null);
-      
+
+      // Cap days at 365 to match backend validation (#12)
+      const safeDays = Math.min(timeRange, 365);
+
       const [overviewRes, trendsRes, customersRes] = await Promise.all([
         axios.get('/analytics/overview'),
-        axios.get(`/analytics/trends?days=${timeRange}`),
+        axios.get(`/analytics/trends?days=${safeDays}`),
         axios.get('/analytics/customers')
       ]);
       
@@ -334,7 +337,7 @@ const CafeAnalytics = () => {
           <label className="text-sm text-secondary-600 dark:text-gray-400">Time Range:</label>
           <select
             value={timeRange}
-            onChange={(e) => setTimeRange(parseInt(e.target.value))}
+            onChange={(e) => setTimeRange(Math.min(parseInt(e.target.value), 365))}
             className="px-3 py-1 border border-accent-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-secondary-500 focus:border-secondary-500 dark:bg-gray-700 dark:text-gray-100 text-sm"
           >
             <option value={7}>Last 7 days</option>

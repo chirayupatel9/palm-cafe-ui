@@ -34,10 +34,11 @@ const Login = () => {
       
       if (result.success) {
         toast.success('Welcome back');
-        
+
         // Redirect to dashboard, which will automatically route to the appropriate role-based dashboard
         navigate('/dashboard');
-      } else {
+      } else if (result.error) {
+        // null error means 429 was already handled by the axios interceptor
         toast.error(result.error);
       }
     } catch (error) {

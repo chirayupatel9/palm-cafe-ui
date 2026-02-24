@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { User, Mail, Lock, ChefHat, ArrowLeft } from 'lucide-react';
+import { User, Mail, Lock, ChefHat, ArrowLeft, Shield } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useCafeSettings } from '../contexts/CafeSettingsContext';
 import { getImageUrl } from '../utils/imageUtils';
 import toast from 'react-hot-toast';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 
 const ChefRegister = () => {
   const { cafeSettings } = useCafeSettings();
@@ -15,8 +15,32 @@ const ChefRegister = () => {
     confirmPassword: ''
   });
   const [loading, setLoading] = useState(false);
-  const { registerChef } = useAuth();
+  const { registerChef, user } = useAuth();
   const navigate = useNavigate();
+
+  // Only admins may register chef accounts (#9)
+  if (!user || user.role !== 'admin') {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-accent-50 dark:bg-gray-900 py-12 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-md w-full space-y-8">
+          <div className="text-center">
+            <Shield className="h-16 w-16 mx-auto text-red-500 mb-4" />
+            <h2 className="text-2xl font-bold text-red-600 dark:text-red-400">Access Denied</h2>
+            <p className="text-gray-600 dark:text-gray-400 mt-2">
+              Only admins can register new chef accounts.
+            </p>
+            <Link
+              to="/login"
+              className="mt-4 inline-flex items-center px-4 py-2 bg-secondary-500 text-white rounded-lg hover:bg-secondary-600 transition-colors"
+            >
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Go to Login
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   const handleChange = (e) => {
     setFormData({
@@ -34,8 +58,8 @@ const ChefRegister = () => {
       return;
     }
 
-    if (formData.password.length < 6) {
-      toast.error('Password must be at least 6 characters long');
+    if (formData.password.length < 12) {
+      toast.error('Password must be at least 12 characters long');
       return;
     }
 
@@ -160,7 +184,7 @@ const ChefRegister = () => {
                   value={formData.password}
                   onChange={handleChange}
                   className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg leading-5 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-secondary-500 focus:border-secondary-500 transition-colors"
-                  placeholder="Enter password (min 6 characters)"
+                  placeholder="Enter password (min 12 characters)"
                 />
               </div>
             </div>
