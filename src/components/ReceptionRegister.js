@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { User, Mail, Lock, Phone, ArrowLeft } from 'lucide-react';
+import { User, Mail, Lock, Phone, ArrowLeft, Shield } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useCafeSettings } from '../contexts/CafeSettingsContext';
 import { getImageUrl } from '../utils/imageUtils';
 import toast from 'react-hot-toast';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 
 const ReceptionRegister = () => {
   const { cafeSettings } = useCafeSettings();
@@ -15,8 +15,32 @@ const ReceptionRegister = () => {
     confirmPassword: ''
   });
   const [loading, setLoading] = useState(false);
-  const { registerReception } = useAuth();
+  const { registerReception, user } = useAuth();
   const navigate = useNavigate();
+
+  // Only admins may register reception accounts (#9)
+  if (!user || user.role !== 'admin') {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-accent-50 dark:bg-gray-900 py-12 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-md w-full space-y-8">
+          <div className="text-center">
+            <Shield className="h-16 w-16 mx-auto text-red-500 mb-4" />
+            <h2 className="text-2xl font-bold text-red-600 dark:text-red-400">Access Denied</h2>
+            <p className="text-gray-600 dark:text-gray-400 mt-2">
+              Only admins can register new reception accounts.
+            </p>
+            <Link
+              to="/login"
+              className="mt-4 inline-flex items-center px-4 py-2 bg-secondary-500 text-white rounded-lg hover:bg-secondary-600 transition-colors"
+            >
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Go to Login
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   const handleChange = (e) => {
     setFormData({
@@ -34,8 +58,8 @@ const ReceptionRegister = () => {
       return;
     }
 
-    if (formData.password.length < 6) {
-      toast.error('Password must be at least 6 characters long');
+    if (formData.password.length < 12) {
+      toast.error('Password must be at least 12 characters long');
       return;
     }
 
@@ -160,7 +184,7 @@ const ReceptionRegister = () => {
                   value={formData.password}
                   onChange={handleChange}
                   className="block w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md leading-5 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:focus:ring-primary-400 dark:focus:border-primary-400"
-                  placeholder="Enter password (min 6 characters)"
+                  placeholder="Enter password (min 12 characters)"
                 />
               </div>
             </div>

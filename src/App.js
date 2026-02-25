@@ -40,9 +40,11 @@ import RoleBasedRedirect from './components/RoleBasedRedirect';
 import DashboardRedirect from './components/DashboardRedirect';
 import OnboardingGuard from './components/OnboardingGuard';
 
-// Configure axios base URL - use environment variable or fallback to localhost
+// Configure axios base URL - use environment variable or fallback to localhost.
+// API_PATH is centralised here so migrating to /api/v1 is a one-line change (#18).
 const API_BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
-axios.defaults.baseURL = `${API_BASE_URL}/api`;
+const API_PATH = '/api'; // change to '/api/v1' when backend versioning is deployed
+axios.defaults.baseURL = `${API_BASE_URL}${API_PATH}`;
 
 // Component to update document title based on user's cafe
 const TitleUpdater = () => {

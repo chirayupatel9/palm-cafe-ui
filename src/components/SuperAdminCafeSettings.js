@@ -390,7 +390,7 @@ const SuperAdminCafeSettings = () => {
             <div className="flex-1">
               <input
                 type="file"
-                accept="image/*"
+                accept="image/jpeg,image/png,image/webp"
                 onChange={(e) => {
                   const file = e.target.files[0];
                   if (file) {

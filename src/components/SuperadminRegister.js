@@ -38,8 +38,8 @@ const SuperadminRegister = ({ onBack }) => {
     }
 
     // Validate password length
-    if (formData.password.length < 6) {
-      toast.error('Password must be at least 6 characters long');
+    if (formData.password.length < 12) {
+      toast.error('Password must be at least 12 characters long');
       setLoading(false);
       return;
     }
@@ -139,7 +139,7 @@ const SuperadminRegister = ({ onBack }) => {
                   value={formData.password}
                   onChange={handleChange}
                   className="appearance-none relative block w-full px-3 py-2 pr-10 border border-accent-300 dark:border-gray-600 placeholder-accent-500 dark:placeholder-gray-400 text-secondary-900 dark:text-gray-100 bg-white dark:bg-gray-800 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary-500 focus:border-secondary-500 focus:z-10 sm:text-sm"
-                  placeholder="Enter password (min 6 characters)"
+                  placeholder="Enter password (min 12 characters)"
                 />
                 <button
                   type="button"
