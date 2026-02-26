@@ -5,6 +5,7 @@ import toast from 'react-hot-toast';
 import CustomerOrderHistory from './CustomerOrderHistory';
 
 const CustomerProfile = ({ customer, onCustomerUpdate, onLogout, onClose, initialSection, setActiveTab, cart, setCart }) => {
+  const hasTabAndCart = typeof setActiveTab === 'function' && typeof setCart === 'function';
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(false);
   const [activeSection, setActiveSection] = useState(initialSection || 'account');
@@ -375,12 +376,19 @@ const CustomerProfile = ({ customer, onCustomerUpdate, onLogout, onClose, initia
 
               {activeSection === 'orders' && (
                 <div className="flex flex-col gap-6 -m-2">
-                  <CustomerOrderHistory
-                    customerPhone={customer?.phone}
-                    setActiveTab={setActiveTab || (() => {})}
-                    cart={cart || []}
-                    setCart={setCart || (() => {})}
-                  />
+                  {hasTabAndCart ? (
+                    <CustomerOrderHistory
+                      customerPhone={customer?.phone}
+                      setActiveTab={setActiveTab}
+                      cart={cart || []}
+                      setCart={setCart}
+                    />
+                  ) : (
+                    <div className="flex flex-col items-center justify-center py-12 px-4 rounded-lg bg-surface-light dark:bg-surface-dark border border-border-light dark:border-border-dark">
+                      <p className="text-text-light dark:text-text-dark font-medium">Order history is available when opened from the menu.</p>
+                      <p className="text-text-light/60 dark:text-text-dark/60 text-sm mt-1">Cart and navigation are required for reordering.</p>
+                    </div>
+                  )}
                 </div>
               )}
             </div>
