@@ -46,6 +46,13 @@ const API_BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
 const API_PATH = '/api'; // change to '/api/v1' when backend versioning is deployed
 axios.defaults.baseURL = `${API_BASE_URL}${API_PATH}`;
 
+// Redirect /customer to the logged-in user's cafe slug so customer menu matches admin menu
+const CustomerRedirect = () => {
+  const { user } = useAuth();
+  const slug = (user && user.cafe_slug) ? user.cafe_slug : 'default';
+  return <Navigate to={`/cafe/${slug}`} replace />;
+};
+
 // Component to update document title based on user's cafe
 const TitleUpdater = () => {
   const { user } = useAuth();
@@ -450,8 +457,8 @@ function App() {
                   <Route path="/cafe/:slug" element={<CustomerApp />} />
                   <Route path="/cafe/:slug/menu" element={<CustomerApp />} />
                   <Route path="/cafe/:slug/order" element={<CustomerApp />} />
-                  {/* Legacy customer route - redirect to default */}
-                  <Route path="/customer" element={<Navigate to="/cafe/default" replace />} />
+                  {/* Legacy customer route - redirect to logged-in user's cafe (same menu as admin) or default */}
+                  <Route path="/customer" element={<CustomerRedirect />} />
                   <Route path="/admin" element={
                     <ProtectedRoute>
                       <OnboardingGuard>
