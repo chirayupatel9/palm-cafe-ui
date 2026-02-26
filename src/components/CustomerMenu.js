@@ -499,6 +499,7 @@ const CustomerMenu = ({
         tableNumber: tableNumber,
         paymentMethod: paymentMethod,
         pickupOption: pickupOption,
+        ...(cafeSlug && { cafeSlug }),
         items: cart.map(item => ({
           id: item.id,
           name: item.name,
@@ -557,8 +558,10 @@ const CustomerMenu = ({
         : 'Order placed successfully!';
       toast.success(successMessage);
     } catch (error) {
-      console.error('Error placing order:', error);
-      toast.error('Failed to place order');
+      const data = error.response?.data;
+      const msg = (data && typeof data.error === 'string') ? data.error : (error.message || 'Failed to place order');
+      console.error('Error placing order:', msg, 'Response:', data);
+      toast.error(msg);
     } finally {
       setOrderLoading(false);
     }
