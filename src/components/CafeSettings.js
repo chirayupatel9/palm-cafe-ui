@@ -595,73 +595,57 @@ const CafeSettings = () => {
   return (
     <div className="min-h-screen bg-accent-50 dark:bg-gray-900">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="flex justify-between items-center mb-8">
+        <div className="flex flex-wrap items-center gap-6 mb-6">
           <div>
-            <h1 className="text-3xl font-bold text-secondary-700 dark:text-white">Cafe Settings</h1>
-            <p className="text-secondary-600 dark:text-gray-300 mt-2">Manage your cafe configuration and appearance</p>
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Cafe Settings</h1>
+            <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">Manage your cafe configuration and appearance.</p>
           </div>
-          <button
-            onClick={handleSubmit}
-            disabled={isSubmitting}
-            className="btn-primary"
-          >
+          <button type="button" onClick={handleSubmit} disabled={isSubmitting} className="btn-primary px-5 py-2.5 text-sm font-medium shrink-0">
             {isSubmitting ? 'Saving...' : 'Save Changes'}
           </button>
         </div>
 
         {showMessage && (
-          <div className={`mb-6 p-4 rounded-lg ${
-            message.type === 'success' 
-              ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' 
-              : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
+          <div className={`mb-6 p-4 rounded-lg text-sm ${
+            message.type === 'success'
+              ? 'bg-green-50 text-green-800 dark:bg-green-900/30 dark:text-green-200 border border-green-200 dark:border-green-800'
+              : 'bg-red-50 text-red-800 dark:bg-red-900/30 dark:text-red-200 border border-red-200 dark:border-red-800'
           }`}>
             {message.text}
           </div>
         )}
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Main Settings */}
-          <div className="lg:col-span-2 space-y-6">
+        <div className=" mx-auto">
+          <div className="space-y-6">
             {/* Cafe Slug & Public URL Section */}
             {(user?.role === 'admin' || user?.role === 'superadmin') && user?.cafe_slug && (
-              <div className="card">
-                <h2 className="text-xl font-semibold mb-4">Public Cafe URL</h2>
-                <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+              <div className="card p-6">
+                <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-1">Public Cafe URL</h2>
+                <p className="text-sm text-gray-600 dark:text-gray-400 mb-5">
                   Share this URL with your customers to access your cafe menu and place orders.
                 </p>
-                
-                <div className="space-y-4">
-                  {/* Slug Display */}
+                <div className="space-y-5">
                   <div>
-                    <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
-                      Cafe Slug
-                    </label>
-                    <div className="flex items-center space-x-2">
-                      <input
-                        type="text"
-                        value={user.cafe_slug}
-                        readOnly
-                        className="input-field bg-gray-50 dark:bg-gray-700 cursor-not-allowed font-mono"
-                      />
-                    </div>
-                    <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">
-                      This is your public cafe identifier. It cannot be changed after creation.
-                    </p>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Cafe Slug</label>
+                    <input
+                      type="text"
+                      value={user.cafe_slug}
+                      readOnly
+                      className="input-field w-full bg-gray-100 dark:bg-gray-700/50 cursor-not-allowed font-mono text-sm"
+                    />
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Cannot be changed after creation.</p>
                   </div>
-
-                  {/* Public URL Display */}
                   <div>
-                    <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
-                      Public Customer URL
-                    </label>
-                    <div className="flex items-center space-x-2">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Public Customer URL</label>
+                    <div className="flex flex-wrap gap-2 items-stretch">
                       <input
                         type="text"
                         value={`${window.location.origin}/cafe/${user.cafe_slug}`}
                         readOnly
-                        className="input-field bg-gray-50 dark:bg-gray-700 cursor-not-allowed font-mono text-sm"
+                        className="input-field flex-1 min-w-[200px] bg-gray-100 dark:bg-gray-700/50 cursor-not-allowed font-mono text-sm"
                       />
                       <button
+                        type="button"
                         onClick={() => {
                           const url = `${window.location.origin}/cafe/${user.cafe_slug}`;
                           navigator.clipboard.writeText(url);
@@ -669,413 +653,150 @@ const CafeSettings = () => {
                           toast.success('URL copied to clipboard!');
                           setTimeout(() => setCopied(false), 2000);
                         }}
-                        className="px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-lg transition-colors flex items-center space-x-2"
+                        className="btn-primary inline-flex items-center gap-2 shrink-0"
                         title="Copy URL"
                       >
-                        {copied ? (
-                          <>
-                            <Check className="h-4 w-4" />
-                            <span>Copied!</span>
-                          </>
-                        ) : (
-                          <>
-                            <Copy className="h-4 w-4" />
-                            <span>Copy</span>
-                          </>
-                        )}
+                        {copied ? <><Check className="h-4 w-4" /> Copied!</> : <><Copy className="h-4 w-4" /> Copy</>}
                       </button>
                       <a
                         href={`/cafe/${user.cafe_slug}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg transition-colors flex items-center space-x-2"
+                        className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 text-sm font-medium shrink-0"
                         title="Open in new tab"
                       >
                         <ExternalLink className="h-4 w-4" />
-                        <span>Open</span>
+                        Open
                       </a>
                     </div>
-                    <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">
-                      Share this link with your customers to access your cafe menu.
-                    </p>
                   </div>
                 </div>
               </div>
             )}
 
             {/* Basic Information */}
-            <div className="card">
-              <h2 className="text-xl font-semibold mb-4">Basic Information</h2>
-              <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="card p-6">
+              <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-1">Basic Information</h2>
+              <p className="text-sm text-gray-600 dark:text-gray-400 mb-5">Your cafe details shown to customers and used in invoices.</p>
+              <form onSubmit={handleSubmit} className="space-y-4" id="cafe-settings-form">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium mb-2">Cafe Name *</label>
-                    <input
-                      type="text"
-                      value={cafeName}
-                      onChange={(e) => setCafeName(e.target.value)}
-                      className="input-field"
-                      required
-                    />
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Cafe Name *</label>
+                    <input type="text" value={cafeName} onChange={(e) => setCafeName(e.target.value)} className="input-field" required />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium mb-2">Phone</label>
-                    <input
-                      type="tel"
-                      value={phone}
-                      onChange={(e) => setPhone(e.target.value)}
-                      className="input-field"
-                    />
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Phone</label>
+                    <input type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} className="input-field" />
                   </div>
                 </div>
-
                 <div>
-                  <label className="block text-sm font-medium mb-2">Address</label>
-                  <input
-                    type="text"
-                    value={address}
-                    onChange={(e) => setAddress(e.target.value)}
-                    className="input-field"
-                  />
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Address</label>
+                  <input type="text" value={address} onChange={(e) => setAddress(e.target.value)} className="input-field" />
                 </div>
-
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium mb-2">Email</label>
-                    <input
-                      type="email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      className="input-field"
-                    />
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Email</label>
+                    <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} className="input-field" />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium mb-2">Website</label>
-                    <input
-                      type="url"
-                      value={website}
-                      onChange={(e) => setWebsite(e.target.value)}
-                      className="input-field"
-                    />
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Website</label>
+                    <input type="url" value={website} onChange={(e) => setWebsite(e.target.value)} className="input-field" />
                   </div>
                 </div>
-
                 <div>
-                  <label className="block text-sm font-medium mb-2">Opening Hours</label>
-                  <input
-                    type="text"
-                    value={openingHours}
-                    onChange={(e) => setOpeningHours(e.target.value)}
-                    className="input-field"
-                    placeholder="e.g., Mon-Fri: 8AM-6PM, Sat-Sun: 9AM-5PM"
-                  />
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Opening Hours</label>
+                  <input type="text" value={openingHours} onChange={(e) => setOpeningHours(e.target.value)} className="input-field" placeholder="e.g., Mon-Fri 8AM-6PM, Sat-Sun 9AM-5PM" />
                 </div>
-
                 <div>
-                  <label className="block text-sm font-medium mb-2">Description</label>
-                  <textarea
-                    value={description}
-                    onChange={(e) => setDescription(e.target.value)}
-                    className="input-field"
-                    rows={3}
-                    placeholder="Brief description of your cafe..."
-                  />
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Description</label>
+                  <textarea value={description} onChange={(e) => setDescription(e.target.value)} className="input-field" rows={3} placeholder="Brief description of your cafe..." />
                 </div>
+              </form>
+            </div>
 
-                {/* Tab Visibility */}
-                <div>
-                  <label className="block text-sm font-medium mb-4">Tab Visibility</label>
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                    <label className="flex items-center space-x-2">
-                      <input
-                        type="checkbox"
-                        checked={showKitchenTab}
-                        onChange={(e) => setShowKitchenTab(e.target.checked)}
-                        className="rounded"
-                      />
-                      <span className="text-sm">Kitchen</span>
-                    </label>
-                    <label className="flex items-center space-x-2">
-                      <input
-                        type="checkbox"
-                        checked={showCustomersTab}
-                        onChange={(e) => setShowCustomersTab(e.target.checked)}
-                        className="rounded"
-                      />
-                      <span className="text-sm">Customers</span>
-                    </label>
-                    <label className="flex items-center space-x-2">
-                      <input
-                        type="checkbox"
-                        checked={showPaymentMethodsTab}
-                        onChange={(e) => setShowPaymentMethodsTab(e.target.checked)}
-                        className="rounded"
-                      />
-                      <span className="text-sm">Payment Methods</span>
-                    </label>
-                    <label className="flex items-center space-x-2">
-                      <input
-                        type="checkbox"
-                        checked={showMenuTab}
-                        onChange={(e) => setShowMenuTab(e.target.checked)}
-                        className="rounded"
-                      />
-                      <span className="text-sm">Menu</span>
-                    </label>
-                    <label className="flex items-center space-x-2">
-                      <input
-                        type="checkbox"
-                        checked={showInventoryTab}
-                        onChange={(e) => setShowInventoryTab(e.target.checked)}
-                        className="rounded"
-                      />
-                      <span className="text-sm">Inventory</span>
-                    </label>
-                    <label className="flex items-center space-x-2">
-                      <input
-                        type="checkbox"
-                        checked={showHistoryTab}
-                        onChange={(e) => setShowHistoryTab(e.target.checked)}
-                        className="rounded"
-                      />
-                      <span className="text-sm">History</span>
-                    </label>
-                    <label className="flex items-center space-x-2">
-                      <input
-                        type="checkbox"
-                        checked={showMenuImages}
-                        onChange={(e) => setShowMenuImages(e.target.checked)}
-                        className="rounded"
-                      />
-                      <span className="text-sm">Show Menu Images</span>
-                    </label>
-                  </div>
-                </div>
-
-                {/* Chef Visibility Settings */}
-                <div>
-                  <label className="block text-sm font-medium mb-4">Chef Access Control</label>
-                  <div className="space-y-4">
-                    <div>
-                      <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Visible Tabs for Chefs</h4>
-                      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                        <label className="flex items-center space-x-2">
-                          <input
-                            type="checkbox"
-                            checked={chefShowKitchenTab}
-                            onChange={(e) => setChefShowKitchenTab(e.target.checked)}
-                            className="rounded"
-                          />
-                          <span className="text-sm">Kitchen Orders</span>
+            {/* Tab & Role Visibility */}
+            <div className="card p-6">
+              <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-1">Tab & Role Visibility</h2>
+              <p className="text-sm text-gray-600 dark:text-gray-400 mb-5">
+                Control which tabs and features are visible to each role.
+              </p>
+              <form onSubmit={handleSubmit} className="space-y-0" id="cafe-visibility-form" noValidate>
+                <div className="space-y-6">
+                  {/* Owner */}
+                  <div className="pb-6 border-b border-gray-200 dark:border-gray-700">
+                    <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-3">Owner (your view)</h3>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-x-4 gap-y-2.5">
+                      {[
+                        [showKitchenTab, setShowKitchenTab, 'Orders'],
+                        [showMenuTab, setShowMenuTab, 'Menu'],
+                        [showMenuImages, setShowMenuImages, 'Show Menu Images'],
+                        [showCustomersTab, setShowCustomersTab, 'Customers'],
+                        [showPaymentMethodsTab, setShowPaymentMethodsTab, 'Payment Methods'],
+                        [showInventoryTab, setShowInventoryTab, 'Inventory'],
+                        [showHistoryTab, setShowHistoryTab, 'History']
+                      ].map(([checked, setter, label]) => (
+                        <label key={label} className="flex items-center gap-2.5 cursor-pointer py-0.5">
+                          <input type="checkbox" checked={checked} onChange={(e) => setter(e.target.checked)} className="rounded border-gray-300 dark:border-gray-600 text-primary-600 focus:ring-primary-500 focus:ring-offset-0" />
+                          <span className="text-sm text-gray-700 dark:text-gray-300">{label}</span>
                         </label>
-                        <label className="flex items-center space-x-2">
-                          <input
-                            type="checkbox"
-                            checked={chefShowMenuTab}
-                            onChange={(e) => setChefShowMenuTab(e.target.checked)}
-                            className="rounded"
-                          />
-                          <span className="text-sm">Menu Management</span>
-                        </label>
-                        <label className="flex items-center space-x-2">
-                          <input
-                            type="checkbox"
-                            checked={chefShowInventoryTab}
-                            onChange={(e) => setChefShowInventoryTab(e.target.checked)}
-                            className="rounded"
-                          />
-                          <span className="text-sm">Inventory</span>
-                        </label>
-                        <label className="flex items-center space-x-2">
-                          <input
-                            type="checkbox"
-                            checked={chefShowHistoryTab}
-                            onChange={(e) => setChefShowHistoryTab(e.target.checked)}
-                            className="rounded"
-                          />
-                          <span className="text-sm">Order History</span>
-                        </label>
-                      </div>
-                    </div>
-                    
-                    <div>
-                      <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Chef Permissions</h4>
-                      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                        <label className="flex items-center space-x-2">
-                          <input
-                            type="checkbox"
-                            checked={chefCanEditOrders}
-                            onChange={(e) => setChefCanEditOrders(e.target.checked)}
-                            className="rounded"
-                          />
-                          <span className="text-sm">Can Edit Orders</span>
-                        </label>
-                        <label className="flex items-center space-x-2">
-                          <input
-                            type="checkbox"
-                            checked={chefCanViewCustomers}
-                            onChange={(e) => setChefCanViewCustomers(e.target.checked)}
-                            className="rounded"
-                          />
-                          <span className="text-sm">Can View Customers</span>
-                        </label>
-                        <label className="flex items-center space-x-2">
-                          <input
-                            type="checkbox"
-                            checked={chefCanViewPayments}
-                            onChange={(e) => setChefCanViewPayments(e.target.checked)}
-                            className="rounded"
-                          />
-                          <span className="text-sm">Can View Payments</span>
-                        </label>
-                      </div>
+                      ))}
                     </div>
                   </div>
-                </div>
-
-                {/* Reception Visibility Settings */}
-                <div>
-                  <label className="block text-sm font-medium mb-4">Reception Access Control</label>
-                  <div className="space-y-4">
-                    <div>
-                      <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Visible Tabs for Reception</h4>
-                      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                        <label className="flex items-center space-x-2">
-                          <input
-                            type="checkbox"
-                            checked={receptionShowKitchenTab}
-                            onChange={(e) => setReceptionShowKitchenTab(e.target.checked)}
-                            className="rounded"
-                          />
-                          <span className="text-sm">Kitchen Orders</span>
+                  {/* Chef */}
+                  <div className="pb-6 border-b border-gray-200 dark:border-gray-700">
+                    <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-3">Chef</h3>
+                    <p className="text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-2">Visible tabs</p>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-x-4 gap-y-2.5 mb-4">
+                      {[[chefShowKitchenTab, setChefShowKitchenTab, 'Orders'], [chefShowMenuTab, setChefShowMenuTab, 'Menu'], [chefShowInventoryTab, setChefShowInventoryTab, 'Inventory'], [chefShowHistoryTab, setChefShowHistoryTab, 'History']].map(([c, s, l]) => (
+                        <label key={l} className="flex items-center gap-2.5 cursor-pointer py-0.5">
+                          <input type="checkbox" checked={c} onChange={(e) => s(e.target.checked)} className="rounded border-gray-300 dark:border-gray-600 text-primary-600 focus:ring-primary-500 focus:ring-offset-0" />
+                          <span className="text-sm text-gray-700 dark:text-gray-300">{l}</span>
                         </label>
-                        <label className="flex items-center space-x-2">
-                          <input
-                            type="checkbox"
-                            checked={receptionShowMenuTab}
-                            onChange={(e) => setReceptionShowMenuTab(e.target.checked)}
-                            className="rounded"
-                          />
-                          <span className="text-sm">Menu Management</span>
-                        </label>
-                        <label className="flex items-center space-x-2">
-                          <input
-                            type="checkbox"
-                            checked={receptionShowInventoryTab}
-                            onChange={(e) => setReceptionShowInventoryTab(e.target.checked)}
-                            className="rounded"
-                          />
-                          <span className="text-sm">Inventory</span>
-                        </label>
-                        <label className="flex items-center space-x-2">
-                          <input
-                            type="checkbox"
-                            checked={receptionShowHistoryTab}
-                            onChange={(e) => setReceptionShowHistoryTab(e.target.checked)}
-                            className="rounded"
-                          />
-                          <span className="text-sm">Order History</span>
-                        </label>
-                      </div>
+                      ))}
                     </div>
-                    
-                    <div>
-                      <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Reception Permissions</h4>
-                      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                        <label className="flex items-center space-x-2">
-                          <input
-                            type="checkbox"
-                            checked={receptionCanEditOrders}
-                            onChange={(e) => setReceptionCanEditOrders(e.target.checked)}
-                            className="rounded"
-                          />
-                          <span className="text-sm">Can Edit Orders</span>
+                    <p className="text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-2">Permissions</p>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-x-4 gap-y-2.5">
+                      {[[chefCanEditOrders, setChefCanEditOrders, 'Can Edit Orders'], [chefCanViewCustomers, setChefCanViewCustomers, 'Can View Customers'], [chefCanViewPayments, setChefCanViewPayments, 'Can View Payments']].map(([c, s, l]) => (
+                        <label key={l} className="flex items-center gap-2.5 cursor-pointer py-0.5">
+                          <input type="checkbox" checked={c} onChange={(e) => s(e.target.checked)} className="rounded border-gray-300 dark:border-gray-600 text-primary-600 focus:ring-primary-500 focus:ring-offset-0" />
+                          <span className="text-sm text-gray-700 dark:text-gray-300">{l}</span>
                         </label>
-                        <label className="flex items-center space-x-2">
-                          <input
-                            type="checkbox"
-                            checked={receptionCanViewCustomers}
-                            onChange={(e) => setReceptionCanViewCustomers(e.target.checked)}
-                            className="rounded"
-                          />
-                          <span className="text-sm">Can View Customers</span>
-                        </label>
-                        <label className="flex items-center space-x-2">
-                          <input
-                            type="checkbox"
-                            checked={receptionCanViewPayments}
-                            onChange={(e) => setReceptionCanViewPayments(e.target.checked)}
-                            className="rounded"
-                          />
-                          <span className="text-sm">Can View Payments</span>
-                        </label>
-                        <label className="flex items-center space-x-2">
-                          <input
-                            type="checkbox"
-                            checked={receptionCanCreateOrders}
-                            onChange={(e) => setReceptionCanCreateOrders(e.target.checked)}
-                            className="rounded"
-                          />
-                          <span className="text-sm">Can Create Orders</span>
-                        </label>
-                      </div>
+                      ))}
                     </div>
                   </div>
-                </div>
-
-                {/* Admin Access Control */}
-                <div>
-                  <label className="block text-sm font-medium mb-4">Admin Access Control</label>
-                  <div className="space-y-4">
-                    <div>
-                      <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Admin Permissions</h4>
-                      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                        <label className="flex items-center space-x-2">
-                          <input
-                            type="checkbox"
-                            checked={adminCanAccessSettings}
-                            onChange={(e) => setAdminCanAccessSettings(e.target.checked)}
-                            className="rounded"
-                          />
-                          <span className="text-sm">Can Access Settings</span>
+                  {/* Reception */}
+                  <div className="pb-6 border-b border-gray-200 dark:border-gray-700">
+                    <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-3">Reception</h3>
+                    <p className="text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-2">Visible tabs</p>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-x-4 gap-y-2.5 mb-4">
+                      {[[receptionShowKitchenTab, setReceptionShowKitchenTab, 'Orders'], [receptionShowMenuTab, setReceptionShowMenuTab, 'Menu'], [receptionShowInventoryTab, setReceptionShowInventoryTab, 'Inventory'], [receptionShowHistoryTab, setReceptionShowHistoryTab, 'History']].map(([c, s, l]) => (
+                        <label key={l} className="flex items-center gap-2.5 cursor-pointer py-0.5">
+                          <input type="checkbox" checked={c} onChange={(e) => s(e.target.checked)} className="rounded border-gray-300 dark:border-gray-600 text-primary-600 focus:ring-primary-500 focus:ring-offset-0" />
+                          <span className="text-sm text-gray-700 dark:text-gray-300">{l}</span>
                         </label>
-                        <label className="flex items-center space-x-2">
-                          <input
-                            type="checkbox"
-                            checked={adminCanManageUsers}
-                            onChange={(e) => setAdminCanManageUsers(e.target.checked)}
-                            className="rounded"
-                          />
-                          <span className="text-sm">Can Manage Users</span>
+                      ))}
+                    </div>
+                    <p className="text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-2">Permissions</p>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-x-4 gap-y-2.5">
+                      {[[receptionCanEditOrders, setReceptionCanEditOrders, 'Can Edit Orders'], [receptionCanViewCustomers, setReceptionCanViewCustomers, 'Can View Customers'], [receptionCanViewPayments, setReceptionCanViewPayments, 'Can View Payments'], [receptionCanCreateOrders, setReceptionCanCreateOrders, 'Can Create Orders']].map(([c, s, l]) => (
+                        <label key={l} className="flex items-center gap-2.5 cursor-pointer py-0.5">
+                          <input type="checkbox" checked={c} onChange={(e) => s(e.target.checked)} className="rounded border-gray-300 dark:border-gray-600 text-primary-600 focus:ring-primary-500 focus:ring-offset-0" />
+                          <span className="text-sm text-gray-700 dark:text-gray-300">{l}</span>
                         </label>
-                        <label className="flex items-center space-x-2">
-                          <input
-                            type="checkbox"
-                            checked={adminCanViewReports}
-                            onChange={(e) => setAdminCanViewReports(e.target.checked)}
-                            className="rounded"
-                          />
-                          <span className="text-sm">Can View Reports</span>
+                      ))}
+                    </div>
+                  </div>
+                  {/* Admin */}
+                  <div>
+                    <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-3">Admin</h3>
+                    <p className="text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-2">Permissions</p>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-x-4 gap-y-2.5">
+                      {[[adminCanAccessSettings, setAdminCanAccessSettings, 'Can Access Settings'], [adminCanManageUsers, setAdminCanManageUsers, 'Can Manage Users'], [adminCanViewReports, setAdminCanViewReports, 'Can View Reports'], [adminCanManageInventory, setAdminCanManageInventory, 'Can Manage Inventory'], [adminCanManageMenu, setAdminCanManageMenu, 'Can Manage Menu']].map(([c, s, l]) => (
+                        <label key={l} className="flex items-center gap-2.5 cursor-pointer py-0.5">
+                          <input type="checkbox" checked={c} onChange={(e) => s(e.target.checked)} className="rounded border-gray-300 dark:border-gray-600 text-primary-600 focus:ring-primary-500 focus:ring-offset-0" />
+                          <span className="text-sm text-gray-700 dark:text-gray-300">{l}</span>
                         </label>
-                        <label className="flex items-center space-x-2">
-                          <input
-                            type="checkbox"
-                            checked={adminCanManageInventory}
-                            onChange={(e) => setAdminCanManageInventory(e.target.checked)}
-                            className="rounded"
-                          />
-                          <span className="text-sm">Can Manage Inventory</span>
-                        </label>
-                        <label className="flex items-center space-x-2">
-                          <input
-                            type="checkbox"
-                            checked={adminCanManageMenu}
-                            onChange={(e) => setAdminCanManageMenu(e.target.checked)}
-                            className="rounded"
-                          />
-                          <span className="text-sm">Can Manage Menu</span>
-                        </label>
-                      </div>
+                      ))}
                     </div>
                   </div>
                 </div>
@@ -1083,17 +804,16 @@ const CafeSettings = () => {
             </div>
 
             {/* Branding Section */}
-            <div className="card">
-              <h2 className="text-xl font-semibold mb-4">Branding</h2>
-              <p className="text-sm text-secondary-600 dark:text-gray-400 mb-6">
-                Manage images displayed on the customer-facing menu page
+            <div className="card p-6">
+              <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-1">Branding</h2>
+              <p className="text-sm text-gray-600 dark:text-gray-400 mb-5">
+                Images shown on the customer-facing menu page.
               </p>
-
-              {/* Logo */}
-              <div className="mb-6">
-                <label className="block text-sm font-medium mb-2">Logo</label>
-                <p className="text-xs text-secondary-500 dark:text-gray-500 mb-3">
-                  Shown in headers, invoices, and customer-facing pages
+              <div className="space-y-6">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Logo</label>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">
+                  Headers, invoices, and customer-facing pages.
                 </p>
                 <div className="space-y-3">
                   {cafeSettings?.logo_url && (
@@ -1134,12 +854,10 @@ const CafeSettings = () => {
                   </div>
                 </div>
               </div>
-
-              {/* Hero Image */}
-              <div className="mb-6">
-                <label className="block text-sm font-medium mb-2">Hero Image</label>
-                <p className="text-xs text-secondary-500 dark:text-gray-500 mb-3">
-                  Shown as the main background image on the customer menu
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Hero Image</label>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">
+                  Main background on the customer menu.
                 </p>
                 <div className="space-y-3">
                   {cafeSettings?.hero_image_url && (
@@ -1181,13 +899,12 @@ const CafeSettings = () => {
                 </div>
               </div>
 
-              {/* Promotional Banners - single list, at least one required */}
-              <div className="pt-6 mt-6 border-t border-gray-200 dark:border-gray-600">
+              <div className="pt-5 border-t border-gray-200 dark:border-gray-700">
                 <div className="flex flex-wrap items-start justify-between gap-3 mb-3">
                   <div>
-                    <label className="block text-sm font-medium mb-2">Promotional Banners</label>
-                    <p className="text-xs text-secondary-500 dark:text-gray-500">
-                      Shown on the customer menu. Add as many as you like; order by priority (lower first). Keep at least one banner.
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Promotional Banners</label>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                      Customer menu. Order by priority (lower first). Keep at least one.
                     </p>
                   </div>
                   {!loadingPromoBanners && !promoBannerForm.show && (
@@ -1350,7 +1067,7 @@ const CafeSettings = () => {
                   </div>
                 )}
               </div>
-
+              </div>
             </div>
 
             {/* Color Scheme Settings */}
