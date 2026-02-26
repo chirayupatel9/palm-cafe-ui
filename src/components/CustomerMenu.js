@@ -1144,7 +1144,7 @@ const CustomerMenu = ({
                               <button
                                 onClick={() => {
                                   setSelectedCategory(categoryName);
-                                  document.getElementById('menu-items-section')?.scrollIntoView({ behavior: 'smooth' });
+                                  window.scrollBy({ top: 10, behavior: 'smooth' });
                                 }}
                                 className="group relative w-28 h-28 sm:w-36 sm:h-36 md:w-40 md:h-40 lg:w-44 lg:h-44 overflow-hidden rounded-full bg-white transition-all duration-300 min-w-[112px] min-h-[112px]"
                                 aria-label={`View ${categoryName} category`}
@@ -1248,7 +1248,7 @@ const CustomerMenu = ({
                   </button>
                 </div>
               ) : (
-                <div id="menu-items-section" className="w-full space-y-5">
+                <div id="menu-items-section" className="w-full space-y-5 scroll-mt-40">
                   {/* Back to categories - when viewing a single category */}
                   {!searchQuery.trim() && selectedCategory !== 'All' && (
                     <div className="max-w-6xl mx-auto px-4 mb-6">
