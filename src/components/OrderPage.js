@@ -51,6 +51,7 @@ const OrderPage = ({ menuItems, cart: externalCart, setCart: setExternalCart }) 
   const [extraCharge, setExtraCharge] = useState(0);
   const [extraChargeNote, setExtraChargeNote] = useState('');
   const [extraChargeEnabled, setExtraChargeEnabled] = useState(false);
+  const [showInvoicePrompt, setShowInvoicePrompt] = useState(false);
 
   // Debounced phone number to reduce API calls
   const debouncedPhone = useDebounce(customerPhone, 500);
@@ -253,34 +254,34 @@ const OrderPage = ({ menuItems, cart: externalCart, setCart: setExternalCart }) 
     );
   };
 
-  // Generate invoice
-  const generateInvoice = async () => {
+  // Start checkout: validate and show invoice prompt
+  const startCheckout = () => {
     if (currentCart.length === 0) {
       toast.error('Add items to your cart before placing an order');
       return;
     }
-
     if (!customerName.trim()) {
       toast.error('Enter a customer name to continue');
       return;
     }
-
-    // Only allow split payment for admins
     if (splitPayment && user?.role !== 'admin') {
       toast.error('Split payment is only available for administrators');
       return;
     }
-
     if (splitPayment && splitAmount <= 0) {
       toast.error('Please enter the split payment amount');
       return;
     }
-
     if (splitPayment && splitAmount >= getTotal()) {
       toast.error('Split amount cannot be greater than or equal to total amount');
       return;
     }
+    setShowInvoicePrompt(true);
+  };
 
+  // Complete order (with or without generating/showing invoice)
+  const completeOrder = async (wantInvoice) => {
+    setShowInvoicePrompt(false);
     setLoading(true);
 
     try {
@@ -304,28 +305,22 @@ const OrderPage = ({ menuItems, cart: externalCart, setCart: setExternalCart }) 
         splitPaymentMethod: splitPaymentMethod,
         splitAmount: splitAmount,
         extraCharge: extraCharge,
-        extraChargeNote: extraChargeNote
+        extraChargeNote: extraChargeNote,
+        wantInvoice: wantInvoice
       };
 
       const response = await axios.post('/invoices', orderData);
-      
-      // Download the PDF
-      const pdfResponse = await axios.get(`/invoices/${response.data.invoiceNumber}/download`);
-      
-      // Create blob and open PDF in new tab
-      const pdfBlob = new Blob([Uint8Array.from(atob(pdfResponse.data.pdf), c => c.charCodeAt(0))], {
-        type: 'application/pdf'
-      });
-      
-      const pdfUrl = URL.createObjectURL(pdfBlob);
-      window.open(pdfUrl, '_blank');
-      
-      // Clean up the URL object after a delay
-      setTimeout(() => {
-        URL.revokeObjectURL(pdfUrl);
-      }, 1000);
 
-      // Clear cart and form
+      if (wantInvoice && response.data.invoiceNumber) {
+        const pdfResponse = await axios.get(`/invoices/${response.data.invoiceNumber}/download`);
+        const pdfBlob = new Blob([Uint8Array.from(atob(pdfResponse.data.pdf), c => c.charCodeAt(0))], {
+          type: 'application/pdf'
+        });
+        const pdfUrl = URL.createObjectURL(pdfBlob);
+        window.open(pdfUrl, '_blank');
+        setTimeout(() => URL.revokeObjectURL(pdfUrl), 1000);
+      }
+
       setCurrentCart([]);
       setCustomerName('');
       setCustomerPhone('');
@@ -339,10 +334,9 @@ const OrderPage = ({ menuItems, cart: externalCart, setCart: setExternalCart }) 
       setSplitAmount(0);
       setExtraCharge(0);
       setExtraChargeNote('');
-      
       toast.success(`Order #${response.data.orderNumber} completed`);
     } catch (error) {
-      console.error('Error generating invoice:', error);
+      console.error('Error completing order:', error);
       toast.error('We couldn\'t complete the order. Please try again.');
     } finally {
       setLoading(false);
@@ -372,6 +366,42 @@ const OrderPage = ({ menuItems, cart: externalCart, setCart: setExternalCart }) 
 
   return (
     <div className="lg:grid lg:grid-cols-3 lg:gap-6 pt-6 pb-6 sm:pt-8 sm:pb-8">
+      {/* Invoice prompt modal */}
+      {showInvoicePrompt && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4" aria-modal="true" role="dialog" aria-labelledby="invoice-prompt-title">
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-xl max-w-sm w-full p-6" style={{ color: 'var(--color-on-surface)' }}>
+            <h2 id="invoice-prompt-title" className="text-lg font-semibold mb-3">Complete order</h2>
+            <p className="text-sm mb-6" style={{ color: 'var(--color-on-surface-variant)' }}>Do you want to see the invoice?</p>
+            <div className="flex gap-3">
+              <button
+                type="button"
+                onClick={() => completeOrder(false)}
+                disabled={loading}
+                className="flex-1 px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-50"
+              >
+                No
+              </button>
+              <button
+                type="button"
+                onClick={() => completeOrder(true)}
+                disabled={loading}
+                className="btn-primary flex-1 px-4 py-2"
+              >
+                Yes, show invoice
+              </button>
+            </div>
+            <button
+              type="button"
+              onClick={() => setShowInvoicePrompt(false)}
+              disabled={loading}
+              className="mt-4 w-full text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Menu Items */}
       <div className="lg:col-span-2 mb-6 lg:mb-0">
         <div className="card">
@@ -961,14 +991,14 @@ const OrderPage = ({ menuItems, cart: externalCart, setCart: setExternalCart }) 
               {/* Generate Invoice Button */}
               <button
                 onClick={() => {
-                  generateInvoice();
+                  startCheckout();
                   setShowCart(false);
                 }}
                 disabled={currentCart.length === 0 || loading}
                 className="btn-primary w-full flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <Receipt className="h-4 w-4 mr-2" />
-                {loading ? 'Generating...' : 'Generate & Open Invoice'}
+                {loading ? 'Completing...' : 'Complete order'}
               </button>
             </div>
           </div>
@@ -1438,14 +1468,14 @@ const OrderPage = ({ menuItems, cart: externalCart, setCart: setExternalCart }) 
             </div>
           )}
 
-          {/* Generate Invoice Button */}
+          {/* Complete order button */}
           <button
-            onClick={generateInvoice}
+            onClick={startCheckout}
             disabled={currentCart.length === 0 || loading}
             className="btn-primary w-full flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <Receipt className="h-4 w-4 mr-2" />
-            {loading ? 'Generating...' : 'Generate & Open Invoice'}
+            {loading ? 'Completing...' : 'Complete order'}
           </button>
         </div>
       </div>
