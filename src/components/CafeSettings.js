@@ -1,14 +1,15 @@
 import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import { useCafeSettings } from '../contexts/CafeSettingsContext';
 import { useAuth } from '../contexts/AuthContext';
 import ColorSchemePreview from './ColorSchemePreview';
 import ColorSchemeTest from './ColorSchemeTest';
 import { getImageUrl } from '../utils/imageUtils';
-import { Copy, ExternalLink, Check } from 'lucide-react';
+import { Copy, ExternalLink, Check, Plus, Pencil, Trash2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 const CafeSettings = () => {
-  const { cafeSettings, updateCafeSettings, updateLogo, updateHeroImage, updatePromoBannerImage, removeHeroImage, removePromoBannerImage, removeLogo } = useCafeSettings();
+  const { cafeSettings, updateCafeSettings, updateLogo, updateHeroImage, removeHeroImage, removeLogo } = useCafeSettings();
   const { user } = useAuth();
   const [copied, setCopied] = useState(false);
   const [showDebugTest, setShowDebugTest] = useState(false);
@@ -17,10 +18,18 @@ const CafeSettings = () => {
   const [message, setMessage] = useState({ type: '', text: '' });
   const [selectedFile, setSelectedFile] = useState(null);
   const [selectedHeroFile, setSelectedHeroFile] = useState(null);
-  const [selectedPromoBannerFile, setSelectedPromoBannerFile] = useState(null);
   const [uploadingLogo, setUploadingLogo] = useState(false);
   const [uploadingHero, setUploadingHero] = useState(false);
-  const [uploadingPromoBanner, setUploadingPromoBanner] = useState(false);
+
+  // Promo banners (multiple per cafe)
+  const [promoBanners, setPromoBanners] = useState([]);
+  const [loadingPromoBanners, setLoadingPromoBanners] = useState(true);
+  const [promoBannerForm, setPromoBannerForm] = useState({ show: false, file: null, link_url: '', priority: 0, active: true });
+  const [uploadingNewBanner, setUploadingNewBanner] = useState(false);
+  const [editingBannerId, setEditingBannerId] = useState(null);
+  const [editingBannerForm, setEditingBannerForm] = useState({ link_url: '', priority: 0, active: true });
+  const [editingBannerReplaceFile, setEditingBannerReplaceFile] = useState(null);
+  const [updatingBanner, setUpdatingBanner] = useState(false);
 
   // Form state
   const [cafeName, setCafeName] = useState('');
@@ -258,6 +267,85 @@ const CafeSettings = () => {
   };
 
   // Initialize form data
+  const fetchPromoBanners = async () => {
+    setLoadingPromoBanners(true);
+    try {
+      const res = await axios.get('/promo-banners');
+      setPromoBanners(Array.isArray(res.data) ? res.data : []);
+    } catch (err) {
+      console.error('Error fetching promo banners:', err);
+      setPromoBanners([]);
+      if (err.response?.status === 403) return;
+      toast.error(err.response?.data?.error || 'Failed to load promo banners');
+    } finally {
+      setLoadingPromoBanners(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchPromoBanners();
+  }, []);
+
+  const handleAddPromoBanner = async () => {
+    if (!promoBannerForm.file) {
+      toast.error('Please select an image');
+      return;
+    }
+    setUploadingNewBanner(true);
+    try {
+      const formData = new FormData();
+      formData.append('image', promoBannerForm.file);
+      if (promoBannerForm.link_url.trim()) formData.append('link_url', promoBannerForm.link_url.trim());
+      formData.append('priority', String(promoBannerForm.priority));
+      formData.append('active', promoBannerForm.active ? 'true' : 'false');
+      await axios.post('/promo-banners', formData, { headers: { 'Content-Type': 'multipart/form-data' } });
+      toast.success('Banner added');
+      setPromoBannerForm({ show: false, file: null, link_url: '', priority: 0, active: true });
+      fetchPromoBanners();
+    } catch (err) {
+      toast.error(err.response?.data?.error || 'Failed to add banner');
+    } finally {
+      setUploadingNewBanner(false);
+    }
+  };
+
+  const handleUpdatePromoBanner = async () => {
+    if (editingBannerId == null) return;
+    const priority = Number(editingBannerForm.priority);
+    setUpdatingBanner(true);
+    try {
+      if (editingBannerReplaceFile) {
+        const formData = new FormData();
+        formData.append('image', editingBannerReplaceFile);
+        await axios.patch(`/promo-banners/${editingBannerId}/image`, formData, { headers: { 'Content-Type': 'multipart/form-data' } });
+      }
+      await axios.put(`/promo-banners/${editingBannerId}`, {
+        link_url: (editingBannerForm.link_url || '').toString().trim() || null,
+        priority: Number.isFinite(priority) ? priority : 0,
+        active: Boolean(editingBannerForm.active)
+      });
+      toast.success('Banner updated');
+      setEditingBannerId(null);
+      setEditingBannerReplaceFile(null);
+      fetchPromoBanners();
+    } catch (err) {
+      toast.error(err.response?.data?.error || 'Failed to update banner');
+    } finally {
+      setUpdatingBanner(false);
+    }
+  };
+
+  const handleDeletePromoBanner = async (id) => {
+    if (!window.confirm('Remove this banner?')) return;
+    try {
+      await axios.delete(`/promo-banners/${id}`);
+      toast.success('Banner removed');
+      fetchPromoBanners();
+    } catch (err) {
+      toast.error(err.response?.data?.error || 'Failed to delete banner');
+    }
+  };
+
   useEffect(() => {
     if (cafeSettings) {
       setCafeName(cafeSettings.cafe_name || '');
@@ -408,35 +496,6 @@ const CafeSettings = () => {
     }
   };
 
-  const handlePromoBannerUpload = async () => {
-    if (!selectedPromoBannerFile) {
-      setMessage({ type: 'error', text: 'Please select a file first' });
-      setShowMessage(true);
-      return;
-    }
-
-    setUploadingPromoBanner(true);
-    const formData = new FormData();
-    formData.append('promo_banner_image', selectedPromoBannerFile);
-
-    try {
-      const result = await updatePromoBannerImage(formData);
-      if (result.success) {
-        setMessage({ type: 'success', text: 'Promo banner image uploaded successfully!' });
-        setSelectedPromoBannerFile(null);
-      } else {
-        setMessage({ type: 'error', text: result.error || 'Failed to upload promo banner image' });
-      }
-      setShowMessage(true);
-      setTimeout(() => setShowMessage(false), 3000);
-    } catch (error) {
-      setMessage({ type: 'error', text: 'An error occurred while uploading promo banner image' });
-      setShowMessage(true);
-    } finally {
-      setUploadingPromoBanner(false);
-    }
-  };
-
   const handleRemoveHeroImage = async () => {
     if (!window.confirm('Are you sure you want to remove the hero image?')) {
       return;
@@ -457,29 +516,6 @@ const CafeSettings = () => {
       setShowMessage(true);
     } finally {
       setUploadingHero(false);
-    }
-  };
-
-  const handleRemovePromoBannerImage = async () => {
-    if (!window.confirm('Are you sure you want to remove the promo banner image?')) {
-      return;
-    }
-
-    setUploadingPromoBanner(true);
-    try {
-      const result = await removePromoBannerImage();
-      if (result.success) {
-        setMessage({ type: 'success', text: 'Promo banner image removed successfully!' });
-      } else {
-        setMessage({ type: 'error', text: result.error || 'Failed to remove promo banner image' });
-      }
-      setShowMessage(true);
-      setTimeout(() => setShowMessage(false), 3000);
-    } catch (error) {
-      setMessage({ type: 'error', text: 'An error occurred while removing promo banner image' });
-      setShowMessage(true);
-    } finally {
-      setUploadingPromoBanner(false);
     }
   };
 
@@ -1145,51 +1181,176 @@ const CafeSettings = () => {
                 </div>
               </div>
 
-              {/* Promotional Banner Image */}
-              <div>
-                <label className="block text-sm font-medium mb-2">Promotional Banner Image</label>
-                <p className="text-xs text-secondary-500 dark:text-gray-500 mb-3">
-                  Shown as the promotional banner on the customer menu
-                </p>
-                <div className="space-y-3">
-                  {cafeSettings?.promo_banner_image_url && (
-                    <div className="relative">
-                      <img
-                        src={getImageUrl(cafeSettings.promo_banner_image_url)}
-                        alt="Promo Banner"
-                        className="w-full h-48 object-cover border rounded-lg"
-                      />
-                      <button
-                        type="button"
-                        onClick={handleRemovePromoBannerImage}
-                        disabled={uploadingPromoBanner}
-                        className="mt-2 px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg text-sm disabled:opacity-50"
-                      >
-                        {uploadingPromoBanner ? 'Removing...' : 'Remove'}
-                      </button>
-                    </div>
-                  )}
-                  <div className="flex items-center space-x-4">
-                    <div className="flex-1">
-                      <input
-                        type="file"
-                        onChange={(e) => setSelectedPromoBannerFile(e.target.files[0])}
-                        accept="image/jpeg,image/png,image/webp"
-                        className="input-field"
-                        disabled={uploadingPromoBanner}
-                      />
-                    </div>
+              {/* Promotional Banners - single list, at least one required */}
+              <div className="pt-6 mt-6 border-t border-gray-200 dark:border-gray-600">
+                <div className="flex flex-wrap items-start justify-between gap-3 mb-3">
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Promotional Banners</label>
+                    <p className="text-xs text-secondary-500 dark:text-gray-500">
+                      Shown on the customer menu. Add as many as you like; order by priority (lower first). Keep at least one banner.
+                    </p>
+                  </div>
+                  {!loadingPromoBanners && !promoBannerForm.show && (
                     <button
                       type="button"
-                      onClick={handlePromoBannerUpload}
-                      disabled={!selectedPromoBannerFile || uploadingPromoBanner}
-                      className="btn-primary disabled:opacity-50"
+                      onClick={() => setPromoBannerForm((f) => ({ ...f, show: true }))}
+                      className="inline-flex items-center gap-2 px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-lg text-sm font-medium shadow-sm"
                     >
-                      {uploadingPromoBanner ? 'Uploading...' : 'Upload'}
+                      <Plus className="h-4 w-4" /> Add banner
                     </button>
-                  </div>
+                  )}
                 </div>
+                {loadingPromoBanners ? (
+                  <p className="text-sm text-gray-500">Loading banners...</p>
+                ) : (
+                  <div className="space-y-4">
+                    <div className="flex flex-wrap gap-3">
+                      {promoBanners.map((b) => (
+                        <div key={b.id} className="border rounded-lg overflow-hidden bg-white dark:bg-gray-800 w-48">
+                          <div className="h-28 bg-gray-100 dark:bg-gray-700">
+                            <img src={getImageUrl(b.image_url)} alt="Banner" className="w-full h-full object-cover" />
+                          </div>
+                          <div className="p-2 text-xs">
+                            <div className="truncate" title={b.link_url || '—'}>{b.link_url || 'No link'}</div>
+                            <div className="flex items-center justify-between mt-1">
+                              <span>Priority: {b.priority}</span>
+                              <span className={b.active ? 'text-green-600' : 'text-gray-400'}>{b.active ? 'On' : 'Off'}</span>
+                            </div>
+                            <div className="flex gap-1 mt-2">
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setEditingBannerId(b.id);
+                                  setEditingBannerForm({ link_url: b.link_url || '', priority: b.priority, active: b.active });
+                                  setEditingBannerReplaceFile(null);
+                                }}
+                                className="flex-1 flex items-center justify-center gap-1 px-2 py-1 bg-gray-200 dark:bg-gray-600 rounded text-xs hover:bg-gray-300"
+                              >
+                                <Pencil className="h-3 w-3" /> Edit
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => handleDeletePromoBanner(b.id)}
+                                disabled={promoBanners.length <= 1}
+                                title={promoBanners.length <= 1 ? 'Keep at least one banner' : 'Remove banner'}
+                                className="flex items-center justify-center px-2 py-1 bg-red-100 dark:bg-red-900/30 text-red-600 rounded text-xs hover:bg-red-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                              >
+                                <Trash2 className="h-3 w-3" />
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                    {editingBannerId != null && (() => {
+                      const b = promoBanners.find((x) => x.id === editingBannerId);
+                      if (!b) return null;
+                      return (
+                        <div className="border rounded-lg p-4 bg-gray-50 dark:bg-gray-800">
+                          <p className="text-sm font-medium mb-2">Edit banner</p>
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div className="sm:col-span-2">
+                              <label className="block text-xs text-gray-500 mb-1">Replace image (optional)</label>
+                              <input
+                                type="file"
+                                accept="image/jpeg,image/png,image/webp"
+                                onChange={(e) => setEditingBannerReplaceFile(e.target.files?.[0] || null)}
+                                className="input-field text-sm"
+                              />
+                              {editingBannerReplaceFile && <span className="text-xs text-gray-500 ml-2">{editingBannerReplaceFile.name}</span>}
+                            </div>
+                            <div>
+                              <label className="block text-xs text-gray-500 mb-1">Link URL</label>
+                              <input
+                                type="url"
+                                value={editingBannerForm.link_url}
+                                onChange={(e) => setEditingBannerForm((f) => ({ ...f, link_url: e.target.value }))}
+                                className="input-field text-sm"
+                                placeholder="https://..."
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-xs text-gray-500 mb-1">Priority</label>
+                              <input
+                                type="number"
+                                value={editingBannerForm.priority}
+                                onChange={(e) => setEditingBannerForm((f) => ({ ...f, priority: Number(e.target.value) || 0 }))}
+                                className="input-field text-sm"
+                              />
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <input
+                                type="checkbox"
+                                id="edit-banner-active"
+                                checked={editingBannerForm.active}
+                                onChange={(e) => setEditingBannerForm((f) => ({ ...f, active: e.target.checked }))}
+                              />
+                              <label htmlFor="edit-banner-active" className="text-sm">Active</label>
+                            </div>
+                          </div>
+                          <div className="flex gap-2 mt-3">
+                            <button type="button" onClick={handleUpdatePromoBanner} disabled={updatingBanner} className="btn-primary text-sm disabled:opacity-50">
+                              {updatingBanner ? 'Saving...' : 'Save'}
+                            </button>
+                            <button type="button" onClick={() => { setEditingBannerId(null); setEditingBannerReplaceFile(null); }} disabled={updatingBanner} className="px-3 py-1 border rounded text-sm disabled:opacity-50">Cancel</button>
+                          </div>
+                        </div>
+                      );
+                    })()}
+                    {promoBannerForm.show && (
+                      <div className="border rounded-lg p-4 bg-gray-50 dark:bg-gray-800">
+                        <p className="text-sm font-medium mb-2">Add banner</p>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                          <div>
+                            <label className="block text-xs text-gray-500 mb-1">Image *</label>
+                            <input
+                              type="file"
+                              accept="image/jpeg,image/png,image/webp"
+                              onChange={(e) => setPromoBannerForm((f) => ({ ...f, file: e.target.files?.[0] || null }))}
+                              className="input-field text-sm"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-xs text-gray-500 mb-1">Link URL (optional)</label>
+                            <input
+                              type="url"
+                              value={promoBannerForm.link_url}
+                              onChange={(e) => setPromoBannerForm((f) => ({ ...f, link_url: e.target.value }))}
+                              className="input-field text-sm"
+                              placeholder="https://..."
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-xs text-gray-500 mb-1">Priority</label>
+                            <input
+                              type="number"
+                              value={promoBannerForm.priority}
+                              onChange={(e) => setPromoBannerForm((f) => ({ ...f, priority: Number(e.target.value) || 0 }))}
+                              className="input-field text-sm"
+                            />
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <input
+                              type="checkbox"
+                              id="new-banner-active"
+                              checked={promoBannerForm.active}
+                              onChange={(e) => setPromoBannerForm((f) => ({ ...f, active: e.target.checked }))}
+                            />
+                            <label htmlFor="new-banner-active" className="text-sm">Active</label>
+                          </div>
+                        </div>
+                        <div className="flex gap-2 mt-3">
+                          <button type="button" onClick={handleAddPromoBanner} disabled={!promoBannerForm.file || uploadingNewBanner} className="btn-primary text-sm disabled:opacity-50">
+                            {uploadingNewBanner ? 'Uploading...' : 'Add'}
+                          </button>
+                          <button type="button" onClick={() => setPromoBannerForm({ show: false, file: null, link_url: '', priority: 0, active: true })} className="px-3 py-1 border rounded text-sm">Cancel</button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
+
             </div>
 
             {/* Color Scheme Settings */}

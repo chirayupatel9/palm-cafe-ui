@@ -1,12 +1,14 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
-import { Plus, Minus, Trash2, ShoppingCart, X, Search, User, Phone, Mail, MapPin, Clock, CheckCircle, XCircle, AlertCircle, CreditCard, Gift, Star, ChevronDown, ChevronUp, ChevronLeft, ChevronRight, Utensils, Coffee, Pizza, Sandwich, Salad, Cake, Wine, Heart, Sparkles, TrendingUp, Award, Zap, LogOut, Edit3, Save, Calendar, Menu, ShoppingBag } from 'lucide-react';
+import { Plus, Minus, Trash2, ShoppingCart, X, Search, User, Phone, Mail, MapPin, CheckCircle, ChevronLeft, ChevronRight, Utensils, Pizza, Sandwich, Salad, Cake, Wine, Star, LogOut, Edit3, Save, Menu, ShoppingBag } from 'lucide-react';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 import { useCurrency } from '../contexts/CurrencyContext';
 import { useCafeSettings } from '../contexts/CafeSettingsContext';
 import CustomerOrderHistory from './CustomerOrderHistory';
 import CustomerProfile from './CustomerProfile';
-import { getImageUrl, getPlaceholderImage, getCategoryBackground } from '../utils/imageUtils';
+import { getImageUrl, getPlaceholderImage } from '../utils/imageUtils';
+import { normalizeBannersFromBranding, getActiveBannersSorted } from '../utils/bannerUtils';
+import PromoBannerSection from './PromoBannerSection';
 
 const CustomerMenu = ({
   cafeSlug,
@@ -109,22 +111,13 @@ const CustomerMenu = ({
   const [mostOrderedItems, setMostOrderedItems] = useState([]);
   const [loadingMostOrdered, setLoadingMostOrdered] = useState(false);
   const [cafeBranding, setCafeBranding] = useState({ hero_image_url: null, promo_banner_image_url: null, logo_url: null });
+  const [loadingBranding, setLoadingBranding] = useState(true);
+  const [brandingError, setBrandingError] = useState(false);
 
   // Helper function to ensure price is a number
   const ensureNumber = (value) => {
     const num = parseFloat(value);
     return isNaN(num) ? 0 : num;
-  };
-
-  // Get category icon based on category name
-  const getCategoryIcon = (categoryName) => {
-    const name = categoryName.toLowerCase();
-    if (name.includes('burger') || name.includes('sandwich')) return <Sandwich className="h-6 w-6" />;
-    if (name.includes('pizza')) return <Pizza className="h-6 w-6" />;
-    if (name.includes('salad') || name.includes('vegetable')) return <Salad className="h-6 w-6" />;
-    if (name.includes('dessert') || name.includes('cake')) return <Cake className="h-6 w-6" />;
-    if (name.includes('coffee') || name.includes('tea') || name.includes('drink')) return <Wine className="h-6 w-6" />;
-    return <Utensils className="h-6 w-6" />;
   };
 
   // Fetch menu items, tax settings, and payment methods
@@ -359,8 +352,10 @@ const CustomerMenu = ({
     }
   };
 
-  // Fetch cafe branding (hero image, promo banner, logo, and basic cafe info)
+  // Fetch cafe branding (hero image, promo banner(s), logo, and basic cafe info)
   const fetchCafeBranding = async () => {
+    setLoadingBranding(true);
+    setBrandingError(false);
     try {
       const slugParam = cafeSlug ? `?cafeSlug=${cafeSlug}` : '';
       const response = await axios.get(`/menu/branding${slugParam}`);
@@ -372,12 +367,13 @@ const CustomerMenu = ({
           cafe_name: response.data.cafe_name || null,
           address: response.data.address || null,
           phone: response.data.phone || null,
-          email: response.data.email || null
+          email: response.data.email || null,
+          banners: response.data.banners || null
         });
       }
     } catch (error) {
       console.error('Error fetching cafe branding:', error);
-      // Gracefully handle error - use null values (will show fallback)
+      setBrandingError(true);
       setCafeBranding({
         hero_image_url: null,
         promo_banner_image_url: null,
@@ -385,10 +381,16 @@ const CustomerMenu = ({
         cafe_name: null,
         address: null,
         phone: null,
-        email: null
+        email: null,
+        banners: null
       });
+    } finally {
+      setLoadingBranding(false);
     }
   };
+
+  const promoBanners = useMemo(() => normalizeBannersFromBranding(cafeBranding), [cafeBranding]);
+  const activeBannersSorted = useMemo(() => getActiveBannersSorted(promoBanners), [promoBanners]);
 
   // Calculate subtotal
   const getSubtotal = () => {
@@ -1351,94 +1353,105 @@ const CustomerMenu = ({
                     })}
 
                   {/* All Dishes Section - Show at the end when "All" is selected and not searching */}
-                  {selectedCategory === 'All' && !searchQuery.trim() && (
-                    <div id="all-dishes-section" className="max-w-6xl mx-auto space-y-8">
-                      {/* Divider */}
-                      <div className="border-t border-dashed border-gray-300 mb-12"></div>
+                  {selectedCategory === 'All' && !searchQuery.trim() && (() => {
+                    const allItems = Object.values(groupedMenuItems).flat();
+                    const bannersToDistribute = activeBannersSorted.length >= 1 ? activeBannersSorted : [];
+                    const n = bannersToDistribute.length;
 
-                      {/* Category Header */}
-                      <div className="text-center mb-10">
-                        <div className="flex items-center justify-center mb-3">
-                          <div className="h-px w-12 bg-orange-500 mr-3"></div>
-                          <span className="text-xs uppercase tracking-wider text-gray-500 font-medium">Complete Selection</span>
+                    return (
+                      <div id="all-dishes-section" className="max-w-6xl mx-auto space-y-8">
+                        {/* Divider */}
+                        <div className="border-t border-dashed border-gray-300 mb-12"></div>
+
+                        {/* Category Header */}
+                        <div className="text-center mb-10">
+                          <div className="flex items-center justify-center mb-3">
+                            <div className="h-px w-12 bg-orange-500 mr-3"></div>
+                            <span className="text-xs uppercase tracking-wider text-gray-500 font-medium">Complete Selection</span>
+                          </div>
+                          <h2 className="text-3xl sm:text-4xl font-serif font-bold text-gray-900 mb-3">
+                            All Dishes
+                          </h2>
+                          <p className="text-gray-500 text-sm sm:text-base max-w-xl mx-auto leading-relaxed">
+                            Browse our complete menu selection with all available dishes.
+                          </p>
                         </div>
-                        <h2 className="text-3xl sm:text-4xl font-serif font-bold text-gray-900 mb-3">
-                          All Dishes
-                        </h2>
-                        <p className="text-gray-500 text-sm sm:text-base max-w-xl mx-auto leading-relaxed">
-                          Browse our complete menu selection with all available dishes.
-                        </p>
+
+                        {/* Menu items with banners distributed equally in between */}
+                        {n === 0 ? (
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-8">
+                            {allItems.map((item) => {
+                              const itemImage = item.image_url ? getImageUrl(item.image_url) : getPlaceholderImage(item.category_name, item.name);
+                              return (
+                                <div key={`all-${item.id}`} className="group flex items-start gap-4 p-4 bg-white rounded-lg hover:shadow-md transition-shadow">
+                                  <div className="flex-shrink-0 w-20 h-20 sm:w-24 sm:h-24 rounded-lg overflow-hidden bg-gray-100">
+                                    <img src={itemImage} alt={item.name} className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" />
+                                  </div>
+                                  <div className="flex-1 min-w-0">
+                                    <h5 className="text-base sm:text-lg font-semibold text-gray-900 mb-1">{item.name}</h5>
+                                    <p className="text-xs sm:text-sm text-gray-500 leading-relaxed line-clamp-2 mb-2">{item.description || 'Consectetur adipisicing elit. Soluta, impedit, saepe.'}</p>
+                                  </div>
+                                  <div className="flex flex-col items-end gap-2">
+                                    <span className="text-base sm:text-lg font-bold text-orange-500 whitespace-nowrap">{formatCurrency(ensureNumber(item.price))}</span>
+                                    <button onClick={(e) => { e.stopPropagation(); addToCart(item); }} className="w-10 h-10 rounded-full bg-orange-500 hover:bg-orange-600 text-white flex items-center justify-center transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-110 active:scale-95" aria-label={`Add ${item.name} to cart`}>
+                                      <ShoppingBag className="h-4 w-4" />
+                                    </button>
+                                  </div>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        ) : (
+                          Array.from({ length: n + 1 }).map((_, chunkIndex) => {
+                            const start = Math.round((chunkIndex * allItems.length) / (n + 1));
+                            const end = chunkIndex === n ? allItems.length : Math.round(((chunkIndex + 1) * allItems.length) / (n + 1));
+                            const chunkItems = allItems.slice(start, end);
+                            return (
+                              <React.Fragment key={`chunk-${chunkIndex}`}>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-8">
+                                  {chunkItems.map((item) => {
+                                    const itemImage = item.image_url ? getImageUrl(item.image_url) : getPlaceholderImage(item.category_name, item.name);
+                                    return (
+                                      <div key={`all-${item.id}`} className="group flex items-start gap-4 p-4 bg-white rounded-lg hover:shadow-md transition-shadow">
+                                        <div className="flex-shrink-0 w-20 h-20 sm:w-24 sm:h-24 rounded-lg overflow-hidden bg-gray-100">
+                                          <img src={itemImage} alt={item.name} className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" />
+                                        </div>
+                                        <div className="flex-1 min-w-0">
+                                          <h5 className="text-base sm:text-lg font-semibold text-gray-900 mb-1">{item.name}</h5>
+                                          <p className="text-xs sm:text-sm text-gray-500 leading-relaxed line-clamp-2 mb-2">{item.description || 'Consectetur adipisicing elit. Soluta, impedit, saepe.'}</p>
+                                        </div>
+                                        <div className="flex flex-col items-end gap-2">
+                                          <span className="text-base sm:text-lg font-bold text-orange-500 whitespace-nowrap">{formatCurrency(ensureNumber(item.price))}</span>
+                                          <button onClick={(e) => { e.stopPropagation(); addToCart(item); }} className="w-10 h-10 rounded-full bg-orange-500 hover:bg-orange-600 text-white flex items-center justify-center transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-110 active:scale-95" aria-label={`Add ${item.name} to cart`}>
+                                            <ShoppingBag className="h-4 w-4" />
+                                          </button>
+                                        </div>
+                                      </div>
+                                    );
+                                  })}
+                                </div>
+                                {chunkIndex < n && (
+                                  <PromoBannerSection banners={[bannersToDistribute[chunkIndex]]} loading={false} error={false} className="my-12" />
+                                )}
+                              </React.Fragment>
+                            );
+                          })
+                        )}
                       </div>
+                    );
+                  })()}
 
-                      {/* All Menu Items Grid - Horizontal Layout */}
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-8">
-                        {Object.values(groupedMenuItems).flat().map((item, index) => {
-                          const itemImage = item.image_url
-                            ? getImageUrl(item.image_url)
-                            : getPlaceholderImage(item.category_name, item.name);
-
-                          return (
-                            <div
-                              key={`all-${item.id}`}
-                              className="group flex items-start gap-4 p-4 bg-white rounded-lg hover:shadow-md transition-shadow"
-                            >
-                              {/* Menu Item Thumbnail */}
-                              <div className="flex-shrink-0 w-20 h-20 sm:w-24 sm:h-24 rounded-lg overflow-hidden bg-gray-100">
-                                <img
-                                  src={itemImage}
-                                  alt={item.name}
-                                  className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                                />
-                              </div>
-
-                              {/* Item Details */}
-                              <div className="flex-1 min-w-0">
-                                <h5 className="text-base sm:text-lg font-semibold text-gray-900 mb-1">
-                                  {item.name}
-                                </h5>
-                                <p className="text-xs sm:text-sm text-gray-500 leading-relaxed line-clamp-2 mb-2">
-                                  {item.description || 'Consectetur adipisicing elit. Soluta, impedit, saepe.'}
-                                </p>
-                              </div>
-
-                              {/* Price and Add to Cart */}
-                              <div className="flex flex-col items-end gap-2">
-                                <span className="text-base sm:text-lg font-bold text-orange-500 whitespace-nowrap">
-                                  {formatCurrency(ensureNumber(item.price))}
-                                </span>
-                                <button
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    addToCart(item);
-                                  }}
-                                  className="w-10 h-10 rounded-full bg-orange-500 hover:bg-orange-600 text-white flex items-center justify-center transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-110 active:scale-95"
-                                  aria-label={`Add ${item.name} to cart`}
-                                >
-                                  <ShoppingBag className="h-4 w-4" />
-                                </button>
-                              </div>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Promotional Banner - Only show if image exists */}
-                  {cafeBranding.promo_banner_image_url && (
-                    <div className="relative w-full -mt-8 sm:-mt-12 mb-16">
-                      <div
-                        className="relative max-w-full mx-auto h-[500px] sm:h-[600px] bg-cover bg-center bg-no-repeat"
-                        style={{
-                          backgroundImage: `url('${getImageUrl(cafeBranding.promo_banner_image_url)}')`
-                        }}
-                      >
-                      </div>
-                    </div>
+                  {/* Promotional Banners - only when not distributing (single category view or no banners) */}
+                  {!(selectedCategory === 'All' && !searchQuery.trim() && activeBannersSorted.length >= 1) && (
+                    <PromoBannerSection
+                      banners={promoBanners}
+                      loading={loadingBranding}
+                      error={brandingError}
+                    />
                   )}
 
                   {/* Special Proposals Section */}
-                  {mostOrderedItems.length > 0 && (
+                  {(loadingMostOrdered || mostOrderedItems.length > 0) && (
                     <div className="mt-16">
                       <div className="text-center mb-10">
                         <div className="flex items-center justify-center mb-3">
@@ -1456,7 +1469,18 @@ const CustomerMenu = ({
 
                       {/* Special Items Cards */}
                       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {mostOrderedItems.map((item, index) => {
+                        {loadingMostOrdered ? (
+                          [1, 2, 3].map((i) => (
+                            <div key={`special-skeleton-${i}`} className="bg-white rounded-xl overflow-hidden shadow-md animate-pulse">
+                              <div className="h-48 sm:h-56 bg-gray-200" />
+                              <div className="p-5">
+                                <div className="h-5 bg-gray-200 rounded w-3/4 mb-2" />
+                                <div className="h-4 bg-gray-100 rounded w-full mb-4" />
+                                <div className="h-10 bg-gray-200 rounded w-1/2" />
+                              </div>
+                            </div>
+                          ))
+                        ) : mostOrderedItems.map((item, index) => {
                           const specialImage = item.image_url
                             ? getImageUrl(item.image_url)
                             : getPlaceholderImage(item.category_name, item.name);
