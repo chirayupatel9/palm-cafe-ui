@@ -780,13 +780,14 @@ const CustomerMenu = ({
                       setSelectedCategory(categoryName);
                       setCategoryMenuOpen(false);
                     }}
-                    className={`flex min-h-[44px] items-center justify-start gap-x-2 rounded-lg px-4 py-2 cursor-pointer transition-colors text-left ${selectedCategory === categoryName
+                    className={`flex min-h-[44px] items-center justify-start gap-x-2 rounded-lg px-4 py-2 cursor-pointer transition-colors text-left min-w-0 ${selectedCategory === categoryName
                         ? 'bg-secondary-500 text-white'
                         : 'bg-accent-100 text-secondary-700 hover:bg-accent-200'
                       }`}
                     aria-label={`Filter by ${categoryName}`}
+                    title={categoryName}
                   >
-                    <p className={`text-sm font-medium ${selectedCategory === categoryName ? 'font-bold' : ''}`}>
+                    <p className={`text-sm font-medium truncate ${selectedCategory === categoryName ? 'font-bold' : ''}`}>
                       {categoryName}
                     </p>
                   </button>
@@ -1017,7 +1018,7 @@ const CustomerMenu = ({
 
               {/* Categories Showcase Section - Circular Carousel - Only show when "All" is selected */}
               {!searchQuery.trim() && selectedCategory === 'All' && Object.keys(groupedMenuItems).length > 0 && (
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-16">
+                <div data-categories-showcase className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-16">
                   <div className="text-center mb-10">
                     <div className="flex items-center justify-center mb-3">
                       <div className="h-px w-12 bg-orange-500 mr-3"></div>
@@ -1160,11 +1161,11 @@ const CustomerMenu = ({
                                 </div>
 
                                 {/* Category Info - Bottom */}
-                                <div className="absolute bottom-0 left-0 right-0 pb-3 sm:pb-4 text-center">
-                                  <h3 className="text-sm sm:text-base font-bold text-white mb-0.5 group-hover:text-orange-300 transition-colors drop-shadow-lg">
+                                <div className="absolute bottom-0 left-0 right-0 px-2 pb-3 sm:pb-4 text-center overflow-hidden min-w-0">
+                                  <h3 className="text-sm sm:text-base font-bold text-white mb-0.5 group-hover:text-orange-300 transition-colors drop-shadow-lg line-clamp-2 break-words leading-tight" title={categoryName}>
                                     {categoryName}
                                   </h3>
-                                  <p className="text-xs sm:text-sm text-white/90 drop-shadow-md">
+                                  <p className="text-xs sm:text-sm text-white/90 drop-shadow-md truncate">
                                     {itemCount} {itemCount === 1 ? 'item' : 'items'}
                                   </p>
                                 </div>
@@ -1248,6 +1249,25 @@ const CustomerMenu = ({
                 </div>
               ) : (
                 <div id="menu-items-section" className="w-full space-y-5">
+                  {/* Back to categories - when viewing a single category */}
+                  {!searchQuery.trim() && selectedCategory !== 'All' && (
+                    <div className="max-w-6xl mx-auto px-4 mb-6">
+                      <button
+                        onClick={() => {
+                          setSelectedCategory('All');
+                          setTimeout(() => {
+                            document.querySelector('[data-categories-showcase]')?.scrollIntoView({ behavior: 'smooth' });
+                          }, 0);
+                        }}
+                        className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-medium text-orange-600 bg-orange-50 border border-orange-200 hover:bg-orange-100 hover:border-orange-300 transition-colors duration-200"
+                        aria-label="Back to all categories"
+                      >
+                        <ChevronLeft className="h-4 w-4" strokeWidth={2.5} />
+                        <span>Back to categories</span>
+                      </button>
+                    </div>
+                  )}
+
                   {/* Search Results Header */}
                   {searchQuery.trim() && (
                     <div className="max-w-6xl mx-auto px-4">
