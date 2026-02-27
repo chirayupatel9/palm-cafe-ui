@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
-import { Plus, Minus, Trash2, ShoppingCart, X, Search, User, Phone, Mail, MapPin, CheckCircle, ChevronLeft, ChevronRight, Utensils, Pizza, Sandwich, Salad, Cake, Wine, Star, LogOut, Edit3, Save, Menu, ShoppingBag } from 'lucide-react';
+import { Plus, Minus, Trash2, ShoppingCart, X, Search, User, Phone, Mail, MapPin, CheckCircle, ChevronLeft, ChevronRight, ChevronDown, Utensils, Pizza, Sandwich, Salad, Cake, Wine, Star, LogOut, Edit3, Save, Menu, ShoppingBag } from 'lucide-react';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 import { useCurrency } from '../contexts/CurrencyContext';
@@ -62,6 +62,7 @@ const CustomerMenu = ({
   const [categoryCarouselIndex, setCategoryCarouselIndex] = useState(0);
   const [itemsPerView, setItemsPerView] = useState(3); // Responsive items per view (default to 3 for mobile)
   const [galleryExpanded, setGalleryExpanded] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
   const categoryScrollRef = useRef(null);
   const searchInputRef = useRef(null);
   const autocompleteRef = useRef(null);
@@ -195,6 +196,13 @@ const CustomerMenu = ({
     setFilteredMenuItems(filtered);
     setSelectedCategory('All'); // Reset category filter when searching
   }, [searchQuery, groupedMenuItems]);
+
+  // Header scroll state (DIR: bg when scrolled)
+  useEffect(() => {
+    const handleScroll = () => setIsScrolled(window.scrollY > 100);
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   // Focus search input when expanded
   useEffect(() => {
@@ -442,6 +450,11 @@ const CustomerMenu = ({
         item.id === itemId ? { ...item, quantity: newQuantity } : item
       )
     );
+  };
+
+  const getCartQuantity = (itemId) => {
+    const item = cart.find(i => i.id === itemId);
+    return item ? item.quantity : 0;
   };
 
   // Handle tip percentage change
@@ -720,508 +733,315 @@ const CustomerMenu = ({
 
   if (loading) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-background-light">
+      <div className="min-h-screen flex flex-col items-center justify-center bg-[#F6F4F0]">
         <div className="relative z-10 flex flex-col items-center">
-          <div className="w-20 h-20 bg-primary rounded-2xl flex items-center justify-center mb-6 shadow-2xl">
+          <div className="w-20 h-20 bg-[#C68E3C] rounded-2xl flex items-center justify-center mb-6 shadow-2xl">
             <Utensils className="h-10 w-10 text-white animate-pulse" />
           </div>
           <div className="relative">
-            <div className="animate-spin rounded-full h-16 w-16 border-4 border-primary/20 border-t-primary"></div>
+            <div className="animate-spin rounded-full h-16 w-16 border-4 border-[#C68E3C]/20 border-t-[#C68E3C]"></div>
           </div>
-          <p className="mt-6 text-xl font-medium text-text-light">Loading menu...</p>
+          <p className="mt-6 text-xl font-medium text-[#2A2A2A]">Loading menu...</p>
         </div>
       </div>
     );
   }
 
+  const getCategorySlug = (name) => (name || '').replace(/\s+/g, '-');
+
+  const scrollToCategory = (categoryName) => {
+    setSelectedCategory(categoryName);
+    const slug = getCategorySlug(categoryName);
+    const el = document.getElementById(slug ? `category-${slug}` : 'menu-items-section');
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
+
+  const scrollCarousel = (direction) => {
+    if (categoryCarouselRef.current) {
+      categoryCarouselRef.current.scrollBy({
+        left: direction === 'left' ? -220 : 220,
+        behavior: 'smooth'
+      });
+    }
+  };
+
   return (
     <div
-      className="relative w-full flex flex-col min-h-screen bg-white/80 overflow-x-hidden"
+      className="relative w-full flex flex-col min-h-screen bg-[#F6F4F0] overflow-x-hidden grain-overlay"
     >
-      {/* Mobile Category Menu - Hamburger Menu Overlay on Hero */}
+      {/* DIR-style fixed header */}
       {activeTab === 'menu' && (
-        <div className="lg:hidden fixed top-4 left-4 z-50 category-menu-container">
-          {/* Hamburger Button - Floating on Hero */}
-          <button
-            onClick={() => setCategoryMenuOpen(!categoryMenuOpen)}
-            className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full bg-white/90 backdrop-blur-sm shadow-lg hover:bg-white transition-colors"
-            aria-label="Toggle category menu"
-          >
-            {categoryMenuOpen ? (
-              <X className="h-6 w-6 text-gray-700" />
-            ) : (
-              <Menu className="h-6 w-6 text-gray-700" />
-            )}
-          </button>
-
-          {/* Category List - Shown when hamburger is clicked */}
-          {categoryMenuOpen && (
-            <div className="absolute top-14 left-0 w-64 bg-white rounded-lg shadow-xl border border-accent-200 overflow-hidden">
-              <div
-                ref={categoryScrollRef}
-                className="flex flex-col gap-1 max-h-[60vh] overflow-y-auto p-2"
+        <header
+          className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
+            isScrolled ? 'bg-white/90 backdrop-blur-xl shadow-lg' : 'bg-transparent'
+          }`}
+        >
+          <div className="flex items-center justify-between px-4 sm:px-6 lg:px-8 h-16 sm:h-20">
+            <div className="flex items-center relative category-menu-container">
+              <button
+                onClick={() => setCategoryMenuOpen(!categoryMenuOpen)}
+                className={`lg:hidden min-h-[44px] min-w-[44px] flex items-center justify-center rounded-full transition-colors ${
+                  isScrolled ? 'hover:bg-[#E9E4DA] text-[#2A2A2A]' : 'hover:bg-white/10 text-white'
+                }`}
+                aria-label="Open menu"
               >
-                <button
-                  onClick={() => {
-                    setSelectedCategory('All');
-                    setCategoryMenuOpen(false);
-                  }}
-                  className={`flex min-h-[44px] items-center justify-start gap-x-2 rounded-lg px-4 py-2 cursor-pointer transition-colors text-left ${selectedCategory === 'All'
-                      ? 'bg-secondary-500 text-white'
-                      : 'bg-accent-100 text-secondary-700 hover:bg-accent-200'
-                    }`}
-                  aria-label="Show all categories"
-                >
-                  <p className={`text-sm font-medium ${selectedCategory === 'All' ? 'font-bold' : ''}`}>
-                    All
-                  </p>
-                </button>
-                {Object.keys(groupedMenuItems).map((categoryName) => (
-                  <button
-                    key={categoryName}
-                    onClick={() => {
-                      setSelectedCategory(categoryName);
-                      setCategoryMenuOpen(false);
-                    }}
-                    className={`flex min-h-[44px] items-center justify-start gap-x-2 rounded-lg px-4 py-2 cursor-pointer transition-colors text-left min-w-0 ${selectedCategory === categoryName
-                        ? 'bg-secondary-500 text-white'
-                        : 'bg-accent-100 text-secondary-700 hover:bg-accent-200'
-                      }`}
-                    aria-label={`Filter by ${categoryName}`}
-                    title={categoryName}
-                  >
-                    <p className={`text-sm font-medium truncate ${selectedCategory === categoryName ? 'font-bold' : ''}`}>
-                      {categoryName}
-                    </p>
-                  </button>
-                ))}
-              </div>
+                <Menu className="h-5 w-5" />
+              </button>
+              {categoryMenuOpen && (
+                <div className="lg:hidden absolute top-full left-0 mt-2 w-64 bg-[#F6F4F0] rounded-xl shadow-xl border border-[#2A2A2A]/10 overflow-hidden z-50">
+                  <div ref={categoryScrollRef} className="max-h-[60vh] overflow-y-auto p-2">
+                    <button onClick={() => { setSelectedCategory('All'); setCategoryMenuOpen(false); document.getElementById('menu-section')?.scrollIntoView({ behavior: 'smooth' }); }} className="w-full text-left px-4 py-3.5 text-base font-medium rounded-xl hover:bg-white transition-colors min-h-[44px]">All</button>
+                    {Object.keys(groupedMenuItems).map((cat) => (
+                      <button key={cat} onClick={() => { setSelectedCategory(cat); setCategoryMenuOpen(false); scrollToCategory(cat); }} className="w-full text-left px-4 py-3.5 text-base font-medium rounded-xl hover:bg-white transition-colors min-h-[44px]">{cat}</button>
+                    ))}
+                    <div className="border-t border-[#2A2A2A]/10 my-4" />
+                    <button onClick={() => { if (customer) { setShowProfile(true); setProfileOpenSection('orders'); } else onOpenLoginForOrders?.(); setCategoryMenuOpen(false); }} className="w-full text-left px-4 py-3.5 text-base font-medium rounded-xl hover:bg-white transition-colors min-h-[44px] flex items-center gap-3">
+                      <CheckCircle className="h-5 w-5 text-[#6F6A63]" />
+                      My Orders
+                    </button>
+                  </div>
+                </div>
+              )}
+              <nav className="hidden lg:flex items-center gap-1">
+                <button onClick={() => document.getElementById('menu-section')?.scrollIntoView({ behavior: 'smooth' })} className={`font-mono text-xs uppercase tracking-[0.15em] min-h-[44px] rounded-full px-5 transition-all ${isScrolled ? 'text-[#2A2A2A] hover:bg-[#E9E4DA]' : 'text-white hover:bg-white/10'}`}>Menu</button>
+                <button onClick={() => { if (customer) { setShowProfile(true); setProfileOpenSection('orders'); } else onOpenLoginForOrders?.(); }} className={`font-mono text-xs uppercase tracking-[0.15em] min-h-[44px] rounded-full px-5 transition-all ${isScrolled ? 'text-[#2A2A2A] hover:bg-[#E9E4DA]' : 'text-white hover:bg-white/10'}`}>Order History</button>
+              </nav>
             </div>
-          )}
-        </div>
+            <div className={`absolute left-1/2 -translate-x-1/2 font-bold text-xl sm:text-2xl tracking-tight transition-colors duration-300 ${isScrolled ? 'text-[#2A2A2A]' : 'text-white'}`}>
+              <button type="button" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>{cafeBranding.cafe_name || 'Brew & Bloom'}</button>
+            </div>
+            <div className="flex items-center gap-1 sm:gap-2">
+              <button onClick={() => { if (customer) { setShowProfile(true); setProfileOpenSection('orders'); } else onOpenLoginForOrders?.(); }} className={`hidden sm:flex font-mono text-xs uppercase tracking-[0.15em] min-h-[44px] rounded-full px-5 transition-all ${isScrolled ? 'text-[#2A2A2A] hover:bg-[#E9E4DA]' : 'text-white hover:bg-white/10'}`}>{customer ? 'My Orders' : 'Login'}</button>
+              {customer && (
+                <button onClick={() => { setProfileOpenSection(null); setShowProfile(true); }} className={`min-h-[44px] min-w-[44px] flex items-center justify-center rounded-full transition-all ${isScrolled ? 'text-[#2A2A2A] hover:bg-[#E9E4DA]' : 'text-white hover:bg-white/10'}`} aria-label="Profile">
+                  <User className="h-5 w-5" />
+                </button>
+              )}
+              <button onClick={() => setShowCart(true)} className={`relative min-h-[44px] min-w-[44px] flex items-center justify-center rounded-full transition-all ${isScrolled ? 'text-[#2A2A2A] hover:bg-[#E9E4DA]' : 'text-white hover:bg-white/10'}`} aria-label="Cart">
+                <ShoppingBag className="h-5 w-5" />
+                {cart.length > 0 && (
+                  <span className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-xs bg-[#C68E3C] text-white border-2 border-white rounded-full font-medium">{cart.reduce((t, i) => t + i.quantity, 0)}</span>
+                )}
+              </button>
+            </div>
+          </div>
+        </header>
       )}
-
 
       {/* Main Content */}
       <main className="min-h-screen w-full overflow-x-hidden">
-        <div className="w-full max-w-full pb-12 sm:pb-16 bg-white">
+        <div id="menu-section" className="w-full max-w-full pb-12 sm:pb-16 bg-[#F6F4F0]">
           {activeTab === 'menu' ? (
             <div>
-              {/* Hero Section with Background Image */}
-              <div className="relative w-full mb-8 sm:mb-16">
+              {/* Hero - DIR: min-h-screen, gradients, blobs, REF headline, scroll hint */}
+              <section className="relative min-h-screen w-full flex items-center justify-center overflow-hidden">
                 <div
-                  className="relative h-[300px] sm:h-[400px] md:h-[500px] bg-cover bg-center bg-no-repeat"
+                  className="absolute inset-0 z-0 bg-cover bg-center bg-no-repeat"
                   style={{
                     backgroundImage: cafeBranding.hero_image_url
-                      ? `linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('${getImageUrl(cafeBranding.hero_image_url)}')`
-                      : `linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), linear-gradient(135deg, #667eea 0%, #764ba2 100%)`
+                      ? `url('${getImageUrl(cafeBranding.hero_image_url)}')`
+                      : 'linear-gradient(135deg, #2A2A2A 0%, #1a1a1a 100%)'
                   }}
                 >
-                  {/* Header Overlay - Fixed at top */}
-                  <div className="absolute top-0 left-0 right-0 z-30 pointer-events-none">
-                    <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-                      <div className="flex items-center justify-end h-16 pointer-events-auto">
-                        {/* Logo and Title */}
-
-                        {/* <div className="flex flex-1 justify-center items-center gap-3">
-                          {cafeBranding.logo_url && (
-                            <img
-                              src={getImageUrl(cafeBranding.logo_url)}
-                              alt={`${cafeBranding.cafe_name || 'Cafe'} Logo`}
-                              className="h-10 w-10 rounded-full"
-                            />
-                          )}
-                          {cafeBranding.cafe_name && (
-                            <h1 className="text-2xl font-bold text-white">
-                              {cafeBranding.cafe_name}
-                            </h1>
-                          )}
-                        </div> */}
-
-                        {/* Navigation - My Orders opens profile orders section when logged in; login modal when not */}
-                        <nav className="flex items-center gap-4 md:gap-8">
-                          <button
-                            onClick={() => {
-                              if (customer) {
-                                setProfileOpenSection('orders');
-                                setShowProfile(true);
-                              } else if (onOpenLoginForOrders) {
-                                onOpenLoginForOrders();
-                              }
-                            }}
-                            className={`text-sm font-medium transition-colors text-white min-h-[44px] min-w-[44px] flex items-center justify-center px-2 ${(activeTab === 'history' || (showProfile && profileOpenSection === 'orders'))
-                              ? 'font-semibold'
-                              : 'hover:text-orange-300'
-                              }`}
-                            aria-label={customer ? 'View my orders' : 'Login to view my orders'}
-                          >
-                            {customer ? 'My Orders' : 'Login / My Orders'}
-                          </button>
-                        </nav>
-
-                        {/* Right Side Icons */}
-                        <div className="flex items-center gap-3">
-                          {/* Cart */}
-                          <button
-                            onClick={() => setShowCart(true)}
-                            className="relative min-w-[44px] min-h-[44px] w-11 h-11 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center text-white transition-colors"
-                            aria-label="View cart"
-                          >
-                            <ShoppingBag className="h-5 w-5" />
-                            {cart.length > 0 && (
-                              <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-orange-500 text-xs font-bold text-white">
-                                {cart.reduce((total, item) => total + item.quantity, 0)}
-                              </span>
-                            )}
-                          </button>
-
-                          {/* User Profile - Only show when logged in */}
-                          {customer && (
-                            <button
-                              onClick={() => { setProfileOpenSection(null); setShowProfile(true); }}
-                              className="flex items-center justify-center min-h-[44px] min-w-[44px] h-11 w-11 rounded-full bg-white/20 hover:bg-white/30 text-white transition-colors"
-                              title={customer.name}
-                              aria-label="View profile"
-                            >
-                              <User className="h-5 w-5" />
-                            </button>
-                          )}
-                        </div>
+                  <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/30 to-black/60" />
+                  <div className="absolute inset-0 bg-gradient-to-r from-black/30 via-transparent to-black/30" />
+                  <div className="absolute inset-0 opacity-[0.03] mix-blend-overlay pointer-events-none" style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E")` }} />
+                </div>
+                <div className="absolute inset-0 z-[1] pointer-events-none overflow-hidden">
+                  <div className="absolute top-1/4 -left-20 w-64 h-64 bg-[#C68E3C]/10 rounded-full blur-3xl float-slow" />
+                  <div className="absolute bottom-1/4 -right-20 w-80 h-80 bg-[#C68E3C]/5 rounded-full blur-3xl float" />
+                </div>
+                <div className="relative z-10 w-full max-w-4xl mx-auto px-6 py-20 text-center">
+                  {/* Logo - DIR (glass-dark for icon, border for image) */}
+                  <div className="mb-10">
+                    {cafeBranding.logo_url ? (
+                      <img src={getImageUrl(cafeBranding.logo_url)} alt="" className="inline-block w-20 h-20 sm:w-24 sm:h-24 rounded-full border border-white/10 shadow-2xl object-cover" />
+                    ) : (
+                      <div className="inline-flex items-center justify-center w-20 h-20 sm:w-24 sm:h-24 rounded-full glass-dark border border-white/10 shadow-2xl">
+                        <Utensils className="w-10 h-10 sm:w-12 sm:h-12 text-white" />
                       </div>
-                    </div>
+                    )}
                   </div>
-                  <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-4 sm:pt-0">
-                    <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-serif font-bold mb-3 sm:mb-4 text-white">
-                      <div className="flex items-center justify-center gap-3">
-                        {cafeBranding.logo_url && (
-                          <img
-                            src={getImageUrl(cafeBranding.logo_url)}
-                            alt={`${cafeBranding.cafe_name || 'Cafe'} Logo`}
-                            className="h-16 w-16 rounded-full"
-                          />
-                        )}
-                        {cafeBranding.cafe_name && (
-                          <h1 className="text-4xl font-bold text-white">
-                            {cafeBranding.cafe_name}
-                          </h1>
-                        )}
-                      </div>
+                  {/* Headline - REF exact copy */}
+                  <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-8 leading-[1.1] tracking-tight">
+                    <span className="inline-block">Crafted</span>{' '}
+                    <span className="inline-block">coffee</span>{' '}
+                    <span className="inline-block italic font-serif font-medium">&</span>
+                    <br className="hidden sm:block" />
+                    <span className="inline-block">seasonal</span>{' '}
+                    <span className="inline-block">plates</span>
+                    <br className="hidden sm:block" />
+                    <span className="inline-block text-[#C68E3C]">made</span>{' '}
+                    <span className="inline-block text-[#C68E3C]">to</span>{' '}
+                    <span className="inline-block text-[#C68E3C]">linger.</span>
+                  </h1>
+                  <p className="text-lg sm:text-xl text-white/70 mb-10 max-w-xl mx-auto font-light leading-relaxed">
+                    Search the menu, pick a category, or scroll to see what&apos;s fresh today.
+                  </p>
 
-                    </h1>
-
-                    <div className="flex flex-col items-center gap-4 w-full">
-                      {/* Search Bar Container */}
-                      <div className="relative w-full max-w-2xl">
-                        {!searchExpanded ? (
-                          /* Search Button - Initial State */
-                          <button
-                            onClick={() => setSearchExpanded(true)}
-                            className="w-full px-4 sm:px-6 py-3 sm:py-4 min-h-[44px] bg-white/95 hover:bg-white text-gray-700 font-medium rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 flex items-center justify-center gap-3 group"
-                            aria-label="Search menu"
-                          >
-                            <Search className="h-5 w-5 text-gray-400 group-hover:text-orange-500 transition-colors" />
-                            <span className="text-gray-500 group-hover:text-gray-700 text-sm sm:text-base">Search menu...</span>
-                          </button>
-                        ) : (
-                          /* Expanded Search Bar */
-                          <div className="relative w-full animate-in fade-in slide-in-from-top-2 duration-300">
-                            <div className="relative">
-                              <Search className="absolute left-5 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400 z-10" />
-                              <input
-                                ref={searchInputRef}
-                                type="text"
-                                placeholder="Search menu items, categories..."
-                                value={searchQuery}
-                                onChange={(e) => {
-                                  setSearchQuery(e.target.value);
-                                  setSelectedSuggestionIndex(-1);
-                                }}
-                                onKeyDown={handleSearchKeyDown}
-                                onFocus={() => {
-                                  if (autocompleteSuggestions.length > 0) {
-                                    setShowAutocomplete(true);
-                                  }
-                                }}
-                                onBlur={(e) => {
-                                  // Don't close if clicking on autocomplete or clear button
-                                  if (
-                                    !e.relatedTarget?.closest('.autocomplete-suggestion') &&
-                                    !e.relatedTarget?.closest('.search-clear-btn') &&
-                                    !searchQuery
-                                  ) {
-                                    setTimeout(() => {
-                                      setSearchExpanded(false);
-                                      setShowAutocomplete(false);
-                                    }, 200);
-                                  }
-                                }}
-                                className="w-full pl-12 sm:pl-14 pr-12 sm:pr-14 py-3 sm:py-4 min-h-[44px] rounded-full bg-white border-2 border-orange-300 text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-4 focus:ring-orange-200 focus:border-orange-500 shadow-2xl transition-all text-sm sm:text-base"
-                                autoFocus
-                              />
-                              {searchQuery && (
-                                <button
-                                  onMouseDown={(e) => e.preventDefault()}
-                                  onClick={() => {
-                                    setSearchQuery('');
-                                    setShowAutocomplete(false);
-                                    setSelectedSuggestionIndex(-1);
-                                    setSearchExpanded(false);
-                                  }}
-                                  className="search-clear-btn absolute right-5 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-orange-500 transition-colors p-1 rounded-full hover:bg-gray-100"
-                                >
-                                  <X className="h-5 w-5" />
-                                </button>
-                              )}
-
-                              {/* Autocomplete Suggestions */}
-                              {showAutocomplete && autocompleteSuggestions.length > 0 && (
-                                <div
-                                  ref={autocompleteRef}
-                                  className="absolute top-full left-0 right-0 mt-2 bg-white rounded-2xl shadow-2xl border border-gray-200 overflow-hidden z-50 max-h-80 overflow-y-auto"
-                                >
-                                  {autocompleteSuggestions.map((suggestion, index) => (
-                                    <button
-                                      key={`${suggestion.name}-${index}`}
-                                      type="button"
-                                      onClick={() => handleSuggestionClick(suggestion)}
-                                      onMouseDown={(e) => e.preventDefault()}
-                                      className={`autocomplete-suggestion w-full px-5 py-3 text-left hover:bg-orange-50 transition-colors flex items-center justify-between ${selectedSuggestionIndex === index
-                                        ? 'bg-orange-50'
-                                        : ''
-                                        }`}
-                                    >
-                                      <div className="flex-1">
-                                        <div className="font-medium text-gray-900">
-                                          {suggestion.name}
-                                        </div>
-                                        {suggestion.category && (
-                                          <div className="text-sm text-gray-500">
-                                            {suggestion.category}
-                                          </div>
-                                        )}
-                                      </div>
-                                      <Search className="h-4 w-4 text-gray-400" />
-                                    </button>
-                                  ))}
-                                </div>
-                              )}
-                            </div>
-                          </div>
-                        )}
-                      </div>
+                  {/* Search - always visible, DIR py-6 */}
+                  <div className="relative max-w-xl mx-auto mb-10">
+                    <div className="relative group">
+                      <Search className="absolute left-5 top-1/2 -translate-y-1/2 h-5 w-5 text-white/50 group-focus-within:text-[#C68E3C] transition-colors" />
+                      <input
+                        ref={searchInputRef}
+                        type="text"
+                        placeholder="Search menu items, categories..."
+                        value={searchQuery}
+                        onChange={(e) => { setSearchQuery(e.target.value); setSelectedSuggestionIndex(-1); }}
+                        onKeyDown={handleSearchKeyDown}
+                        onFocus={() => { if (autocompleteSuggestions.length > 0) setShowAutocomplete(true); }}
+                        onBlur={(e) => {
+                          if (!e.relatedTarget?.closest('.autocomplete-suggestion') && !e.relatedTarget?.closest('.search-clear-btn')) {
+                            setTimeout(() => setShowAutocomplete(false), 200);
+                          }
+                        }}
+                        className="w-full pl-14 pr-12 py-6 text-base rounded-2xl bg-white/10 backdrop-blur-xl border border-white/20 text-white placeholder:text-white/40 focus:bg-white/15 focus:border-[#C68E3C]/50 focus:ring-2 focus:ring-[#C68E3C]/20 transition-all duration-300"
+                      />
+                      {searchQuery && (
+                        <button type="button" onClick={() => { setSearchQuery(''); setShowAutocomplete(false); setSelectedSuggestionIndex(-1); }} className="search-clear-btn absolute right-4 top-1/2 -translate-y-1/2 p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors" aria-label="Clear search">
+                          <X className="h-4 w-4 text-white/60" />
+                        </button>
+                      )}
                     </div>
+                    {showAutocomplete && autocompleteSuggestions.length > 0 && (
+                      <div ref={autocompleteRef} className="absolute top-full left-0 right-0 mt-3 bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl overflow-hidden z-50 border border-white/20">
+                        {autocompleteSuggestions.map((suggestion, index) => (
+                          <button key={`${suggestion.name}-${index}`} type="button" onClick={() => handleSuggestionClick(suggestion)} onMouseDown={(e) => e.preventDefault()} className={`autocomplete-suggestion w-full px-5 py-4 text-left flex items-center justify-between hover:bg-[#F6F4F0] transition-colors ${selectedSuggestionIndex === index ? 'bg-[#F6F4F0]' : ''}`}>
+                            <span className="font-medium text-[#2A2A2A]">{suggestion.name}</span>
+                            {suggestion.category && <span className="font-mono text-xs uppercase tracking-wider text-[#6F6A63] bg-[#E9E4DA] px-2 py-1 rounded">{suggestion.category}</span>}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                    {showAutocomplete && searchQuery && autocompleteSuggestions.length === 0 && (
+                      <div className="absolute top-full left-0 right-0 mt-3 bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl p-6 text-center z-50">
+                        <p className="text-[#6F6A63]">No results found</p>
+                      </div>
+                    )}
                   </div>
-                  {/* Side Icons */}
-                  <div className="absolute right-4 top-1/2 transform -translate-y-1/2 flex flex-col gap-4 hidden sm:flex">
 
+                  {/* Category Chips - DIR */}
+                  {!searchQuery.trim() && Object.keys(groupedMenuItems).length > 0 && (
+                    <div className="flex flex-wrap justify-center gap-3">
+                      <button onClick={() => { setSelectedCategory('All'); document.getElementById('menu-section')?.scrollIntoView({ behavior: 'smooth', block: 'start' }); }} className={`px-5 sm:px-6 py-3 rounded-full font-mono text-xs sm:text-sm uppercase tracking-widest transition-all duration-300 min-h-[44px] ${selectedCategory === 'All' ? 'bg-[#C68E3C] text-white shadow-lg shadow-[#C68E3C]/30' : 'bg-white/10 backdrop-blur-sm text-white border border-white/20 hover:bg-white/20 hover:border-white/40 hover:shadow-lg'}`} aria-label="Show all categories">All</button>
+                      {Object.keys(groupedMenuItems).map((categoryName) => (
+                        <button key={categoryName} onClick={() => scrollToCategory(categoryName)} className={`px-5 sm:px-6 py-3 rounded-full font-mono text-xs sm:text-sm uppercase tracking-widest transition-all duration-300 min-h-[44px] truncate max-w-[180px] ${selectedCategory === categoryName ? 'bg-[#C68E3C] text-white shadow-lg shadow-[#C68E3C]/30' : 'bg-white/10 backdrop-blur-sm text-white border border-white/20 hover:bg-white/20 hover:border-white/40 hover:shadow-lg'}`} aria-label={`Filter by ${categoryName}`} title={categoryName}>{categoryName}</button>
+                      ))}
+                    </div>
+                  )}
 
+                  {/* Scroll hint - DIR */}
+                  <div className="mt-16 flex flex-col items-center gap-3">
+                    <span className="font-mono text-xs uppercase tracking-[0.2em] text-white/40">Scroll to explore</span>
+                    <div className="w-6 h-10 rounded-full border-2 border-white/30 flex justify-center pt-2">
+                      <div className="w-1.5 h-3 bg-white/50 rounded-full animate-bounce" />
+                    </div>
                   </div>
                 </div>
-              </div>
+              </section>
 
-              {/* Categories Showcase Section - Circular Carousel - Only show when "All" is selected */}
+              {/* Categories Showcase Section - DIR "Our Categories" carousel */}
               {!searchQuery.trim() && selectedCategory === 'All' && Object.keys(groupedMenuItems).length > 0 && (
-                <div data-categories-showcase className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-16">
-                  <div className="text-center mb-10">
-                    <div className="flex items-center justify-center mb-3">
-                      <div className="h-px w-12 bg-orange-500 mr-3"></div>
-                      <span className="text-xs uppercase tracking-wider text-gray-500 font-medium">Explore</span>
-                      <div className="h-px w-12 bg-orange-500 ml-3"></div>
+                <section className="py-16 sm:py-24 bg-[#F6F4F0] relative overflow-hidden">
+                  <div className="absolute top-0 right-0 w-96 h-96 bg-[#C68E3C]/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
+                  <div className="absolute bottom-0 left-0 w-64 h-64 bg-[#C68E3C]/5 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2" />
+                  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+                    <div className="flex items-end justify-between mb-12">
+                      <div>
+                        <span className="font-mono text-xs uppercase tracking-[0.2em] text-[#C68E3C] mb-3 block">
+                          Browse
+                        </span>
+                        <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-[#2A2A2A] tracking-tight">
+                          Our Categories
+                        </h2>
+                      </div>
+                      <div className="hidden sm:flex items-center gap-3">
+                        <button type="button" onClick={() => scrollCarousel('left')} className="rounded-full border border-[#2A2A2A]/10 hover:bg-[#2A2A2A] hover:text-white hover:border-[#2A2A2A] transition-all duration-300 min-h-[44px] min-w-[44px] w-12 h-12 flex items-center justify-center" aria-label="Scroll left">
+                          <ChevronLeft className="h-5 w-5" />
+                        </button>
+                        <button type="button" onClick={() => scrollCarousel('right')} className="rounded-full border border-[#2A2A2A]/10 hover:bg-[#2A2A2A] hover:text-white hover:border-[#2A2A2A] transition-all duration-300 min-h-[44px] min-w-[44px] w-12 h-12 flex items-center justify-center" aria-label="Scroll right">
+                          <ChevronRight className="h-5 w-5" />
+                        </button>
+                      </div>
                     </div>
-                    <h2 className="text-3xl sm:text-4xl font-serif font-bold text-gray-900 mb-3">
-                      Our Categories
-                    </h2>
-                    <p className="text-gray-500 text-sm sm:text-base max-w-xl mx-auto leading-relaxed">
-                      Discover our delicious selection organized by category
-                    </p>
-                  </div>
 
-                  {/* Categories Carousel */}
-                  <div className="relative px-8 sm:px-12">
-                    {/* Navigation Arrows */}
-                    {(() => {
-                      const categories = Object.keys(groupedMenuItems);
-                      // Responsive items per view: 2 on mobile, 3 on tablet, 4 on desktop
-                      // Show arrows if we have more categories than items per view
-                      if (categories.length <= itemsPerView) return null;
-
-                      // Calculate max index based on current itemsPerView
-                      const totalSlides = Math.ceil(categories.length / itemsPerView);
-                      const maxIndex = Math.max(0, totalSlides - 1);
-
-                      return (
-                        <>
-                          <button
-                            onClick={() => {
-                              setCategoryCarouselIndex(prev => prev > 0 ? prev - 1 : maxIndex);
-                            }}
-                            className="absolute left-0 top-1/2 -translate-y-1/2 z-10 min-w-[44px] min-h-[44px] w-11 h-11 sm:w-12 sm:h-12 bg-white rounded-full shadow-lg flex items-center justify-center hover:bg-orange-500 hover:text-white transition-all duration-300 group"
-                            aria-label="Previous categories"
-                          >
-                            <ChevronLeft className="h-5 w-5 sm:h-6 sm:w-6 text-gray-700 group-hover:text-white" />
-                          </button>
-                          <button
-                            onClick={() => {
-                              setCategoryCarouselIndex(prev => prev < maxIndex ? prev + 1 : 0);
-                            }}
-                            className="absolute right-0 top-1/2 -translate-y-1/2 z-10 min-w-[44px] min-h-[44px] w-11 h-11 sm:w-12 sm:h-12 bg-white rounded-full shadow-lg flex items-center justify-center hover:bg-orange-500 hover:text-white transition-all duration-300 group"
-                            aria-label="Next categories"
-                          >
-                            <ChevronRight className="h-5 w-5 sm:h-6 sm:w-6 text-gray-700 group-hover:text-white" />
-                          </button>
-                        </>
-                      );
-                    })()}
-
-                    {/* Carousel Container */}
+                    {/* Carousel - horizontal scroll DIR style */}
                     <div
                       ref={categoryCarouselRef}
-                      className="overflow-hidden"
+                      className="flex gap-5 sm:gap-6 overflow-x-auto pb-6 -mx-4 px-4 sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8 scrollbar-hide"
+                      style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
                       onTouchStart={(e) => {
-                        if (!categoryCarouselRef.current) {
-                          categoryCarouselRef.current = {};
-                        }
+                        if (!categoryCarouselRef.current) categoryCarouselRef.current = {};
                         categoryCarouselRef.current.touchStartX = e.touches[0].clientX;
                       }}
                       onTouchEnd={(e) => {
                         if (!categoryCarouselRef.current?.touchStartX) return;
                         const touchEndX = e.changedTouches[0].clientX;
                         const diff = categoryCarouselRef.current.touchStartX - touchEndX;
-                        const threshold = 50;
-
-                        if (Math.abs(diff) > threshold) {
+                        if (Math.abs(diff) > 50) {
                           const categories = Object.keys(groupedMenuItems);
                           const totalSlides = Math.ceil(categories.length / itemsPerView);
                           const maxIndex = Math.max(0, totalSlides - 1);
-
                           if (diff > 0) {
-                            // Swipe left - next
-                            setCategoryCarouselIndex(prev => {
-                              if (categories.length <= itemsPerView) return 0;
-                              return prev < maxIndex ? prev + 1 : 0;
-                            });
+                            setCategoryCarouselIndex(prev => (prev < maxIndex ? prev + 1 : 0));
                           } else {
-                            // Swipe right - previous
-                            setCategoryCarouselIndex(prev => {
-                              if (categories.length <= itemsPerView) return 0;
-                              return prev > 0 ? prev - 1 : maxIndex;
-                            });
+                            setCategoryCarouselIndex(prev => (prev > 0 ? prev - 1 : maxIndex));
                           }
                         }
-                        if (categoryCarouselRef.current) {
-                          categoryCarouselRef.current.touchStartX = null;
-                        }
+                        if (categoryCarouselRef.current) categoryCarouselRef.current.touchStartX = null;
                       }}
                     >
-                      <div
-                        className="flex transition-transform duration-500 ease-in-out"
-                        style={{
-                          // Move by one item width at a time based on current screen size
-                          // Each item width = 100% / itemsPerView
-                          // Mobile: 50% per item (2 items), Tablet: 33.33% per item (3 items), Desktop: 25% per item (4 items)
-                          transform: `translateX(-${categoryCarouselIndex * (100 / itemsPerView)}%)`
-                        }}
-                      >
-                        {Object.keys(groupedMenuItems).map((categoryName, index) => {
-                          // Get a menu item image from this category (use first item with image for consistency)
-                          const categoryItems = groupedMenuItems[categoryName];
-                          const itemsWithImages = categoryItems.filter(item => item.image_url);
-                          let categoryImage;
+                      {Object.keys(groupedMenuItems).map((categoryName) => {
+                        const categoryItems = groupedMenuItems[categoryName];
+                        const itemsWithImages = categoryItems.filter(item => item.image_url);
+                        const categoryImage = itemsWithImages.length > 0
+                          ? getImageUrl(itemsWithImages[0].image_url)
+                          : getPlaceholderImage(categoryName);
+                        const itemCount = categoryItems.length;
 
-                          if (itemsWithImages.length > 0) {
-                            // Use first item with image for consistent display (or use index % length for variety)
-                            const selectedItem = itemsWithImages[index % itemsWithImages.length];
-                            categoryImage = getImageUrl(selectedItem.image_url);
-                          } else {
-                            // Fallback to placeholder if no images in category
-                            categoryImage = getPlaceholderImage(categoryName);
-                          }
-
-                          const itemCount = groupedMenuItems[categoryName].length;
-
-                          return (
-                            <div
-                              key={categoryName}
-                              className="flex-shrink-0 w-1/3 sm:w-1/3 md:w-1/4 px-2 sm:px-3 flex justify-center"
-                            >
-                              <button
-                                onClick={() => {
-                                  setSelectedCategory(categoryName);
-                                  window.scrollBy({ top: 10, behavior: 'smooth' });
-                                }}
-                                className="group relative w-28 h-28 sm:w-36 sm:h-36 md:w-40 md:h-40 lg:w-44 lg:h-44 overflow-hidden rounded-full bg-white transition-all duration-300 min-w-[112px] min-h-[112px]"
-                                aria-label={`View ${categoryName} category`}
-                              >
-                                {/* Circular Category Image */}
-                                <div className="relative w-full h-full overflow-hidden rounded-full">
-                                  <img
-                                    src={categoryImage}
-                                    alt={categoryName}
-                                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                                  />
-                                  {/* Overlay gradient */}
-                                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent rounded-full"></div>
-                                </div>
-
-                                {/* Category Info - Bottom */}
-                                <div className="absolute bottom-0 left-0 right-0 px-2 pb-3 sm:pb-4 text-center overflow-hidden min-w-0">
-                                  <h3 className="text-sm sm:text-base font-bold text-white mb-0.5 group-hover:text-orange-300 transition-colors drop-shadow-lg line-clamp-2 break-words leading-tight" title={categoryName}>
-                                    {categoryName}
-                                  </h3>
-                                  <p className="text-xs sm:text-sm text-white/90 drop-shadow-md truncate">
-                                    {itemCount} {itemCount === 1 ? 'item' : 'items'}
-                                  </p>
-                                </div>
-                              </button>
+                        return (
+                          <button
+                            key={categoryName}
+                            onClick={() => scrollToCategory(categoryName)}
+                            className="flex-shrink-0 group text-center min-w-[128px]"
+                            aria-label={`View ${categoryName} category`}
+                          >
+                            <div className="relative w-32 h-32 sm:w-40 sm:h-40 md:w-48 md:h-48 rounded-full overflow-hidden mb-5 shadow-lg group-hover:shadow-2xl transition-all duration-500 mx-auto">
+                              <img
+                                src={categoryImage}
+                                alt={categoryName}
+                                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
+                              />
+                              <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                              <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-500">
+                                <span className="text-white font-mono text-xs uppercase tracking-widest bg-black/30 backdrop-blur-sm px-3 py-1.5 rounded-full">
+                                  View
+                                </span>
+                              </div>
                             </div>
-                          );
-                        })}
-                      </div>
+                            <p className="font-medium text-sm sm:text-base text-[#2A2A2A] group-hover:text-[#C68E3C] transition-colors duration-300">
+                              {categoryName}
+                            </p>
+                            <p className="font-mono text-xs text-[#6F6A63] mt-1">
+                              {itemCount} items
+                            </p>
+                          </button>
+                        );
+                      })}
                     </div>
 
-                    {/* Carousel Dots Indicator */}
-                    {(() => {
-                      const categories = Object.keys(groupedMenuItems);
-                      // Calculate total slides based on current itemsPerView
-                      const totalSlides = Math.max(1, Math.ceil(categories.length / itemsPerView));
-
-                      if (categories.length <= itemsPerView) {
-                        // If we have fewer or equal categories than items per view, no dots needed
-                        return null;
-                      }
-
-                      // Calculate max valid index (last slide that shows items)
-                      const maxValidIndex = Math.max(0, totalSlides - 1);
-
-                      // Ensure current index doesn't exceed max
-                      if (categoryCarouselIndex > maxValidIndex) {
-                        setCategoryCarouselIndex(maxValidIndex);
-                      }
-
-                      return (
-                        <div className="flex justify-center gap-2 mt-6">
-                          {Array.from({ length: totalSlides }).map((_, index) => (
-                            <button
-                              key={index}
-                              onClick={() => setCategoryCarouselIndex(index)}
-                              className="relative h-2 rounded-full transition-all duration-300 min-h-[44px] min-w-[44px] flex items-center justify-center"
-                              aria-label={`Go to slide ${index + 1}`}
-                            >
-                              <span className={`absolute h-2 rounded-full transition-all duration-300 ${categoryCarouselIndex === index
-                                  ? 'w-8 bg-orange-500'
-                                  : 'w-2 bg-gray-300'
-                                }`} />
-                            </button>
-                          ))}
-                        </div>
-                      );
-                    })()}
+                    <div className="flex justify-center gap-2 mt-6 sm:hidden">
+                      {Object.keys(groupedMenuItems).map((_, i) => (
+                        <div key={i} className="w-1.5 h-1.5 rounded-full bg-[#2A2A2A]/20" />
+                      ))}
+                    </div>
                   </div>
-                </div>
+                </section>
               )}
 
               {Object.keys(groupedMenuItems).length === 0 ? (
-                <div className="text-center py-12">
+                <div className="text-center py-16 bg-[#F6F4F0]">
                   {cafeBranding.logo_url && (
                     <img
                       src={getImageUrl(cafeBranding.logo_url)}
@@ -1229,15 +1049,15 @@ const CustomerMenu = ({
                       className="h-24 w-24 mx-auto mb-6 opacity-50"
                     />
                   )}
-                  <h3 className="text-xl font-semibold mb-2 text-gray-900">No menu items available</h3>
-                  <p className="text-base text-gray-500">Add items in Menu Management to get started</p>
+                  <h3 className="text-xl font-semibold mb-2 text-[#2A2A2A]">No menu items available</h3>
+                  <p className="text-base text-[#6F6A63]">Add items in Menu Management to get started</p>
                 </div>
               ) : searchQuery.trim() && Object.keys(filteredMenuItems).length === 0 ? (
-                <div className="text-center py-12 max-w-6xl mx-auto">
-                  <Search className="h-16 w-16 mx-auto mb-4 text-gray-400" />
-                  <h3 className="text-xl font-semibold mb-2 text-gray-900">No results found</h3>
-                  <p className="text-base text-gray-500 mb-4">
-                    We couldn't find any items matching "{searchQuery}"
+                <div className="text-center py-16 max-w-6xl mx-auto bg-[#F6F4F0]">
+                  <Search className="h-16 w-16 mx-auto mb-4 text-[#6F6A63]" />
+                  <h3 className="text-xl font-semibold mb-2 text-[#2A2A2A]">No results found</h3>
+                  <p className="text-base text-[#6F6A63] mb-4">
+                    We couldn&apos;t find any items matching &quot;{searchQuery}&quot;
                   </p>
                   <button
                     onClick={() => {
@@ -1245,24 +1065,22 @@ const CustomerMenu = ({
                       setShowAutocomplete(false);
                       setSelectedSuggestionIndex(-1);
                     }}
-                    className="px-6 py-2 bg-orange-500 hover:bg-orange-600 text-white font-medium rounded-full transition-colors"
+                    className="px-6 py-3 bg-[#2A2A2A] hover:bg-[#C68E3C] text-white font-medium rounded-xl transition-colors min-h-[44px]"
                   >
                     Clear search
                   </button>
                 </div>
               ) : (
-                <div id="menu-items-section" className="w-full space-y-5 scroll-mt-40">
+                <div id="menu-items-section" className="w-full space-y-0 scroll-mt-40">
                   {/* Back to categories - when viewing a single category */}
                   {!searchQuery.trim() && selectedCategory !== 'All' && (
-                    <div className="max-w-6xl mx-auto px-4 mb-6">
+                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 mb-6">
                       <button
                         onClick={() => {
                           setSelectedCategory('All');
-                          setTimeout(() => {
-                            document.querySelector('[data-categories-showcase]')?.scrollIntoView({ behavior: 'smooth' });
-                          }, 0);
+                          document.getElementById('menu-section')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
                         }}
-                        className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-medium text-orange-600 bg-orange-50 border border-orange-200 hover:bg-orange-100 hover:border-orange-300 transition-colors duration-200"
+                        className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-medium text-[#2A2A2A] bg-[#E9E4DA] border border-[#2A2A2A]/10 hover:bg-[#C68E3C] hover:text-white hover:border-[#C68E3C] transition-colors duration-200 min-h-[44px]"
                         aria-label="Back to all categories"
                       >
                         <ChevronLeft className="h-4 w-4" strokeWidth={2.5} />
@@ -1271,12 +1089,11 @@ const CustomerMenu = ({
                     </div>
                   )}
 
-                  {/* Search Results Header */}
                   {searchQuery.trim() && (
-                    <div className="max-w-6xl mx-auto px-4">
-                      <div className="flex items-center justify-between mb-4">
-                        <h3 className="text-lg font-semibold text-gray-900">
-                          Search Results for "{searchQuery}"
+                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
+                      <div className="flex items-center justify-between mb-6">
+                        <h3 className="text-lg font-semibold text-[#2A2A2A]">
+                          Search Results for &quot;{searchQuery}&quot;
                         </h3>
                         <button
                           onClick={() => {
@@ -1284,7 +1101,7 @@ const CustomerMenu = ({
                             setShowAutocomplete(false);
                             setSelectedSuggestionIndex(-1);
                           }}
-                          className="text-sm text-orange-500 hover:text-orange-600 transition-colors"
+                          className="text-sm text-[#C68E3C] hover:text-[#2A2A2A] transition-colors"
                         >
                           Clear search
                         </button>
@@ -1292,373 +1109,323 @@ const CustomerMenu = ({
                     </div>
                   )}
 
-                  {/* Individual Category Sections - Show first */}
+                  {/* Category Sections - DIR layout: number badge + title + card grid */}
                   {Object.entries(searchQuery.trim() ? filteredMenuItems : groupedMenuItems)
                     .filter(([categoryName]) => selectedCategory === 'All' || categoryName === selectedCategory)
                     .map(([categoryName, items], index) => {
                       const categoryNumber = String(index + 1).padStart(2, '0');
+                      const slug = getCategorySlug(categoryName);
                       return (
-                        <div key={categoryName} className="max-w-6xl mx-auto space-y-8space-y-5">
-                          {/* Divider before category (except first one) */}
-                          {((selectedCategory === 'All' && index > 0) || (selectedCategory !== 'All' && index > 0)) && (
-                            <div className="border-t border-dashed border-gray-300 mb-12"></div>
-                          )}
-
-                          {/* Category Header */}
-                          <div className="text-center mb-10">
-                            <div className="flex items-center justify-center mb-3">
-                              <div className="h-px w-12 bg-orange-500 mr-3"></div>
-                              <span className="text-xs uppercase tracking-wider text-gray-500 font-medium">{categoryNumber}</span>
+                        <section
+                          key={categoryName}
+                          id={slug ? `category-${slug}` : undefined}
+                          className="py-16 sm:py-24 bg-[#F6F4F0] relative scroll-mt-24"
+                        >
+                          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#C68E3C]/[0.02] to-transparent pointer-events-none" />
+                          <div className="px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto relative z-10">
+                            <div className="mb-12 sm:mb-16">
+                              <div className="flex items-baseline gap-4 mb-4">
+                                <span className="font-mono text-sm text-[#C68E3C] bg-[#C68E3C]/10 px-3 py-1 rounded-full">
+                                  {categoryNumber}
+                                </span>
+                                <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-[#2A2A2A] tracking-tight">
+                                  {categoryName}
+                                </h2>
+                              </div>
                             </div>
-                            <h2 className="text-3xl sm:text-4xl font-serif font-bold text-gray-900 mb-3">
-                              {categoryName}
-                            </h2>
-                            <p className="text-gray-500 text-sm sm:text-base max-w-xl mx-auto leading-relaxed">
-                              {/* Porro eveniet, autem ipsam corrupti consectetur cum. Repudiandae dignissimos fugiat sit nam. */}
-                              {/* {categoryDescription} */}
-                            </p>
+
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+                              {items.map((item) => {
+                                const itemImage = item.image_url
+                                  ? getImageUrl(item.image_url)
+                                  : getPlaceholderImage(item.category_name, item.name);
+                                const quantity = getCartQuantity(item.id);
+
+                                return (
+                                  <div
+                                    key={item.id}
+                                    className="group overflow-hidden border-0 bg-white rounded-2xl shadow-sm hover:shadow-2xl transition-all duration-500 ease-out hover:-translate-y-2"
+                                  >
+                                    <div className="relative aspect-[4/3] overflow-hidden">
+                                      <img
+                                        src={itemImage}
+                                        alt={item.name}
+                                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
+                                      />
+                                      <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                                      <div className="absolute top-4 right-4 bg-white/95 backdrop-blur-sm px-3 py-1.5 rounded-full shadow-lg">
+                                        <span className="font-mono text-sm font-medium text-[#C68E3C]">
+                                          {formatCurrency(ensureNumber(item.price))}
+                                        </span>
+                                      </div>
+                                    </div>
+                                    <div className="p-5 sm:p-6">
+                                      <h3 className="font-semibold text-lg sm:text-xl text-[#2A2A2A] mb-2 group-hover:text-[#C68E3C] transition-colors duration-300">
+                                        {item.name}
+                                      </h3>
+                                      <p className="text-sm text-[#6F6A63] mb-5 line-clamp-2 leading-relaxed">
+                                        {item.description || 'Delicious choice from our menu.'}
+                                      </p>
+                                      {quantity === 0 ? (
+                                        <button
+                                          onClick={(e) => { e.stopPropagation(); addToCart(item); }}
+                                          className="w-full bg-[#2A2A2A] hover:bg-[#C68E3C] text-white transition-all duration-300 rounded-xl py-5 flex items-center justify-center gap-2 min-h-[44px] font-medium"
+                                          aria-label={`Add ${item.name} to cart`}
+                                        >
+                                          <ShoppingBag className="h-4 w-4" />
+                                          Add to cart
+                                        </button>
+                                      ) : (
+                                        <div className="flex items-center justify-between bg-[#F6F4F0] rounded-xl p-2">
+                                          <button
+                                            type="button"
+                                            onClick={() => updateQuantity(item.id, quantity - 1)}
+                                            className="h-11 w-11 rounded-full bg-white hover:bg-[#E9E4DA] shadow-sm flex items-center justify-center min-w-[44px] min-h-[44px] transition-all duration-200 hover:scale-105"
+                                            aria-label="Decrease quantity"
+                                          >
+                                            <Minus className="h-4 w-4" />
+                                          </button>
+                                          <span className="font-mono text-lg font-medium text-[#2A2A2A]">{quantity}</span>
+                                          <button
+                                            type="button"
+                                            onClick={() => updateQuantity(item.id, quantity + 1)}
+                                            className="h-11 w-11 rounded-full bg-white hover:bg-[#E9E4DA] shadow-sm flex items-center justify-center min-w-[44px] min-h-[44px] transition-all duration-200 hover:scale-105"
+                                            aria-label="Increase quantity"
+                                          >
+                                            <Plus className="h-4 w-4" />
+                                          </button>
+                                        </div>
+                                      )}
+                                    </div>
+                                  </div>
+                                );
+                              })}
+                            </div>
                           </div>
-
-                          {/* Menu Items Grid - Horizontal Layout */}
-                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-8">
-                            {items.map((item, itemIndex) => {
-                              const itemImage = item.image_url
-                                ? getImageUrl(item.image_url)
-                                : getPlaceholderImage(item.category_name, item.name);
-
-                              return (
-                                <div
-                                  key={item.id}
-                                  className="group flex items-start gap-4 p-4 bg-white rounded-lg hover:shadow-md hover:bg-orange-100 transition-shadow mask-hover"
-
-                                >
-                                  {/* Menu Item Thumbnail */}
-                                  <div className="flex-shrink-0 w-20 h-20 sm:w-24 sm:h-24 rounded-lg overflow-hidden bg-gray-100">
-                                    <img
-                                      src={itemImage}
-                                      alt={item.name}
-                                      className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                                    />
-                                  </div>
-
-                                  {/* Item Details */}
-                                  <div className="flex-1 min-w-0">
-                                    <h5 className="text-base sm:text-lg font-semibold text-gray-900 mb-1">
-                                      {item.name}
-                                    </h5>
-                                    <p className="text-xs sm:text-sm text-gray-500 leading-relaxed line-clamp-2 mb-2">
-                                      {item.description || 'Consectetur adipisicing elit. Soluta, impedit, saepe.'}
-                                    </p>
-                                  </div>
-
-                                  {/* Price and Add to Cart */}
-                                  <div className="flex flex-col items-end gap-2">
-                                    <span className="text-base sm:text-lg font-bold text-orange-500 whitespace-nowrap">
-                                      {formatCurrency(ensureNumber(item.price))}
-                                    </span>
-                                    <button
-                                      onClick={(e) => {
-                                        e.stopPropagation();
-                                        addToCart(item);
-                                      }}
-                                      className="w-10 h-10 rounded-full bg-orange-500 hover:bg-orange-600 text-white flex items-center justify-center transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-110 active:scale-95"
-                                      aria-label={`Add ${item.name} to cart`}
-                                    >
-                                      <ShoppingBag className="h-4 w-4" />
-                                    </button>
-                                  </div>
-                                </div>
-                              );
-                            })}
-                          </div>
-                        </div>
+                        </section>
                       );
                     })}
 
-                  {/* All Dishes Section - Show at the end when "All" is selected and not searching */}
-                  {selectedCategory === 'All' && !searchQuery.trim() && (() => {
-                    const allItems = Object.values(groupedMenuItems).flat();
-                    const bannersToDistribute = activeBannersSorted.length >= 1 ? activeBannersSorted : [];
-                    const n = bannersToDistribute.length;
+                  {/* Promo Banner - DIR placement after category sections */}
+                  <PromoBannerSection
+                    banners={promoBanners}
+                    loading={loadingBranding}
+                    error={brandingError}
+                  />
 
-                    return (
-                      <div id="all-dishes-section" className="max-w-6xl mx-auto space-y-8">
-                        {/* Divider */}
-                        <div className="border-t border-dashed border-gray-300 mb-12"></div>
-
-                        {/* Category Header */}
-                        <div className="text-center mb-10">
-                          <div className="flex items-center justify-center mb-3">
-                            <div className="h-px w-12 bg-orange-500 mr-3"></div>
-                            <span className="text-xs uppercase tracking-wider text-gray-500 font-medium">Complete Selection</span>
+                  {/* Special Proposals - DIR style (#E9E4DA bg, Featured pill, Popular badge) */}
+                  {(loadingMostOrdered || mostOrderedItems.length > 0) && (
+                    <section className="py-20 sm:py-28 bg-[#E9E4DA] relative overflow-hidden">
+                      <div className="absolute top-0 left-1/4 w-96 h-96 bg-[#C68E3C]/10 rounded-full blur-3xl -translate-y-1/2" />
+                      <div className="absolute bottom-0 right-1/4 w-80 h-80 bg-[#C68E3C]/5 rounded-full blur-3xl translate-y-1/2" />
+                      <div className="absolute inset-0 opacity-[0.02]" style={{ backgroundImage: 'radial-gradient(circle at 1px 1px, #2A2A2A 1px, transparent 0)', backgroundSize: '40px 40px' }} />
+                      <div className="px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto relative z-10">
+                        <div className="text-center mb-14 sm:mb-20">
+                          <div className="inline-flex items-center gap-2 bg-white/80 backdrop-blur-sm px-4 py-2 rounded-full mb-6 shadow-sm">
+                            <Star className="h-4 w-4 text-[#C68E3C] fill-[#C68E3C]" />
+                            <span className="font-mono text-xs uppercase tracking-[0.2em] text-[#6F6A63]">
+                              Featured
+                            </span>
                           </div>
-                          <h2 className="text-3xl sm:text-4xl font-serif font-bold text-gray-900 mb-3">
-                            All Dishes
+                          <h2 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-[#2A2A2A] mb-5 tracking-tight">
+                            Special Proposals
                           </h2>
-                          <p className="text-gray-500 text-sm sm:text-base max-w-xl mx-auto leading-relaxed">
-                            Browse our complete menu selection with all available dishes.
+                          <p className="text-[#6F6A63] max-w-lg mx-auto text-lg leading-relaxed">
+                            Our most popular items, handpicked for first-timers and regulars alike.
                           </p>
                         </div>
 
-                        {/* Menu items with banners distributed equally in between */}
-                        {n === 0 ? (
-                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-8">
-                            {allItems.map((item) => {
-                              const itemImage = item.image_url ? getImageUrl(item.image_url) : getPlaceholderImage(item.category_name, item.name);
-                              return (
-                                <div key={`all-${item.id}`} className="group flex items-start gap-4 p-4 bg-white rounded-lg hover:shadow-md transition-shadow">
-                                  <div className="flex-shrink-0 w-20 h-20 sm:w-24 sm:h-24 rounded-lg overflow-hidden bg-gray-100">
-                                    <img src={itemImage} alt={item.name} className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" />
-                                  </div>
-                                  <div className="flex-1 min-w-0">
-                                    <h5 className="text-base sm:text-lg font-semibold text-gray-900 mb-1">{item.name}</h5>
-                                    <p className="text-xs sm:text-sm text-gray-500 leading-relaxed line-clamp-2 mb-2">{item.description || 'Consectetur adipisicing elit. Soluta, impedit, saepe.'}</p>
-                                  </div>
-                                  <div className="flex flex-col items-end gap-2">
-                                    <span className="text-base sm:text-lg font-bold text-orange-500 whitespace-nowrap">{formatCurrency(ensureNumber(item.price))}</span>
-                                    <button onClick={(e) => { e.stopPropagation(); addToCart(item); }} className="w-10 h-10 rounded-full bg-orange-500 hover:bg-orange-600 text-white flex items-center justify-center transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-110 active:scale-95" aria-label={`Add ${item.name} to cart`}>
-                                      <ShoppingBag className="h-4 w-4" />
-                                    </button>
-                                  </div>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+                          {loadingMostOrdered ? (
+                            [1, 2, 3].map((i) => (
+                              <div key={`special-skeleton-${i}`} className="bg-white rounded-2xl overflow-hidden shadow-lg animate-pulse">
+                                <div className="aspect-[16/10] bg-[#E9E4DA]" />
+                                <div className="p-5 sm:p-6">
+                                  <div className="h-5 bg-[#E9E4DA] rounded w-3/4 mb-2" />
+                                  <div className="h-4 bg-[#E9E4DA]/60 rounded w-full mb-4" />
+                                  <div className="h-12 bg-[#E9E4DA] rounded-xl w-1/2" />
                                 </div>
-                              );
-                            })}
-                          </div>
-                        ) : (
-                          Array.from({ length: n + 1 }).map((_, chunkIndex) => {
-                            const start = Math.round((chunkIndex * allItems.length) / (n + 1));
-                            const end = chunkIndex === n ? allItems.length : Math.round(((chunkIndex + 1) * allItems.length) / (n + 1));
-                            const chunkItems = allItems.slice(start, end);
+                              </div>
+                            ))
+                          ) : mostOrderedItems.map((item) => {
+                            const specialImage = item.image_url
+                              ? getImageUrl(item.image_url)
+                              : getPlaceholderImage(item.category_name, item.name);
+                            const quantity = getCartQuantity(item.id);
+
                             return (
-                              <React.Fragment key={`chunk-${chunkIndex}`}>
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-8">
-                                  {chunkItems.map((item) => {
-                                    const itemImage = item.image_url ? getImageUrl(item.image_url) : getPlaceholderImage(item.category_name, item.name);
-                                    return (
-                                      <div key={`all-${item.id}`} className="group flex items-start gap-4 p-4 bg-white rounded-lg hover:shadow-md transition-shadow">
-                                        <div className="flex-shrink-0 w-20 h-20 sm:w-24 sm:h-24 rounded-lg overflow-hidden bg-gray-100">
-                                          <img src={itemImage} alt={item.name} className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" />
-                                        </div>
-                                        <div className="flex-1 min-w-0">
-                                          <h5 className="text-base sm:text-lg font-semibold text-gray-900 mb-1">{item.name}</h5>
-                                          <p className="text-xs sm:text-sm text-gray-500 leading-relaxed line-clamp-2 mb-2">{item.description || 'Consectetur adipisicing elit. Soluta, impedit, saepe.'}</p>
-                                        </div>
-                                        <div className="flex flex-col items-end gap-2">
-                                          <span className="text-base sm:text-lg font-bold text-orange-500 whitespace-nowrap">{formatCurrency(ensureNumber(item.price))}</span>
-                                          <button onClick={(e) => { e.stopPropagation(); addToCart(item); }} className="w-10 h-10 rounded-full bg-orange-500 hover:bg-orange-600 text-white flex items-center justify-center transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-110 active:scale-95" aria-label={`Add ${item.name} to cart`}>
-                                            <ShoppingBag className="h-4 w-4" />
-                                          </button>
-                                        </div>
-                                      </div>
-                                    );
-                                  })}
-                                </div>
-                                {chunkIndex < n && (
-                                  <PromoBannerSection banners={[bannersToDistribute[chunkIndex]]} loading={false} error={false} className="my-12" />
-                                )}
-                              </React.Fragment>
-                            );
-                          })
-                        )}
-                      </div>
-                    );
-                  })()}
-
-                  {/* Promotional Banners - only when not distributing (single category view or no banners) */}
-                  {!(selectedCategory === 'All' && !searchQuery.trim() && activeBannersSorted.length >= 1) && (
-                    <PromoBannerSection
-                      banners={promoBanners}
-                      loading={loadingBranding}
-                      error={brandingError}
-                    />
-                  )}
-
-                  {/* Special Proposals Section */}
-                  {(loadingMostOrdered || mostOrderedItems.length > 0) && (
-                    <div className="mt-16">
-                      <div className="text-center mb-10">
-                        <div className="flex items-center justify-center mb-3">
-                          <div className="h-px w-12 bg-orange-500 mr-3"></div>
-                          <span className="text-xs uppercase tracking-wider text-gray-500 font-medium">Featured</span>
-                          <div className="h-px w-12 bg-orange-500 ml-3"></div>
-                        </div>
-                        <h2 className="text-3xl sm:text-4xl font-serif font-bold text-gray-900 mb-3">
-                          Special Proposals
-                        </h2>
-                        <p className="text-gray-500 text-sm sm:text-base max-w-xl mx-auto leading-relaxed">
-                          Our most popular items, loved by our customers
-                        </p>
-                      </div>
-
-                      {/* Special Items Cards */}
-                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {loadingMostOrdered ? (
-                          [1, 2, 3].map((i) => (
-                            <div key={`special-skeleton-${i}`} className="bg-white rounded-xl overflow-hidden shadow-md animate-pulse">
-                              <div className="h-48 sm:h-56 bg-gray-200" />
-                              <div className="p-5">
-                                <div className="h-5 bg-gray-200 rounded w-3/4 mb-2" />
-                                <div className="h-4 bg-gray-100 rounded w-full mb-4" />
-                                <div className="h-10 bg-gray-200 rounded w-1/2" />
-                              </div>
-                            </div>
-                          ))
-                        ) : mostOrderedItems.map((item, index) => {
-                          const specialImage = item.image_url
-                            ? getImageUrl(item.image_url)
-                            : getPlaceholderImage(item.category_name, item.name);
-
-                          return (
-                            <div
-                              key={`special-${item.id}`}
-                              className="group bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-shadow"
-                            >
-                              {/* Item Image */}
-                              <div className="relative h-48 sm:h-56 overflow-hidden">
-                                <img
-                                  src={specialImage}
-                                  alt={item.name}
-                                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                                />
-                              </div>
-
-                              {/* Item Details */}
-                              <div className="p-5">
-                                <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                                  {item.name}
-                                </h3>
-                                <p className="text-sm text-gray-500 leading-relaxed mb-4 line-clamp-2">
-                                  {item.description || 'A customer favorite'}
-                                </p>
-
-                                {/* Price and Add to Cart */}
-                                <div className="flex items-center justify-between">
-                                  <div className="flex items-center gap-2">
-                                    <span className="text-xl font-bold text-orange-500">
+                              <div
+                                key={`special-${item.id}`}
+                                className="group overflow-hidden border-0 bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 ease-out hover:-translate-y-3"
+                              >
+                                <div className="relative aspect-[16/10] overflow-hidden">
+                                  <img
+                                    src={specialImage}
+                                    alt={item.name}
+                                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
+                                  />
+                                  <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
+                                  <div className="absolute top-4 right-4 bg-white/95 backdrop-blur-sm px-4 py-2 rounded-full shadow-lg">
+                                    <span className="font-mono text-sm font-semibold text-[#C68E3C]">
                                       {formatCurrency(ensureNumber(item.price))}
                                     </span>
                                   </div>
-                                  <button
-                                    onClick={() => addToCart(item)}
-                                    className="w-10 h-10 rounded-full bg-orange-500 hover:bg-orange-600 text-white flex items-center justify-center transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-110 active:scale-95"
-                                    aria-label={`Add ${item.name} to cart`}
-                                  >
-                                    <ShoppingBag className="h-4 w-4" />
-                                  </button>
+                                  <div className="absolute top-4 left-4 bg-[#C68E3C] text-white px-3 py-1.5 rounded-full shadow-lg flex items-center gap-1.5">
+                                    <Star className="h-3 w-3 fill-white" />
+                                    <span className="font-mono text-xs uppercase tracking-wider">Popular</span>
+                                  </div>
                                 </div>
-                              </div>
-                            </div>
-                          );
-                        })}
-                      </div>
-
-                      {/* View All Products Button */}
-                      <div className="text-center mt-10">
-                        <button
-                          onClick={() => document.getElementById('all-dishes-section')?.scrollIntoView({ behavior: 'smooth' })}
-                          className="inline-flex items-center gap-2 px-8 py-3 bg-orange-500 hover:bg-orange-600 text-white font-semibold rounded-full transition-colors"
-                        >
-                          All Products
-                        </button>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Footer Section */}
-                  <div className="mt-20 pt-16 border-t max-w-6xl mx-auto space-y-8 border-gray-200">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-
-
-                      {/* Contact Info Column */}
-                      <div className="px-4 sm:px-6">
-                        <h3 className="text-xl font-serif font-bold text-orange-500 mb-4">Contact Info</h3>
-                        <p className="text-gray-600 text-sm leading-relaxed mb-4">
-                          Have questions or want to make a reservation? We'd love to hear from you. Reach out to us for any inquiries.
-                        </p>
-                        {cafeBranding && (
-                          <div className="space-y-3 text-sm">
-                            {cafeBranding.cafe_name && (
-                              <div className="flex items-start gap-2">
-                                <MapPin className="h-4 w-4 text-orange-500 mt-1 flex-shrink-0" />
-                                <span className="text-gray-700 font-medium">{cafeBranding.cafe_name}</span>
-                              </div>
-                            )}
-                            {cafeBranding.address && (
-                              <div className="flex items-start gap-2">
-                                <MapPin className="h-4 w-4 text-orange-500 mt-1 flex-shrink-0" />
-                                <span className="text-gray-600">{cafeBranding.address}</span>
-                              </div>
-                            )}
-                            {cafeBranding.phone && (
-                              <div className="flex items-center gap-2">
-                                <Phone className="h-4 w-4 text-orange-500 flex-shrink-0" />
-                                <a href={`tel:${cafeBranding.phone}`} className="text-gray-600 hover:text-orange-500 transition-colors">
-                                  {cafeBranding.phone}
-                                </a>
-                              </div>
-                            )}
-                            {cafeBranding.email && (
-                              <div className="flex items-center gap-2">
-                                <Mail className="h-4 w-4 text-orange-500 flex-shrink-0" />
-                                <a href={`mailto:${cafeBranding.email}`} className="text-gray-600 hover:text-orange-500 transition-colors">
-                                  {cafeBranding.email}
-                                </a>
-                              </div>
-                            )}
-                            {cafeSettings.website && (
-                              <div className="flex items-center gap-2">
-                                <MapPin className="h-4 w-4 text-orange-500 flex-shrink-0" />
-                                <a href={cafeSettings.website} target="_blank" rel="noopener noreferrer" className="text-gray-600 hover:text-orange-500 transition-colors">
-                                  {cafeSettings.website}
-                                </a>
-                              </div>
-                            )}
-                          </div>
-                        )}
-                      </div>
-
-                      {/* Gallery Column */}
-                      <div className="px-4 sm:px-6">
-                        <h3 className="text-xl font-serif font-bold text-orange-500 mb-4">Gallery</h3>
-                        <div className="grid grid-cols-3 gap-2 mb-4">
-                          {galleryItems.map((item, idx) => {
-                            const imageUrl = item.image_url
-                              ? getImageUrl(item.image_url)
-                              : getPlaceholderImage(item.category_name, item.name);
-
-                            return (
-                              <div key={`gallery-${idx}-${item.id || idx}`} className="aspect-square rounded-lg overflow-hidden">
-                                <img
-                                  src={imageUrl}
-                                  alt={item.name || `Gallery ${idx + 1}`}
-                                  className="w-full h-full object-cover hover:scale-110 transition-transform duration-300"
-                                />
+                                <div className="p-5 sm:p-6">
+                                  <h3 className="font-semibold text-xl text-[#2A2A2A] mb-2 group-hover:text-[#C68E3C] transition-colors duration-300">
+                                    {item.name}
+                                  </h3>
+                                  <p className="text-sm text-[#6F6A63] mb-5 line-clamp-2 leading-relaxed">
+                                    {item.description || 'A customer favorite.'}
+                                  </p>
+                                  {quantity === 0 ? (
+                                    <button
+                                      onClick={() => addToCart(item)}
+                                      className="w-full bg-[#2A2A2A] hover:bg-[#C68E3C] text-white transition-all duration-300 rounded-xl py-5 flex items-center justify-center gap-2 min-h-[44px] font-medium"
+                                      aria-label={`Add ${item.name} to cart`}
+                                    >
+                                      <ShoppingBag className="h-4 w-4" />
+                                      Add to cart
+                                    </button>
+                                  ) : (
+                                    <div className="flex items-center justify-between bg-[#F6F4F0] rounded-xl p-2">
+                                      <button
+                                        type="button"
+                                        onClick={() => updateQuantity(item.id, quantity - 1)}
+                                        className="h-11 w-11 rounded-full bg-white hover:bg-[#E9E4DA] shadow-sm flex items-center justify-center min-w-[44px] min-h-[44px] transition-all duration-200 hover:scale-105"
+                                        aria-label="Decrease quantity"
+                                      >
+                                        <Minus className="h-4 w-4" />
+                                      </button>
+                                      <span className="font-mono text-lg font-medium text-[#2A2A2A]">{quantity}</span>
+                                      <button
+                                        type="button"
+                                        onClick={() => updateQuantity(item.id, quantity + 1)}
+                                        className="h-11 w-11 rounded-full bg-white hover:bg-[#E9E4DA] shadow-sm flex items-center justify-center min-w-[44px] min-h-[44px] transition-all duration-200 hover:scale-105"
+                                        aria-label="Increase quantity"
+                                      >
+                                        <Plus className="h-4 w-4" />
+                                      </button>
+                                    </div>
+                                  )}
+                                </div>
                               </div>
                             );
                           })}
                         </div>
-                        {allGalleryItems.length > 6 && (
+
+                        <div className="text-center mt-14">
                           <button
-                            onClick={() => setGalleryExpanded(!galleryExpanded)}
-                            className="text-orange-500 hover:text-orange-600 text-sm font-medium flex items-center gap-1 transition-colors"
+                            onClick={() => document.getElementById('menu-items-section')?.scrollIntoView({ behavior: 'smooth' })}
+                            className="border border-[#2A2A2A]/20 hover:bg-[#2A2A2A] hover:text-white hover:border-[#2A2A2A] text-[#2A2A2A] transition-all duration-300 min-h-[44px] px-8 py-6 rounded-xl text-base font-medium inline-flex items-center gap-2 group"
                           >
-                            {galleryExpanded ? 'See Less' : 'See More'}
-                            <span className="text-lg">{galleryExpanded ? '↑' : '→'}</span>
+                            <span>View All Products</span>
+                            <ChevronDown className="h-5 w-5 group-hover:translate-y-1 transition-transform" />
                           </button>
-                        )}
+                        </div>
+                      </div>
+                    </section>
+                  )}
+
+                  {/* Footer - DIR style (#F6F4F0, #2A2A2A, #C68E3C) */}
+                  <footer className="py-20 sm:py-28 bg-[#F6F4F0] relative overflow-hidden">
+                    <div className="absolute top-0 right-0 w-96 h-96 bg-[#C68E3C]/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
+                    <div className="px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto relative z-10">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+                        <div className="space-y-5">
+                          <div className="mb-6">
+                            <h3 className="text-2xl sm:text-3xl font-bold text-[#2A2A2A] mb-1">
+                              {cafeBranding.cafe_name || 'Café'}
+                            </h3>
+                            <p className="font-serif italic text-[#6F6A63] text-lg">Café</p>
+                          </div>
+                          <p className="text-[#6F6A63] text-sm leading-relaxed mb-4">
+                            Have questions or want to make a reservation? We&apos;d love to hear from you.
+                          </p>
+                          {cafeBranding && (
+                            <div className="space-y-4">
+                              {cafeBranding.address && (
+                                <div className="flex items-start gap-4 group">
+                                  <div className="w-10 h-10 rounded-full bg-[#E9E4DA] flex items-center justify-center flex-shrink-0 group-hover:bg-[#C68E3C] group-hover:text-white transition-colors duration-300">
+                                    <MapPin className="h-4 w-4 text-[#6F6A63] group-hover:text-white transition-colors" />
+                                  </div>
+                                  <span className="text-[#2A2A2A] pt-2">{cafeBranding.address}</span>
+                                </div>
+                              )}
+                              {cafeBranding.phone && (
+                                <a href={`tel:${cafeBranding.phone}`} className="flex items-center gap-4 group">
+                                  <div className="w-10 h-10 rounded-full bg-[#E9E4DA] flex items-center justify-center flex-shrink-0 group-hover:bg-[#C68E3C] transition-colors duration-300">
+                                    <Phone className="h-4 w-4 text-[#6F6A63] group-hover:text-white transition-colors" />
+                                  </div>
+                                  <span className="text-[#2A2A2A] group-hover:text-[#C68E3C] transition-colors">{cafeBranding.phone}</span>
+                                </a>
+                              )}
+                              {cafeBranding.email && (
+                                <a href={`mailto:${cafeBranding.email}`} className="flex items-center gap-4 group">
+                                  <div className="w-10 h-10 rounded-full bg-[#E9E4DA] flex items-center justify-center flex-shrink-0 group-hover:bg-[#C68E3C] transition-colors duration-300">
+                                    <Mail className="h-4 w-4 text-[#6F6A63] group-hover:text-white transition-colors" />
+                                  </div>
+                                  <span className="text-[#2A2A2A] group-hover:text-[#C68E3C] transition-colors">{cafeBranding.email}</span>
+                                </a>
+                              )}
+                              {cafeSettings.website && (
+                                <a href={cafeSettings.website} target="_blank" rel="noopener noreferrer" className="flex items-center gap-4 group">
+                                  <div className="w-10 h-10 rounded-full bg-[#E9E4DA] flex items-center justify-center flex-shrink-0 group-hover:bg-[#C68E3C] transition-colors duration-300">
+                                    <MapPin className="h-4 w-4 text-[#6F6A63] group-hover:text-white transition-colors" />
+                                  </div>
+                                  <span className="text-[#2A2A2A] group-hover:text-[#C68E3C] transition-colors">Website</span>
+                                </a>
+                              )}
+                            </div>
+                          )}
+                        </div>
+
+                        <div>
+                          <div className="flex items-center gap-2 mb-6">
+                            <div className="w-8 h-8 rounded-full bg-[#C68E3C]/10 flex items-center justify-center">
+                              <Star className="h-4 w-4 text-[#C68E3C]" />
+                            </div>
+                            <h4 className="font-mono text-xs uppercase tracking-[0.2em] text-[#6F6A63]">Gallery</h4>
+                          </div>
+                          <div className="grid grid-cols-3 gap-3">
+                            {galleryItems.map((item, idx) => {
+                              const imageUrl = item.image_url ? getImageUrl(item.image_url) : getPlaceholderImage(item.category_name, item.name);
+                              return (
+                                <div key={`gallery-${idx}-${item.id || idx}`} className="aspect-square rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-shadow duration-300 group">
+                                  <img src={imageUrl} alt={item.name || `Gallery ${idx + 1}`} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                                </div>
+                              );
+                            })}
+                          </div>
+                          {allGalleryItems.length > 6 && (
+                            <button
+                              onClick={() => setGalleryExpanded(!galleryExpanded)}
+                              className="mt-5 text-sm text-[#C68E3C] hover:text-[#2A2A2A] transition-colors font-medium min-h-[44px]"
+                            >
+                              {galleryExpanded ? 'Show Less' : `View All ${allGalleryItems.length} Photos`}
+                            </button>
+                          )}
+                        </div>
+                      </div>
+
+                      <div className="mt-16 pt-8 border-t border-[#2A2A2A]/10 flex flex-col sm:flex-row items-center justify-between gap-4">
+                        <p className="text-sm text-[#6F6A63]">
+                          © {new Date().getFullYear()} {cafeBranding.cafe_name || 'Café'}. Crafted with care.
+                        </p>
+                        <button
+                          onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+                          className="text-[#6F6A63] hover:text-[#2A2A2A] hover:bg-[#E9E4DA] min-h-[44px] px-4 rounded-full text-sm font-medium transition-colors inline-flex items-center gap-2"
+                        >
+                          <span>Back to top</span>
+                          <ChevronLeft className="h-4 w-4 rotate-[-90deg]" />
+                        </button>
                       </div>
                     </div>
-
-                    {/* Back to Top */}
-                    <div className="text-center mt-12">
-                      <button
-                        onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-                        className="text-orange-500 hover:text-orange-600 text-sm font-medium transition-colors"
-                      >
-                        Back to top ↑
-                      </button>
-                    </div>
-                  </div>
+                  </footer>
                 </div>
               )}
             </div>
@@ -1673,6 +1440,33 @@ const CustomerMenu = ({
           )}
         </div>
       </main>
+
+      {/* Floating Cart Bar - mobile only, DIR style */}
+      {activeTab === 'menu' && cart.length > 0 && (
+        <div className="fixed bottom-0 left-0 right-0 z-40 p-4 bg-white border-t border-[#2A2A2A]/10 shadow-lg lg:hidden">
+          <button
+            onClick={() => setShowCart(true)}
+            className="w-full flex items-center justify-between bg-[#2A2A2A] text-white rounded-xl px-4 py-3 min-h-[44px]"
+            aria-label="View cart"
+          >
+            <div className="flex items-center gap-3">
+              <div className="relative">
+                <ShoppingBag className="h-5 w-5" />
+                <span className="absolute -top-2 -right-2 w-5 h-5 bg-[#C68E3C] rounded-full text-xs flex items-center justify-center font-medium">
+                  {cart.reduce((total, item) => total + item.quantity, 0)}
+                </span>
+              </div>
+              <span className="text-sm font-medium">
+                {cart.reduce((total, item) => total + item.quantity, 0)} items
+              </span>
+            </div>
+            <div className="flex items-center gap-3">
+              <span className="font-mono font-medium">{formatCurrency(getSubtotal())}</span>
+              <ChevronRight className="h-5 w-5" />
+            </div>
+          </button>
+        </div>
+      )}
 
       {/* Cart Modal - Full screen on mobile, centered modal on desktop */}
       {
