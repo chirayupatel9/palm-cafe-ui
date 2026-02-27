@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
-import { Plus, Minus, Trash2, ShoppingCart, X, Search, User, Phone, Mail, MapPin, CheckCircle, ChevronLeft, ChevronRight, ChevronDown, Utensils, Pizza, Sandwich, Salad, Cake, Wine, Star, LogOut, Edit3, Save, Menu, ShoppingBag } from 'lucide-react';
+import { Plus, Minus, Trash2, ShoppingCart, X, Search, User, Phone, Mail, MapPin, CheckCircle, ChevronLeft, ChevronRight, ChevronDown, Utensils, Star, LogOut, Edit3, Save, Menu, ShoppingBag } from 'lucide-react';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 import { useCurrency } from '../contexts/CurrencyContext';
@@ -7,8 +7,10 @@ import { useCafeSettings } from '../contexts/CafeSettingsContext';
 import CustomerOrderHistory from './CustomerOrderHistory';
 import CustomerProfile from './CustomerProfile';
 import { getImageUrl, getPlaceholderImage } from '../utils/imageUtils';
-import { normalizeBannersFromBranding, getActiveBannersSorted } from '../utils/bannerUtils';
+import { normalizeBannersFromBranding } from '../utils/bannerUtils';
 import PromoBannerSection from './PromoBannerSection';
+import Sheet from './ui/Sheet';
+import Dialog from './ui/Dialog';
 
 const CustomerMenu = ({
   cafeSlug,
@@ -398,7 +400,6 @@ const CustomerMenu = ({
   };
 
   const promoBanners = useMemo(() => normalizeBannersFromBranding(cafeBranding), [cafeBranding]);
-  const activeBannersSorted = useMemo(() => getActiveBannersSorted(promoBanners), [promoBanners]);
 
   // Calculate subtotal
   const getSubtotal = () => {
@@ -803,24 +804,64 @@ const CustomerMenu = ({
                 </div>
               )}
               <nav className="hidden lg:flex items-center gap-1">
-                <button onClick={() => document.getElementById('menu-section')?.scrollIntoView({ behavior: 'smooth' })} className={`font-mono text-xs uppercase tracking-[0.15em] min-h-[44px] rounded-full px-5 transition-all ${isScrolled ? 'text-[#2A2A2A] hover:bg-[#E9E4DA]' : 'text-white hover:bg-white/10'}`}>Menu</button>
-                <button onClick={() => { if (customer) { setShowProfile(true); setProfileOpenSection('orders'); } else onOpenLoginForOrders?.(); }} className={`font-mono text-xs uppercase tracking-[0.15em] min-h-[44px] rounded-full px-5 transition-all ${isScrolled ? 'text-[#2A2A2A] hover:bg-[#E9E4DA]' : 'text-white hover:bg-white/10'}`}>Order History</button>
+                <button
+                  onClick={() => {
+                    const el = document.getElementById('categories-section') || document.getElementById('menu-items-section') || document.getElementById('menu-section');
+                    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                  }}
+                  className={`font-mono text-xs uppercase tracking-[0.15em] min-h-[44px] rounded-full px-5 transition-all ${isScrolled ? 'text-[#2A2A2A] hover:bg-[#E9E4DA]' : 'text-white hover:bg-white/10'}`}
+                >
+                  Menu
+                </button>
+                <button
+                  onClick={() => {
+                    setCategoryMenuOpen(false);
+                    if (customer) { setShowProfile(true); setProfileOpenSection('orders'); } else onOpenLoginForOrders?.();
+                  }}
+                  className={`font-mono text-xs uppercase tracking-[0.15em] min-h-[44px] rounded-full px-5 transition-all ${isScrolled ? 'text-[#2A2A2A] hover:bg-[#E9E4DA]' : 'text-white hover:bg-white/10'}`}
+                >
+                  Order History
+                </button>
               </nav>
             </div>
             <div className={`absolute left-1/2 -translate-x-1/2 font-bold text-xl sm:text-2xl tracking-tight transition-colors duration-300 ${isScrolled ? 'text-[#2A2A2A]' : 'text-white'}`}>
               <button type="button" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>{cafeBranding.cafe_name || 'Brew & Bloom'}</button>
             </div>
-            <div className="flex items-center gap-1 sm:gap-2">
-              <button onClick={() => { if (customer) { setShowProfile(true); setProfileOpenSection('orders'); } else onOpenLoginForOrders?.(); }} className={`hidden sm:flex font-mono text-xs uppercase tracking-[0.15em] min-h-[44px] rounded-full px-5 transition-all ${isScrolled ? 'text-[#2A2A2A] hover:bg-[#E9E4DA]' : 'text-white hover:bg-white/10'}`}>{customer ? 'My Orders' : 'Login'}</button>
+            <div className="flex items-center gap-2 sm:gap-3">
+              <button
+                onClick={() => {
+                  setCategoryMenuOpen(false);
+                  if (customer) {
+                    setShowProfile(true);
+                    setProfileOpenSection('orders');
+                  } else {
+                    setShowLoginModal(true);
+                  }
+                }}
+                className={`hidden sm:inline-flex items-center justify-center font-mono text-xs uppercase tracking-[0.15em] min-h-[44px] rounded-full px-5 transition-all ${isScrolled ? 'text-[#2A2A2A] hover:bg-[#E9E4DA]' : 'text-white bg-white/10 hover:bg-white/20 shadow-sm'}`}
+                aria-label={customer ? 'My Orders' : 'Login'}
+              >
+                {customer ? 'My Orders' : 'Login'}
+              </button>
               {customer && (
-                <button onClick={() => { setProfileOpenSection(null); setShowProfile(true); }} className={`min-h-[44px] min-w-[44px] flex items-center justify-center rounded-full transition-all ${isScrolled ? 'text-[#2A2A2A] hover:bg-[#E9E4DA]' : 'text-white hover:bg-white/10'}`} aria-label="Profile">
+                <button
+                  onClick={() => { setCategoryMenuOpen(false); setProfileOpenSection(null); setShowProfile(true); }}
+                  className={`min-h-[44px] min-w-[44px] flex items-center justify-center rounded-full transition-all ${isScrolled ? 'text-[#2A2A2A] hover:bg-[#E9E4DA]' : 'text-white hover:bg-white/10'}`}
+                  aria-label="Profile"
+                >
                   <User className="h-5 w-5" />
                 </button>
               )}
-              <button onClick={() => setShowCart(true)} className={`relative min-h-[44px] min-w-[44px] flex items-center justify-center rounded-full transition-all ${isScrolled ? 'text-[#2A2A2A] hover:bg-[#E9E4DA]' : 'text-white hover:bg-white/10'}`} aria-label="Cart">
+              <button
+                onClick={() => { setCategoryMenuOpen(false); setShowCart(true); }}
+                className={`relative min-h-[44px] min-w-[44px] flex items-center justify-center rounded-full transition-all ${isScrolled ? 'text-[#2A2A2A] hover:bg-[#E9E4DA]' : 'text-white hover:bg-white/10'}`}
+                aria-label="Cart"
+              >
                 <ShoppingBag className="h-5 w-5" />
                 {cart.length > 0 && (
-                  <span className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-xs bg-[#C68E3C] text-white border-2 border-white rounded-full font-medium">{cart.reduce((t, i) => t + i.quantity, 0)}</span>
+                  <span className={`absolute -top-0.5 -right-0.5 min-w-[20px] h-5 flex items-center justify-center px-1.5 text-xs font-bold text-white bg-[#C68E3C] rounded-full shadow-md ${isScrolled ? 'border-2 border-white' : 'border-2 border-[#2A2A2A]'}`}>
+                    {cart.reduce((t, i) => t + i.quantity, 0)}
+                  </span>
                 )}
               </button>
             </div>
@@ -943,7 +984,7 @@ const CustomerMenu = ({
 
               {/* Categories Showcase Section - DIR "Our Categories" carousel */}
               {!searchQuery.trim() && selectedCategory === 'All' && Object.keys(groupedMenuItems).length > 0 && (
-                <section className="py-16 sm:py-24 bg-[#F6F4F0] relative overflow-hidden">
+                <section id="categories-section" className="py-16 sm:py-24 bg-[#F6F4F0] relative overflow-hidden scroll-mt-24">
                   <div className="absolute top-0 right-0 w-96 h-96 bg-[#C68E3C]/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
                   <div className="absolute bottom-0 left-0 w-64 h-64 bg-[#C68E3C]/5 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2" />
                   <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
@@ -1468,28 +1509,9 @@ const CustomerMenu = ({
         </div>
       )}
 
-      {/* Cart Modal - Full screen on mobile, centered modal on desktop */}
-      {
-        showCart && (
-          <div className="fixed inset-0 bg-black/70 backdrop-blur-md flex items-end lg:items-center justify-center z-50 p-0 lg:p-4">
-            <div className="bg-white rounded-t-2xl lg:rounded-2xl w-full lg:max-w-4xl max-h-[90vh] lg:max-h-[90vh] overflow-hidden shadow-2xl flex flex-col h-[90vh] lg:h-auto">
-              {/* Cart Header */}
-              <div className="flex w-full items-center justify-between border-b border-accent-200 bg-accent-50 px-4 sm:px-6 py-4 flex-shrink-0">
-                <div className="flex items-center gap-4">
-                  <ShoppingCart className="h-6 w-6 text-secondary-600" />
-                  <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-secondary-700">Your Order</h2>
-                </div>
-                <button
-                  onClick={() => setShowCart(false)}
-                  className="text-secondary-600 hover:bg-accent-100 p-2 rounded-lg transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center"
-                  aria-label="Close cart"
-                >
-                  <X className="h-6 w-6" />
-                </button>
-              </div>
-
-              {/* Cart Content - Two Column Layout */}
-              <div className="flex flex-col lg:grid lg:grid-cols-3 gap-4 sm:gap-8 p-4 sm:p-6 flex-1 overflow-y-auto">
+      {/* Cart - Template Sheet (right-side drawer) */}
+      <Sheet open={showCart} onClose={() => setShowCart(false)} title="Your Order">
+        <div className="flex flex-col lg:grid lg:grid-cols-3 gap-4 sm:gap-8">
                 {/* Left Column: Cart Items */}
                 <div className="lg:col-span-2 flex flex-col gap-4">
                   {cart.length === 0 ? (
@@ -1826,11 +1848,8 @@ const CustomerMenu = ({
                     </div>
                   </div>
                 )}
-              </div>
-            </div>
-          </div>
-        )
-      }
+        </div>
+      </Sheet>
 
       {/* Floating Cart Summary Bar - Mobile Only */}
       {cart.length > 0 && (
@@ -1859,25 +1878,14 @@ const CustomerMenu = ({
       )}
 
 
-      {/* Edit Profile Modal - Full screen on mobile */}
-      {showEditProfile && (
-        <div className="fixed inset-0 bg-black/70 backdrop-blur-md flex items-end lg:items-center justify-center z-50 p-0 lg:p-4">
-          <div className="bg-white rounded-t-2xl lg:rounded-2xl shadow-2xl max-w-md lg:max-w-md w-full h-[90vh] lg:h-auto flex flex-col">
-            <div className="flex items-center justify-between border-b border-accent-200 bg-accent-50 px-4 sm:px-6 py-4 flex-shrink-0">
-              <div className="flex items-center gap-4">
-                <Edit3 className="h-6 w-6 text-secondary-600" />
-                <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-secondary-700">Edit Profile</h2>
-              </div>
-              <button
-                onClick={() => setShowEditProfile(false)}
-                className="text-secondary-600 hover:bg-accent-100 p-2 rounded-lg transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center"
-                aria-label="Close"
-              >
-                <X className="h-6 w-6" />
-              </button>
-            </div>
-
-            <div className="p-4 sm:p-6 flex-1 overflow-y-auto">
+      {/* Edit Profile - Template Dialog */}
+      <Dialog
+        open={showEditProfile}
+        onClose={() => setShowEditProfile(false)}
+        title="Edit Profile"
+      >
+        {showEditProfile && (
+            <div className="pt-0">
               <form onSubmit={handleProfileUpdate} className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-secondary-700 mb-2">
@@ -1959,13 +1967,16 @@ const CustomerMenu = ({
                 </div>
               </form>
             </div>
-          </div>
-        </div>
-      )}
+        )}
+      </Dialog>
 
-      {/* Customer Profile - Full Page View */}
-      {showProfile && customer && (
-        <div className="fixed inset-0 z-50" style={{ backgroundColor: 'var(--color-background)' }}>
+      {/* Customer Profile - Template Dialog (centered modal) */}
+      <Dialog
+        open={!!(showProfile && customer)}
+        onClose={() => { setShowProfile(false); setProfileOpenSection(null); }}
+        title={profileOpenSection === 'orders' ? 'My Orders' : 'Profile'}
+      >
+        {showProfile && customer && (
           <CustomerProfile
             customer={customer}
             onCustomerUpdate={onCustomerUpdate}
@@ -1984,9 +1995,9 @@ const CustomerMenu = ({
             cart={cart}
             setCart={setCart}
           />
-        </div>
-      )}
-    </div >
+        )}
+      </Dialog>
+    </div>
   );
 };
 

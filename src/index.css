@@ -818,6 +818,14 @@ img {
   animation: slideIn var(--motion-duration-slow) var(--motion-easing-out);
 }
 
+@keyframes slideInFromRight {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+.animate-slide-in-right {
+  animation: slideInFromRight 0.3s ease-out;
+}
+
 /* ============================================
    VIEWPORT & MOBILE
    ============================================ */
