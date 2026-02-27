@@ -227,20 +227,19 @@ function MainApp() {
     }
   };
 
-  // Reorganized navigation structure: Dashboard, Orders, Menu, Users, Settings
-  // PRO features: Analytics, Inventory, Advanced Reports, User Management
+  // Same 9 tabs for every cafe so the nav bar layout is consistent (same API, same UI structure).
+  // Access is enforced on each page: PRO tabs show upgrade/locked when the plan does not include them.
   const navigationItems = [
-    { id: 'order', label: 'Dashboard', icon: BarChart3, module: 'orders', primary: true, show: checkFeatureAccess('orders') },
-    { id: 'kitchen', label: 'Orders', icon: Receipt, module: 'orders', show: cafeSettings?.show_kitchen_tab !== false && checkFeatureAccess('orders') },
-    { id: 'menu', label: 'Menu', icon: Utensils, module: 'menu_management', show: cafeSettings?.admin_can_manage_menu !== false && checkFeatureAccess('menu_management') },
-    { id: 'customers', label: 'Customers', icon: Users, module: 'customers', show: cafeSettings?.show_customers_tab !== false && checkFeatureAccess('customers') },
-    // PRO Features
-    { id: 'analytics', label: 'Analytics', icon: TrendingUp, module: 'analytics', show: checkFeatureAccess('analytics') },
-    { id: 'inventory', label: 'Inventory', icon: Package, module: 'inventory', show: checkFeatureAccess('inventory') },
-    { id: 'users', label: 'User Management', icon: User, module: 'users', show: checkFeatureAccess('users') },
-    { id: 'advanced-reports', label: 'Reports', icon: FileText, module: 'advanced_reports', show: checkFeatureAccess('advanced_reports') },
-    { id: 'cafe-settings', label: 'Settings', icon: Settings, module: 'settings', show: (user?.role === 'admin' || cafeSettings?.admin_can_access_settings !== false) && checkFeatureAccess('settings') },
-  ].filter(item => item.show !== false); // Filter out items that should be hidden
+    { id: 'order', label: 'Dashboard', icon: BarChart3, module: 'orders', primary: true },
+    { id: 'kitchen', label: 'Orders', icon: Receipt, module: 'orders' },
+    { id: 'menu', label: 'Menu', icon: Utensils, module: 'menu_management' },
+    { id: 'customers', label: 'Customers', icon: Users, module: 'customers' },
+    { id: 'analytics', label: 'Analytics', icon: TrendingUp, module: 'analytics' },
+    { id: 'inventory', label: 'Inventory', icon: Package, module: 'inventory' },
+    { id: 'users', label: 'User Management', icon: User, module: 'users' },
+    { id: 'advanced-reports', label: 'Reports', icon: FileText, module: 'advanced_reports' },
+    { id: 'cafe-settings', label: 'Settings', icon: Settings, module: 'settings' }
+  ];
 
   if (loading || cafeSettingsLoading || subscriptionLoading || featuresLoading) {
     return (
