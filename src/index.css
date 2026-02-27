@@ -827,6 +827,82 @@ img {
 }
 
 /* ============================================
+   SCROLL-TRIGGERED ANIMATIONS (template-style)
+   ============================================ */
+
+/* Base: elements start hidden and slide up; when .in-view they animate in */
+.scroll-animate-in {
+  opacity: 0;
+  transform: translateY(40px);
+  transition: opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1), transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.scroll-animate-in.in-view,
+[data-scroll-animate].in-view .scroll-animate-in {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Slide from left (for section headers) */
+.scroll-animate-left {
+  opacity: 0;
+  transform: translateX(-40px);
+  transition: opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1), transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.scroll-animate-left.in-view,
+[data-scroll-animate].in-view .scroll-animate-left {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+/* Slight scale + fade (for cards) */
+.scroll-animate-scale {
+  opacity: 0;
+  transform: translateY(50px) scale(0.97);
+  transition: opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1), transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.scroll-animate-scale.in-view,
+[data-scroll-animate].in-view .scroll-animate-scale {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+/* Stagger delays for children */
+.scroll-stagger-1 { transition-delay: 0.05s; }
+.scroll-stagger-2 { transition-delay: 0.1s; }
+.scroll-stagger-3 { transition-delay: 0.15s; }
+.scroll-stagger-4 { transition-delay: 0.2s; }
+.scroll-stagger-5 { transition-delay: 0.25s; }
+.scroll-stagger-6 { transition-delay: 0.3s; }
+.scroll-stagger-7 { transition-delay: 0.35s; }
+.scroll-stagger-8 { transition-delay: 0.4s; }
+.scroll-stagger-9 { transition-delay: 0.45s; }
+.scroll-stagger-10 { transition-delay: 0.5s; }
+
+/* Hero entrance (on load) */
+@keyframes heroFadeUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes heroFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.hero-animate {
+  animation: heroFadeUp 1s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+.hero-animate-delay-0 { animation-delay: 0.1s; opacity: 0; }
+.hero-animate-delay-1 { animation-delay: 0.25s; opacity: 0; }
+.hero-animate-delay-2 { animation-delay: 0.4s; opacity: 0; }
+.hero-animate-delay-3 { animation-delay: 0.55s; opacity: 0; }
+.hero-animate-delay-4 { animation-delay: 0.7s; opacity: 0; }
+.hero-animate-delay-5 { animation-delay: 0.85s; opacity: 0; }
+.hero-animate-delay-6 { animation-delay: 1s; opacity: 0; }
+.hero-animate-delay-7 { animation-delay: 1.15s; opacity: 0; }
+.hero-animate-delay-8 { animation-delay: 1.3s; opacity: 0; }
+.hero-animate-delay-9 { animation-delay: 1.45s; opacity: 0; }
+.hero-animate-delay-10 { animation-delay: 1.6s; opacity: 0; }
+
+/* ============================================
    VIEWPORT & MOBILE
    ============================================ */
 

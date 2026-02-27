@@ -227,6 +227,22 @@ const CustomerMenu = ({
     }
   }, [categoryMenuOpen]);
 
+  // Scroll-triggered animations (template-style): add .in-view when section enters viewport
+  useEffect(() => {
+    const els = document.querySelectorAll('[data-scroll-animate]');
+    if (els.length === 0) return () => {};
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) entry.target.classList.add('in-view');
+        });
+      },
+      { rootMargin: '0px 0px -80px 0px', threshold: 0.1 }
+    );
+    els.forEach((el) => observer.observe(el));
+    return () => observer.disconnect();
+  }, [activeTab, Object.keys(groupedMenuItems).length]);
+
   // Handle keyboard navigation for autocomplete
   const handleSearchKeyDown = (e) => {
     if (!showAutocomplete || autocompleteSuggestions.length === 0) return;
@@ -893,8 +909,8 @@ const CustomerMenu = ({
                   <div className="absolute bottom-1/4 -right-20 w-80 h-80 bg-[#C68E3C]/5 rounded-full blur-3xl float" />
                 </div>
                 <div className="relative z-10 w-full max-w-4xl mx-auto px-6 py-20 text-center">
-                  {/* Logo - DIR (glass-dark for icon, border for image) */}
-                  <div className="mb-10">
+                  {/* Logo - DIR (glass-dark for icon, border for image) + hero entrance */}
+                  <div className="mb-10 hero-animate hero-animate-delay-0">
                     {cafeBranding.logo_url ? (
                       <img src={getImageUrl(cafeBranding.logo_url)} alt="" className="inline-block w-20 h-20 sm:w-24 sm:h-24 rounded-full border border-white/10 shadow-2xl object-cover" />
                     ) : (
@@ -903,8 +919,8 @@ const CustomerMenu = ({
                       </div>
                     )}
                   </div>
-                  {/* Headline - REF exact copy */}
-                  <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-8 leading-[1.1] tracking-tight">
+                  {/* Headline - REF exact copy + hero entrance */}
+                  <h1 className="hero-animate hero-animate-delay-1 text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-8 leading-[1.1] tracking-tight">
                     <span className="inline-block">Crafted</span>{' '}
                     <span className="inline-block">coffee</span>{' '}
                     <span className="inline-block italic font-serif font-medium">&</span>
@@ -916,12 +932,12 @@ const CustomerMenu = ({
                     <span className="inline-block text-[#C68E3C]">to</span>{' '}
                     <span className="inline-block text-[#C68E3C]">linger.</span>
                   </h1>
-                  <p className="text-lg sm:text-xl text-white/70 mb-10 max-w-xl mx-auto font-light leading-relaxed">
+                  <p className="hero-animate hero-animate-delay-2 text-lg sm:text-xl text-white/70 mb-10 max-w-xl mx-auto font-light leading-relaxed">
                     Search the menu, pick a category, or scroll to see what&apos;s fresh today.
                   </p>
 
-                  {/* Search - always visible, DIR py-6 */}
-                  <div className="relative max-w-xl mx-auto mb-10">
+                  {/* Search - always visible, DIR py-6 + hero entrance */}
+                  <div className="hero-animate hero-animate-delay-3 relative max-w-xl mx-auto mb-10">
                     <div className="relative group">
                       <Search className="absolute left-5 top-1/2 -translate-y-1/2 h-5 w-5 text-white/50 group-focus-within:text-[#C68E3C] transition-colors" />
                       <input
@@ -962,9 +978,9 @@ const CustomerMenu = ({
                     )}
                   </div>
 
-                  {/* Category Chips - DIR */}
+                  {/* Category Chips - DIR + hero entrance */}
                   {!searchQuery.trim() && Object.keys(groupedMenuItems).length > 0 && (
-                    <div className="flex flex-wrap justify-center gap-3">
+                    <div className="hero-animate hero-animate-delay-4 flex flex-wrap justify-center gap-3">
                       <button onClick={() => { setSelectedCategory('All'); document.getElementById('menu-section')?.scrollIntoView({ behavior: 'smooth', block: 'start' }); }} className={`px-5 sm:px-6 py-3 rounded-full font-mono text-xs sm:text-sm uppercase tracking-widest transition-all duration-300 min-h-[44px] ${selectedCategory === 'All' ? 'bg-[#C68E3C] text-white shadow-lg shadow-[#C68E3C]/30' : 'bg-white/10 backdrop-blur-sm text-white border border-white/20 hover:bg-white/20 hover:border-white/40 hover:shadow-lg'}`} aria-label="Show all categories">All</button>
                       {Object.keys(groupedMenuItems).map((categoryName) => (
                         <button key={categoryName} onClick={() => scrollToCategory(categoryName)} className={`px-5 sm:px-6 py-3 rounded-full font-mono text-xs sm:text-sm uppercase tracking-widest transition-all duration-300 min-h-[44px] truncate max-w-[180px] ${selectedCategory === categoryName ? 'bg-[#C68E3C] text-white shadow-lg shadow-[#C68E3C]/30' : 'bg-white/10 backdrop-blur-sm text-white border border-white/20 hover:bg-white/20 hover:border-white/40 hover:shadow-lg'}`} aria-label={`Filter by ${categoryName}`} title={categoryName}>{categoryName}</button>
@@ -972,8 +988,8 @@ const CustomerMenu = ({
                     </div>
                   )}
 
-                  {/* Scroll hint - DIR */}
-                  <div className="mt-16 flex flex-col items-center gap-3">
+                  {/* Scroll hint - DIR + hero entrance */}
+                  <div className="hero-animate hero-animate-delay-5 mt-16 flex flex-col items-center gap-3">
                     <span className="font-mono text-xs uppercase tracking-[0.2em] text-white/40">Scroll to explore</span>
                     <div className="w-6 h-10 rounded-full border-2 border-white/30 flex justify-center pt-2">
                       <div className="w-1.5 h-3 bg-white/50 rounded-full animate-bounce" />
@@ -982,14 +998,14 @@ const CustomerMenu = ({
                 </div>
               </section>
 
-              {/* Categories Showcase Section - DIR "Our Categories" carousel */}
+              {/* Categories Showcase Section - DIR "Our Categories" carousel + scroll animate */}
               {!searchQuery.trim() && selectedCategory === 'All' && Object.keys(groupedMenuItems).length > 0 && (
-                <section id="categories-section" className="py-16 sm:py-24 bg-[#F6F4F0] relative overflow-hidden scroll-mt-24">
+                <section id="categories-section" data-scroll-animate className="py-16 sm:py-24 bg-[#F6F4F0] relative overflow-hidden scroll-mt-24">
                   <div className="absolute top-0 right-0 w-96 h-96 bg-[#C68E3C]/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
                   <div className="absolute bottom-0 left-0 w-64 h-64 bg-[#C68E3C]/5 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2" />
                   <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
                     <div className="flex items-end justify-between mb-12">
-                      <div>
+                      <div className="scroll-animate-left">
                         <span className="font-mono text-xs uppercase tracking-[0.2em] text-[#C68E3C] mb-3 block">
                           Browse
                         </span>
@@ -997,7 +1013,7 @@ const CustomerMenu = ({
                           Our Categories
                         </h2>
                       </div>
-                      <div className="hidden sm:flex items-center gap-3">
+                      <div className="scroll-animate-left hidden sm:flex items-center gap-3">
                         <button type="button" onClick={() => scrollCarousel('left')} className="rounded-full border border-[#2A2A2A]/10 hover:bg-[#2A2A2A] hover:text-white hover:border-[#2A2A2A] transition-all duration-300 min-h-[44px] min-w-[44px] w-12 h-12 flex items-center justify-center" aria-label="Scroll left">
                           <ChevronLeft className="h-5 w-5" />
                         </button>
@@ -1007,7 +1023,7 @@ const CustomerMenu = ({
                       </div>
                     </div>
 
-                    {/* Carousel - horizontal scroll DIR style */}
+                    {/* Carousel - horizontal scroll DIR style + stagger */}
                     <div
                       ref={categoryCarouselRef}
                       className="flex gap-5 sm:gap-6 overflow-x-auto pb-6 -mx-4 px-4 sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8 scrollbar-hide"
@@ -1033,19 +1049,20 @@ const CustomerMenu = ({
                         if (categoryCarouselRef.current) categoryCarouselRef.current.touchStartX = null;
                       }}
                     >
-                      {Object.keys(groupedMenuItems).map((categoryName) => {
+                      {Object.keys(groupedMenuItems).map((categoryName, carouselIndex) => {
                         const categoryItems = groupedMenuItems[categoryName];
                         const itemsWithImages = categoryItems.filter(item => item.image_url);
                         const categoryImage = itemsWithImages.length > 0
                           ? getImageUrl(itemsWithImages[0].image_url)
                           : getPlaceholderImage(categoryName);
                         const itemCount = categoryItems.length;
+                        const staggerClass = carouselIndex < 10 ? `scroll-stagger-${carouselIndex + 1}` : '';
 
                         return (
                           <button
                             key={categoryName}
                             onClick={() => scrollToCategory(categoryName)}
-                            className="flex-shrink-0 group text-center min-w-[128px]"
+                            className={`scroll-animate-scale flex-shrink-0 group text-center min-w-[128px] ${staggerClass}`}
                             aria-label={`View ${categoryName} category`}
                           >
                             <div className="relative w-32 h-32 sm:w-40 sm:h-40 md:w-48 md:h-48 rounded-full overflow-hidden mb-5 shadow-lg group-hover:shadow-2xl transition-all duration-500 mx-auto">
@@ -1160,12 +1177,13 @@ const CustomerMenu = ({
                         <section
                           key={categoryName}
                           id={slug ? `category-${slug}` : undefined}
+                          data-scroll-animate
                           className="py-16 sm:py-24 bg-[#F6F4F0] relative scroll-mt-24"
                         >
                           <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#C68E3C]/[0.02] to-transparent pointer-events-none" />
                           <div className="px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto relative z-10">
                             <div className="mb-12 sm:mb-16">
-                              <div className="flex items-baseline gap-4 mb-4">
+                              <div className="scroll-animate-left flex items-baseline gap-4 mb-4">
                                 <span className="font-mono text-sm text-[#C68E3C] bg-[#C68E3C]/10 px-3 py-1 rounded-full">
                                   {categoryNumber}
                                 </span>
@@ -1176,16 +1194,17 @@ const CustomerMenu = ({
                             </div>
 
                             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
-                              {items.map((item) => {
+                              {items.map((item, itemIndex) => {
                                 const itemImage = item.image_url
                                   ? getImageUrl(item.image_url)
                                   : getPlaceholderImage(item.category_name, item.name);
                                 const quantity = getCartQuantity(item.id);
+                                const staggerClass = itemIndex < 10 ? `scroll-stagger-${itemIndex + 1}` : '';
 
                                 return (
                                   <div
                                     key={item.id}
-                                    className="group overflow-hidden border-0 bg-white rounded-2xl shadow-sm hover:shadow-2xl transition-all duration-500 ease-out hover:-translate-y-2"
+                                    className={`scroll-animate-scale group overflow-hidden border-0 bg-white rounded-2xl shadow-sm hover:shadow-2xl transition-all duration-500 ease-out hover:-translate-y-2 ${staggerClass}`}
                                   >
                                     <div className="relative aspect-[4/3] overflow-hidden">
                                       <img
@@ -1254,21 +1273,21 @@ const CustomerMenu = ({
                     error={brandingError}
                   />
 
-                  {/* Special Proposals - DIR style (#E9E4DA bg, Featured pill, Popular badge) */}
+                  {/* Special Proposals - DIR style (#E9E4DA bg, Featured pill, Popular badge) + scroll animate */}
                   {(loadingMostOrdered || mostOrderedItems.length > 0) && (
-                    <section className="py-20 sm:py-28 bg-[#E9E4DA] relative overflow-hidden">
+                    <section data-scroll-animate className="py-20 sm:py-28 bg-[#E9E4DA] relative overflow-hidden">
                       <div className="absolute top-0 left-1/4 w-96 h-96 bg-[#C68E3C]/10 rounded-full blur-3xl -translate-y-1/2" />
                       <div className="absolute bottom-0 right-1/4 w-80 h-80 bg-[#C68E3C]/5 rounded-full blur-3xl translate-y-1/2" />
                       <div className="absolute inset-0 opacity-[0.02]" style={{ backgroundImage: 'radial-gradient(circle at 1px 1px, #2A2A2A 1px, transparent 0)', backgroundSize: '40px 40px' }} />
                       <div className="px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto relative z-10">
                         <div className="text-center mb-14 sm:mb-20">
-                          <div className="inline-flex items-center gap-2 bg-white/80 backdrop-blur-sm px-4 py-2 rounded-full mb-6 shadow-sm">
+                          <div className="scroll-animate-in inline-flex items-center gap-2 bg-white/80 backdrop-blur-sm px-4 py-2 rounded-full mb-6 shadow-sm">
                             <Star className="h-4 w-4 text-[#C68E3C] fill-[#C68E3C]" />
                             <span className="font-mono text-xs uppercase tracking-[0.2em] text-[#6F6A63]">
                               Featured
                             </span>
                           </div>
-                          <h2 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-[#2A2A2A] mb-5 tracking-tight">
+                          <h2 className="scroll-animate-in scroll-stagger-1 text-4xl sm:text-5xl lg:text-6xl font-bold text-[#2A2A2A] mb-5 tracking-tight">
                             Special Proposals
                           </h2>
                           <p className="text-[#6F6A63] max-w-lg mx-auto text-lg leading-relaxed">
@@ -1288,16 +1307,17 @@ const CustomerMenu = ({
                                 </div>
                               </div>
                             ))
-                          ) : mostOrderedItems.map((item) => {
+                          ) : mostOrderedItems.map((item, specialIndex) => {
                             const specialImage = item.image_url
                               ? getImageUrl(item.image_url)
                               : getPlaceholderImage(item.category_name, item.name);
                             const quantity = getCartQuantity(item.id);
+                            const staggerClass = specialIndex < 10 ? `scroll-stagger-${specialIndex + 1}` : '';
 
                             return (
                               <div
                                 key={`special-${item.id}`}
-                                className="group overflow-hidden border-0 bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 ease-out hover:-translate-y-3"
+                                className={`scroll-animate-scale group overflow-hidden border-0 bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 ease-out hover:-translate-y-3 ${staggerClass}`}
                               >
                                 <div className="relative aspect-[16/10] overflow-hidden">
                                   <img
@@ -1372,12 +1392,12 @@ const CustomerMenu = ({
                     </section>
                   )}
 
-                  {/* Footer - DIR style (#F6F4F0, #2A2A2A, #C68E3C) */}
-                  <footer className="py-20 sm:py-28 bg-[#F6F4F0] relative overflow-hidden">
+                  {/* Footer - DIR style (#F6F4F0, #2A2A2A, #C68E3C) + scroll animate */}
+                  <footer data-scroll-animate className="py-20 sm:py-28 bg-[#F6F4F0] relative overflow-hidden">
                     <div className="absolute top-0 right-0 w-96 h-96 bg-[#C68E3C]/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
                     <div className="px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto relative z-10">
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-                        <div className="space-y-5">
+                        <div className="scroll-animate-in space-y-5">
                           <div className="mb-6">
                             <h3 className="text-2xl sm:text-3xl font-bold text-[#2A2A2A] mb-1">
                               {cafeBranding.cafe_name || 'Café'}
