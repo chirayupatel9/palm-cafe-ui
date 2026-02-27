@@ -9,8 +9,9 @@ import { Copy, ExternalLink, Check, Plus, Pencil, Trash2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 const CafeSettings = () => {
-  const { cafeSettings, updateCafeSettings, updateLogo, updateHeroImage, removeHeroImage, removeLogo } = useCafeSettings();
+  const { cafeSettings, loading: cafeSettingsLoading, error: cafeSettingsError, fetchCafeSettings, updateCafeSettings, updateLogo, updateHeroImage, removeHeroImage, removeLogo } = useCafeSettings();
   const { user } = useAuth();
+  const publicSlug = user?.cafe_slug || cafeSettings?.cafe_slug || null;
   const [copied, setCopied] = useState(false);
   const [showDebugTest, setShowDebugTest] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -526,7 +527,7 @@ const CafeSettings = () => {
     try {
       const formData = {
         cafe_name: cafeName,
-        logo_url: cafeSettings.logo_url,
+        logo_url: cafeSettings?.logo_url,
         address,
         phone,
         email,
@@ -600,7 +601,7 @@ const CafeSettings = () => {
             <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Cafe Settings</h1>
             <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">Manage your cafe configuration and appearance.</p>
           </div>
-          <button type="button" onClick={handleSubmit} disabled={isSubmitting} className="btn-primary px-5 py-2.5 text-sm font-medium shrink-0">
+          <button type="button" onClick={handleSubmit} disabled={isSubmitting || cafeSettingsLoading} className="btn-primary px-5 py-2.5 text-sm font-medium shrink-0 disabled:opacity-50 disabled:cursor-not-allowed">
             {isSubmitting ? 'Saving...' : 'Save Changes'}
           </button>
         </div>
@@ -615,10 +616,24 @@ const CafeSettings = () => {
           </div>
         )}
 
-        <div className=" mx-auto">
+        {cafeSettingsLoading ? (
+          <div className="flex flex-col items-center justify-center py-16">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 mb-4" style={{ borderColor: 'var(--color-primary)' }} />
+            <p className="text-gray-600 dark:text-gray-400">Loading cafe settings...</p>
+          </div>
+        ) : cafeSettingsError ? (
+          <div className="card p-6 border-red-200 dark:border-red-800 bg-red-50/50 dark:bg-red-900/20">
+            <p className="text-red-700 dark:text-red-300 font-medium mb-2">Failed to load cafe settings</p>
+            <p className="text-sm text-red-600 dark:text-red-400 mb-4">{cafeSettingsError}</p>
+            <button type="button" onClick={() => fetchCafeSettings()} className="btn-primary">
+              Retry
+            </button>
+          </div>
+        ) : (
+        <div className="w-full max-w-4xl">
           <div className="space-y-6">
-            {/* Cafe Slug & Public URL Section */}
-            {(user?.role === 'admin' || user?.role === 'superadmin') && user?.cafe_slug && (
+            {/* Cafe Slug & Public URL Section (multi-cafe: show when admin/superadmin has a cafe slug) */}
+            {(user?.role === 'admin' || user?.role === 'superadmin') && publicSlug && (
               <div className="card p-6">
                 <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-1">Public Cafe URL</h2>
                 <p className="text-sm text-gray-600 dark:text-gray-400 mb-5">
@@ -629,9 +644,9 @@ const CafeSettings = () => {
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Cafe Slug</label>
                     <input
                       type="text"
-                      value={user.cafe_slug}
+                      value={publicSlug}
                       readOnly
-                      className="input-field w-full bg-gray-100 dark:bg-gray-700/50 cursor-not-allowed font-mono text-sm"
+                      className="input-field w-full bg-gray-100 dark:bg-gray-700/50 cursor-not-allowed font-mono text-sm truncate"
                     />
                     <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Cannot be changed after creation.</p>
                   </div>
@@ -640,14 +655,14 @@ const CafeSettings = () => {
                     <div className="flex flex-wrap gap-2 items-stretch">
                       <input
                         type="text"
-                        value={`${window.location.origin}/cafe/${user.cafe_slug}`}
+                        value={`${window.location.origin}/cafe/${publicSlug}`}
                         readOnly
-                        className="input-field flex-1 min-w-[200px] bg-gray-100 dark:bg-gray-700/50 cursor-not-allowed font-mono text-sm"
+                        className="input-field flex-1 min-w-[200px] bg-gray-100 dark:bg-gray-700/50 cursor-not-allowed font-mono text-sm truncate"
                       />
                       <button
                         type="button"
                         onClick={() => {
-                          const url = `${window.location.origin}/cafe/${user.cafe_slug}`;
+                          const url = `${window.location.origin}/cafe/${publicSlug}`;
                           navigator.clipboard.writeText(url);
                           setCopied(true);
                           toast.success('URL copied to clipboard!');
@@ -659,7 +674,7 @@ const CafeSettings = () => {
                         {copied ? <><Check className="h-4 w-4" /> Copied!</> : <><Copy className="h-4 w-4" /> Copy</>}
                       </button>
                       <a
-                        href={`/cafe/${user.cafe_slug}`}
+                        href={`/cafe/${publicSlug}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 text-sm font-medium shrink-0"
@@ -1322,6 +1337,7 @@ const CafeSettings = () => {
           </div>
           */}
         </div>
+        )}
       </div>
     </div>
   );

@@ -53,16 +53,16 @@ const CustomerRedirect = () => {
   return <Navigate to={`/cafe/${slug}`} replace />;
 };
 
-// Component to update document title based on user's cafe
+// Component to update document title based on user's cafe (uses user.cafe_name so it works outside CafeSettingsProvider)
 const TitleUpdater = () => {
   const { user } = useAuth();
-  
+
   React.useEffect(() => {
     if (user) {
-      if (user.cafe_name) {
-        document.title = user.cafe_name;
-      } else if (user.role === 'superadmin') {
+      if (user.role === 'superadmin') {
         document.title = 'Super Admin Dashboard';
+      } else if (user.cafe_name) {
+        document.title = user.cafe_name;
       } else {
         document.title = 'Cafe Management System';
       }
@@ -70,7 +70,7 @@ const TitleUpdater = () => {
       document.title = 'Cafe Management System';
     }
   }, [user]);
-  
+
   return null;
 };
 

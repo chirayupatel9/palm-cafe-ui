@@ -1,10 +1,11 @@
 import React from 'react';
 import { useCafeSettings } from '../contexts/CafeSettingsContext';
+import { useAuth } from '../contexts/AuthContext';
 import { getImageUrl } from '../utils/imageUtils';
 
-const CafeInfo = ({ 
-  showLogo = true, 
-  showName = true, 
+const CafeInfo = ({
+  showLogo = true,
+  showName = true,
   logoSize = 'h-10 w-10',
   nameSize = 'text-xl sm:text-2xl',
   className = '',
@@ -12,19 +13,21 @@ const CafeInfo = ({
   nameClassName = ''
 }) => {
   const { cafeSettings } = useCafeSettings();
+  const { user } = useAuth();
+  const displayName = cafeSettings?.cafe_name || user?.cafe_name || null;
 
   return (
     <div className={`flex items-center ${className}`}>
-      {showLogo && cafeSettings.logo_url && (
-        <img 
-          src={getImageUrl(cafeSettings.logo_url)} 
-          alt={`${cafeSettings.cafe_name || 'Cafe'} Logo`} 
+      {showLogo && (cafeSettings?.logo_url) && (
+        <img
+          src={getImageUrl(cafeSettings.logo_url)}
+          alt={`${displayName || 'Cafe'} Logo`}
           className={`${logoSize} mr-3 ${logoClassName}`}
         />
       )}
-      {showName && cafeSettings.cafe_name && (
+      {showName && displayName && (
         <h1 className={`font-bold ${nameSize} ${nameClassName}`}>
-          {cafeSettings.cafe_name}
+          {displayName}
         </h1>
       )}
     </div>
