@@ -222,16 +222,26 @@ const MenuManagement = ({ menuItems, onUpdate, onAdd, onDelete }) => {
     event.target.value = ''; // Reset file input
   };
 
-  const handleImageUpload = async () => {
-    if (!selectedImageFile) {
+  const handleImageUpload = async (fileFromEvent) => {
+    const fileToUpload = fileFromEvent || selectedImageFile;
+    if (!fileToUpload) {
       toast.error('Please select an image file first');
+      return;
+    }
+    if (!fileToUpload.type.startsWith('image/')) {
+      toast.error('Please select an image file');
+      return;
+    }
+    const maxSize = 5 * 1024 * 1024; // 5MB
+    if (fileToUpload.size > maxSize) {
+      toast.error('Image size must be less than 5MB');
       return;
     }
 
     try {
       setImageUploading(true);
       const formData = new FormData();
-      formData.append('image', selectedImageFile);
+      formData.append('image', fileToUpload);
 
       // If editing an existing item, use item-specific endpoint
       if (editingId) {
@@ -247,7 +257,6 @@ const MenuManagement = ({ menuItems, onUpdate, onAdd, onDelete }) => {
           setSelectedImageFile(null);
           // Refresh menu items to show updated image
           if (onUpdate) {
-            // Trigger a refresh by calling onUpdate with current formData
             await onUpdate(editingId, { ...formData, image_url: response.data.image_url });
           }
         } else {
@@ -904,7 +913,11 @@ const MenuManagement = ({ menuItems, onUpdate, onAdd, onDelete }) => {
                                   <input
                                     type="file"
                                     accept="image/jpeg,image/png,image/webp"
-                                    onChange={handleImageUpload}
+                                    onChange={(e) => {
+                                      const file = e.target.files?.[0];
+                                      if (file) handleImageUpload(file);
+                                      e.target.value = '';
+                                    }}
                                     className="text-xs"
                                     disabled={imageUploading}
                                   />
@@ -1072,7 +1085,11 @@ const MenuManagement = ({ menuItems, onUpdate, onAdd, onDelete }) => {
                             <input
                               type="file"
                               accept="image/jpeg,image/png,image/webp"
-                              onChange={handleImageUpload}
+                              onChange={(e) => {
+                                const file = e.target.files?.[0];
+                                if (file) handleImageUpload(file);
+                                e.target.value = '';
+                              }}
                               className="text-xs"
                               disabled={imageUploading}
                             />

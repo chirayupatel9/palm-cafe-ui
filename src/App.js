@@ -96,10 +96,10 @@ function MainApp() {
     return hasModuleAccess ? hasModuleAccess(featureKey) : false;
   };
 
-  // Memoize fetchMenuItems to prevent unnecessary re-renders
+  // Memoize fetchMenuItems to prevent unnecessary re-renders (use admin endpoint so cafe context matches auth/impersonation)
   const fetchMenuItems = useCallback(async () => {
     try {
-      const response = await axios.get('/menu');
+      const response = await axios.get('/admin/menu');
       setMenuItems(response.data || []);
     } catch (error) {
       console.error('Error fetching menu items:', error);
@@ -422,7 +422,7 @@ function App() {
   }, []);
 
   return (
-    <Router>
+    <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
       <AuthProvider>
         <TitleUpdater />
         <DarkModeProvider>
