@@ -288,42 +288,47 @@ const CustomerManagement = () => {
       {/* Statistics Cards */}
       {statistics && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <div className="card bg-gradient-to-r from-blue-500 to-blue-600 text-white">
+          <div className="card">
             <div className="flex items-center">
-              <Users className="h-8 w-8 mr-3" />
-              <div>
-                <p className="text-sm opacity-90">Total Customers</p>
-                <p className="text-2xl font-bold">{statistics.totalCustomers}</p>
+              <div className="p-2 rounded-lg bg-[var(--color-primary-container)]">
+                <Users className="h-6 w-6" style={{ color: 'var(--color-primary)' }} />
+              </div>
+              <div className="ml-4">
+                <p className="text-sm font-medium text-body-muted">Total Customers</p>
+                <p className="text-2xl font-bold text-on-surface">{statistics.totalCustomers}</p>
               </div>
             </div>
           </div>
-          
-          <div className="card bg-gradient-to-r from-green-500 to-green-600 text-white">
+          <div className="card">
             <div className="flex items-center">
-              <UserCheck className="h-8 w-8 mr-3" />
-              <div>
-                <p className="text-sm opacity-90">Active Customers</p>
-                <p className="text-2xl font-bold">{statistics.activeCustomers}</p>
+              <div className="p-2 rounded-lg bg-[var(--color-primary-container)]">
+                <UserCheck className="h-6 w-6" style={{ color: 'var(--color-success)' }} />
+              </div>
+              <div className="ml-4">
+                <p className="text-sm font-medium text-body-muted">Active Customers</p>
+                <p className="text-2xl font-bold text-on-surface">{statistics.activeCustomers}</p>
               </div>
             </div>
           </div>
-          
-          <div className="card bg-gradient-to-r from-yellow-500 to-yellow-600 text-white">
+          <div className="card">
             <div className="flex items-center">
-              <Star className="h-8 w-8 mr-3" />
-              <div>
-                <p className="text-sm opacity-90">Total Points</p>
-                <p className="text-2xl font-bold">{statistics.totalLoyaltyPoints}</p>
+              <div className="p-2 rounded-lg bg-[var(--color-primary-container)]">
+                <Star className="h-6 w-6" style={{ color: 'var(--color-warning)' }} />
+              </div>
+              <div className="ml-4">
+                <p className="text-sm font-medium text-body-muted">Total Points</p>
+                <p className="text-2xl font-bold text-on-surface">{statistics.totalLoyaltyPoints}</p>
               </div>
             </div>
           </div>
-          
-          <div className="card text-white" style={{ background: 'linear-gradient(to right, var(--color-primary), var(--color-primary))' }}>
+          <div className="card">
             <div className="flex items-center">
-              <TrendingUp className="h-8 w-8 mr-3" />
-              <div>
-                <p className="text-sm opacity-90">Total Spent</p>
-                <p className="text-2xl font-bold">{formatCurrency(statistics.totalSpent)}</p>
+              <div className="p-2 rounded-lg bg-[var(--color-primary-container)]">
+                <TrendingUp className="h-6 w-6" style={{ color: 'var(--color-primary)' }} />
+              </div>
+              <div className="ml-4">
+                <p className="text-sm font-medium text-body-muted">Total Spent</p>
+                <p className="text-2xl font-bold text-on-surface">{formatCurrency(statistics.totalSpent)}</p>
               </div>
             </div>
           </div>

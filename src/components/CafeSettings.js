@@ -596,9 +596,9 @@ const CafeSettings = () => {
   return (
     <div className="min-h-screen">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="flex flex-wrap items-center gap-6 mb-6">
-          <div>
-            <h1 className="text-2xl font-bold text-on-surface">Cafe Settings</h1>
+        <div className="flex flex-nowrap justify-between items-start sm:items-center gap-4 mb-6">
+          <div className="min-w-0">
+            <h1 className="text-2xl font-bold text-on-surface truncate">Cafe Settings</h1>
             <p className="text-sm text-body-muted mt-1">Manage your cafe configuration and appearance.</p>
           </div>
           <button type="button" onClick={handleSubmit} disabled={isSubmitting || cafeSettingsLoading} className="btn-primary px-5 py-2.5 text-sm font-medium shrink-0 disabled:opacity-50 disabled:cursor-not-allowed">
@@ -607,12 +607,17 @@ const CafeSettings = () => {
         </div>
 
         {showMessage && (
-          <div className={`mb-6 p-4 rounded-lg text-sm ${
-            message.type === 'success'
-              ? 'bg-green-50 text-green-800 dark:bg-green-900/30 dark:text-green-200 border border-green-200 dark:border-green-800'
-              : 'bg-red-50 text-red-800 dark:bg-red-900/30 dark:text-red-200 border border-red-200 dark:border-red-800'
-          }`}>
-            {message.text}
+          <div className="w-full max-w-4xl mx-auto mb-6">
+            <div
+              className="p-4 rounded-xl text-sm border"
+              style={{
+                backgroundColor: message.type === 'success' ? 'color-mix(in srgb, var(--color-success) 12%, transparent)' : 'color-mix(in srgb, var(--color-error) 12%, transparent)',
+                color: message.type === 'success' ? 'var(--color-success)' : 'var(--color-error)',
+                borderColor: message.type === 'success' ? 'var(--color-success)' : 'var(--color-error)'
+              }}
+            >
+              {message.text}
+            </div>
           </div>
         )}
 
@@ -622,23 +627,27 @@ const CafeSettings = () => {
             <p className="text-body-muted">Loading cafe settings...</p>
           </div>
         ) : cafeSettingsError ? (
-          <div className="card p-6 border-2 bg-red-50 dark:bg-red-900/20" style={{ borderColor: 'var(--color-error)' }}>
-            <p className="font-medium mb-2" style={{ color: 'var(--color-error)' }}>Failed to load cafe settings</p>
-            <p className="text-sm mb-4" style={{ color: 'var(--color-error)' }}>{cafeSettingsError}</p>
-            <button type="button" onClick={() => fetchCafeSettings()} className="btn-primary">
-              Retry
-            </button>
+          <div className="w-full max-w-4xl mx-auto">
+            <div className="card border-2 bg-red-50 dark:bg-red-900/20" style={{ borderColor: 'var(--color-error)' }}>
+              <p className="font-medium mb-2" style={{ color: 'var(--color-error)' }}>Failed to load cafe settings</p>
+              <p className="text-sm mb-4" style={{ color: 'var(--color-error)' }}>{cafeSettingsError}</p>
+              <button type="button" onClick={() => fetchCafeSettings()} className="btn-primary">
+                Retry
+              </button>
+            </div>
           </div>
         ) : (
-        <div className="w-full max-w-4xl">
+        <div className="w-full max-w-4xl mx-auto">
           <div className="space-y-6">
             {/* Cafe Slug & Public URL Section (multi-cafe: show when admin/superadmin has a cafe slug) */}
             {(user?.role === 'admin' || user?.role === 'superadmin') && publicSlug && (
-              <div className="card p-6">
-                <h2 className="text-xl font-semibold text-on-surface mb-1">Public Cafe URL</h2>
-                <p className="text-sm text-body-muted mb-5">
-                  Share this URL with your customers to access your cafe menu and place orders.
-                </p>
+              <div className="card">
+                <div className="card-header">
+                  <h2 className="card-title">Public Cafe URL</h2>
+                  <p className="card-description">
+                    Share this URL with your customers to access your cafe menu and place orders.
+                  </p>
+                </div>
                 <div className="space-y-5">
                   <div>
                     <label className="block text-sm font-medium text-on-surface mb-1.5">Cafe Slug</label>
@@ -690,9 +699,11 @@ const CafeSettings = () => {
             )}
 
             {/* Basic Information */}
-            <div className="card p-6">
-              <h2 className="text-xl font-semibold text-on-surface mb-1">Basic Information</h2>
-              <p className="text-sm text-body-muted mb-5">Your cafe details shown to customers and used in invoices.</p>
+            <div className="card">
+              <div className="card-header">
+                <h2 className="card-title">Basic Information</h2>
+                <p className="card-description">Your cafe details shown to customers and used in invoices.</p>
+              </div>
               <form onSubmit={handleSubmit} className="space-y-4" id="cafe-settings-form">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
@@ -730,11 +741,11 @@ const CafeSettings = () => {
             </div>
 
             {/* Tab & Role Visibility */}
-            <div className="card p-6">
-              <h2 className="text-xl font-semibold text-on-surface mb-1">Tab & Role Visibility</h2>
-              <p className="text-sm text-body-muted mb-5">
-                Control which tabs and features are visible to each role.
-              </p>
+            <div className="card">
+              <div className="card-header">
+                <h2 className="card-title">Tab & Role Visibility</h2>
+                <p className="card-description">Control which tabs and features are visible to each role.</p>
+              </div>
               <form onSubmit={handleSubmit} className="space-y-0" id="cafe-visibility-form" noValidate>
                 <div className="space-y-6">
                   {/* Owner */}
@@ -819,11 +830,11 @@ const CafeSettings = () => {
             </div>
 
             {/* Branding Section */}
-            <div className="card p-6">
-              <h2 className="text-xl font-semibold text-on-surface mb-1">Branding</h2>
-              <p className="text-sm text-body-muted mb-5">
-                Images shown on the customer-facing menu page.
-              </p>
+            <div className="card">
+              <div className="card-header">
+                <h2 className="card-title">Branding</h2>
+                <p className="card-description">Images shown on the customer-facing menu page.</p>
+              </div>
               <div className="space-y-6">
               <div>
                 <label className="block text-sm font-medium text-on-surface mb-1.5">Logo</label>

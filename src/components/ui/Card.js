@@ -20,9 +20,9 @@ const Card = ({
   kpi = false // Use KPI card style for dashboards
 }) => {
   const paddingClasses = {
-    sm: 'p-5',
-    md: 'p-7',
-    lg: 'p-9'
+    sm: 'card-sm',
+    md: '',
+    lg: 'card-lg'
   };
   
   let cardClass = 'card';

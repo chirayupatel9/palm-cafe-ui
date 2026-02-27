@@ -415,48 +415,45 @@ const InventoryManagement = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="card">
           <div className="flex items-center">
-            <div className={`p-2 rounded-lg ${isDarkMode ? 'bg-blue-900' : 'bg-blue-100'}`}>
-              <Package className={`h-6 w-6 ${isDarkMode ? 'text-blue-400' : 'text-blue-600'}`} />
+            <div className="p-2 rounded-lg bg-[var(--color-primary-container)]">
+              <Package className="h-6 w-6" style={{ color: 'var(--color-primary)' }} />
             </div>
             <div className="ml-4">
-              <p className={`text-sm font-medium ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Total Items</p>
-              <p className={`text-2xl font-bold ${isDarkMode ? 'text-gray-100' : 'text-gray-900'}`}>{stats.totalItems}</p>
+              <p className="text-sm font-medium text-body-muted">Total Items</p>
+              <p className="text-2xl font-bold text-on-surface">{stats.totalItems}</p>
             </div>
           </div>
         </div>
-
         <div className="card">
           <div className="flex items-center">
-            <div className={`p-2 rounded-lg ${isDarkMode ? 'bg-orange-900' : 'bg-orange-100'}`}>
-              <AlertTriangle className={`h-6 w-6 ${isDarkMode ? 'text-orange-400' : 'text-orange-600'}`} />
+            <div className="p-2 rounded-lg bg-[var(--color-primary-container)]">
+              <AlertTriangle className="h-6 w-6" style={{ color: 'var(--color-warning)' }} />
             </div>
             <div className="ml-4">
-              <p className={`text-sm font-medium ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Low Stock</p>
-              <p className={`text-2xl font-bold ${isDarkMode ? 'text-gray-100' : 'text-gray-900'}`}>{stats.lowStockItems}</p>
+              <p className="text-sm font-medium text-body-muted">Low Stock</p>
+              <p className="text-2xl font-bold text-on-surface">{stats.lowStockItems}</p>
             </div>
           </div>
         </div>
-
         <div className="card">
           <div className="flex items-center">
-            <div className={`p-2 rounded-lg ${isDarkMode ? 'bg-red-900' : 'bg-red-100'}`}>
-              <AlertTriangle className={`h-6 w-6 ${isDarkMode ? 'text-red-400' : 'text-red-600'}`} />
+            <div className="p-2 rounded-lg bg-[var(--color-primary-container)]">
+              <AlertTriangle className="h-6 w-6" style={{ color: 'var(--color-error)' }} />
             </div>
             <div className="ml-4">
-              <p className={`text-sm font-medium ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Out of Stock</p>
-              <p className={`text-2xl font-bold ${isDarkMode ? 'text-gray-100' : 'text-gray-900'}`}>{stats.outOfStockItems}</p>
+              <p className="text-sm font-medium text-body-muted">Out of Stock</p>
+              <p className="text-2xl font-bold text-on-surface">{stats.outOfStockItems}</p>
             </div>
           </div>
         </div>
-
         <div className="card">
           <div className="flex items-center">
-            <div className={`p-2 rounded-lg ${isDarkMode ? 'bg-green-900' : 'bg-green-100'}`}>
-              <TrendingUp className={`h-6 w-6 ${isDarkMode ? 'text-green-400' : 'text-green-600'}`} />
+            <div className="p-2 rounded-lg bg-[var(--color-primary-container)]">
+              <TrendingUp className="h-6 w-6" style={{ color: 'var(--color-success)' }} />
             </div>
             <div className="ml-4">
-              <p className={`text-sm font-medium ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Total Value</p>
-              <p className={`text-2xl font-bold ${isDarkMode ? 'text-gray-100' : 'text-gray-900'}`}>{formatCurrency(stats.totalValue)}</p>
+              <p className="text-sm font-medium text-body-muted">Total Value</p>
+              <p className="text-2xl font-bold text-on-surface">{formatCurrency(stats.totalValue)}</p>
             </div>
           </div>
         </div>
@@ -465,7 +462,7 @@ const InventoryManagement = () => {
       {/* Import Results */}
       {importResults && (
         <div className="card">
-          <h3 className={`text-lg font-semibold mb-3 ${isDarkMode ? 'text-gray-100' : 'text-gray-900'}`}>Import Results</h3>
+          <h3 className="text-lg font-semibold mb-3 text-on-surface">Import Results</h3>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
             <div className="text-center">
               <div className="text-2xl font-bold text-blue-600">{importResults.total}</div>

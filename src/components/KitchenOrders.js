@@ -627,14 +627,12 @@ const KitchenOrders = ({ cart, setCart }) => {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <div className="card">
           <div className="flex items-center">
-            <div className={`p-2 rounded-lg ${isDarkMode ? 'bg-yellow-900' : 'bg-yellow-100'}`}>
-              <Clock className={`h-6 w-6 ${isDarkMode ? 'text-yellow-400' : 'text-yellow-600'}`} />
+            <div className="p-2 rounded-lg bg-[var(--color-primary-container)]">
+              <Clock className="h-6 w-6" style={{ color: 'var(--color-warning)' }} />
             </div>
             <div className="ml-4">
-              <p className={`text-sm font-medium ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                {activeTab === 'today' && todaySubTab === 'active' ? 'Pending' : 'Pending'}
-              </p>
-              <p className={`text-2xl font-bold ${isDarkMode ? 'text-yellow-400' : 'text-yellow-600'}`}>
+              <p className="text-sm font-medium text-body-muted">Pending</p>
+              <p className="text-2xl font-bold text-on-surface">
                 {todayOrders.filter(o => o.status === 'pending').length}
               </p>
             </div>
@@ -642,14 +640,12 @@ const KitchenOrders = ({ cart, setCart }) => {
         </div>
         <div className="card">
           <div className="flex items-center">
-            <div className={`p-2 rounded-lg ${isDarkMode ? 'bg-blue-900' : 'bg-blue-100'}`}>
-              <Utensils className={`h-6 w-6 ${isDarkMode ? 'text-blue-400' : 'text-blue-600'}`} />
+            <div className="p-2 rounded-lg bg-[var(--color-primary-container)]">
+              <Utensils className="h-6 w-6" style={{ color: 'var(--color-info)' }} />
             </div>
             <div className="ml-4">
-              <p className={`text-sm font-medium ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                {activeTab === 'today' && todaySubTab === 'active' ? 'Preparing' : 'Preparing'}
-              </p>
-              <p className={`text-2xl font-bold ${isDarkMode ? 'text-blue-400' : 'text-blue-600'}`}>
+              <p className="text-sm font-medium text-body-muted">Preparing</p>
+              <p className="text-2xl font-bold text-on-surface">
                 {todayOrders.filter(o => o.status === 'preparing').length}
               </p>
             </div>
@@ -657,14 +653,12 @@ const KitchenOrders = ({ cart, setCart }) => {
         </div>
         <div className="card">
           <div className="flex items-center">
-            <div className={`p-2 rounded-lg ${isDarkMode ? 'bg-green-900' : 'bg-green-100'}`}>
-              <CheckCircle className={`h-6 w-6 ${isDarkMode ? 'text-green-400' : 'text-green-600'}`} />
+            <div className="p-2 rounded-lg bg-[var(--color-primary-container)]">
+              <CheckCircle className="h-6 w-6" style={{ color: 'var(--color-success)' }} />
             </div>
             <div className="ml-4">
-              <p className={`text-sm font-medium ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                Ready
-              </p>
-              <p className={`text-2xl font-bold ${isDarkMode ? 'text-green-400' : 'text-green-600'}`}>
+              <p className="text-sm font-medium text-body-muted">Ready</p>
+              <p className="text-2xl font-bold text-on-surface">
                 {todayOrders.filter(o => o.status === 'ready').length}
               </p>
             </div>
@@ -672,17 +666,17 @@ const KitchenOrders = ({ cart, setCart }) => {
         </div>
         <div className="card">
           <div className="flex items-center">
-            <div className="p-2 rounded-lg transition-surface" style={{ backgroundColor: 'var(--surface-table)' }}>
+            <div className="p-2 rounded-lg bg-[var(--surface-table)]">
               <Coffee className="h-6 w-6" style={{ color: 'var(--color-on-surface-variant)' }} />
             </div>
             <div className="ml-4">
-              <p className="text-sm font-medium" style={{ color: 'var(--color-on-surface-variant)' }}>
+              <p className="text-sm font-medium text-body-muted">
                 {activeTab === 'today' && todaySubTab === 'active' ? 'Total Active' : 
                  activeTab === 'today' && todaySubTab === 'ready' ? 'Total Ready' :
                  activeTab === 'today' && todaySubTab === 'completed' ? 'Total Completed' :
                  activeTab === 'today' && todaySubTab === 'cancelled' ? 'Total Cancelled' : 'Total Active'}
               </p>
-              <p className="text-2xl font-bold" style={{ color: 'var(--color-primary)' }}>
+              <p className="text-2xl font-bold text-on-surface">
                 {activeTab === 'today' && todaySubTab === 'active'
                   ? pendingOrders.length
                   : activeTab === 'today' && todaySubTab === 'ready'
@@ -921,13 +915,7 @@ const KitchenOrders = ({ cart, setCart }) => {
               return (
                 <div
                   key={order.id}
-                  className={`card border-l-4 ${
-                    order.status === 'pending' ? 'border-l-yellow-500' :
-                    order.status === 'preparing' ? 'border-l-blue-500' :
-                    order.status === 'ready' ? 'border-l-green-500' :
-                    order.status === 'completed' ? 'border-l-green-600' :
-                    'border-l-red-500'
-                  }`}
+                  className={`card card-status-${order.status}`}
                 >
                 {/* Order Header */}
                 <div className="flex items-center justify-between mb-4">

@@ -399,70 +399,64 @@ const InvoiceHistory = ({ cart, setCart, setCurrentPage }) => {
              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 sm:gap-6 mb-6">
                <div className="card">
                  <div className="flex items-center">
-                   <div className="flex-shrink-0">
-                     <div className="h-6 w-6 sm:h-8 sm:w-8 bg-secondary-500 rounded-full flex items-center justify-center">
-                       <span className="text-white text-xs sm:text-sm font-bold">{currencySettings.currency_symbol}</span>
-                     </div>
+                   <div className="p-2 rounded-lg bg-[var(--color-primary-container)] flex-shrink-0">
+                     <span className="text-sm font-bold text-primary">{currencySettings.currency_symbol}</span>
                    </div>
                    <div className="ml-3 sm:ml-4">
-                     <div className="text-xs sm:text-sm font-medium text-gray-500 dark:text-gray-400">Total Revenue</div>
-                     <div className="text-lg sm:text-2xl font-semibold text-secondary-700 dark:text-secondary-300">
+                     <div className="text-xs sm:text-sm font-medium text-body-muted">Total Revenue</div>
+                     <div className="text-lg sm:text-2xl font-semibold text-on-surface">
                        {formatCurrency(statistics.totalRevenue)}
                      </div>
                    </div>
                  </div>
                </div>
-               
                <div className="card">
                  <div className="flex items-center">
-                   <div className="flex-shrink-0">
-                     <Calendar className="h-6 w-6 sm:h-8 sm:w-8 text-secondary-500" />
+                   <div className="p-2 rounded-lg bg-[var(--color-primary-container)] flex-shrink-0">
+                     <Calendar className="h-6 w-6 sm:h-8 sm:w-8 text-primary" />
                    </div>
                    <div className="ml-3 sm:ml-4">
-                     <div className="text-xs sm:text-sm font-medium text-gray-500 dark:text-gray-400">Total Orders</div>
-                     <div className="text-lg sm:text-2xl font-semibold text-secondary-700 dark:text-secondary-300">
+                     <div className="text-xs sm:text-sm font-medium text-body-muted">Total Orders</div>
+                     <div className="text-lg sm:text-2xl font-semibold text-on-surface">
                        {statistics.totalOrders}
                      </div>
                    </div>
                  </div>
                </div>
-               
                <div className="card">
                  <div className="flex items-center">
-                   <div className="flex-shrink-0">
-                     <User className="h-6 w-6 sm:h-8 sm:w-8 text-secondary-500" />
+                   <div className="p-2 rounded-lg bg-[var(--color-primary-container)] flex-shrink-0">
+                     <User className="h-6 w-6 sm:h-8 sm:w-8 text-primary" />
                    </div>
                    <div className="ml-3 sm:ml-4">
-                     <div className="text-xs sm:text-sm font-medium text-gray-500 dark:text-gray-400">Unique Customers</div>
-                     <div className="text-lg sm:text-2xl font-semibold text-secondary-700 dark:text-secondary-300">
+                     <div className="text-xs sm:text-sm font-medium text-body-muted">Unique Customers</div>
+                     <div className="text-lg sm:text-2xl font-semibold text-on-surface">
                        {statistics.uniqueCustomers}
                      </div>
                    </div>
                  </div>
                </div>
-
                <div className="card">
                  <div className="flex items-center">
-                   <div className="flex-shrink-0">
-                     <Percent className="h-6 w-6 sm:h-8 sm:w-8 text-green-500" />
+                   <div className="p-2 rounded-lg bg-[var(--color-primary-container)] flex-shrink-0">
+                     <Percent className="h-6 w-6 sm:h-8 sm:w-8 text-success" />
                    </div>
                    <div className="ml-3 sm:ml-4">
-                     <div className="text-xs sm:text-sm font-medium text-gray-500 dark:text-gray-400">Total Tax Collected</div>
-                     <div className="text-lg sm:text-2xl font-semibold text-secondary-700 dark:text-secondary-300">
+                     <div className="text-xs sm:text-sm font-medium text-body-muted">Total Tax Collected</div>
+                     <div className="text-lg sm:text-2xl font-semibold text-on-surface">
                        {formatCurrency(statistics.totalTax)}
                      </div>
                    </div>
                  </div>
                </div>
-
                <div className="card">
                  <div className="flex items-center">
-                   <div className="flex-shrink-0">
-                     <Heart className="h-6 w-6 sm:h-8 sm:w-8 text-red-500" />
+                   <div className="p-2 rounded-lg bg-[var(--color-primary-container)] flex-shrink-0">
+                     <Heart className="h-6 w-6 sm:h-8 sm:w-8 text-error" />
                    </div>
                    <div className="ml-3 sm:ml-4">
-                     <div className="text-xs sm:text-sm font-medium text-gray-500 dark:text-gray-400">Total Tips</div>
-                     <div className="text-lg sm:text-2xl font-semibold text-secondary-700 dark:text-secondary-300">
+                     <div className="text-xs sm:text-sm font-medium text-body-muted">Total Tips</div>
+                     <div className="text-lg sm:text-2xl font-semibold text-on-surface">
                        {formatCurrency(statistics.totalTips)}
                      </div>
                    </div>
