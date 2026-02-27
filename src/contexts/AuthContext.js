@@ -83,12 +83,9 @@ export const AuthProvider = ({ children }) => {
         }
 
         if (error.response?.status === 403) {
-          const { code, feature, current_plan } = error.response.data || {};
+          const { code } = error.response.data || {};
           if (code === 'FEATURE_ACCESS_DENIED') {
-            toast.error(
-              `${feature || 'This feature'} is not available on your ${current_plan || 'current'} plan.`,
-              { duration: 5000 }
-            );
+            toast.error('Locked feature. Upgrade your plan to access.', { duration: 4000 });
           }
         }
 

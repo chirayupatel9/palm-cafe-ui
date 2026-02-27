@@ -51,7 +51,7 @@ const InventoryManagement = () => {
       setInventory(response.data);
     } catch (error) {
       console.error('Error fetching inventory:', error);
-      toast.error('Failed to load inventory');
+      toast.error('Locked feature. Upgrade your plan to access.', { duration: 4000 });
     } finally {
       setLoading(false);
     }

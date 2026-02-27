@@ -178,16 +178,7 @@ const CafeAnalytics = () => {
       setCustomers(customersRes.data);
     } catch (err) {
       console.error('Error fetching analytics:', err);
-      if (err.response?.status === 403) {
-        if (err.response?.data?.code === 'FEATURE_ACCESS_DENIED') {
-          setError('feature_denied');
-        } else {
-          setError('access_denied');
-        }
-      } else {
-        setError('fetch_error');
-        toast.error('We couldn\'t load analytics data. Please try again.');
-      }
+      setError('feature_denied');
     } finally {
       setLoading(false);
     }
@@ -291,30 +282,13 @@ const CafeAnalytics = () => {
     );
   }
 
-  if (error === 'feature_denied' || error === 'access_denied') {
+  if (error === 'feature_denied' || error === 'access_denied' || error === 'fetch_error') {
     return (
       <LockedFeature 
         featureName="Analytics" 
         requiredPlan="Pro"
         description="Advanced insights and business intelligence to track performance, revenue trends, and customer behavior."
       />
-    );
-  }
-
-  if (error === 'fetch_error') {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <div className="text-center">
-          <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
-          <p className="text-secondary-600 dark:text-gray-400">Failed to load analytics data. Please try again.</p>
-          <button
-            onClick={fetchAnalytics}
-            className="mt-4 px-4 py-2 bg-secondary-600 hover:bg-secondary-700 text-white rounded-lg transition-colors"
-          >
-            Retry
-          </button>
-        </div>
-      </div>
     );
   }
 

@@ -114,9 +114,7 @@ function MainApp() {
             duration: 5000
           });
         } else if (errorCode === 'FEATURE_ACCESS_DENIED') {
-          toast.error(`Menu management is not available on your current plan (${error.response?.data?.current_plan || 'FREE'}).`, {
-            duration: 5000
-          });
+          toast.error('Locked feature. Upgrade your plan to access.', { duration: 4000 });
         } else {
           toast.error('Access denied. Please check your subscription status.', {
             duration: 5000
@@ -252,7 +250,7 @@ function MainApp() {
   }
 
   return (
-    <div className={`min-h-screen surface-page ${impersonation?.isImpersonating ? 'pt-16' : ''}`}>
+    <div className={`min-h-screen bg-white ${impersonation?.isImpersonating ? 'pt-16' : ''}`}>
       <Toaster position="top-right" />
     
     {/* Header - Distinct navigation surface */}
@@ -404,8 +402,8 @@ function MainApp() {
       </div>
     </nav>
 
-    {/* Main Content - Container surface with distinct background */}
-    <main className="surface-container max-w-7xl mx-auto my-8 sm:my-12 px-4 sm:px-6 lg:px-8">
+    {/* Main Content - Plain background */}
+    <main className="bg-white surface-container max-w-7xl mx-auto my-8 sm:my-12 px-4 sm:px-6 lg:px-8">
       {renderPage()}
     </main>
       </div>

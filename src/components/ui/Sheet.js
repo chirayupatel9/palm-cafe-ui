@@ -27,13 +27,14 @@ function Sheet({ open, onClose, children, title = '', className = '' }) {
         onClick={onClose}
         aria-hidden="true"
       />
-      {/* Panel - template: right side, w-full sm:max-w-md, slide-in */}
+      {/* Panel - right side, Material-style elevation; wider on desktop */}
       <div
-        className={`absolute inset-y-0 right-0 w-full sm:max-w-md bg-white shadow-xl flex flex-col animate-slide-in-right ${className}`}
+        className={`absolute inset-y-0 right-0 w-full sm:max-w-md lg:max-w-lg bg-white flex flex-col animate-slide-in-right shadow-2xl ${className}`}
+        style={{ boxShadow: 'var(--shadow-lg, 0 10px 15px -3px rgba(0,0,0,.1))' }}
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex items-center justify-between flex-shrink-0 p-4 border-b border-[#2A2A2A]/10">
-          {title && <h2 className="text-xl font-bold text-[#2A2A2A]">{title}</h2>}
+        <div className="flex items-center justify-between flex-shrink-0 px-4 py-3 border-b border-[#2A2A2A]/10">
+          {title && <h2 className="text-lg font-semibold text-[#2A2A2A]">{title}</h2>}
           <button
             type="button"
             onClick={onClose}
