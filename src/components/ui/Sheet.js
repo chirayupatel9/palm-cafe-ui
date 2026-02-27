@@ -29,16 +29,19 @@ function Sheet({ open, onClose, children, title = '', className = '' }) {
       />
       {/* Panel - right side, Material-style elevation; wider on desktop */}
       <div
-        className={`absolute inset-y-0 right-0 w-full sm:max-w-md lg:max-w-lg bg-white flex flex-col animate-slide-in-right shadow-2xl ${className}`}
-        style={{ boxShadow: 'var(--shadow-lg, 0 10px 15px -3px rgba(0,0,0,.1))' }}
+        className={`absolute inset-y-0 right-0 w-full sm:max-w-md lg:max-w-lg flex flex-col animate-slide-in-right shadow-2xl ${className}`}
+        style={{
+          boxShadow: 'var(--shadow-lg, 0 10px 15px -3px rgba(0,0,0,.1))',
+          backgroundColor: 'var(--surface-card)'
+        }}
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex items-center justify-between flex-shrink-0 px-4 py-3 border-b border-[#2A2A2A]/10">
-          {title && <h2 className="text-lg font-semibold text-[#2A2A2A]">{title}</h2>}
+        <div className="flex items-center justify-between flex-shrink-0 px-4 py-3 border-b sheet-header-border">
+          {title && <h2 className="text-lg font-semibold text-on-surface">{title}</h2>}
           <button
             type="button"
             onClick={onClose}
-            className="ml-auto p-2 rounded-full text-[#6F6A63] hover:bg-[#F6F4F0] hover:text-[#2A2A2A] transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center"
+            className="ml-auto p-2 rounded-full text-on-surface-variant hover:bg-[var(--color-outline-variant)] hover:text-on-surface transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center"
             aria-label="Close"
           >
             <X className="h-5 w-5" />

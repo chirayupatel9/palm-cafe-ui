@@ -373,16 +373,16 @@ const OrderPage = ({ menuItems, cart: externalCart, setCart: setExternalCart }) 
   const total = getTotal();
 
   return (
-    <div className={`min-h-screen pt-6 pb-6 sm:pt-8 sm:pb-8 px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto ${isDarkMode ? 'bg-gray-900' : 'bg-white'}`}>
+    <div className="min-h-screen pt-6 pb-6 sm:pt-8 sm:pb-8 px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto surface-page">
       {/* Invoice prompt - Template Dialog */}
       <Dialog open={showInvoicePrompt} onClose={() => setShowInvoicePrompt(false)} title="Complete order" maxHeight={false}>
-        <p className="text-sm text-[#6F6A63] mb-6">Do you want to see the invoice?</p>
+        <p className="text-sm text-body-muted mb-6">Do you want to see the invoice?</p>
         <div className="flex gap-3">
           <button
             type="button"
             onClick={() => completeOrder(false)}
             disabled={loading}
-            className="flex-1 px-4 py-2 rounded-lg border border-gray-300 hover:bg-gray-50 disabled:opacity-50 text-gray-900"
+            className="flex-1 px-4 py-2 rounded-lg border btn-secondary disabled:opacity-50"
           >
             No
           </button>
@@ -390,7 +390,7 @@ const OrderPage = ({ menuItems, cart: externalCart, setCart: setExternalCart }) 
             type="button"
             onClick={() => completeOrder(true)}
             disabled={loading}
-            className="flex-1 px-4 py-2 rounded-lg bg-[#2A2A2A] hover:bg-[#C68E3C] text-white font-medium disabled:opacity-50"
+            className="flex-1 px-4 py-2 rounded-lg bg-primary hover:opacity-90 text-on-primary font-medium disabled:opacity-50"
           >
             Yes, show invoice
           </button>
@@ -399,7 +399,7 @@ const OrderPage = ({ menuItems, cart: externalCart, setCart: setExternalCart }) 
           type="button"
           onClick={() => setShowInvoicePrompt(false)}
           disabled={loading}
-          className="mt-4 w-full text-sm text-[#6F6A63] hover:text-[#2A2A2A]"
+          className="mt-4 w-full text-sm text-body-muted hover:text-on-surface"
         >
           Cancel
         </button>
@@ -408,15 +408,15 @@ const OrderPage = ({ menuItems, cart: externalCart, setCart: setExternalCart }) 
       {/* Menu Items - full width; cart opens in right-side sheet */}
       <div className="mb-6">
         <div className="mb-8 sm:mb-12">
-          <span className={`font-mono text-xs uppercase tracking-[0.2em] mb-2 block ${isDarkMode ? 'text-amber-400' : 'text-[#C68E3C]'}`}>Dashboard</span>
-          <h2 className={`text-3xl sm:text-4xl font-bold tracking-tight ${isDarkMode ? 'text-gray-100' : 'text-[#2A2A2A]'}`}>Create new orders</h2>
-          <p className={`max-w-xl text-base sm:text-lg mt-2 leading-relaxed ${isDarkMode ? 'text-gray-400' : 'text-[#6F6A63]'}`}>
+          <span className="font-mono text-xs uppercase tracking-[0.2em] mb-2 block text-primary">Dashboard</span>
+          <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-on-surface">Create new orders</h2>
+          <p className="max-w-xl text-base sm:text-lg mt-2 leading-relaxed text-body-muted">
             Manage your cafe operations. Add items to the cart and complete the order.
           </p>
         </div>
 
         {Object.keys(groupedMenuItems).length === 0 ? (
-          <div className={`text-center py-16 ${isDarkMode ? 'bg-gray-800/40' : 'bg-transparent'}`}>
+          <div className="text-center py-16">
             {cafeSettings.logo_url && (
               <img
                 src={getImageUrl(cafeSettings.logo_url)}
@@ -424,8 +424,8 @@ const OrderPage = ({ menuItems, cart: externalCart, setCart: setExternalCart }) 
                 className="h-24 w-24 mx-auto mb-6 opacity-50"
               />
             )}
-            <h3 className={`text-xl font-semibold mb-2 ${isDarkMode ? 'text-gray-200' : 'text-[#2A2A2A]'}`}>No menu items available</h3>
-            <p className={isDarkMode ? 'text-gray-400' : 'text-[#6F6A63]'}>Add items in Menu Management to get started</p>
+            <h3 className="text-xl font-semibold mb-2 text-on-surface">No menu items available</h3>
+            <p className="text-body-muted">Add items in Menu Management to get started</p>
           </div>
         ) : (
           <div className="space-y-12 sm:space-y-16">
@@ -439,10 +439,10 @@ const OrderPage = ({ menuItems, cart: externalCart, setCart: setExternalCart }) 
                 >
                   <div className="mb-6 sm:mb-8">
                     <div className="flex items-baseline gap-4 mb-2">
-                      <span className={`font-mono text-sm px-3 py-1 rounded-full ${isDarkMode ? 'text-amber-400 bg-amber-400/10' : 'text-[#C68E3C] bg-[#C68E3C]/10'}`}>
+                      <span className="font-mono text-sm px-3 py-1 rounded-full text-primary bg-primary-container">
                         {categoryNumber}
                       </span>
-                      <h3 className={`text-2xl sm:text-3xl font-bold tracking-tight ${isDarkMode ? 'text-gray-100' : 'text-[#2A2A2A]'}`}>
+                      <h3 className="text-2xl sm:text-3xl font-bold tracking-tight text-on-surface">
                         {categoryName}
                       </h3>
                     </div>
@@ -453,9 +453,9 @@ const OrderPage = ({ menuItems, cart: externalCart, setCart: setExternalCart }) 
                       return (
                         <div
                           key={item.id}
-                          className={`group overflow-hidden border-b last:border-b-0 transition-colors ${isDarkMode ? 'border-gray-700 hover:bg-gray-800/50' : 'border-gray-200 hover:bg-gray-50'}`}
+                          className="group overflow-hidden border-b last:border-b-0 transition-colors border-[var(--color-outline)] hover:bg-[var(--color-outline-variant)]"
                         >
-                          <div className={`relative aspect-[4/3] overflow-hidden flex-shrink-0 ${isDarkMode ? 'bg-gray-700' : 'bg-gray-100'}`}>
+                          <div className="relative aspect-[4/3] overflow-hidden flex-shrink-0 bg-[var(--surface-table)]">
                             {cafeSettings?.show_menu_images && item.image_url ? (
                               <img
                                 src={getImageUrl(item.image_url)}
@@ -464,49 +464,49 @@ const OrderPage = ({ menuItems, cart: externalCart, setCart: setExternalCart }) 
                               />
                             ) : (
                               <div className="w-full h-full flex items-center justify-center">
-                                <FolderOpen className={`h-12 w-12 ${isDarkMode ? 'text-amber-500/40' : 'text-[#C68E3C]/40'}`} />
+                                <FolderOpen className="h-12 w-12 text-primary opacity-40" />
                               </div>
                             )}
-                            <div className={`absolute top-3 right-3 px-3 py-1.5 rounded-full ${isDarkMode ? 'bg-gray-800/95' : 'bg-white/95'}`}>
-                              <span className={`font-mono text-sm font-medium ${isDarkMode ? 'text-amber-400' : 'text-[#C68E3C]'}`}>
+                            <div className="absolute top-3 right-3 px-3 py-1.5 rounded-full bg-[var(--surface-card)]/95">
+                              <span className="font-mono text-sm font-medium text-primary">
                                 {formatCurrency(ensureNumber(item.price))}
                               </span>
                             </div>
                           </div>
                           <div className="p-4 sm:p-5">
-                            <h4 className={`font-semibold text-lg mb-2 group-hover:text-[#C68E3C] transition-colors ${isDarkMode ? 'text-gray-100' : 'text-[#2A2A2A]'}`}>
+                            <h4 className="font-semibold text-lg mb-2 group-hover:text-primary transition-colors text-on-surface">
                               {item.name}
                             </h4>
-                            <p className={`text-sm mb-4 line-clamp-2 leading-relaxed ${isDarkMode ? 'text-gray-400' : 'text-[#6F6A63]'}`}>
+                            <p className="text-sm mb-4 line-clamp-2 leading-relaxed text-body-muted">
                               {item.description || '—'}
                             </p>
                             {quantity === 0 ? (
                               <button
                                 type="button"
                                 onClick={(e) => { e.stopPropagation(); addToCart(item); }}
-                                className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-[#2A2A2A] hover:bg-[#C68E3C] text-white font-medium transition-colors duration-300"
+                                className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-primary hover:opacity-90 text-on-primary font-medium transition-colors duration-300"
                               >
                                 <ShoppingBag className="h-4 w-4" />
                                 Add to cart
                               </button>
                             ) : (
-                              <div className={`flex items-center justify-between rounded-xl p-2 ${isDarkMode ? 'bg-gray-700' : 'bg-gray-100'}`}>
+                              <div className="flex items-center justify-between rounded-xl p-2 bg-[var(--surface-table)]">
                                 <button
                                   type="button"
                                   onClick={(e) => { e.stopPropagation(); updateQuantity(item.id, quantity - 1); }}
-                                  className={`h-10 w-10 rounded-full shadow-sm flex items-center justify-center transition-all hover:scale-105 ${isDarkMode ? 'bg-gray-600 hover:bg-gray-500' : 'bg-white hover:bg-gray-200 border border-gray-200'}`}
+                                  className="h-10 w-10 rounded-full shadow-sm flex items-center justify-center transition-all hover:scale-105 bg-[var(--surface-card)] hover:bg-[var(--surface-elevated)] border border-[var(--color-outline)]"
                                   aria-label="Decrease quantity"
                                 >
-                                  <Minus className={`h-4 w-4 ${isDarkMode ? 'text-gray-200' : 'text-[#2A2A2A]'}`} />
+                                  <Minus className="h-4 w-4 text-on-surface" />
                                 </button>
-                                <span className={`font-mono text-lg font-medium ${isDarkMode ? 'text-gray-100' : 'text-[#2A2A2A]'}`}>{quantity}</span>
+                                <span className="font-mono text-lg font-medium text-on-surface">{quantity}</span>
                                 <button
                                   type="button"
                                   onClick={(e) => { e.stopPropagation(); updateQuantity(item.id, quantity + 1); }}
-                                  className={`h-10 w-10 rounded-full shadow-sm flex items-center justify-center transition-all hover:scale-105 ${isDarkMode ? 'bg-gray-600 hover:bg-gray-500' : 'bg-white hover:bg-gray-200 border border-gray-200'}`}
+                                  className="h-10 w-10 rounded-full shadow-sm flex items-center justify-center transition-all hover:scale-105 bg-[var(--surface-card)] hover:bg-[var(--surface-elevated)] border border-[var(--color-outline)]"
                                   aria-label="Increase quantity"
                                 >
-                                  <Plus className={`h-4 w-4 ${isDarkMode ? 'text-gray-200' : 'text-[#2A2A2A]'}`} />
+                                  <Plus className="h-4 w-4 text-on-surface" />
                                 </button>
                               </div>
                             )}
@@ -534,7 +534,7 @@ const OrderPage = ({ menuItems, cart: externalCart, setCart: setExternalCart }) 
           {currentCart.length > 0 ? (
             <>
               <span className="hidden sm:inline font-medium">Cart</span>
-              <span className="bg-white text-[var(--color-primary)] text-xs font-semibold rounded-full h-6 min-w-[24px] flex items-center justify-center px-1.5">
+              <span className="bg-on-primary text-primary text-xs font-semibold rounded-full h-6 min-w-[24px] flex items-center justify-center px-1.5">
                 {currentCart.length}
               </span>
             </>
@@ -546,7 +546,7 @@ const OrderPage = ({ menuItems, cart: externalCart, setCart: setExternalCart }) 
 
       {/* Cart - Right-side sheet (mobile + desktop) */}
       {showCart && (
-        <Sheet open={showCart} onClose={() => setShowCart(false)} title={currentCart.length > 0 ? `Cart (${currentCart.length})` : 'Cart'} className={isDarkMode ? 'bg-gray-800' : ''}>
+        <Sheet open={showCart} onClose={() => setShowCart(false)} title={currentCart.length > 0 ? `Cart (${currentCart.length})` : 'Cart'}>
               {/* Customer Info */}
               <div className="space-form">
                 <input
@@ -571,8 +571,8 @@ const OrderPage = ({ menuItems, cart: externalCart, setCart: setExternalCart }) 
                   className="input-field"
                 />
                 {customerInfo && (
-                  <div className="mb-2 p-2 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
-                    <div className="flex items-center text-sm text-green-700 dark:text-green-300">
+                  <div className="mb-2 p-2 bg-[var(--color-primary-container)] border border-[var(--color-outline)] rounded-lg">
+                    <div className="flex items-center text-sm text-success">
                       <Star className="h-4 w-4 mr-1" />
                       <span>Welcome back! {customerInfo.loyalty_points} loyalty points available</span>
                     </div>
@@ -582,31 +582,31 @@ const OrderPage = ({ menuItems, cart: externalCart, setCart: setExternalCart }) 
                 {/* Points Redemption */}
                 {currentCart.length > 0 && customerInfo?.loyalty_points > 0 && (
                   <div className="mb-4">
-                    <label className="block text-sm font-medium text-secondary-700 dark:text-secondary-300 mb-2 flex items-center">
-                      <Star className="h-4 w-4 mr-2 text-yellow-500" />
+                    <label className="block text-sm font-medium text-on-surface mb-2 flex items-center">
+                      <Star className="h-4 w-4 mr-2 text-warning" />
                       Redeem Points
-                      <span className="ml-2 text-sm text-gray-500">
+                      <span className="ml-2 text-sm text-body-muted">
                         (1 point = {formatCurrency(0.10)})
                       </span>
                     </label>
                     
-                    <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-3 mb-3">
+                    <div className="bg-[var(--color-primary-container)] border border-[var(--color-outline)] rounded-lg p-3 mb-3">
                       <div className="flex justify-between items-center text-sm">
-                        <span className="text-gray-600 dark:text-gray-400">Available Points:</span>
-                        <span className="font-medium text-yellow-700 dark:text-yellow-300">
+                        <span className="text-body-muted">Available Points:</span>
+                        <span className="font-medium text-on-primary-container">
                           {customerInfo.loyalty_points}
                         </span>
                       </div>
                       <div className="flex justify-between items-center text-sm mt-1">
-                        <span className="text-gray-600 dark:text-gray-400">Max Redeemable:</span>
-                        <span className="font-medium text-yellow-700 dark:text-yellow-300">
+                        <span className="text-body-muted">Max Redeemable:</span>
+                        <span className="font-medium text-on-primary-container">
                           {maxRedeemablePoints} points
                         </span>
                       </div>
                     </div>
                     
                     <div className="flex items-center space-x-2">
-                      <span className="text-sm text-gray-600 dark:text-gray-400">Points to redeem:</span>
+                      <span className="text-sm text-body-muted">Points to redeem:</span>
                       <input
                         type="number"
                         value={pointsToRedeem}
@@ -619,7 +619,7 @@ const OrderPage = ({ menuItems, cart: externalCart, setCart: setExternalCart }) 
                     </div>
                     
                     {pointsToRedeem > 0 && (
-                      <div className="mt-2 text-sm text-green-600 dark:text-green-400">
+                      <div className="mt-2 text-sm text-success">
                         Customer will save: ₹{(pointsToRedeem * 0.1).toFixed(2)}
                       </div>
                     )}
@@ -628,7 +628,7 @@ const OrderPage = ({ menuItems, cart: externalCart, setCart: setExternalCart }) 
                 
                 {/* Payment Method */}
                 <div className="mb-2">
-                  <label className="block text-sm font-medium text-secondary-700 dark:text-secondary-300 mb-2">
+                  <label className="block text-sm font-medium text-on-surface mb-2">
                     Payment Method
                   </label>
                   <div className="grid grid-cols-2 gap-2">
@@ -639,7 +639,7 @@ const OrderPage = ({ menuItems, cart: externalCart, setCart: setExternalCart }) 
                         onClick={() => setPaymentMethod(method.code)}
                         className={`h-10 flex items-center justify-center rounded-lg border transition-colors text-sm font-medium ${
                           paymentMethod === method.code
-                            ? 'bg-secondary-600 text-white border-secondary-600'
+                            ? 'bg-primary text-on-primary border-primary'
                             : 'btn-secondary'
                         }`}
                       >
@@ -654,7 +654,7 @@ const OrderPage = ({ menuItems, cart: externalCart, setCart: setExternalCart }) 
                 {currentCart.length > 0 && user?.role === 'admin' && (
                   <div className="mb-2">
                     <div className="flex items-center justify-between mb-3">
-                      <h3 className="font-medium text-secondary-700 dark:text-secondary-300">Split Payment</h3>
+                      <h3 className="font-medium text-on-surface">Split Payment</h3>
                       <label className="flex items-center space-x-2 cursor-pointer">
                         <input
                           type="checkbox"
@@ -667,14 +667,14 @@ const OrderPage = ({ menuItems, cart: externalCart, setCart: setExternalCart }) 
                           }}
                           className="rounded"
                         />
-                        <span className="text-sm text-gray-600 dark:text-gray-400">Enable split payment</span>
+                        <span className="text-sm text-body-muted">Enable split payment</span>
                       </label>
                     </div>
                     
                     {splitPayment && (
-                      <div className="space-y-3 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                      <div className="space-y-3 p-4 bg-[var(--surface-table)] rounded-lg">
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                          <label className="block text-sm font-medium text-on-surface mb-2">
                             Split Payment Method
                           </label>
                           <div className="grid grid-cols-2 gap-2">
@@ -685,7 +685,7 @@ const OrderPage = ({ menuItems, cart: externalCart, setCart: setExternalCart }) 
                                 onClick={() => setSplitPaymentMethod(method.code)}
                                 className={`h-10 flex items-center justify-center rounded-lg border transition-colors text-sm font-medium ${
                                   splitPaymentMethod === method.code
-                                    ? 'bg-secondary-600 text-white border-secondary-600'
+                                    ? 'bg-primary text-on-primary border-primary'
                                     : 'btn-secondary'
                                 }`}
                               >
@@ -697,7 +697,7 @@ const OrderPage = ({ menuItems, cart: externalCart, setCart: setExternalCart }) 
                         </div>
                         
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                          <label className="block text-sm font-medium text-on-surface mb-2">
                             Amount paid via {paymentMethods.find(m => m.code === splitPaymentMethod)?.name || 'split method'}
                           </label>
                           <input
@@ -710,7 +710,7 @@ const OrderPage = ({ menuItems, cart: externalCart, setCart: setExternalCart }) 
                             className="input-field"
                             placeholder="Enter amount"
                           />
-                          <p className="text-xs text-gray-500 mt-1">
+                          <p className="text-xs text-body-muted mt-1">
                             Remaining amount: {formatCurrency(getTotal() - splitAmount)} via {paymentMethods.find(m => m.code === paymentMethod)?.name || 'primary method'}
                           </p>
                         </div>
@@ -723,7 +723,7 @@ const OrderPage = ({ menuItems, cart: externalCart, setCart: setExternalCart }) 
 
                 {/* Pickup Option */}
                 <div className="mb-2">
-                  <label className="block text-sm font-medium text-secondary-700 dark:text-secondary-300 mb-2">
+                  <label className="block text-sm font-medium text-on-surface mb-2">
                     Pickup Option
                   </label>
                   <div className="grid grid-cols-2 gap-2">
@@ -752,7 +752,7 @@ const OrderPage = ({ menuItems, cart: externalCart, setCart: setExternalCart }) 
                       <span>Dine-in</span>
                     </button>
                   </div>
-                  <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
+                  <p className="text-xs text-body-muted mt-1">
                     {pickupOption === 'pickup' 
                       ? 'Order will be ready for pickup at the counter' 
                       : 'Order will be served at the table'}
@@ -762,16 +762,16 @@ const OrderPage = ({ menuItems, cart: externalCart, setCart: setExternalCart }) 
 
               {/* UPI QR Code Display */}
               {paymentMethod === 'upi' && (
-                <div className="mb-4 p-4 bg-white border border-accent-200 rounded-lg">
+                <div className="mb-4 p-4 bg-surface-card border border-[var(--color-outline)] rounded-lg">
                   <div className="text-center">
-                    <div className="bg-[#6F4E37] text-white p-3 rounded-t-lg -mt-4 -mx-4 mb-4 flex items-center">
-                      <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center mr-2">
-                        <span className="text-[#6F4E37] font-bold text-sm">पे</span>
+                    <div className="bg-primary text-on-primary p-3 rounded-t-lg -mt-4 -mx-4 mb-4 flex items-center">
+                      <div className="w-8 h-8 bg-on-primary rounded-full flex items-center justify-center mr-2">
+                        <span className="text-primary font-bold text-sm">पे</span>
                       </div>
                       <span className="font-semibold">PhonePe</span>
                     </div>
                     
-                    <p className="text-sm text-gray-600 mb-4">Scan & Pay with any UPI App</p>
+                    <p className="text-sm text-body-muted mb-4">Scan & Pay with any UPI App</p>
                     
                     <img 
                       src="/images/upi-qr-code.png" 
@@ -779,23 +779,23 @@ const OrderPage = ({ menuItems, cart: externalCart, setCart: setExternalCart }) 
                       className="w-40 h-40 mx-auto mb-4"
                     />
                     
-                    <div className="text-sm text-gray-600 mb-2">UPI ID: Q966641592@ybl</div>
+                    <div className="text-sm text-body-muted mb-2">UPI ID: Q966641592@ybl</div>
                     
                     <div className="flex justify-center items-center space-x-4 mb-3">
                       <div className="text-center">
-                        <div className="text-base font-bold text-gray-700">BHIM</div>
-                        <div className="text-xs text-gray-500">BHARAT INTERFACE</div>
-                        <div className="text-xs text-gray-500">FOR MONEY</div>
+                        <div className="text-base font-bold text-on-surface">BHIM</div>
+                        <div className="text-xs text-body-muted">BHARAT INTERFACE</div>
+                        <div className="text-xs text-body-muted">FOR MONEY</div>
                       </div>
-                      <div className="w-px h-6 bg-gray-300"></div>
+                      <div className="w-px h-6 bg-[var(--color-outline)]"></div>
                       <div className="text-center">
-                        <div className="text-base font-bold text-gray-700">UPI</div>
-                        <div className="text-xs text-gray-500">UNIFIED PAYMENTS</div>
-                        <div className="text-xs text-gray-500">INTERFACE</div>
+                        <div className="text-base font-bold text-on-surface">UPI</div>
+                        <div className="text-xs text-body-muted">UNIFIED PAYMENTS</div>
+                        <div className="text-xs text-body-muted">INTERFACE</div>
                       </div>
                     </div>
                     
-                    <div className="text-sm font-medium text-gray-700">{cafeSettings?.cafe_name || 'Cafe'}</div>
+                    <div className="text-sm font-medium text-on-surface">{cafeSettings?.cafe_name || 'Cafe'}</div>
                     
                     <div className="h-2 -mx-4 -mb-4 rounded-b-lg" style={{ backgroundColor: 'var(--color-primary)' }}></div>
                   </div>
@@ -804,15 +804,15 @@ const OrderPage = ({ menuItems, cart: externalCart, setCart: setExternalCart }) 
 
               {/* Cart Items */}
               {currentCart.length === 0 ? (
-                <div className="text-center py-8 text-gray-500 dark:text-gray-400">
-                  <ShoppingCart className="h-12 w-12 mx-auto mb-2 text-gray-300 dark:text-gray-500" />
-                  <p className="font-medium mb-1">Your cart is empty</p>
+                <div className="text-center py-8 text-body-muted">
+                  <ShoppingCart className="h-12 w-12 mx-auto mb-2 opacity-60" style={{ color: 'var(--color-on-surface-variant)' }} />
+                  <p className="font-medium mb-1 text-on-surface">Your cart is empty</p>
                   <p className="text-sm">Select items from the menu to add them to your order</p>
                 </div>
               ) : (
                 <div className="space-y-3 mb-4">
                   {currentCart.map((item) => (
-                    <div key={item.id} className="flex items-center justify-between p-3 bg-accent-50 dark:bg-gray-700 rounded-lg border border-accent-200 dark:border-gray-600">
+                    <div key={item.id} className="flex items-center justify-between p-3 bg-[var(--surface-table)] rounded-lg border border-[var(--color-outline)]">
                       <div className="flex items-center space-x-3 flex-1">
                         {/* Cart Item Image */}
                         {cafeSettings?.show_menu_images && item.image_url && (
@@ -896,8 +896,8 @@ const OrderPage = ({ menuItems, cart: externalCart, setCart: setExternalCart }) 
 
               {/* Tip Selection */}
               {currentCart.length > 0 && (
-                <div className="border-t border-accent-200 pt-4 mb-4">
-                  <h3 className="font-medium text-secondary-700 dark:text-secondary-300 mb-3">Tip</h3>
+                <div className="border-t border-[var(--color-outline)] pt-4 mb-4">
+                  <h3 className="font-medium text-on-surface mb-3">Tip</h3>
                   
                   {/* Quick tip buttons */}
                   <div className="grid grid-cols-3 gap-2 mb-3">
@@ -907,7 +907,7 @@ const OrderPage = ({ menuItems, cart: externalCart, setCart: setExternalCart }) 
                         onClick={() => handleTipPercentageChange(percentage)}
                         className={`h-10 text-sm rounded-lg border transition-colors font-medium ${
                           tipPercentage === percentage
-                            ? 'bg-secondary-600 text-white border-secondary-600'
+                            ? 'bg-primary text-on-primary border-primary'
                             : 'btn-secondary'
                         }`}
                       >
@@ -918,7 +918,7 @@ const OrderPage = ({ menuItems, cart: externalCart, setCart: setExternalCart }) 
                   
                   {/* Custom tip amount */}
                   <div className="flex items-center space-x-2">
-                    <span className="text-sm text-gray-600 dark:text-gray-400">Custom:</span>
+                    <span className="text-sm text-body-muted">Custom:</span>
                     <input
                       type="number"
                       value={tipAmount.toFixed(2)}
@@ -934,43 +934,43 @@ const OrderPage = ({ menuItems, cart: externalCart, setCart: setExternalCart }) 
 
               {/* Totals */}
               {currentCart.length > 0 && (
-                <div className="border-t border-accent-200 pt-4 mb-4 space-y-2">
-                  <div className="flex justify-between text-sm text-gray-600 dark:text-gray-400">
+                <div className="border-t border-[var(--color-outline)] pt-4 mb-4 space-y-2">
+                  <div className="flex justify-between text-sm text-body-muted">
                     <span>Subtotal:</span>
                     <span>{formatCurrency(subtotal)}</span>
                   </div>
                   
                   {taxInfo.taxAmount > 0 && (
-                    <div className="flex justify-between text-sm text-gray-600 dark:text-gray-400">
+                    <div className="flex justify-between text-sm text-body-muted">
                       <span>{taxInfo.taxName} ({taxInfo.taxRate}%):</span>
                       <span>{formatCurrency(taxInfo.taxAmount)}</span>
                     </div>
                   )}
                   
                   {tipAmount > 0 && (
-                    <div className="flex justify-between text-sm text-gray-600 dark:text-gray-400">
+                    <div className="flex justify-between text-sm text-body-muted">
                       <span>Tip:</span>
                       <span>{formatCurrency(tipAmount)}</span>
                     </div>
                   )}
                   
                   {pointsToRedeem > 0 && (
-                    <div className="flex justify-between text-sm text-green-600 dark:text-green-400">
+                    <div className="flex justify-between text-sm text-success">
                       <span>Points Redeemed ({pointsToRedeem} pts):</span>
                       <span>-{formatCurrency(pointsToRedeem * 0.1)}</span>
                     </div>
                   )}
 
                   {extraCharge > 0 && (
-                    <div className="flex justify-between text-sm text-gray-600 dark:text-gray-400">
+                    <div className="flex justify-between text-sm text-body-muted">
                       <span>Extra Charge:</span>
                       <span>{formatCurrency(extraCharge)}</span>
                     </div>
                   )}
                   
-                  <div className="flex justify-between items-center text-lg font-semibold border-t border-accent-200 pt-2">
-                    <span className="text-secondary-700 dark:text-secondary-300">Total:</span>
-                    <span className="text-secondary-600 dark:text-secondary-400">{formatCurrency(total)}</span>
+                  <div className="flex justify-between items-center text-lg font-semibold border-t border-[var(--color-outline)] pt-2">
+                    <span className="text-on-surface">Total:</span>
+                    <span className="text-on-surface">{formatCurrency(total)}</span>
                   </div>
                 </div>
               )}

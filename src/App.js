@@ -250,7 +250,7 @@ function MainApp() {
   }
 
   return (
-    <div className={`min-h-screen bg-white ${impersonation?.isImpersonating ? 'pt-16' : ''}`}>
+    <div className={`min-h-screen surface-page ${impersonation?.isImpersonating ? 'pt-16' : ''}`}>
       <Toaster position="top-right" />
     
     {/* Header - Distinct navigation surface */}
@@ -379,14 +379,14 @@ function MainApp() {
     {/* Desktop Navigation - Distinct elevated surface */}
     <nav className="hidden lg:block surface-nav p-2">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex space-x-8">
+        <div className="flex flex-wrap gap-2">
           {navigationItems.map((item) => {
             const Icon = item.icon;
             return (
               <button
                 key={item.id}
                 onClick={() => handlePageChange(item.id)}
-                className={`flex items-center px-5 py-1 text-sm font-medium ${
+                className={`flex items-center px-4 py-2 text-sm font-medium ${
                   currentPage === item.id
                     ? 'nav-active'
                     : 'nav-inactive'
@@ -403,7 +403,7 @@ function MainApp() {
     </nav>
 
     {/* Main Content - Plain background */}
-    <main className="bg-white surface-container max-w-7xl mx-auto my-8 sm:my-12 px-4 sm:px-6 lg:px-8">
+    <main className="surface-container max-w-7xl mx-auto my-8 sm:my-12 px-4 sm:px-6 lg:px-8">
       {renderPage()}
     </main>
       </div>

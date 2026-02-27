@@ -49,8 +49,8 @@ export const defaultLightColors = {
   primary: '#6F4E37',
   secondary: '#153059',
   accent: '#D4A574',
-  background: '#F5F5DC',
-  surface: '#FFFFFF',
+  background: '#F7F4EF',
+  surface: '#FFFCF7',
   text: {
     primary: '#2C1810',
     muted: '#6B7280',
@@ -71,7 +71,7 @@ export const defaultDarkColors = {
   background: '#1a1612',
   surface: '#2c241d',
   text: {
-    primary: '#F5F5DC',
+    primary: '#F7F4EF',
     muted: '#9CA3AF',
     disabled: '#6B7280',
   },

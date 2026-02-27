@@ -120,14 +120,14 @@ const CafeSettings = () => {
         accent: '#D2691E',
         background: '#FFF8DC',
         text: '#2F1B14',
-        surface: '#F5F5DC'
+        surface: '#FFFFF'
       },
       dark: {
         primary: '#CD853F',
         secondary: '#DEB887',
         accent: '#F4A460',
         background: '#2F1B14',
-        text: '#F5F5DC',
+        text: '#F7F4EF',
         surface: '#3C2A21'
       }
     },
@@ -594,12 +594,12 @@ const CafeSettings = () => {
   };
 
   return (
-    <div className="min-h-screen bg-accent-50 dark:bg-gray-900">
+    <div className="min-h-screen">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex flex-wrap items-center gap-6 mb-6">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Cafe Settings</h1>
-            <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">Manage your cafe configuration and appearance.</p>
+            <h1 className="text-2xl font-bold text-on-surface">Cafe Settings</h1>
+            <p className="text-sm text-body-muted mt-1">Manage your cafe configuration and appearance.</p>
           </div>
           <button type="button" onClick={handleSubmit} disabled={isSubmitting || cafeSettingsLoading} className="btn-primary px-5 py-2.5 text-sm font-medium shrink-0 disabled:opacity-50 disabled:cursor-not-allowed">
             {isSubmitting ? 'Saving...' : 'Save Changes'}
@@ -619,12 +619,12 @@ const CafeSettings = () => {
         {cafeSettingsLoading ? (
           <div className="flex flex-col items-center justify-center py-16">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 mb-4" style={{ borderColor: 'var(--color-primary)' }} />
-            <p className="text-gray-600 dark:text-gray-400">Loading cafe settings...</p>
+            <p className="text-body-muted">Loading cafe settings...</p>
           </div>
         ) : cafeSettingsError ? (
-          <div className="card p-6 border-red-200 dark:border-red-800 bg-red-50/50 dark:bg-red-900/20">
-            <p className="text-red-700 dark:text-red-300 font-medium mb-2">Failed to load cafe settings</p>
-            <p className="text-sm text-red-600 dark:text-red-400 mb-4">{cafeSettingsError}</p>
+          <div className="card p-6 border-2 bg-red-50 dark:bg-red-900/20" style={{ borderColor: 'var(--color-error)' }}>
+            <p className="font-medium mb-2" style={{ color: 'var(--color-error)' }}>Failed to load cafe settings</p>
+            <p className="text-sm mb-4" style={{ color: 'var(--color-error)' }}>{cafeSettingsError}</p>
             <button type="button" onClick={() => fetchCafeSettings()} className="btn-primary">
               Retry
             </button>
@@ -635,29 +635,29 @@ const CafeSettings = () => {
             {/* Cafe Slug & Public URL Section (multi-cafe: show when admin/superadmin has a cafe slug) */}
             {(user?.role === 'admin' || user?.role === 'superadmin') && publicSlug && (
               <div className="card p-6">
-                <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-1">Public Cafe URL</h2>
-                <p className="text-sm text-gray-600 dark:text-gray-400 mb-5">
+                <h2 className="text-xl font-semibold text-on-surface mb-1">Public Cafe URL</h2>
+                <p className="text-sm text-body-muted mb-5">
                   Share this URL with your customers to access your cafe menu and place orders.
                 </p>
                 <div className="space-y-5">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Cafe Slug</label>
+                    <label className="block text-sm font-medium text-on-surface mb-1.5">Cafe Slug</label>
                     <input
                       type="text"
                       value={publicSlug}
                       readOnly
-                      className="input-field w-full bg-gray-100 dark:bg-gray-700/50 cursor-not-allowed font-mono text-sm truncate"
+                      className="input-field w-full bg-[var(--surface-table)] cursor-not-allowed font-mono text-sm truncate"
                     />
-                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Cannot be changed after creation.</p>
+                    <p className="text-xs text-body-muted mt-1">Cannot be changed after creation.</p>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Public Customer URL</label>
+                    <label className="block text-sm font-medium text-on-surface mb-1.5">Public Customer URL</label>
                     <div className="flex flex-wrap gap-2 items-stretch">
                       <input
                         type="text"
                         value={`${window.location.origin}/cafe/${publicSlug}`}
                         readOnly
-                        className="input-field flex-1 min-w-[200px] bg-gray-100 dark:bg-gray-700/50 cursor-not-allowed font-mono text-sm truncate"
+                        className="input-field flex-1 min-w-[200px] bg-[var(--surface-table)] cursor-not-allowed font-mono text-sm truncate"
                       />
                       <button
                         type="button"
@@ -677,7 +677,7 @@ const CafeSettings = () => {
                         href={`/cafe/${publicSlug}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 text-sm font-medium shrink-0"
+                        className="btn-secondary inline-flex items-center gap-2 shrink-0"
                         title="Open in new tab"
                       >
                         <ExternalLink className="h-4 w-4" />
@@ -691,39 +691,39 @@ const CafeSettings = () => {
 
             {/* Basic Information */}
             <div className="card p-6">
-              <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-1">Basic Information</h2>
-              <p className="text-sm text-gray-600 dark:text-gray-400 mb-5">Your cafe details shown to customers and used in invoices.</p>
+              <h2 className="text-xl font-semibold text-on-surface mb-1">Basic Information</h2>
+              <p className="text-sm text-body-muted mb-5">Your cafe details shown to customers and used in invoices.</p>
               <form onSubmit={handleSubmit} className="space-y-4" id="cafe-settings-form">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Cafe Name *</label>
+                    <label className="block text-sm font-medium text-on-surface mb-1.5">Cafe Name *</label>
                     <input type="text" value={cafeName} onChange={(e) => setCafeName(e.target.value)} className="input-field" required />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Phone</label>
+                    <label className="block text-sm font-medium text-on-surface mb-1.5">Phone</label>
                     <input type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} className="input-field" />
                   </div>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Address</label>
+                  <label className="block text-sm font-medium text-on-surface mb-1.5">Address</label>
                   <input type="text" value={address} onChange={(e) => setAddress(e.target.value)} className="input-field" />
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Email</label>
+                    <label className="block text-sm font-medium text-on-surface mb-1.5">Email</label>
                     <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} className="input-field" />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Website</label>
+                    <label className="block text-sm font-medium text-on-surface mb-1.5">Website</label>
                     <input type="url" value={website} onChange={(e) => setWebsite(e.target.value)} className="input-field" />
                   </div>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Opening Hours</label>
+                  <label className="block text-sm font-medium text-on-surface mb-1.5">Opening Hours</label>
                   <input type="text" value={openingHours} onChange={(e) => setOpeningHours(e.target.value)} className="input-field" placeholder="e.g., Mon-Fri 8AM-6PM, Sat-Sun 9AM-5PM" />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Description</label>
+                  <label className="block text-sm font-medium text-on-surface mb-1.5">Description</label>
                   <textarea value={description} onChange={(e) => setDescription(e.target.value)} className="input-field" rows={3} placeholder="Brief description of your cafe..." />
                 </div>
               </form>
@@ -731,15 +731,15 @@ const CafeSettings = () => {
 
             {/* Tab & Role Visibility */}
             <div className="card p-6">
-              <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-1">Tab & Role Visibility</h2>
-              <p className="text-sm text-gray-600 dark:text-gray-400 mb-5">
+              <h2 className="text-xl font-semibold text-on-surface mb-1">Tab & Role Visibility</h2>
+              <p className="text-sm text-body-muted mb-5">
                 Control which tabs and features are visible to each role.
               </p>
               <form onSubmit={handleSubmit} className="space-y-0" id="cafe-visibility-form" noValidate>
                 <div className="space-y-6">
                   {/* Owner */}
-                  <div className="pb-6 border-b border-gray-200 dark:border-gray-700">
-                    <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-3">Owner (your view)</h3>
+                  <div className="pb-6 border-b border-[var(--color-outline)]">
+                    <h3 className="text-sm font-semibold text-on-surface mb-3">Owner (your view)</h3>
                     <div className="grid grid-cols-2 sm:grid-cols-3 gap-x-4 gap-y-2.5">
                       {[
                         [showKitchenTab, setShowKitchenTab, 'Orders'],
@@ -751,65 +751,65 @@ const CafeSettings = () => {
                         [showHistoryTab, setShowHistoryTab, 'History']
                       ].map(([checked, setter, label]) => (
                         <label key={label} className="flex items-center gap-2.5 cursor-pointer py-0.5">
-                          <input type="checkbox" checked={checked} onChange={(e) => setter(e.target.checked)} className="rounded border-gray-300 dark:border-gray-600 text-primary-600 focus:ring-primary-500 focus:ring-offset-0" />
-                          <span className="text-sm text-gray-700 dark:text-gray-300">{label}</span>
+                          <input type="checkbox" checked={checked} onChange={(e) => setter(e.target.checked)} className="rounded border-[var(--color-outline)] text-primary focus:ring-primary focus:ring-offset-0" />
+                          <span className="text-sm text-on-surface">{label}</span>
                         </label>
                       ))}
                     </div>
                   </div>
                   {/* Chef */}
-                  <div className="pb-6 border-b border-gray-200 dark:border-gray-700">
-                    <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-3">Chef</h3>
-                    <p className="text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-2">Visible tabs</p>
+                  <div className="pb-6 border-b border-[var(--color-outline)]">
+                    <h3 className="text-sm font-semibold text-on-surface mb-3">Chef</h3>
+                    <p className="text-xs font-medium uppercase tracking-wider text-body-muted mb-2">Visible tabs</p>
                     <div className="grid grid-cols-2 sm:grid-cols-3 gap-x-4 gap-y-2.5 mb-4">
                       {[[chefShowKitchenTab, setChefShowKitchenTab, 'Orders'], [chefShowMenuTab, setChefShowMenuTab, 'Menu'], [chefShowInventoryTab, setChefShowInventoryTab, 'Inventory'], [chefShowHistoryTab, setChefShowHistoryTab, 'History']].map(([c, s, l]) => (
                         <label key={l} className="flex items-center gap-2.5 cursor-pointer py-0.5">
-                          <input type="checkbox" checked={c} onChange={(e) => s(e.target.checked)} className="rounded border-gray-300 dark:border-gray-600 text-primary-600 focus:ring-primary-500 focus:ring-offset-0" />
-                          <span className="text-sm text-gray-700 dark:text-gray-300">{l}</span>
+                          <input type="checkbox" checked={c} onChange={(e) => s(e.target.checked)} className="rounded border-[var(--color-outline)] text-primary focus:ring-primary focus:ring-offset-0" />
+                          <span className="text-sm text-on-surface">{l}</span>
                         </label>
                       ))}
                     </div>
-                    <p className="text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-2">Permissions</p>
+                    <p className="text-xs font-medium uppercase tracking-wider text-body-muted mb-2">Permissions</p>
                     <div className="grid grid-cols-2 sm:grid-cols-3 gap-x-4 gap-y-2.5">
                       {[[chefCanEditOrders, setChefCanEditOrders, 'Can Edit Orders'], [chefCanViewCustomers, setChefCanViewCustomers, 'Can View Customers'], [chefCanViewPayments, setChefCanViewPayments, 'Can View Payments']].map(([c, s, l]) => (
                         <label key={l} className="flex items-center gap-2.5 cursor-pointer py-0.5">
-                          <input type="checkbox" checked={c} onChange={(e) => s(e.target.checked)} className="rounded border-gray-300 dark:border-gray-600 text-primary-600 focus:ring-primary-500 focus:ring-offset-0" />
-                          <span className="text-sm text-gray-700 dark:text-gray-300">{l}</span>
+                          <input type="checkbox" checked={c} onChange={(e) => s(e.target.checked)} className="rounded border-[var(--color-outline)] text-primary focus:ring-primary focus:ring-offset-0" />
+                          <span className="text-sm text-on-surface">{l}</span>
                         </label>
                       ))}
                     </div>
                   </div>
                   {/* Reception */}
-                  <div className="pb-6 border-b border-gray-200 dark:border-gray-700">
-                    <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-3">Reception</h3>
-                    <p className="text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-2">Visible tabs</p>
+                  <div className="pb-6 border-b border-[var(--color-outline)]">
+                    <h3 className="text-sm font-semibold text-on-surface mb-3">Reception</h3>
+                    <p className="text-xs font-medium uppercase tracking-wider text-body-muted mb-2">Visible tabs</p>
                     <div className="grid grid-cols-2 sm:grid-cols-3 gap-x-4 gap-y-2.5 mb-4">
                       {[[receptionShowKitchenTab, setReceptionShowKitchenTab, 'Orders'], [receptionShowMenuTab, setReceptionShowMenuTab, 'Menu'], [receptionShowInventoryTab, setReceptionShowInventoryTab, 'Inventory'], [receptionShowHistoryTab, setReceptionShowHistoryTab, 'History']].map(([c, s, l]) => (
                         <label key={l} className="flex items-center gap-2.5 cursor-pointer py-0.5">
-                          <input type="checkbox" checked={c} onChange={(e) => s(e.target.checked)} className="rounded border-gray-300 dark:border-gray-600 text-primary-600 focus:ring-primary-500 focus:ring-offset-0" />
-                          <span className="text-sm text-gray-700 dark:text-gray-300">{l}</span>
+                          <input type="checkbox" checked={c} onChange={(e) => s(e.target.checked)} className="rounded border-[var(--color-outline)] text-primary focus:ring-primary focus:ring-offset-0" />
+                          <span className="text-sm text-on-surface">{l}</span>
                         </label>
                       ))}
                     </div>
-                    <p className="text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-2">Permissions</p>
+                    <p className="text-xs font-medium uppercase tracking-wider text-body-muted mb-2">Permissions</p>
                     <div className="grid grid-cols-2 sm:grid-cols-3 gap-x-4 gap-y-2.5">
                       {[[receptionCanEditOrders, setReceptionCanEditOrders, 'Can Edit Orders'], [receptionCanViewCustomers, setReceptionCanViewCustomers, 'Can View Customers'], [receptionCanViewPayments, setReceptionCanViewPayments, 'Can View Payments'], [receptionCanCreateOrders, setReceptionCanCreateOrders, 'Can Create Orders']].map(([c, s, l]) => (
                         <label key={l} className="flex items-center gap-2.5 cursor-pointer py-0.5">
-                          <input type="checkbox" checked={c} onChange={(e) => s(e.target.checked)} className="rounded border-gray-300 dark:border-gray-600 text-primary-600 focus:ring-primary-500 focus:ring-offset-0" />
-                          <span className="text-sm text-gray-700 dark:text-gray-300">{l}</span>
+                          <input type="checkbox" checked={c} onChange={(e) => s(e.target.checked)} className="rounded border-[var(--color-outline)] text-primary focus:ring-primary focus:ring-offset-0" />
+                          <span className="text-sm text-on-surface">{l}</span>
                         </label>
                       ))}
                     </div>
                   </div>
                   {/* Admin */}
                   <div>
-                    <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-3">Admin</h3>
-                    <p className="text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-2">Permissions</p>
+                    <h3 className="text-sm font-semibold text-on-surface mb-3">Admin</h3>
+                    <p className="text-xs font-medium uppercase tracking-wider text-body-muted mb-2">Permissions</p>
                     <div className="grid grid-cols-2 sm:grid-cols-3 gap-x-4 gap-y-2.5">
                       {[[adminCanAccessSettings, setAdminCanAccessSettings, 'Can Access Settings'], [adminCanManageUsers, setAdminCanManageUsers, 'Can Manage Users'], [adminCanViewReports, setAdminCanViewReports, 'Can View Reports'], [adminCanManageInventory, setAdminCanManageInventory, 'Can Manage Inventory'], [adminCanManageMenu, setAdminCanManageMenu, 'Can Manage Menu']].map(([c, s, l]) => (
                         <label key={l} className="flex items-center gap-2.5 cursor-pointer py-0.5">
-                          <input type="checkbox" checked={c} onChange={(e) => s(e.target.checked)} className="rounded border-gray-300 dark:border-gray-600 text-primary-600 focus:ring-primary-500 focus:ring-offset-0" />
-                          <span className="text-sm text-gray-700 dark:text-gray-300">{l}</span>
+                          <input type="checkbox" checked={c} onChange={(e) => s(e.target.checked)} className="rounded border-[var(--color-outline)] text-primary focus:ring-primary focus:ring-offset-0" />
+                          <span className="text-sm text-on-surface">{l}</span>
                         </label>
                       ))}
                     </div>
@@ -820,14 +820,14 @@ const CafeSettings = () => {
 
             {/* Branding Section */}
             <div className="card p-6">
-              <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-1">Branding</h2>
-              <p className="text-sm text-gray-600 dark:text-gray-400 mb-5">
+              <h2 className="text-xl font-semibold text-on-surface mb-1">Branding</h2>
+              <p className="text-sm text-body-muted mb-5">
                 Images shown on the customer-facing menu page.
               </p>
               <div className="space-y-6">
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Logo</label>
-                <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">
+                <label className="block text-sm font-medium text-on-surface mb-1.5">Logo</label>
+                <p className="text-xs text-body-muted mb-2">
                   Headers, invoices, and customer-facing pages.
                 </p>
                 <div className="space-y-3">
@@ -870,8 +870,8 @@ const CafeSettings = () => {
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Hero Image</label>
-                <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">
+                <label className="block text-sm font-medium text-on-surface mb-1.5">Hero Image</label>
+                <p className="text-xs text-body-muted mb-2">
                   Main background on the customer menu.
                 </p>
                 <div className="space-y-3">
@@ -914,11 +914,11 @@ const CafeSettings = () => {
                 </div>
               </div>
 
-              <div className="pt-5 border-t border-gray-200 dark:border-gray-700">
+              <div className="pt-5 border-t border-[var(--color-outline)]">
                 <div className="flex flex-wrap items-start justify-between gap-3 mb-3">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Promotional Banners</label>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                    <label className="block text-sm font-medium text-on-surface mb-1.5">Promotional Banners</label>
+                    <p className="text-xs text-body-muted">
                       Customer menu. Order by priority (lower first). Keep at least one.
                     </p>
                   </div>
