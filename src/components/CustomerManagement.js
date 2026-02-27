@@ -24,6 +24,7 @@ import {
 import PageHeader from './PageHeader';
 import { TableSkeleton } from './ui/Skeleton';
 import { EmptyCustomers } from './ui/EmptyState';
+import Dialog from './ui/Dialog';
 
 const CustomerManagement = () => {
   const { isAuthenticated, user, loading: authLoading } = useAuth();
@@ -527,12 +528,9 @@ const CustomerManagement = () => {
         )}
       </div>
 
-      {/* Add Customer Modal */}
-      {showAddModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className={`${isDarkMode ? 'bg-gray-800' : 'bg-white'} rounded-lg p-6 w-full max-w-md`}>
-            <h3 className={`text-lg font-medium mb-4 ${isDarkMode ? 'text-gray-100' : 'text-gray-900'}`}>Add New Customer</h3>
-            <form onSubmit={handleSubmit}>
+      {/* Add Customer Modal - Template Dialog */}
+      <Dialog open={showAddModal} onClose={() => setShowAddModal(false)} title="Add New Customer">
+        <form onSubmit={handleSubmit} className="pt-0">
               <div className="space-y-4">
                 <div>
                   <label className={`block text-sm font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>Name *</label>
@@ -609,16 +607,16 @@ const CustomerManagement = () => {
                 </button>
               </div>
             </form>
-          </div>
-        </div>
-      )}
+      </Dialog>
 
-      {/* Edit Customer Modal */}
-      {showEditModal && selectedCustomer && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg p-6 w-full max-w-md">
-            <h3 className="text-lg font-medium mb-4">Edit Customer</h3>
-            <form onSubmit={handleSubmit}>
+      {/* Edit Customer Modal - Template Dialog */}
+      <Dialog
+        open={!!(showEditModal && selectedCustomer)}
+        onClose={() => setShowEditModal(false)}
+        title="Edit Customer"
+      >
+        {showEditModal && selectedCustomer && (
+            <form onSubmit={handleSubmit} className="pt-0">
               <div className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700">Name *</label>
@@ -707,24 +705,18 @@ const CustomerManagement = () => {
                 </button>
               </div>
             </form>
-          </div>
-        </div>
-      )}
+        )}
+      </Dialog>
 
-      {/* Order History Modal */}
-      {showOrderHistoryModal && selectedCustomer && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className={`${isDarkMode ? 'bg-gray-800' : 'bg-white'} rounded-lg p-6 w-full max-w-4xl max-h-[80vh] overflow-y-auto`}>
-            <div className="flex justify-between items-center mb-4">
-              <h3 className={`text-lg font-medium ${isDarkMode ? 'text-gray-100' : 'text-gray-900'}`}>Order History - {selectedCustomer.name}</h3>
-              <button
-                onClick={() => setShowOrderHistoryModal(false)}
-                className={`text-gray-400 hover:text-gray-600 ${isDarkMode ? 'dark:hover:text-gray-300' : ''}`}
-              >
-                ✕
-              </button>
-            </div>
-            
+      {/* Order History Modal - Template Dialog */}
+      <Dialog
+        open={!!(showOrderHistoryModal && selectedCustomer)}
+        onClose={() => setShowOrderHistoryModal(false)}
+        title={selectedCustomer ? `Order History - ${selectedCustomer.name}` : 'Order History'}
+        size="4xl"
+      >
+        {showOrderHistoryModal && selectedCustomer && (
+            <>
             {orderHistory.length === 0 ? (
               <p className={`${isDarkMode ? 'text-gray-400' : 'text-gray-500'} text-center py-8`}>This customer hasn't placed any orders yet. Orders will appear here once they make a purchase.</p>
             ) : (
@@ -763,32 +755,20 @@ const CustomerManagement = () => {
                 ))}
               </div>
             )}
-          </div>
-        </div>
-      )}
+            </>
+        )}
+      </Dialog>
 
-      {/* Order Details Modal */}
-      {showOrderDetailsModal && selectedOrder && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className={`${isDarkMode ? 'bg-gray-800' : 'bg-white'} rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto`}>
-            <div className="p-6">
-              <div className="flex justify-between items-start mb-4">
-                <div>
-                  <h3 className={`text-lg font-semibold ${isDarkMode ? 'text-secondary-300' : 'text-secondary-700'}`}>
-                    Order #{selectedOrder.order_number}
-                  </h3>
-                  <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                    {formatDate(selectedOrder.created_at)}
-                  </p>
-                </div>
-                <button
-                  onClick={() => setShowOrderDetailsModal(false)}
-                  className={`text-gray-400 hover:text-gray-600 ${isDarkMode ? 'dark:hover:text-gray-300' : ''}`}
-                >
-                  ✕
-                </button>
-              </div>
-
+      {/* Order Details Modal - Template Dialog */}
+      <Dialog
+        open={!!(showOrderDetailsModal && selectedOrder)}
+        onClose={() => setShowOrderDetailsModal(false)}
+        title={selectedOrder ? `Order #${selectedOrder.order_number}` : 'Order Details'}
+        size="2xl"
+      >
+        {showOrderDetailsModal && selectedOrder && (
+            <>
+              <p className="text-sm text-[#6F6A63] mb-4">{formatDate(selectedOrder.created_at)}</p>
               <div className="space-y-4">
                 <div className="grid grid-cols-2 gap-4 text-sm">
                   <div>
@@ -841,10 +821,9 @@ const CustomerManagement = () => {
                   </button>
                 </div>
               </div>
-            </div>
-          </div>
-        </div>
-      )}
+            </>
+        )}
+      </Dialog>
     </div>
   );
 };

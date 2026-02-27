@@ -2,10 +2,8 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 import { useParams, useNavigate } from 'react-router-dom';
-import { 
-  Users, ArrowLeft, Plus, Edit, Trash2, X, Search, 
-  Building, Loader, AlertCircle 
-} from 'lucide-react';
+import { Users, ArrowLeft, Plus, Edit, Trash2, Search, Building, Loader, AlertCircle } from 'lucide-react';
+import Dialog from './ui/Dialog';
 
 const SuperAdminCafeUsers = () => {
   const { cafeId } = useParams();
@@ -271,28 +269,13 @@ const SuperAdminCafeUsers = () => {
         )}
       </div>
 
-      {/* Create User Modal */}
-      {showCreateModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full">
-            <div className="p-6 border-b border-accent-200 dark:border-gray-700">
-              <div className="flex justify-between items-center">
-                <h3 className="text-lg font-semibold text-secondary-700 dark:text-gray-100">
-                  Create New User
-                </h3>
-                <button
-                  onClick={() => {
-                    setShowCreateModal(false);
-                    setFormData({ username: '', email: '', password: '', role: 'admin' });
-                  }}
-                  className="text-secondary-500 hover:text-secondary-700 dark:text-gray-400 dark:hover:text-gray-200"
-                >
-                  <X className="h-6 w-6" />
-                </button>
-              </div>
-            </div>
-
-            <form onSubmit={handleCreate} className="p-6 space-y-4">
+      {/* Create User Modal - Template Dialog */}
+      <Dialog
+        open={showCreateModal}
+        onClose={() => { setShowCreateModal(false); setFormData({ username: '', email: '', password: '', role: 'admin' }); }}
+        title="Create New User"
+      >
+        <form onSubmit={handleCreate} className="space-y-4 pt-0">
               <div>
                 <label className="block text-sm font-medium text-secondary-700 dark:text-gray-300 mb-2">
                   Username <span className="text-red-500">*</span>
@@ -372,33 +355,16 @@ const SuperAdminCafeUsers = () => {
                 </button>
               </div>
             </form>
-          </div>
-        </div>
-      )}
+      </Dialog>
 
-      {/* Edit User Modal */}
-      {showEditModal && editingUser && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full">
-            <div className="p-6 border-b border-accent-200 dark:border-gray-700">
-              <div className="flex justify-between items-center">
-                <h3 className="text-lg font-semibold text-secondary-700 dark:text-gray-100">
-                  Edit User
-                </h3>
-                <button
-                  onClick={() => {
-                    setShowEditModal(false);
-                    setEditingUser(null);
-                    setFormData({ username: '', email: '', password: '', role: 'admin' });
-                  }}
-                  className="text-secondary-500 hover:text-secondary-700 dark:text-gray-400 dark:hover:text-gray-200"
-                >
-                  <X className="h-6 w-6" />
-                </button>
-              </div>
-            </div>
-
-            <form onSubmit={handleUpdate} className="p-6 space-y-4">
+      {/* Edit User Modal - Template Dialog */}
+      <Dialog
+        open={!!(showEditModal && editingUser)}
+        onClose={() => { setShowEditModal(false); setEditingUser(null); setFormData({ username: '', email: '', password: '', role: 'admin' }); }}
+        title="Edit User"
+      >
+        {showEditModal && editingUser && (
+            <form onSubmit={handleUpdate} className="space-y-4 pt-0">
               <div>
                 <label className="block text-sm font-medium text-secondary-700 dark:text-gray-300 mb-2">
                   Username <span className="text-red-500">*</span>
@@ -478,9 +444,8 @@ const SuperAdminCafeUsers = () => {
                 </button>
               </div>
             </form>
-          </div>
-        </div>
-      )}
+        )}
+      </Dialog>
     </div>
   );
 };

@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import toast from 'react-hot-toast';
-import { Users, Building, Search, Edit, X, Check } from 'lucide-react';
+import { Users, Building, Search, Edit, Check } from 'lucide-react';
+import Dialog from './ui/Dialog';
 
 const SuperAdminUserManagement = () => {
   const [users, setUsers] = useState([]);
@@ -215,28 +216,14 @@ const SuperAdminUserManagement = () => {
         )}
       </div>
 
-      {/* Assign Cafe Modal */}
-      {editingUser && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full">
-            <div className="p-6 border-b border-accent-200 dark:border-gray-700">
-              <div className="flex justify-between items-center">
-                <h3 className="text-lg font-semibold text-secondary-700 dark:text-gray-100">
-                  Assign User to Cafe
-                </h3>
-                <button
-                  onClick={() => {
-                    setEditingUser(null);
-                    setSelectedCafeId('');
-                  }}
-                  className="text-secondary-500 hover:text-secondary-700 dark:text-gray-400 dark:hover:text-gray-200"
-                >
-                  <X className="h-6 w-6" />
-                </button>
-              </div>
-            </div>
-
-            <div className="p-6 space-y-4">
+      {/* Assign Cafe Modal - Template Dialog */}
+      <Dialog
+        open={!!editingUser}
+        onClose={() => { setEditingUser(null); setSelectedCafeId(''); }}
+        title="Assign User to Cafe"
+      >
+        {editingUser && (
+            <div className="space-y-4 pt-0">
               <div>
                 <p className="text-sm text-secondary-600 dark:text-gray-400 mb-2">
                   User: <span className="font-semibold">{editingUser.username}</span>
@@ -280,9 +267,8 @@ const SuperAdminUserManagement = () => {
                 </button>
               </div>
             </div>
-          </div>
-        </div>
-      )}
+        )}
+      </Dialog>
     </div>
   );
 };

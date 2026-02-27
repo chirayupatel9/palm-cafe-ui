@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Download, Calendar, User, DollarSign, Percent, Heart, BarChart3, Plus, ShoppingCart, X, FileText } from 'lucide-react';
+import { Download, Calendar, User, DollarSign, Percent, Heart, BarChart3, Plus, ShoppingCart, FileText } from 'lucide-react';
+import Dialog from './ui/Dialog';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 import { useCurrency } from '../contexts/CurrencyContext';
@@ -85,8 +86,7 @@ const InvoiceHistory = ({ cart, setCart, setCurrentPage }) => {
   };
 
   const openInvoice = async (invoiceNumber) => {
-    if (!invoiceNumber) {
-      console.error('Invoice number is undefined');
+    if (!invoiceNumber || String(invoiceNumber).toLowerCase() === 'unknown') {
       toast.error('Invalid invoice number');
       return;
     }
@@ -726,29 +726,16 @@ const InvoiceHistory = ({ cart, setCart, setCurrentPage }) => {
                  </>
        )}
 
-      {/* Invoice Details Modal */}
-      {showInvoiceDetails && selectedInvoice && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-end lg:items-center justify-center z-50 p-0 lg:p-4">
-          <div className="bg-white dark:bg-gray-800 rounded-t-lg lg:rounded-lg shadow-xl max-w-2xl lg:max-w-2xl w-full h-[90vh] lg:h-auto max-h-[90vh] flex flex-col">
-            <div className="p-4 sm:p-6 flex-1 overflow-y-auto">
-              <div className="flex justify-between items-start mb-4">
-                <div>
-                  <h3 className="text-lg font-semibold text-secondary-700 dark:text-secondary-300">
-                    Invoice #{getInvoiceNumber(selectedInvoice)}
-                  </h3>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">
-                    Order #{selectedInvoice.order_number}
-                  </p>
-                </div>
-                <button
-                  onClick={() => setShowInvoiceDetails(false)}
-                  className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 min-h-[44px] min-w-[44px] flex items-center justify-center"
-                  aria-label="Close"
-                >
-                  <X className="h-6 w-6" />
-                </button>
-              </div>
-
+      {/* Invoice Details Modal - Template Dialog */}
+      <Dialog
+        open={!!(showInvoiceDetails && selectedInvoice)}
+        onClose={() => setShowInvoiceDetails(false)}
+        title={selectedInvoice ? `Invoice #${getInvoiceNumber(selectedInvoice)}` : 'Invoice'}
+        size="2xl"
+      >
+        {showInvoiceDetails && selectedInvoice && (
+            <>
+              <p className="text-sm text-[#6F6A63] mb-4">Order #{selectedInvoice.order_number}</p>
               <div className="space-y-4">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
                   <div>
@@ -803,10 +790,9 @@ const InvoiceHistory = ({ cart, setCart, setCurrentPage }) => {
                   )}
                 </div>
               </div>
-            </div>
-          </div>
-        </div>
-      )}
+            </>
+        )}
+      </Dialog>
     </div>
   );
 };

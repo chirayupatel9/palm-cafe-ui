@@ -6,7 +6,10 @@ import { X } from 'lucide-react';
  * Template-style Dialog (centered modal). Use for Profile, Login, Edit Profile.
  * Renders via portal into document.body so it always appears on top.
  */
-function Dialog({ open, onClose, children, title = '', className = '', maxHeight = true }) {
+const sizeClasses = { md: 'sm:max-w-md', lg: 'sm:max-w-lg', xl: 'sm:max-w-xl', '2xl': 'sm:max-w-2xl', '4xl': 'sm:max-w-4xl' };
+
+function Dialog({ open, onClose, children, title = '', className = '', maxHeight = true, size = 'md' }) {
+  const maxW = sizeClasses[size] || sizeClasses.md;
   useEffect(() => {
     if (!open) return;
     const handleEscape = (e) => { if (e.key === 'Escape') onClose(); };
@@ -30,7 +33,7 @@ function Dialog({ open, onClose, children, title = '', className = '', maxHeight
       />
       {/* Content - template: centered, sm:max-w-md, rounded-2xl */}
       <div
-        className={`absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-[calc(100%-2rem)] sm:max-w-md bg-white rounded-2xl shadow-xl flex flex-col ${maxHeight ? 'max-h-[90vh]' : ''} overflow-hidden ${className}`}
+        className={`absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-[calc(100%-2rem)] ${maxW} bg-white rounded-2xl shadow-xl flex flex-col ${maxHeight ? 'max-h-[90vh]' : ''} overflow-hidden ${className}`}
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between flex-shrink-0 p-6 pb-4 border-b border-[#2A2A2A]/10">

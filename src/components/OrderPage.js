@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { Plus, Minus, Trash2, Receipt, ShoppingCart, FolderOpen, X, Star } from 'lucide-react';
+import { Plus, Minus, Trash2, Receipt, ShoppingCart, FolderOpen, Star, ShoppingBag } from 'lucide-react';
+import Dialog from './ui/Dialog';
+import Sheet from './ui/Sheet';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 import { useCurrency } from '../contexts/CurrencyContext';
@@ -28,6 +30,7 @@ const useDebounce = (value, delay) => {
 const OrderPage = ({ menuItems, cart: externalCart, setCart: setExternalCart }) => {
   const { formatCurrency } = useCurrency();
   const { cafeSettings } = useCafeSettings();
+  const { isDarkMode } = useDarkMode();
   const { user } = useAuth();
   const [cart, setCart] = useState([]);
   const [customerName, setCustomerName] = useState('');
@@ -242,6 +245,11 @@ const OrderPage = ({ menuItems, cart: externalCart, setCart: setExternalCart }) 
     toast.success('Item removed from cart');
   };
 
+  const getCartQuantity = (itemId) => {
+    const item = currentCart.find((i) => i.id === itemId);
+    return item ? item.quantity : 0;
+  };
+
   const updateQuantity = (itemId, newQuantity) => {
     if (newQuantity <= 0) {
       removeFromCart(itemId);
@@ -365,201 +373,175 @@ const OrderPage = ({ menuItems, cart: externalCart, setCart: setExternalCart }) 
   const total = getTotal();
 
   return (
-    <div className="lg:grid lg:grid-cols-3 lg:gap-6 pt-6 pb-6 sm:pt-8 sm:pb-8">
-      {/* Invoice prompt modal */}
-      {showInvoicePrompt && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4" aria-modal="true" role="dialog" aria-labelledby="invoice-prompt-title">
-          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-xl max-w-sm w-full p-6" style={{ color: 'var(--color-on-surface)' }}>
-            <h2 id="invoice-prompt-title" className="text-lg font-semibold mb-3">Complete order</h2>
-            <p className="text-sm mb-6" style={{ color: 'var(--color-on-surface-variant)' }}>Do you want to see the invoice?</p>
-            <div className="flex gap-3">
-              <button
-                type="button"
-                onClick={() => completeOrder(false)}
-                disabled={loading}
-                className="flex-1 px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-50"
-              >
-                No
-              </button>
-              <button
-                type="button"
-                onClick={() => completeOrder(true)}
-                disabled={loading}
-                className="btn-primary flex-1 px-4 py-2"
-              >
-                Yes, show invoice
-              </button>
-            </div>
-            <button
-              type="button"
-              onClick={() => setShowInvoicePrompt(false)}
-              disabled={loading}
-              className="mt-4 w-full text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
-            >
-              Cancel
-            </button>
-          </div>
+    <div className={`min-h-screen lg:grid lg:grid-cols-3 lg:gap-8 pt-6 pb-6 sm:pt-8 sm:pb-8 px-4 sm:px-6 lg:px-8 max-w-[1600px] mx-auto ${isDarkMode ? 'bg-gray-900' : 'bg-[#F6F4F0]'}`}>
+      {/* Invoice prompt - Template Dialog */}
+      <Dialog open={showInvoicePrompt} onClose={() => setShowInvoicePrompt(false)} title="Complete order" maxHeight={false}>
+        <p className="text-sm text-[#6F6A63] mb-6">Do you want to see the invoice?</p>
+        <div className="flex gap-3">
+          <button
+            type="button"
+            onClick={() => completeOrder(false)}
+            disabled={loading}
+            className="flex-1 px-4 py-2 rounded-lg border border-[#2A2A2A]/20 hover:bg-[#F6F4F0] disabled:opacity-50 text-[#2A2A2A]"
+          >
+            No
+          </button>
+          <button
+            type="button"
+            onClick={() => completeOrder(true)}
+            disabled={loading}
+            className="flex-1 px-4 py-2 rounded-lg bg-[#2A2A2A] hover:bg-[#C68E3C] text-white font-medium disabled:opacity-50"
+          >
+            Yes, show invoice
+          </button>
         </div>
-      )}
+        <button
+          type="button"
+          onClick={() => setShowInvoicePrompt(false)}
+          disabled={loading}
+          className="mt-4 w-full text-sm text-[#6F6A63] hover:text-[#2A2A2A]"
+        >
+          Cancel
+        </button>
+      </Dialog>
 
-      {/* Menu Items */}
+      {/* Menu Items - customerMenu-inspired layout */}
       <div className="lg:col-span-2 mb-6 lg:mb-0">
-        <div className="card">
-          <div className="mb-6">
-            <h2 className="text-2xl font-bold mb-1" style={{ color: 'var(--color-on-surface)' }}>Dashboard</h2>
-            <p className="text-sm" style={{ color: 'var(--color-on-surface-variant)' }}>Create new orders and manage your cafe operations</p>
+        <div className="mb-8 sm:mb-12">
+          <span className={`font-mono text-xs uppercase tracking-[0.2em] mb-2 block ${isDarkMode ? 'text-amber-400' : 'text-[#C68E3C]'}`}>Dashboard</span>
+          <h2 className={`text-3xl sm:text-4xl font-bold tracking-tight ${isDarkMode ? 'text-gray-100' : 'text-[#2A2A2A]'}`}>Create new orders</h2>
+          <p className={`max-w-xl text-base sm:text-lg mt-2 leading-relaxed ${isDarkMode ? 'text-gray-400' : 'text-[#6F6A63]'}`}>
+            Manage your cafe operations. Add items to the cart and complete the order.
+          </p>
+        </div>
+
+        {Object.keys(groupedMenuItems).length === 0 ? (
+          <div className={`text-center py-16 rounded-2xl border ${isDarkMode ? 'bg-gray-800/60 border-gray-700' : 'bg-white/60 border-[#E9E4DA]'}`}>
+            {cafeSettings.logo_url && (
+              <img
+                src={getImageUrl(cafeSettings.logo_url)}
+                alt={`${cafeSettings.cafe_name || 'Cafe'} Logo`}
+                className="h-24 w-24 mx-auto mb-6 opacity-50"
+              />
+            )}
+            <h3 className={`text-xl font-semibold mb-2 ${isDarkMode ? 'text-gray-200' : 'text-[#2A2A2A]'}`}>No menu items available</h3>
+            <p className={isDarkMode ? 'text-gray-400' : 'text-[#6F6A63]'}>Add items in Menu Management to get started</p>
           </div>
-          
-          {Object.keys(groupedMenuItems).length === 0 ? (
-            <div className="text-center py-12" style={{ color: 'var(--color-on-surface-variant)' }}>
-              {cafeSettings.logo_url && (
-                <img 
-                  src={getImageUrl(cafeSettings.logo_url)} 
-                  alt={`${cafeSettings.cafe_name || 'Cafe'} Logo`} 
-                  className="h-24 w-24 mx-auto mb-6 opacity-50"
-                />
-              )}
-              <h3 className="text-xl font-semibold mb-2" style={{ color: 'var(--color-on-surface)' }}>No menu items available</h3>
-              <p className="text-base">Add items in Menu Management to get started</p>
-            </div>
-          ) : (
-            <div className="space-y-4 sm:space-y-6">
-              {Object.entries(groupedMenuItems).map(([categoryName, items], index) => {
-                return (
-                <div 
-                  key={categoryName} 
-                  className="rounded-xl p-4 sm:p-6 transition-surface"
-                  style={{ 
-                    backgroundColor: 'var(--surface-table)',
-                    border: '1px solid var(--color-outline-variant)',
-                    boxShadow: 'var(--elevation-0)'
-                  }}
+        ) : (
+          <div className="space-y-12 sm:space-y-16">
+            {Object.entries(groupedMenuItems).map(([categoryName, items], catIndex) => {
+              const categoryNumber = String(catIndex + 1).padStart(2, '0');
+              return (
+                <section
+                  key={categoryName}
+                  id={`category-${categoryName.replace(/\s+/g, '-')}`}
+                  className="relative"
                 >
-                  <h3 className="text-xl font-bold mb-4 sm:mb-6 flex items-center" style={{ color: 'var(--color-on-surface)' }}>
-                    <div className="p-2 rounded-lg mr-3 transition-surface" style={{ backgroundColor: 'var(--color-primary-container)' }}>
-                      <FolderOpen className="h-5 w-5" style={{ color: 'var(--color-primary)' }} />
+                  <div className="mb-6 sm:mb-8">
+                    <div className="flex items-baseline gap-4 mb-2">
+                      <span className={`font-mono text-sm px-3 py-1 rounded-full ${isDarkMode ? 'text-amber-400 bg-amber-400/10' : 'text-[#C68E3C] bg-[#C68E3C]/10'}`}>
+                        {categoryNumber}
+                      </span>
+                      <h3 className={`text-2xl sm:text-3xl font-bold tracking-tight ${isDarkMode ? 'text-gray-100' : 'text-[#2A2A2A]'}`}>
+                        {categoryName}
+                      </h3>
                     </div>
-                    {categoryName}
-                  </h3>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-                    {items.map((item) => (
-                      <div
-                        key={item.id}
-                        className="group relative rounded-xl p-4 sm:p-5 cursor-pointer overflow-hidden transition-elevation hover-lift"
-                        style={{ 
-                          backgroundColor: 'var(--surface-card)',
-                          border: '1px solid var(--color-outline)',
-                          boxShadow: 'var(--elevation-1)'
-                        }}
-                        onClick={() => addToCart(item)}
-                        onMouseEnter={(e) => {
-                          e.currentTarget.style.boxShadow = 'var(--elevation-2)';
-                          e.currentTarget.style.backgroundColor = 'var(--surface-table)';
-                        }}
-                        onMouseLeave={(e) => {
-                          e.currentTarget.style.boxShadow = 'var(--elevation-1)';
-                          e.currentTarget.style.backgroundColor = 'var(--surface-card)';
-                        }}
-                      >
-                        {/* Add to cart indicator */}
-                        <div 
-                          className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity rounded-full p-2 z-10 transition-elevation"
-                          style={{ 
-                            backgroundColor: 'var(--color-primary)',
-                            boxShadow: 'var(--elevation-1)',
-                            transition: 'opacity var(--motion-duration-normal) var(--motion-easing-out)'
-                          }}
-                        >
-                          <Plus className="h-4 w-4" style={{ color: 'var(--color-on-primary)' }} />
-                        </div>
-                        
-                        {/* Menu Item Image */}
-                        {cafeSettings?.show_menu_images && item.image_url && (
-                          <div className="w-full h-32 mb-3 overflow-hidden rounded-lg">
-                            <img
-                              src={getImageUrl(item.image_url)}
-                              alt={item.name}
-                              className="w-full h-full object-cover"
-                            />
-                          </div>
-                        )}
-                        
-                        <div className="flex justify-between items-start mb-3">
-                          <h4 className="font-semibold text-sm sm:text-base leading-tight flex-1" style={{ color: 'var(--color-on-surface)' }}>
-                            {item.name}
-                          </h4>
-                          <span 
-                            className="text-lg sm:text-xl font-extrabold ml-2 whitespace-nowrap"
-                            style={{ 
-                              color: 'var(--color-primary)',
-                              fontWeight: 700
-                            }}
-                          >
-                            {formatCurrency(ensureNumber(item.price))}
-                          </span>
-                        </div>
-                        
-                        <p className="text-xs sm:text-sm leading-relaxed" style={{ color: 'var(--color-on-surface-variant)' }}>
-                          {item.description}
-                        </p>
-                      </div>
-                    ))}
                   </div>
-                </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6">
+                    {items.map((item) => {
+                      const quantity = getCartQuantity(item.id);
+                      return (
+                        <div
+                          key={item.id}
+                          className={`group rounded-2xl border-0 shadow-sm hover:shadow-2xl transition-all duration-300 ease-out overflow-hidden hover:-translate-y-1 ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}
+                        >
+                          <div className={`relative aspect-[4/3] overflow-hidden ${isDarkMode ? 'bg-gray-700' : 'bg-[#E9E4DA]'}`}>
+                            {cafeSettings?.show_menu_images && item.image_url ? (
+                              <img
+                                src={getImageUrl(item.image_url)}
+                                alt={item.name}
+                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                              />
+                            ) : (
+                              <div className="w-full h-full flex items-center justify-center">
+                                <FolderOpen className={`h-12 w-12 ${isDarkMode ? 'text-amber-500/40' : 'text-[#C68E3C]/40'}`} />
+                              </div>
+                            )}
+                            <div className={`absolute top-3 right-3 backdrop-blur-sm px-3 py-1.5 rounded-full shadow-md ${isDarkMode ? 'bg-gray-800/95' : 'bg-white/95'}`}>
+                              <span className={`font-mono text-sm font-medium ${isDarkMode ? 'text-amber-400' : 'text-[#C68E3C]'}`}>
+                                {formatCurrency(ensureNumber(item.price))}
+                              </span>
+                            </div>
+                          </div>
+                          <div className="p-4 sm:p-5">
+                            <h4 className={`font-semibold text-lg mb-2 group-hover:text-[#C68E3C] transition-colors ${isDarkMode ? 'text-gray-100' : 'text-[#2A2A2A]'}`}>
+                              {item.name}
+                            </h4>
+                            <p className={`text-sm mb-4 line-clamp-2 leading-relaxed ${isDarkMode ? 'text-gray-400' : 'text-[#6F6A63]'}`}>
+                              {item.description || '—'}
+                            </p>
+                            {quantity === 0 ? (
+                              <button
+                                type="button"
+                                onClick={(e) => { e.stopPropagation(); addToCart(item); }}
+                                className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-[#2A2A2A] hover:bg-[#C68E3C] text-white font-medium transition-colors duration-300"
+                              >
+                                <ShoppingBag className="h-4 w-4" />
+                                Add to cart
+                              </button>
+                            ) : (
+                              <div className={`flex items-center justify-between rounded-xl p-2 ${isDarkMode ? 'bg-gray-700' : 'bg-[#F6F4F0]'}`}>
+                                <button
+                                  type="button"
+                                  onClick={(e) => { e.stopPropagation(); updateQuantity(item.id, quantity - 1); }}
+                                  className={`h-10 w-10 rounded-full shadow-sm flex items-center justify-center transition-all hover:scale-105 ${isDarkMode ? 'bg-gray-600 hover:bg-gray-500' : 'bg-white hover:bg-[#E9E4DA]'}`}
+                                  aria-label="Decrease quantity"
+                                >
+                                  <Minus className={`h-4 w-4 ${isDarkMode ? 'text-gray-200' : 'text-[#2A2A2A]'}`} />
+                                </button>
+                                <span className={`font-mono text-lg font-medium ${isDarkMode ? 'text-gray-100' : 'text-[#2A2A2A]'}`}>{quantity}</span>
+                                <button
+                                  type="button"
+                                  onClick={(e) => { e.stopPropagation(); updateQuantity(item.id, quantity + 1); }}
+                                  className={`h-10 w-10 rounded-full shadow-sm flex items-center justify-center transition-all hover:scale-105 ${isDarkMode ? 'bg-gray-600 hover:bg-gray-500' : 'bg-white hover:bg-[#E9E4DA]'}`}
+                                  aria-label="Increase quantity"
+                                >
+                                  <Plus className={`h-4 w-4 ${isDarkMode ? 'text-gray-200' : 'text-[#2A2A2A]'}`} />
+                                </button>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </section>
               );
             })}
-            </div>
-          )}
-        </div>
+          </div>
+        )}
       </div>
 
       {/* Cart - Mobile Floating Button */}
       <div className="lg:hidden fixed bottom-4 right-4 z-50">
         <button
           onClick={() => setShowCart(!showCart)}
-          className="bg-secondary-500 text-white p-4 rounded-full shadow-lg hover:bg-secondary-600 transition-colors"
+          className="bg-[#2A2A2A] hover:bg-[#C68E3C] text-white p-4 rounded-full shadow-lg transition-colors duration-300 dark:bg-gray-700 dark:hover:bg-amber-600"
+          aria-label="Open cart"
         >
           <ShoppingCart className="h-6 w-6" />
           {currentCart.length > 0 && (
-            <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-6 w-6 flex items-center justify-center">
+            <span className="absolute -top-2 -right-2 bg-[#C68E3C] dark:bg-amber-500 text-white text-xs font-medium rounded-full h-6 w-6 flex items-center justify-center">
               {currentCart.length}
             </span>
           )}
         </button>
       </div>
 
-      {/* Mobile Cart Overlay - Authoritative elevated surface */}
+      {/* Mobile Cart - Template Sheet (same as customer menu) */}
       {showCart && (
-        <div className="lg:hidden fixed inset-0 bg-black bg-opacity-50 z-40">
-          <div 
-            className="absolute bottom-0 left-0 right-0 rounded-t-lg max-h-[80vh] overflow-y-auto"
-            style={{ 
-              backgroundColor: 'var(--surface-elevated)',
-              boxShadow: 'var(--elevation-4)'
-            }}
-          >
-            <div className="p-4">
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center">
-                  {cafeSettings.logo_url && (
-                    <img 
-                      src={getImageUrl(cafeSettings.logo_url)} 
-                      alt={`${cafeSettings.cafe_name || 'Cafe'} Logo`} 
-                      className="h-8 w-8 mr-2"
-                    />
-                  )}
-                  <h2 className="text-xl font-semibold text-secondary-700 dark:text-secondary-300">
-                    Cart ({currentCart.length})
-                  </h2>
-                </div>
-                <button
-                  onClick={() => setShowCart(false)}
-                  className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
-                >
-                  <X className="h-6 w-6" />
-                </button>
-              </div>
-              
+        <div className="lg:hidden">
+          <Sheet open={showCart} onClose={() => setShowCart(false)} title={`Cart (${currentCart.length})`}>
               {/* Customer Info */}
               <div className="space-form">
                 <input
@@ -1000,37 +982,41 @@ const OrderPage = ({ menuItems, cart: externalCart, setCart: setExternalCart }) 
                 <Receipt className="h-4 w-4 mr-2" />
                 {loading ? 'Completing...' : 'Complete order'}
               </button>
-            </div>
-          </div>
+          </Sheet>
         </div>
       )}
 
-      {/* Desktop Cart - Authoritative elevated surface */}
+      {/* Desktop Cart - customerMenu-inspired */}
       <div className="hidden lg:block lg:col-span-1">
-        <div className="card-elevated sticky top-6" style={{ boxShadow: 'var(--elevation-3)' }}>
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center">
-              {cafeSettings.logo_url && (
-                <img 
-                  src={getImageUrl(cafeSettings.logo_url)} 
-                  alt={`${cafeSettings.cafe_name || 'Cafe'} Logo`} 
-                  className="h-8 w-8 mr-2"
-                />
+        <div className={`rounded-2xl shadow-xl sticky top-6 overflow-hidden border ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-[#E9E4DA]'}`}>
+          <div className={`px-5 sm:px-6 pt-5 sm:pt-6 pb-4 border-b ${isDarkMode ? 'border-gray-700' : 'border-[#E9E4DA]'}`}>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                {cafeSettings.logo_url && (
+                  <img
+                    src={getImageUrl(cafeSettings.logo_url)}
+                    alt=""
+                    className="h-8 w-8 rounded-lg object-cover"
+                  />
+                )}
+                <h2 className={`text-xl font-semibold flex items-center gap-2 ${isDarkMode ? 'text-gray-100' : 'text-[#2A2A2A]'}`}>
+                  <ShoppingCart className={`h-5 w-5 ${isDarkMode ? 'text-amber-400' : 'text-[#C68E3C]'}`} />
+                  Cart
+                </h2>
+              </div>
+              {currentCart.length > 0 && (
+                <button
+                  type="button"
+                  onClick={clearCart}
+                  className={`text-sm transition-colors hover:text-red-600 ${isDarkMode ? 'text-gray-400' : 'text-[#6F6A63]'}`}
+                >
+                  Clear
+                </button>
               )}
-              <h2 className="text-xl font-semibold text-secondary-700 dark:text-secondary-300">Cart</h2>
             </div>
-            {currentCart.length > 0 && (
-              <button
-                onClick={clearCart}
-                className="text-red-500 hover:text-red-700 text-sm"
-              >
-                Clear
-              </button>
-            )}
           </div>
-
-          {/* Customer Info */}
-          <div className="space-form">
+          <div className="px-5 sm:px-6 py-4 space-y-4 max-h-[calc(100vh-12rem)] overflow-y-auto">
+            {/* Customer Info */}
             <input
               type="text"
               placeholder="Customer Name *"
@@ -1053,9 +1039,9 @@ const OrderPage = ({ menuItems, cart: externalCart, setCart: setExternalCart }) 
               className="input-field"
             />
             {customerInfo && (
-              <div className="mb-2 p-2 bg-green-50 border border-green-200 rounded-lg">
-                <div className="flex items-center text-sm text-green-700">
-                  <Star className="h-4 w-4 mr-1" />
+              <div className="mb-2 p-2 bg-[#C68E3C]/10 border border-[#C68E3C]/30 rounded-xl">
+                <div className="flex items-center text-sm text-[#2A2A2A]">
+                  <Star className="h-4 w-4 mr-1 text-[#C68E3C]" />
                   <span>Welcome back! {customerInfo.loyalty_points} loyalty points available</span>
                 </div>
               </div>
@@ -1064,31 +1050,23 @@ const OrderPage = ({ menuItems, cart: externalCart, setCart: setExternalCart }) 
             {/* Points Redemption */}
             {currentCart.length > 0 && customerInfo?.loyalty_points > 0 && (
               <div className="mb-4">
-                <label className="block text-sm font-medium text-secondary-700 dark:text-secondary-300 mb-2 flex items-center">
-                  <Star className="h-4 w-4 mr-2 text-yellow-500" />
+                <label className="block text-sm font-medium text-[#2A2A2A] mb-2 flex items-center">
+                  <Star className="h-4 w-4 mr-2 text-[#C68E3C]" />
                   Redeem Points
-                  <span className="ml-2 text-sm text-gray-500">
-                    (1 point = {formatCurrency(0.10)})
-                  </span>
+                  <span className="ml-2 text-sm text-[#6F6A63]">(1 point = {formatCurrency(0.10)})</span>
                 </label>
-                
-                <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-3 mb-3">
+                <div className="bg-[#C68E3C]/5 border border-[#C68E3C]/20 rounded-xl p-3 mb-3">
                   <div className="flex justify-between items-center text-sm">
-                    <span className="text-gray-600 dark:text-gray-400">Available:</span>
-                    <span className="font-medium text-yellow-700 dark:text-yellow-300">
-                      {customerInfo.loyalty_points} pts
-                    </span>
+                    <span className="text-[#6F6A63]">Available:</span>
+                    <span className="font-medium text-[#2A2A2A]">{customerInfo.loyalty_points} pts</span>
                   </div>
                   <div className="flex justify-between items-center text-sm mt-1">
-                    <span className="text-gray-600 dark:text-gray-400">Max:</span>
-                    <span className="font-medium text-yellow-700 dark:text-yellow-300">
-                      {maxRedeemablePoints} pts
-                    </span>
+                    <span className="text-[#6F6A63]">Max:</span>
+                    <span className="font-medium text-[#2A2A2A]">{maxRedeemablePoints} pts</span>
                   </div>
                 </div>
-                
                 <div className="flex items-center space-x-2">
-                  <span className="text-sm text-gray-600">Points:</span>
+                  <span className="text-sm text-[#6F6A63]">Points:</span>
                   <input
                     type="number"
                     value={pointsToRedeem}
@@ -1101,26 +1079,24 @@ const OrderPage = ({ menuItems, cart: externalCart, setCart: setExternalCart }) 
                 </div>
                 
                 {pointsToRedeem > 0 && (
-                  <div className="mt-2 text-sm text-green-600 dark:text-green-400">
-                    Save: ₹{(pointsToRedeem * 0.1).toFixed(2)}
-                  </div>
+                  <div className="mt-2 text-sm text-green-600">Save: ₹{(pointsToRedeem * 0.1).toFixed(2)}</div>
                 )}
               </div>
             )}
-            
+
             {/* Payment Method */}
-            <div className="mb-6">
-              <h3 className="font-medium text-secondary-700 dark:text-secondary-300 mb-3">Payment Method</h3>
+            <div className="mb-4">
+              <h3 className="font-medium text-[#2A2A2A] mb-3">Payment Method</h3>
               <div className="grid grid-cols-2 gap-2">
                 {paymentMethods.map((method) => (
                   <button
                     key={method.code}
                     type="button"
                     onClick={() => setPaymentMethod(method.code)}
-                    className={`h-10 flex items-center justify-center rounded-lg border transition-colors text-sm font-medium ${
+                    className={`h-10 flex items-center justify-center rounded-xl border transition-colors text-sm font-medium ${
                       paymentMethod === method.code
-                        ? 'bg-secondary-600 text-white border-secondary-600'
-                        : 'btn-secondary'
+                        ? 'bg-[#2A2A2A] text-white border-[#2A2A2A] hover:bg-[#C68E3C] hover:border-[#C68E3C]'
+                        : 'border-[#2A2A2A]/20 text-[#2A2A2A] hover:bg-[#F6F4F0]'
                     }`}
                   >
                     <span className="mr-2">{method.icon}</span>
@@ -1132,9 +1108,9 @@ const OrderPage = ({ menuItems, cart: externalCart, setCart: setExternalCart }) 
 
             {/* Split Payment Option */}
             {currentCart.length > 0 && user?.role === 'admin' && (
-              <div className="mb-6">
+              <div className="mb-4">
                 <div className="flex items-center justify-between mb-3">
-                  <h3 className="font-medium text-secondary-700 dark:text-secondary-300">Split Payment</h3>
+                  <h3 className="font-medium text-[#2A2A2A]">Split Payment</h3>
                   <label className="flex items-center space-x-2 cursor-pointer">
                     <input
                       type="checkbox"
@@ -1147,26 +1123,23 @@ const OrderPage = ({ menuItems, cart: externalCart, setCart: setExternalCart }) 
                       }}
                       className="rounded"
                     />
-                    <span className="text-sm text-gray-600 dark:text-gray-400">Enable split payment</span>
+                    <span className="text-sm text-[#6F6A63]">Enable split payment</span>
                   </label>
                 </div>
-                
                 {splitPayment && (
-                  <div className="space-y-3 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                  <div className="space-y-3 p-4 bg-[#F6F4F0] border border-[#E9E4DA] rounded-xl mt-2">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        Split Payment Method
-                      </label>
+                      <label className="block text-sm font-medium text-[#2A2A2A] mb-2">Split Payment Method</label>
                       <div className="grid grid-cols-2 gap-2">
                         {paymentMethods.filter(method => method.code !== paymentMethod).map((method) => (
                           <button
                             key={method.code}
                             type="button"
                             onClick={() => setSplitPaymentMethod(method.code)}
-                            className={`h-10 flex items-center justify-center rounded-lg border transition-colors text-sm font-medium ${
+                            className={`h-10 flex items-center justify-center rounded-xl border transition-colors text-sm font-medium ${
                               splitPaymentMethod === method.code
-                                ? 'bg-secondary-600 text-white border-secondary-600'
-                                : 'btn-secondary'
+                                ? 'bg-[#2A2A2A] text-white border-[#2A2A2A] hover:bg-[#C68E3C]'
+                                : 'border-[#2A2A2A]/20 text-[#2A2A2A] hover:bg-white'
                             }`}
                           >
                             <span className="mr-2">{method.icon}</span>
@@ -1175,9 +1148,8 @@ const OrderPage = ({ menuItems, cart: externalCart, setCart: setExternalCart }) 
                         ))}
                       </div>
                     </div>
-                    
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      <label className="block text-sm font-medium text-[#2A2A2A] mb-2">
                         Amount paid via {paymentMethods.find(m => m.code === splitPaymentMethod)?.name || 'split method'}
                       </label>
                       <input
@@ -1190,8 +1162,8 @@ const OrderPage = ({ menuItems, cart: externalCart, setCart: setExternalCart }) 
                         className="input-field"
                         placeholder="Enter amount"
                       />
-                      <p className="text-xs text-gray-500 mt-1">
-                        Remaining amount: {formatCurrency(getTotal() - splitAmount)} via {paymentMethods.find(m => m.code === paymentMethod)?.name || 'primary method'}
+                      <p className="text-xs text-[#6F6A63] mt-1">
+                        Remaining: {formatCurrency(getTotal() - splitAmount)} via {paymentMethods.find(m => m.code === paymentMethod)?.name || 'primary'}
                       </p>
                     </div>
                   </div>
@@ -1199,21 +1171,17 @@ const OrderPage = ({ menuItems, cart: externalCart, setCart: setExternalCart }) 
               </div>
             )}
 
-
-
             {/* Pickup Option */}
-            <div className="mb-2">
-              <label className="block text-sm font-medium text-secondary-700 dark:text-secondary-300 mb-2">
-                Pickup Option
-              </label>
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-[#2A2A2A] mb-2">Pickup Option</label>
               <div className="grid grid-cols-2 gap-2">
                 <button
                   type="button"
                   onClick={() => setPickupOption('pickup')}
-                  className={`h-10 flex items-center justify-center rounded-lg border transition-colors text-sm font-medium ${
+                  className={`h-10 flex items-center justify-center rounded-xl border transition-colors text-sm font-medium ${
                     pickupOption === 'pickup'
-                      ? 'bg-secondary-600 text-white border-secondary-600'
-                      : 'btn-secondary'
+                      ? 'bg-[#2A2A2A] text-white border-[#2A2A2A] hover:bg-[#C68E3C]'
+                      : 'border-[#2A2A2A]/20 text-[#2A2A2A] hover:bg-[#F6F4F0]'
                   }`}
                 >
                   <span className="mr-2">🏪</span>
@@ -1222,26 +1190,26 @@ const OrderPage = ({ menuItems, cart: externalCart, setCart: setExternalCart }) 
                 <button
                   type="button"
                   onClick={() => setPickupOption('dine-in')}
-                  className={`h-10 flex items-center justify-center rounded-lg border transition-colors text-sm font-medium ${
+                  className={`h-10 flex items-center justify-center rounded-xl border transition-colors text-sm font-medium ${
                     pickupOption === 'dine-in'
-                      ? 'bg-secondary-600 text-white border-secondary-600'
-                      : 'btn-secondary'
+                      ? 'bg-[#2A2A2A] text-white border-[#2A2A2A] hover:bg-[#C68E3C]'
+                      : 'border-[#2A2A2A]/20 text-[#2A2A2A] hover:bg-[#F6F4F0]'
                   }`}
                 >
                   <span className="mr-2">🍽️</span>
                   <span>Dine-in</span>
                 </button>
               </div>
-              <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
-                {pickupOption === 'pickup' 
-                  ? 'Order will be ready for pickup at the counter' 
+              <p className="text-xs text-[#6F6A63] mt-1">
+                {pickupOption === 'pickup'
+                  ? 'Order will be ready for pickup at the counter'
                   : 'Order will be served at the table'}
               </p>
             </div>
 
             {/* UPI QR Code Display */}
             {paymentMethod === 'upi' && (
-              <div className="mb-4 p-4 bg-white border border-accent-200 rounded-lg">
+              <div className="mb-4 p-4 bg-[#F6F4F0] border border-[#E9E4DA] rounded-xl">
                 <div className="text-center">
                   <div className="p-3 rounded-t-lg -mt-4 -mx-4 mb-4 flex items-center" style={{ backgroundColor: 'var(--color-primary)', color: 'var(--color-on-primary)' }}>
                     <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center mr-2">
@@ -1283,16 +1251,17 @@ const OrderPage = ({ menuItems, cart: externalCart, setCart: setExternalCart }) 
           </div>
 
           {/* Cart Items */}
+          <div className={`px-5 sm:px-6 pb-4 border-t pt-4 ${isDarkMode ? 'border-gray-700' : 'border-[#E9E4DA]'}`}>
           {currentCart.length === 0 ? (
-            <div className="text-center py-8 text-gray-500 dark:text-gray-400">
-              <ShoppingCart className="h-12 w-12 mx-auto mb-2 text-gray-300 dark:text-gray-500" />
-              <p className="font-medium mb-1">Your cart is empty</p>
+            <div className={`text-center py-8 ${isDarkMode ? 'text-gray-400' : 'text-[#6F6A63]'}`}>
+              <ShoppingCart className={`h-12 w-12 mx-auto mb-2 ${isDarkMode ? 'text-amber-500/40' : 'text-[#C68E3C]/40'}`} />
+              <p className={`font-medium mb-1 ${isDarkMode ? 'text-gray-200' : 'text-[#2A2A2A]'}`}>Your cart is empty</p>
               <p className="text-sm">Select items from the menu to add them to your order</p>
             </div>
           ) : (
             <div className="space-y-3 mb-4">
               {currentCart.map((item) => (
-                <div key={item.id} className="flex items-center justify-between p-3 bg-accent-50 dark:bg-gray-700 rounded-lg border border-accent-200 dark:border-gray-600">
+                <div key={item.id} className={`flex items-center justify-between p-3 rounded-xl border ${isDarkMode ? 'bg-gray-700/50 border-gray-600' : 'bg-[#F6F4F0] border-[#E9E4DA]'}`}>
                   <div className="flex items-center space-x-3 flex-1">
                     {/* Cart Item Image */}
                     {cafeSettings?.show_menu_images && item.image_url && (
@@ -1305,27 +1274,33 @@ const OrderPage = ({ menuItems, cart: externalCart, setCart: setExternalCart }) 
                       </div>
                     )}
                     <div className="flex-1">
-                      <h4 className="font-medium text-secondary-700 dark:text-secondary-300">{item.name}</h4>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">{formatCurrency(ensureNumber(item.price))} each</p>
+                      <h4 className={`font-medium ${isDarkMode ? 'text-gray-200' : 'text-[#2A2A2A]'}`}>{item.name}</h4>
+                      <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-[#6F6A63]'}`}>{formatCurrency(ensureNumber(item.price))} each</p>
                     </div>
                   </div>
                   <div className="flex items-center space-x-2">
                     <button
+                      type="button"
                       onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                      className="p-1 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+                      className={`p-1.5 rounded-lg transition-colors ${isDarkMode ? 'text-gray-400 hover:text-gray-100 hover:bg-gray-600' : 'text-[#6F6A63] hover:text-[#2A2A2A] hover:bg-white'}`}
+                      aria-label="Decrease quantity"
                     >
                       <Minus className="h-4 w-4" />
                     </button>
-                    <span className="w-8 text-center font-medium text-gray-900 dark:text-gray-100">{item.quantity}</span>
+                    <span className={`w-8 text-center font-medium ${isDarkMode ? 'text-gray-100' : 'text-[#2A2A2A]'}`}>{item.quantity}</span>
                     <button
+                      type="button"
                       onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                      className="p-1 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+                      className={`p-1.5 rounded-lg transition-colors ${isDarkMode ? 'text-gray-400 hover:text-gray-100 hover:bg-gray-600' : 'text-[#6F6A63] hover:text-[#2A2A2A] hover:bg-white'}`}
+                      aria-label="Increase quantity"
                     >
                       <Plus className="h-4 w-4" />
                     </button>
                     <button
+                      type="button"
                       onClick={() => removeFromCart(item.id)}
-                      className="p-1 text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 ml-2"
+                      className="p-1.5 rounded-lg text-red-600 hover:text-red-500 hover:bg-white/80 dark:hover:bg-gray-600 ml-1 transition-colors"
+                      aria-label="Remove item"
                     >
                       <Trash2 className="h-4 w-4" />
                     </button>
@@ -1337,29 +1312,28 @@ const OrderPage = ({ menuItems, cart: externalCart, setCart: setExternalCart }) 
 
           {/* Tip Selection */}
           {currentCart.length > 0 && (
-            <div className="border-t border-accent-200 pt-4 mb-4">
-              <h3 className="font-medium text-secondary-700 dark:text-secondary-300 mb-3">Tip</h3>
+            <div className={`border-t pt-4 mb-4 ${isDarkMode ? 'border-gray-700' : 'border-[#E9E4DA]'}`}>
+              <h3 className={`font-medium mb-3 ${isDarkMode ? 'text-gray-200' : 'text-[#2A2A2A]'}`}>Tip</h3>
               
               {/* Quick tip buttons */}
               <div className="grid grid-cols-3 gap-2 mb-3">
                 {[0, 10, 15, 18, 20, 25].map((percentage) => (
                   <button
                     key={percentage}
+                    type="button"
                     onClick={() => handleTipPercentageChange(percentage)}
-                                            className={`py-2 px-3 text-sm rounded-lg border transition-colors ${
-                          tipPercentage === percentage
-                            ? 'bg-secondary-500 text-white border-secondary-500'
-                            : 'bg-white dark:bg-gray-700 text-secondary-700 dark:text-gray-200 border-accent-300 dark:border-gray-600 hover:bg-accent-50 dark:hover:bg-gray-600'
-                        }`}
+                    className={`py-2 px-3 text-sm rounded-xl border transition-colors ${
+                      tipPercentage === percentage
+                        ? 'bg-[#2A2A2A] text-white border-[#2A2A2A] hover:bg-[#C68E3C]'
+                        : 'border-[#2A2A2A]/20 text-[#2A2A2A] hover:bg-[#F6F4F0]'
+                    }`}
                   >
                     {percentage === 0 ? 'No Tip' : `${percentage}%`}
                   </button>
                 ))}
               </div>
-              
-              {/* Custom tip amount */}
               <div className="flex items-center space-x-2">
-                <span className="text-sm text-gray-600 dark:text-gray-400">Custom:</span>
+                <span className="text-sm text-[#6F6A63]">Custom:</span>
                 <input
                   type="number"
                   value={tipAmount.toFixed(2)}
@@ -1375,8 +1349,8 @@ const OrderPage = ({ menuItems, cart: externalCart, setCart: setExternalCart }) 
 
           {/* Extra Charge */}
           {currentCart.length > 0 && (
-            <div className="border-t border-accent-200 pt-4 mb-4">
-              <h3 className="font-medium text-secondary-700 dark:text-secondary-300 mb-3">Extra Charge</h3>
+            <div className="border-t border-[#E9E4DA] pt-4 mb-4">
+              <h3 className="font-medium text-[#2A2A2A] mb-3">Extra Charge</h3>
               <div className="flex items-center space-x-2">
                 <input
                   type="checkbox"
@@ -1390,33 +1364,29 @@ const OrderPage = ({ menuItems, cart: externalCart, setCart: setExternalCart }) 
                   }}
                   className="rounded"
                 />
-                <span className="text-sm text-gray-600 dark:text-gray-400">Add extra charge</span>
+                <span className="text-sm text-[#6F6A63]">Add extra charge</span>
               </div>
               {extraChargeEnabled && (
-                <div className="space-y-3 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                <div className="space-y-3 p-4 bg-[#F6F4F0] border border-[#E9E4DA] rounded-xl mt-2">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      Extra Charge Amount
-                    </label>
+                    <label className="block text-sm font-medium text-[#2A2A2A] mb-2">Extra Charge Amount</label>
                     <input
                       type="number"
                       value={extraCharge}
                       onChange={(e) => setExtraCharge(parseFloat(e.target.value) || 0)}
                       min="0"
                       step="0.01"
-                      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-secondary-500 focus:border-transparent"
+                      className="w-full p-3 border border-[#E9E4DA] rounded-xl focus:ring-2 focus:ring-[#C68E3C]/30 focus:border-[#C68E3C]"
                       placeholder="Enter extra charge amount"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      Extra Charge Note (optional)
-                    </label>
+                    <label className="block text-sm font-medium text-[#2A2A2A] mb-2">Extra Charge Note (optional)</label>
                     <input
                       type="text"
                       value={extraChargeNote}
                       onChange={(e) => setExtraChargeNote(e.target.value)}
-                      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-secondary-500 focus:border-transparent"
+                      className="w-full p-3 border border-[#E9E4DA] rounded-xl focus:ring-2 focus:ring-[#C68E3C]/30 focus:border-[#C68E3C]"
                       placeholder="e.g., Service fee, Delivery charge"
                     />
                   </div>
@@ -1427,56 +1397,53 @@ const OrderPage = ({ menuItems, cart: externalCart, setCart: setExternalCart }) 
 
           {/* Totals */}
           {currentCart.length > 0 && (
-            <div className="border-t border-accent-200 pt-4 mb-4 space-y-2">
-              <div className="flex justify-between text-sm text-gray-600 dark:text-gray-400">
+            <div className="border-t border-[#E9E4DA] pt-4 mb-4 space-y-2">
+              <div className="flex justify-between text-sm text-[#6F6A63]">
                 <span>Subtotal:</span>
-                                    <span>{formatCurrency(subtotal)}</span>
+                <span>{formatCurrency(subtotal)}</span>
               </div>
-              
               {taxInfo.taxAmount > 0 && (
-                <div className="flex justify-between text-sm text-gray-600 dark:text-gray-400">
+                <div className="flex justify-between text-sm text-[#6F6A63]">
                   <span>{taxInfo.taxName} ({taxInfo.taxRate}%):</span>
                   <span>{formatCurrency(taxInfo.taxAmount)}</span>
                 </div>
               )}
-              
               {tipAmount > 0 && (
-                <div className="flex justify-between text-sm text-gray-600 dark:text-gray-400">
+                <div className="flex justify-between text-sm text-[#6F6A63]">
                   <span>Tip:</span>
                   <span>{formatCurrency(tipAmount)}</span>
                 </div>
               )}
-              
               {pointsToRedeem > 0 && (
-                <div className="flex justify-between text-sm text-green-600 dark:text-green-400">
+                <div className="flex justify-between text-sm text-green-600">
                   <span>Points Redeemed ({pointsToRedeem} pts):</span>
                   <span>-{formatCurrency(pointsToRedeem * 0.1)}</span>
                 </div>
               )}
-
               {extraCharge > 0 && (
-                <div className="flex justify-between text-sm text-gray-600 dark:text-gray-400">
+                <div className="flex justify-between text-sm text-[#6F6A63]">
                   <span>Extra Charge:</span>
                   <span>{formatCurrency(extraCharge)}</span>
                 </div>
               )}
-              
-              <div className="flex justify-between items-center text-lg font-semibold border-t border-accent-200 pt-2">
-                <span className="text-secondary-700 dark:text-secondary-300">Total:</span>
-                <span className="text-secondary-600 dark:text-secondary-400">{formatCurrency(total)}</span>
+              <div className="flex justify-between items-center text-lg font-semibold border-t border-[#E9E4DA] pt-2">
+                <span className="text-[#2A2A2A]">Total:</span>
+                <span className="text-[#C68E3C]">{formatCurrency(total)}</span>
               </div>
             </div>
           )}
 
           {/* Complete order button */}
           <button
+            type="button"
             onClick={startCheckout}
             disabled={currentCart.length === 0 || loading}
-            className="btn-primary w-full flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl bg-[#2A2A2A] hover:bg-[#C68E3C] dark:bg-gray-700 dark:hover:bg-amber-600 text-white font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            <Receipt className="h-4 w-4 mr-2" />
+            <Receipt className="h-4 w-4" />
             {loading ? 'Completing...' : 'Complete order'}
           </button>
+          </div>
         </div>
       </div>
     </div>

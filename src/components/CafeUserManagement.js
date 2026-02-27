@@ -3,11 +3,9 @@ import axios from 'axios';
 import toast from 'react-hot-toast';
 import { useAuth } from '../contexts/AuthContext';
 import { useFeatures } from '../contexts/FeatureContext';
-import { 
-  Users, Plus, Edit, Trash2, X, Search, 
-  Loader, AlertCircle, Lock 
-} from 'lucide-react';
+import { Users, Plus, Edit, Trash2, Search, Loader, AlertCircle } from 'lucide-react';
 import LockedFeature from './ui/LockedFeature';
+import Dialog from './ui/Dialog';
 
 const CafeUserManagement = () => {
   const { user: currentUser } = useAuth();
@@ -310,29 +308,13 @@ const CafeUserManagement = () => {
         )}
       </div>
 
-      {/* Create User Modal - Full screen on mobile */}
-      {showCreateModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-end lg:items-center justify-center z-50 p-0 lg:p-4">
-          <div className="bg-white dark:bg-gray-800 rounded-t-lg lg:rounded-lg shadow-xl max-w-md lg:max-w-md w-full h-[90vh] lg:h-auto flex flex-col">
-            <div className="p-4 sm:p-6 border-b border-accent-200 dark:border-gray-700 flex-shrink-0">
-              <div className="flex justify-between items-center">
-                <h3 className="text-lg font-semibold text-secondary-700 dark:text-gray-100">
-                  Add User
-                </h3>
-                <button
-                  onClick={() => {
-                    setShowCreateModal(false);
-                    setFormData({ username: '', email: '', password: '', role: 'admin' });
-                  }}
-                  className="text-secondary-500 hover:text-secondary-700 dark:text-gray-400 dark:hover:text-gray-200 min-h-[44px] min-w-[44px] flex items-center justify-center"
-                  aria-label="Close"
-                >
-                  <X className="h-6 w-6" />
-                </button>
-              </div>
-            </div>
-
-            <form onSubmit={handleCreate} className="p-4 sm:p-6 space-y-4 flex-1 overflow-y-auto">
+      {/* Create User Modal - Template Dialog */}
+      <Dialog
+        open={showCreateModal}
+        onClose={() => { setShowCreateModal(false); setFormData({ username: '', email: '', password: '', role: 'admin' }); }}
+        title="Add User"
+      >
+        <form onSubmit={handleCreate} className="space-y-4 pt-0">
               <div>
                 <label className="block text-sm font-medium text-secondary-700 dark:text-gray-300 mb-2">
                   Username <span className="text-red-500">*</span>
@@ -415,34 +397,16 @@ const CafeUserManagement = () => {
                 </button>
               </div>
             </form>
-          </div>
-        </div>
-      )}
+      </Dialog>
 
-      {/* Edit User Modal - Full screen on mobile */}
-      {showEditModal && editingUser && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-end lg:items-center justify-center z-50 p-0 lg:p-4">
-          <div className="bg-white dark:bg-gray-800 rounded-t-lg lg:rounded-lg shadow-xl max-w-md lg:max-w-md w-full h-[90vh] lg:h-auto flex flex-col">
-            <div className="p-4 sm:p-6 border-b border-accent-200 dark:border-gray-700 flex-shrink-0">
-              <div className="flex justify-between items-center">
-                <h3 className="text-lg font-semibold text-secondary-700 dark:text-gray-100">
-                  Edit User
-                </h3>
-                <button
-                  onClick={() => {
-                    setShowEditModal(false);
-                    setEditingUser(null);
-                    setFormData({ username: '', email: '', password: '', role: 'admin' });
-                  }}
-                  className="text-secondary-500 hover:text-secondary-700 dark:text-gray-400 dark:hover:text-gray-200 min-h-[44px] min-w-[44px] flex items-center justify-center"
-                  aria-label="Close"
-                >
-                  <X className="h-6 w-6" />
-                </button>
-              </div>
-            </div>
-
-            <form onSubmit={handleUpdate} className="p-4 sm:p-6 space-y-4 flex-1 overflow-y-auto">
+      {/* Edit User Modal - Template Dialog */}
+      <Dialog
+        open={!!(showEditModal && editingUser)}
+        onClose={() => { setShowEditModal(false); setEditingUser(null); setFormData({ username: '', email: '', password: '', role: 'admin' }); }}
+        title="Edit User"
+      >
+        {showEditModal && editingUser && (
+            <form onSubmit={handleUpdate} className="space-y-4 pt-0">
               <div>
                 <label className="block text-sm font-medium text-secondary-700 dark:text-gray-300 mb-2">
                   Username <span className="text-red-500">*</span>
@@ -525,9 +489,8 @@ const CafeUserManagement = () => {
                 </button>
               </div>
             </form>
-          </div>
-        </div>
-      )}
+        )}
+      </Dialog>
     </div>
   );
 };
