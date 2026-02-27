@@ -558,7 +558,9 @@ const CustomerMenu = ({
       // Update customer points after successful order
       if (customer.phone) {
         try {
-          const customerResponse = await axios.post('/customer/login', { phone: customer.phone });
+          const loginPayload = { phone: customer.phone };
+          if (cafeSlug) loginPayload.cafeSlug = cafeSlug;
+          const customerResponse = await axios.post('/customer/login', loginPayload);
           if (customerResponse.data) {
             // Update the customer data with new points
             const updatedCustomer = {
@@ -614,7 +616,9 @@ const CustomerMenu = ({
       return;
     }
     try {
-      const response = await axios.get(`/customer/orders?customer_phone=${encodeURIComponent(phone)}`);
+      const params = new URLSearchParams({ customer_phone: phone });
+      if (cafeSlug) params.set('cafeSlug', cafeSlug);
+      const response = await axios.get(`/customer/orders?${params.toString()}`);
       const order = response.data.find(o => o.order_number === orderNumber);
       if (order) {
         setOrderStatus(order.status);
@@ -1494,6 +1498,7 @@ const CustomerMenu = ({
             /* Order History Tab */
             <CustomerOrderHistory
               customerPhone={customer?.phone}
+              cafeSlug={cafeSlug}
               setActiveTab={setActiveTab}
               cart={cart}
               setCart={setCart}

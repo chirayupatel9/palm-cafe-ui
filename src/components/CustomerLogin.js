@@ -3,7 +3,7 @@ import { Phone, ArrowRight, UserPlus, User, Mail, MapPin } from 'lucide-react';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 
-const CustomerLogin = ({ onLogin, onRegister }) => {
+const CustomerLogin = ({ cafeSlug, onLogin, onRegister }) => {
   const [phone, setPhone] = useState('');
   const [loading, setLoading] = useState(false);
   const [showRegister, setShowRegister] = useState(false);
@@ -25,7 +25,9 @@ const CustomerLogin = ({ onLogin, onRegister }) => {
     setLoading(true);
 
     try {
-      const response = await axios.post('/customer/login', { phone });
+      const payload = { phone };
+      if (cafeSlug) payload.cafeSlug = cafeSlug;
+      const response = await axios.post('/customer/login', payload);
       
       if (response.data) {
         const customer = response.data;
@@ -59,7 +61,9 @@ const CustomerLogin = ({ onLogin, onRegister }) => {
     setLoading(true);
 
     try {
-      const customer = await axios.post('/customer/register', registerData);
+      const dataToSend = { ...registerData };
+      if (cafeSlug) dataToSend.cafeSlug = cafeSlug;
+      const customer = await axios.post('/customer/register', dataToSend);
       toast.success(`Welcome, ${customer.data.name}! You've been registered successfully.`);
       onLogin(customer.data);
     } catch (error) {

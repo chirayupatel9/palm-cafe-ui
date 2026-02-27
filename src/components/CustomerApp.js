@@ -271,7 +271,7 @@ const CustomerApp = () => {
               </div>
             )}
             <p className="text-[#6F6A63] text-sm text-center mb-4">Enter your phone number to continue</p>
-            <CustomerLogin onLogin={handleLogin} />
+            <CustomerLogin cafeSlug={slug} onLogin={handleLogin} />
             <div className="mt-6 pt-4 border-t border-[#E9E4DA]">
               <button
                 onClick={() => { setShowLoginModal(false); setLoginIntent(null); }}

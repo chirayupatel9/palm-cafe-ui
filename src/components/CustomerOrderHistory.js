@@ -4,7 +4,7 @@ import axios from 'axios';
 import toast from 'react-hot-toast';
 import { useCurrency } from '../contexts/CurrencyContext';
 
-const CustomerOrderHistory = ({ customerPhone, setActiveTab, cart, setCart }) => {
+const CustomerOrderHistory = ({ customerPhone, cafeSlug, setActiveTab, cart, setCart }) => {
   const { formatCurrency } = useCurrency();
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -22,7 +22,7 @@ const CustomerOrderHistory = ({ customerPhone, setActiveTab, cart, setCart }) =>
     }
     fetchOrderHistory();
     fetchCustomerInfo();
-  }, [customerPhone]);
+  }, [customerPhone, cafeSlug]);
 
   useEffect(() => {
     if (orders.length > 0) {
@@ -39,7 +39,9 @@ const CustomerOrderHistory = ({ customerPhone, setActiveTab, cart, setCart }) =>
     }
     try {
       setLoading(true);
-      const response = await axios.get(`/customer/orders?customer_phone=${encodeURIComponent(phone)}`);
+      const params = new URLSearchParams({ customer_phone: phone });
+      if (cafeSlug) params.set('cafeSlug', cafeSlug);
+      const response = await axios.get(`/customer/orders?${params.toString()}`);
       const data = response.data;
       setOrders(Array.isArray(data) ? data : []);
     } catch (error) {
@@ -53,7 +55,9 @@ const CustomerOrderHistory = ({ customerPhone, setActiveTab, cart, setCart }) =>
 
   const fetchCustomerInfo = async () => {
     try {
-      const response = await axios.post('/customer/login', { phone: customerPhone });
+      const payload = { phone: customerPhone };
+      if (cafeSlug) payload.cafeSlug = cafeSlug;
+      const response = await axios.post('/customer/login', payload);
       if (response.data) {
         setCustomerInfo(response.data);
       }
