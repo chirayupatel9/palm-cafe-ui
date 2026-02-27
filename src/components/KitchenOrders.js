@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Clock, CheckCircle, XCircle, Printer, RefreshCw, AlertTriangle, Coffee, Utensils, ChevronDown, ChevronUp, ShoppingCart, Plus, Edit, Save, X, Trash2 } from 'lucide-react';
+import { Clock, CheckCircle, XCircle, Printer, RefreshCw, AlertTriangle, Coffee, Utensils, ChevronDown, ChevronUp, ShoppingCart, Plus, Edit, Save, X, Trash2, FileText } from 'lucide-react';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 import { useAuth } from '../contexts/AuthContext';
@@ -28,6 +28,7 @@ const KitchenOrders = ({ cart, setCart }) => {
   } = useOrders(true, 30000, true);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [showPrintModal, setShowPrintModal] = useState(false);
+  const [generatingInvoiceId, setGeneratingInvoiceId] = useState(null);
   const [autoRefresh, setAutoRefresh] = useState(true);
   const [filterStatus, setFilterStatus] = useState('all');
   const [activeTab, setActiveTab] = useState('today');
@@ -273,7 +274,28 @@ const KitchenOrders = ({ cart, setCart }) => {
     setShowPrintModal(true);
   };
 
-
+  const handleGenerateInvoice = async (order) => {
+    setGeneratingInvoiceId(order.id);
+    try {
+      const response = await axios.post('/invoices/generate', { order_id: order.id });
+      const invoiceNumber = response.data.invoiceNumber;
+      if (!invoiceNumber) {
+        toast.error('Failed to generate invoice');
+        return;
+      }
+      const pdfResponse = await axios.get(`/invoices/${invoiceNumber}/download`);
+      const pdfBlob = new Blob([Uint8Array.from(atob(pdfResponse.data.pdf), function (c) { return c.charCodeAt(0); })], { type: 'application/pdf' });
+      const pdfUrl = URL.createObjectURL(pdfBlob);
+      window.open(pdfUrl, '_blank');
+      setTimeout(function () { URL.revokeObjectURL(pdfUrl); }, 1000);
+      toast.success('Invoice generated');
+    } catch (error) {
+      console.error('Error generating invoice:', error);
+      toast.error(error.response?.data?.error || 'Failed to generate invoice');
+    } finally {
+      setGeneratingInvoiceId(null);
+    }
+  };
 
   const addOrderToCart = (order) => {
     try {
@@ -1390,42 +1412,64 @@ const KitchenOrders = ({ cart, setCart }) => {
                       </>
                     )}
                   </div>
-                  <div className="flex items-center space-x-2">
+                  <div className="flex items-center flex-wrap gap-2">
                     {editingOrder !== order.id && (
                       <>
                         {(user?.role === 'admin' || (user?.role === 'chef' && cafeSettings?.chef_can_edit_orders) || (user?.role === 'reception' && cafeSettings?.reception_can_edit_orders)) && (
                           <button
                             onClick={() => startEditing(order)}
-                            className={`text-sm px-3 py-1 rounded border flex items-center ${
+                            className={`inline-flex items-center justify-center h-8 min-w-[5.5rem] text-sm px-3 rounded border ${
                               isDarkMode 
                                 ? 'text-blue-400 border-blue-600 hover:bg-blue-900' 
                                 : 'text-blue-600 border-blue-300 hover:bg-blue-50'
                             }`}
                             title="Edit Order"
                           >
-                            <Edit className="h-3 w-3 mr-1" />
+                            <Edit className="h-4 w-4 mr-1 shrink-0" />
                             Edit
                           </button>
                         )}
                         <button
                           onClick={() => addOrderToCart(order)}
-                          className={`text-sm px-3 py-1 rounded border flex items-center ${
+                          className={`inline-flex items-center justify-center h-8 min-w-[5.5rem] text-sm px-3 rounded border ${
                             isDarkMode 
                               ? 'text-green-400 border-green-600 hover:bg-green-900' 
                               : 'text-green-600 border-green-300 hover:bg-green-50'
                           }`}
                           title="Add to Cart"
                         >
-                          <ShoppingCart className="h-3 w-3 mr-1" />
+                          <ShoppingCart className="h-4 w-4 mr-1 shrink-0" />
                           Add to Cart
                         </button>
                         <button
                           onClick={() => printOrder(order)}
-                          className="btn-secondary text-sm px-3 py-1"
+                          className="btn-secondary inline-flex items-center justify-center h-8 min-w-[5.5rem] text-sm px-3 rounded border"
                           title="Print Order"
                         >
-                          <Printer className="h-4 w-4" />
+                          <Printer className="h-4 w-4 shrink-0" />
+                          Print
                         </button>
+                        {user?.role === 'admin' && (
+                          <button
+                            onClick={() => handleGenerateInvoice(order)}
+                            disabled={generatingInvoiceId === order.id}
+                            className={`inline-flex items-center justify-center h-8 min-w-[5.5rem] text-sm px-3 rounded border ${
+                              isDarkMode
+                                ? 'text-purple-400 border-purple-600 hover:bg-purple-900 disabled:opacity-50'
+                                : 'text-purple-600 border-purple-300 hover:bg-purple-50 disabled:opacity-50'
+                            }`}
+                            title="Generate Invoice"
+                          >
+                            {generatingInvoiceId === order.id ? (
+                              <RefreshCw className="h-4 w-4 shrink-0 animate-spin" />
+                            ) : (
+                              <>
+                                <FileText className="h-4 w-4 mr-1 shrink-0" />
+                                Invoice
+                              </>
+                            )}
+                          </button>
+                        )}
                       </>
                     )}
                   </div>
