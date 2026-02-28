@@ -33,10 +33,10 @@ function Dialog({ open, onClose, children, title = '', className = '', maxHeight
       />
       {/* Content - template: centered, sm:max-w-md, rounded-2xl */}
       <div
-        className={`absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-[calc(100%-2rem)] ${maxW} bg-white rounded-2xl shadow-xl flex flex-col ${maxHeight ? 'max-h-[90vh]' : ''} overflow-hidden ${className}`}
+        className={`absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-[calc(100%-2rem)] ${maxW} bg-white rounded-3xl shadow-xl flex flex-col ${maxHeight ? 'max-h-[90vh]' : ''} overflow-hidden ${className}`}
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex items-center justify-between flex-shrink-0 p-6 pb-4 border-b border-[#2A2A2A]/10">
+        <div className="flex items-center justify-between flex-shrink-0 px-6 pt-6 pb-5">
           {title ? <h2 id="dialog-title" className="text-xl font-bold text-[#2A2A2A]">{title}</h2> : <span />}
           <button
             type="button"
@@ -47,7 +47,7 @@ function Dialog({ open, onClose, children, title = '', className = '', maxHeight
             <X className="h-5 w-5" />
           </button>
         </div>
-        <div className={`flex-1 overflow-y-auto p-6 ${maxHeight ? 'max-h-[calc(90vh-80px)]' : ''}`}>
+        <div className={`flex-1 overflow-y-auto px-6 pb-6 pt-1 ${maxHeight ? 'max-h-[calc(90vh-80px)]' : ''}`}>
           {children}
         </div>
       </div>

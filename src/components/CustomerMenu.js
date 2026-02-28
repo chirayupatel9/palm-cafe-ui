@@ -794,7 +794,7 @@ const CustomerMenu = ({
       {activeTab === 'menu' && (
         <header
           className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
-            isScrolled ? 'bg-white/90 backdrop-blur-xl shadow-lg' : 'bg-transparent'
+            isScrolled ? 'bg-black/10 backdrop-blur-md' : 'bg-transparent'
           }`}
         >
           <div className="flex items-center justify-between px-4 sm:px-6 lg:px-8 h-16 sm:h-20">
@@ -1542,24 +1542,25 @@ const CustomerMenu = ({
 
       {/* Cart - Template Sheet (right-side drawer) */}
       <Sheet open={showCart} onClose={() => setShowCart(false)} title="Your Order">
-        <div className="flex flex-col lg:grid lg:grid-cols-3 gap-4 sm:gap-8">
-                {/* Left Column: Cart Items */}
-                <div className="lg:col-span-2 flex flex-col gap-4">
-                  {cart.length === 0 ? (
-                    <div className="flex flex-col items-center justify-center gap-6 rounded-lg bg-accent-50 p-12 text-center shadow-sm">
-                      <div className="text-secondary-600">
-                        <ShoppingCart className="h-24 w-24" />
-                      </div>
-                      <h3 className="text-2xl font-bold text-secondary-700">Your cart is empty</h3>
-                      <p className="max-w-sm text-secondary-600">Looks like you haven't added anything to your order yet. Let's fix that!</p>
+        <div className="flex flex-col gap-6">
+                {/* 1. Cart Items */}
+                {cart.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center gap-6 rounded-lg bg-accent-50 p-12 text-center shadow-sm">
+                    <div className="text-secondary-600">
+                      <ShoppingCart className="h-24 w-24" />
                     </div>
-                  ) : (
-                    <>
-                      {cart.map((item) => (
-                        <div key={item.id} className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 rounded-lg bg-accent-50 p-3 sm:p-4 shadow-sm border border-accent-200">
-                          <div className="flex items-center gap-3 sm:gap-4 w-full sm:w-auto">
+                    <h3 className="text-2xl font-bold text-secondary-700">Your cart is empty</h3>
+                    <p className="max-w-sm text-secondary-600">Looks like you haven&apos;t added anything to your order yet. Let&apos;s fix that!</p>
+                  </div>
+                ) : (
+                  <div className="flex flex-col gap-6">
+                    <div>
+                      <h2 className="text-lg font-bold text-secondary-700 mb-3">Items</h2>
+                      <div className="flex flex-col gap-3">
+                        {cart.map((item) => (
+                          <div key={item.id} className="flex items-center gap-3 rounded-lg bg-accent-50 p-3 shadow-sm border border-accent-200">
                             <div
-                              className="bg-center bg-no-repeat aspect-square bg-cover rounded-lg size-16 flex-shrink-0"
+                              className="bg-center bg-no-repeat aspect-square bg-cover rounded-lg size-14 flex-shrink-0"
                               style={{
                                 backgroundImage: `url('${item.image_url
                                   ? getImageUrl(item.image_url)
@@ -1567,55 +1568,43 @@ const CustomerMenu = ({
                                   }')`
                               }}
                             />
-                            <div className="flex flex-1 flex-col justify-center min-w-0">
-                              <p className="text-sm sm:text-base font-bold text-secondary-700 truncate">{item.name}</p>
-                              <p className="text-xs sm:text-sm text-secondary-600">{formatCurrency(item.price)}</p>
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm font-bold text-secondary-700 truncate">{item.name}</p>
+                              <p className="text-xs text-secondary-600">{formatCurrency(item.price)}</p>
                             </div>
-                          </div>
-                          <div className="flex items-center justify-between sm:justify-end gap-3 sm:gap-6 w-full sm:w-auto">
                             <div className="flex items-center gap-2">
                               <button
                                 onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                                className="flex h-11 w-11 items-center justify-center rounded-full bg-accent-100 transition-colors hover:bg-secondary-100 cursor-pointer min-h-[44px] min-w-[44px]"
+                                className="flex h-9 w-9 items-center justify-center rounded-full bg-accent-100 hover:bg-secondary-100 min-h-[36px] min-w-[36px]"
                                 aria-label="Decrease quantity"
                               >
-                                <Minus className="h-5 w-5" />
+                                <Minus className="h-4 w-4" />
                               </button>
-                              <input
-                                className="w-12 sm:w-16 border-none bg-transparent p-0 text-center text-base font-medium focus:outline-0 focus:ring-0 text-secondary-700"
-                                type="number"
-                                value={item.quantity}
-                                readOnly
-                                aria-label="Quantity"
-                              />
+                              <span className="w-8 text-center text-sm font-medium text-secondary-700">{item.quantity}</span>
                               <button
                                 onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                                className="flex h-11 w-11 items-center justify-center rounded-full bg-accent-100 transition-colors hover:bg-secondary-100 cursor-pointer min-h-[44px] min-w-[44px]"
+                                className="flex h-9 w-9 items-center justify-center rounded-full bg-accent-100 hover:bg-secondary-100 min-h-[36px] min-w-[36px]"
                                 aria-label="Increase quantity"
                               >
-                                <Plus className="h-5 w-5" />
+                                <Plus className="h-4 w-4" />
                               </button>
                             </div>
-                            <p className="text-right font-semibold text-secondary-700 text-sm sm:text-base whitespace-nowrap">{formatCurrency(item.price * item.quantity)}</p>
+                            <p className="text-sm font-semibold text-secondary-700 w-16 text-right">{formatCurrency(item.price * item.quantity)}</p>
                             <button
                               onClick={() => removeFromCart(item.id)}
-                              className="text-secondary-600 transition-colors hover:text-red-500 min-h-[44px] min-w-[44px] flex items-center justify-center"
+                              className="text-secondary-600 hover:text-red-500 p-2"
                               aria-label="Remove item"
                             >
-                              <Trash2 className="h-5 w-5" />
+                              <Trash2 className="h-4 w-4" />
                             </button>
                           </div>
-                        </div>
-                      ))}
-                    </>
-                  )}
-                </div>
+                        ))}
+                      </div>
+                    </div>
 
-                {/* Right Column: Order Summary */}
-                {cart.length > 0 && (
-                  <div className="lg:col-span-1 flex flex-col max-h-full">
-                    <div className="flex flex-col gap-6 rounded-xl bg-accent-50 p-6 shadow-sm border border-accent-200 flex-1 overflow-y-auto">
-                      <h2 className="text-2xl font-bold tracking-tight text-secondary-700">Order Summary</h2>
+                {/* 2. Order Summary */}
+                    <div className="rounded-xl bg-accent-50 p-4 shadow-sm border border-accent-200">
+                      <h3 className="font-bold text-secondary-700 mb-3 text-sm">Order Summary</h3>
 
                       <div className="flex flex-col gap-3 border-b border-accent-200 pb-4">
                         <div className="flex justify-between">
@@ -1646,9 +1635,11 @@ const CustomerMenu = ({
                         <p className="text-lg font-bold text-secondary-700">Total</p>
                         <p className="text-xl font-extrabold text-secondary-700">{formatCurrency(getTotal())}</p>
                       </div>
+                    </div>
 
-                      {/* Login Required Message */}
-                      {!customer && (
+                    {/* 3. Login or Customer & checkout options */}
+                    <>
+                    {!customer ? (
                         <div className="p-6 bg-secondary-50 border border-secondary-200 rounded-lg">
                           <div className="text-center">
                             <div className="w-12 h-12 bg-secondary-500 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -1671,34 +1662,31 @@ const CustomerMenu = ({
                             </button>
                           </div>
                         </div>
-                      )}
-
-                      {/* Customer sections only show when logged in */}
-                      {customer && (
-                        <div className="flex flex-col gap-4">
+                      ) : (
+                        <React.Fragment>
                           {/* Customer Information */}
                           <div className="p-4 bg-secondary-50 border border-secondary-200 rounded-lg">
-                            <div className="flex flex-col gap-2 mb-3">
-                              <div className="flex items-center justify-between">
-                                <h3 className="font-bold text-secondary-700 flex items-center text-base">
-                                  <User className="h-4 w-4 mr-2 text-secondary-600" />
-                                  Customer Info
-                                </h3>
-                              </div>
-                              <div className="flex items-center gap-2">
+                            <div className="flex items-center justify-between gap-2 mb-3">
+                              <h3 className="font-bold text-secondary-700 flex items-center text-base shrink-0">
+                                <User className="h-4 w-4 mr-2 text-secondary-600" />
+                                Customer Info
+                              </h3>
+                              <div className="flex items-center gap-2 shrink-0">
                                 <button
+                                  type="button"
                                   onClick={openEditProfile}
-                                  className="flex items-center justify-center gap-1 px-3 py-1.5 bg-secondary-500 text-white rounded-lg hover:bg-secondary-600 transition-colors text-xs flex-1"
+                                  className="flex items-center justify-center gap-1 px-3 py-1.5 bg-secondary-500 text-white rounded-lg hover:bg-secondary-600 transition-colors text-xs whitespace-nowrap"
                                 >
-                                  <Edit3 className="h-3 w-3" />
+                                  <Edit3 className="h-3 w-3 shrink-0" />
                                   <span>Edit Profile</span>
                                 </button>
                                 {onLogout && (
                                   <button
+                                    type="button"
                                     onClick={onLogout}
-                                    className="flex items-center justify-center gap-1 px-3 py-1.5 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors text-xs flex-1"
+                                    className="flex items-center justify-center gap-1 px-3 py-1.5 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors text-xs whitespace-nowrap"
                                   >
-                                    <LogOut className="h-3 w-3" />
+                                    <LogOut className="h-3 w-3 shrink-0" />
                                     <span>Logout</span>
                                   </button>
                                 )}
@@ -1749,24 +1737,25 @@ const CustomerMenu = ({
                           </div>
 
                           {/* Pickup Option */}
-                          <div>
+                          <div className="min-w-0">
                             <h3 className="font-bold text-secondary-700 mb-3 text-sm">Dining Preference</h3>
                             <div className="grid grid-cols-2 gap-2">
                               {[
-                                { value: 'pickup', label: 'Pickup', icon: '🥡' },
-                                { value: 'dine-in', label: 'Dine-in', icon: '🍽️' }
+                                { value: 'pickup', label: 'Pick up', icon: '🥡' },
+                                { value: 'dine-in', label: 'Dine in', icon: '🍽️' }
                               ].map((option) => (
                                 <button
                                   key={option.value}
+                                  type="button"
                                   onClick={() => setPickupOption(option.value)}
-                                  className={`p-3 rounded-lg border-2 transition-colors ${pickupOption === option.value
+                                  className={`p-3 rounded-lg border-2 transition-colors min-w-0 ${pickupOption === option.value
                                     ? 'bg-secondary-500 text-white border-secondary-500'
                                     : 'bg-white text-secondary-700 border-accent-200 hover:border-secondary-500'
                                     }`}
                                 >
-                                  <div className="flex items-center justify-center gap-2">
-                                    <span className="text-lg">{option.icon}</span>
-                                    <span className="font-semibold text-sm">{option.label}</span>
+                                  <div className="flex items-center justify-center gap-1.5 overflow-hidden">
+                                    <span className="text-lg shrink-0">{option.icon}</span>
+                                    <span className="font-semibold text-sm truncate">{option.label}</span>
                                   </div>
                                 </button>
                               ))}
@@ -1822,14 +1811,15 @@ const CustomerMenu = ({
                           )}
 
                           {/* Tip Selection */}
-                          <div>
+                          <div className="min-w-0">
                             <h3 className="font-bold text-secondary-700 mb-3 text-sm">Add Tip</h3>
-                            <div className="grid grid-cols-3 gap-2 mb-3">
+                            <div className="flex flex-wrap gap-2 mb-3">
                               {[0, 10, 15, 18, 20, 25].map((percentage) => (
                                 <button
                                   key={percentage}
+                                  type="button"
                                   onClick={() => handleTipPercentageChange(percentage)}
-                                  className={`py-2 px-3 text-xs rounded-lg border-2 transition-colors font-semibold ${tipPercentage === percentage
+                                  className={`py-2 px-3 text-xs rounded-lg border-2 transition-colors font-semibold shrink-0 ${tipPercentage === percentage
                                     ? 'bg-secondary-500 text-white border-secondary-500'
                                     : 'bg-white text-secondary-700 border-accent-200 hover:border-secondary-500'
                                     }`}
@@ -1846,13 +1836,13 @@ const CustomerMenu = ({
                               placeholder="Custom tip"
                             />
                           </div>
-                        </div>
+                        </React.Fragment>
                       )}
-                    </div>
+                    </>
 
-                    {/* Action Buttons - Sticky at bottom */}
-                    <div className="flex flex-col gap-3 p-4 bg-accent-50 border-t border-accent-200 rounded-b-xl flex-shrink-0">
+                    <div className="flex flex-col gap-3 pt-2">
                       <button
+                        type="button"
                         onClick={placeOrder}
                         disabled={orderLoading || !customer}
                         className="w-full rounded-lg bg-secondary-500 py-3 min-h-[44px] text-base font-bold text-white transition-opacity hover:bg-secondary-600 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
@@ -2006,6 +1996,7 @@ const CustomerMenu = ({
         open={!!(showProfile && customer)}
         onClose={() => { setShowProfile(false); setProfileOpenSection(null); }}
         title={profileOpenSection === 'orders' ? 'My Orders' : 'Profile'}
+        size="4xl"
       >
         {showProfile && customer && (
           <CustomerProfile
@@ -2025,6 +2016,7 @@ const CustomerMenu = ({
             }}
             cart={cart}
             setCart={setCart}
+            embedded
           />
         )}
       </Dialog>

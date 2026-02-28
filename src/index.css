@@ -834,6 +834,14 @@ img {
               transform var(--motion-duration-normal) var(--motion-easing);
 }
 
+/* Material-style elevation utilities */
+.elevation-1 {
+  box-shadow: var(--elevation-1);
+}
+.elevation-2 {
+  box-shadow: var(--elevation-2);
+}
+
 .transition-surface {
   transition: background-color var(--motion-duration-normal) var(--motion-easing),
               border-color var(--motion-duration-normal) var(--motion-easing);
