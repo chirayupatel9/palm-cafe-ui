@@ -10,6 +10,7 @@ import { TableSkeleton, CardSkeleton } from './ui/Skeleton';
 import { EmptyMenu } from './ui/EmptyState';
 import ConfirmModal from './ui/ConfirmModal';
 import Dialog from './ui/Dialog';
+import Select from './ui/Select';
 
 const MenuManagement = ({ menuItems, onUpdate, onAdd, onDelete }) => {
   const { formatCurrency } = useCurrency();
@@ -673,18 +674,16 @@ const MenuManagement = ({ menuItems, onUpdate, onAdd, onDelete }) => {
           <div className="card">
             <div className="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-4">
               <label className={`text-sm font-medium ${isDarkMode ? 'text-secondary-300' : 'text-secondary-700'}`}>Filter by Category:</label>
-              <select
-                value={selectedCategory}
-                onChange={(e) => setSelectedCategory(e.target.value)}
-                className="input-field sm:max-w-xs"
-              >
-                <option value="all">All Categories</option>
-                {categories.map(category => (
-                  <option key={category.id} value={category.id}>
-                    {category.name}
-                  </option>
-                ))}
-              </select>
+              <Select
+                options={[
+                  { value: 'all', label: 'All Categories' },
+                  ...categories.map(c => ({ value: String(c.id), label: c.name }))
+                ]}
+                value={String(selectedCategory)}
+                onChange={setSelectedCategory}
+                className="sm:max-w-xs"
+                placeholder="All Categories"
+              />
             </div>
           </div>
 
@@ -693,19 +692,15 @@ const MenuManagement = ({ menuItems, onUpdate, onAdd, onDelete }) => {
             <div className="card">
               <h3 className={`text-lg font-semibold mb-4 ${isDarkMode ? 'text-secondary-300' : 'text-secondary-700'}`}>Add New Menu Item</h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4">
-                <select
-                  value={formData.category_id}
-                  onChange={(e) => handleInputChange('category_id', e.target.value)}
-                  className="input-field"
-                  required
-                >
-                  <option value="">Select Category *</option>
-                  {categories.map(category => (
-                    <option key={category.id} value={category.id}>
-                      {category.name}
-                    </option>
-                  ))}
-                </select>
+                <Select
+                  options={[
+                    { value: '', label: 'Select Category *' },
+                    ...categories.map(c => ({ value: String(c.id), label: c.name }))
+                  ]}
+                  value={formData.category_id === '' || formData.category_id == null ? '' : String(formData.category_id)}
+                  onChange={(v) => handleInputChange('category_id', v)}
+                  placeholder="Select Category *"
+                />
                 <input
                   type="text"
                   placeholder="Item Name *"
@@ -862,16 +857,12 @@ const MenuManagement = ({ menuItems, onUpdate, onAdd, onDelete }) => {
           ) : (
             Object.entries(groupedMenuItems).map(([categoryName, items], index) => {
               return (
-                <div
-                  key={categoryName}
-                  className={`rounded-2xl overflow-hidden border transition-shadow ${isDarkMode ? 'bg-gray-800/80 border-gray-700 shadow-lg' : 'bg-white border-gray-200/80 shadow-md hover:shadow-lg'}`}
-                  style={{ boxShadow: 'var(--elevation-2)' }}
-                >
-                  <div className={`px-6 py-4 border-b ${isDarkMode ? 'border-gray-700 bg-gray-800/50' : 'border-gray-100 bg-gray-50/80'}`}>
-                    <h3 className={`text-base font-semibold flex items-center tracking-tight ${isDarkMode ? 'text-gray-100' : 'text-gray-900'}`}>
-                      <FolderOpen className={`h-5 w-5 mr-2.5 opacity-80 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`} />
+                <div key={categoryName} className="card overflow-hidden">
+                  <div className="card-header !mb-4">
+                    <h3 className="card-title flex items-center">
+                      <FolderOpen className="h-5 w-5 mr-2.5 opacity-80" />
                       {categoryName}
-                      <span className={`ml-2 text-sm font-normal ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                      <span className="card-description ml-2 !mt-0">
                         {items.length} item{items.length !== 1 ? 's' : ''}
                       </span>
                     </h3>
@@ -976,15 +967,7 @@ const MenuManagement = ({ menuItems, onUpdate, onAdd, onDelete }) => {
                   {items.map((item) => (
                     <div
                       key={item.id}
-                      className={`rounded-xl border p-4 transition-all duration-200 ${
-                        editingId === item.id
-                          ? isDarkMode
-                            ? 'bg-gray-700/40 border-gray-600'
-                            : 'bg-gray-50 border-gray-200'
-                          : isDarkMode
-                            ? 'bg-gray-800/60 border-gray-700 hover:bg-gray-700/30'
-                            : 'bg-white border-gray-200/90 hover:bg-gray-50/80 hover:border-gray-200'
-                      }`}
+                      className={`card card-sm ${editingId === item.id ? (isDarkMode ? '!bg-gray-700/50' : '!bg-gray-50') : ''}`}
                     >
                       <div>
                           <div className="flex items-start space-x-3 mb-3">
@@ -1262,15 +1245,7 @@ const MenuManagement = ({ menuItems, onUpdate, onAdd, onDelete }) => {
                 {/* Mobile Cards */}
                 <div className="lg:hidden space-y-3">
                   {categories.map((category) => (
-                    <div 
-                      key={category.id} 
-                      className="border rounded-lg p-4 transition-elevation hover-lift"
-                      style={{ 
-                        borderColor: 'var(--color-outline)',
-                        backgroundColor: 'var(--surface-card)',
-                        boxShadow: 'var(--elevation-1)'
-                      }}
-                    >
+                    <div key={category.id} className="card card-sm">
                       {categoryEditingId === category.id ? (
                         // Edit Mode Mobile
                         <div className="space-y-3">
@@ -1366,17 +1341,13 @@ const MenuManagement = ({ menuItems, onUpdate, onAdd, onDelete }) => {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className={`block text-sm font-medium mb-1 ${isDarkMode ? 'text-gray-300' : 'text-secondary-700'}`}>Category *</label>
-                <select
-                  value={formData.category_id}
-                  onChange={(e) => handleInputChange('category_id', e.target.value)}
-                  className="input-field w-full text-base py-2.5"
-                >
-                  {categories.map(category => (
-                    <option key={category.id} value={category.id}>
-                      {category.name}
-                    </option>
-                  ))}
-                </select>
+                <Select
+                  options={categories.map(c => ({ value: String(c.id), label: c.name }))}
+                  value={formData.category_id === '' || formData.category_id == null ? '' : String(formData.category_id)}
+                  onChange={(v) => handleInputChange('category_id', v)}
+                  placeholder="Category"
+                  className="w-full text-base py-2.5"
+                />
               </div>
               <div>
                 <label className={`block text-sm font-medium mb-1 ${isDarkMode ? 'text-gray-300' : 'text-secondary-700'}`}>Item Name *</label>

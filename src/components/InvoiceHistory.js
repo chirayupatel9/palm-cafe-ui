@@ -351,10 +351,10 @@ const InvoiceHistory = ({ cart, setCart, setCurrentPage }) => {
          ) : (
           <>
                          {/* Search Bar */}
-             <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700 p-6">
+             <div className="card">
                <div className="flex items-center space-x-4">
                  <div className="flex-1 relative">
-                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none z-10">
                      <svg
                        className="h-5 w-5 text-gray-400"
                        fill="none"
@@ -374,13 +374,13 @@ const InvoiceHistory = ({ cart, setCart, setCurrentPage }) => {
                      placeholder="Search by invoice number, order number, customer name, or phone..."
                      value={searchQuery}
                      onChange={(e) => setSearchQuery(e.target.value)}
-                     className="w-full pl-12 pr-4 py-4 text-lg border-0 bg-gray-50 dark:bg-gray-700 rounded-xl focus:ring-2 focus:ring-secondary-500 focus:bg-white dark:focus:bg-gray-600 transition-all duration-200 placeholder-gray-400 dark:placeholder-gray-500"
+                     className="input-field pl-12 text-base"
                    />
                  </div>
                  {searchQuery && (
                    <button
                      onClick={() => setSearchQuery('')}
-                     className="px-6 py-4 text-sm font-medium text-gray-600 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200 bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 rounded-xl transition-all duration-200"
+                     className="btn-secondary"
                      title="Clear search"
                    >
                      Clear
@@ -484,7 +484,7 @@ const InvoiceHistory = ({ cart, setCart, setCurrentPage }) => {
                 {/* Desktop Table */}
                 <div className="hidden lg:block overflow-x-auto">
                   <table className="min-w-full divide-y divide-accent-200">
-                    <thead className="bg-accent-50">
+                    <thead className="bg-accent-50 dark:bg-gray-700">
                       <tr>
                         <th className="px-6 py-3 text-left text-xs font-medium text-secondary-600 uppercase tracking-wider">
                           Invoice #
@@ -512,9 +512,9 @@ const InvoiceHistory = ({ cart, setCart, setCurrentPage }) => {
                         </th>
                       </tr>
                     </thead>
-                    <tbody className="bg-white divide-y divide-accent-200">
+                    <tbody className="bg-white dark:bg-gray-800 divide-y divide-accent-200 dark:divide-gray-700">
                       {displayedInvoices.map((invoice) => (
-                        <tr key={getInvoiceNumber(invoice)} className="hover:bg-accent-50">
+                        <tr key={getInvoiceNumber(invoice)} className="hover:bg-accent-50 dark:hover:bg-gray-700">
                           <td className="px-6 py-4 whitespace-nowrap">
                             <div className="text-sm font-medium text-secondary-700 dark:text-secondary-300">
                               #{getInvoiceNumber(invoice)}
@@ -622,7 +622,7 @@ const InvoiceHistory = ({ cart, setCart, setCurrentPage }) => {
                 {/* Mobile Cards */}
                 <div className="lg:hidden space-y-4">
                   {displayedInvoices.map((invoice) => (
-                    <div key={getInvoiceNumber(invoice)} className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-accent-200 dark:border-gray-700 p-4">
+                    <div key={getInvoiceNumber(invoice)} className="card card-sm">
                       <div className="flex justify-between items-start mb-3">
                         <div>
                           <div className="font-medium text-secondary-700 dark:text-secondary-300">

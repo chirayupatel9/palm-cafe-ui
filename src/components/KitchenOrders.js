@@ -9,6 +9,7 @@ import { useCurrency } from '../contexts/CurrencyContext';
 import { getImageUrl } from '../utils/imageUtils';
 import useOrders from '../hooks/useOrders';
 import PrintModal from './PrintModal';
+import Select from './ui/Select';
 
 const KitchenOrders = ({ cart, setCart }) => {
   const { isAuthenticated, user, loading: authLoading } = useAuth();
@@ -823,42 +824,39 @@ const KitchenOrders = ({ cart, setCart }) => {
       {/* Filters */}
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-4">
-          {(
-            <select
-              value={filterStatus}
-              onChange={(e) => {
-                setFilterStatus(e.target.value);
-                setCurrentPage(1); // Reset pagination when filter changes
-              }}
-              className={`px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 ${
-                isDarkMode 
-                  ? 'bg-gray-800 border-gray-600 text-gray-100' 
-                  : 'border-gray-300 bg-white text-gray-900'
-              }`}
-            >
-              <option value="all">All Orders</option>
-              {activeTab === 'today' && todaySubTab === 'active' ? (
-                <>
-                  <option value="pending">Pending</option>
-                  <option value="preparing">Preparing</option>
-                </>
-              ) : activeTab === 'today' && todaySubTab === 'ready' ? (
-                <option value="ready">Ready</option>
-              ) : activeTab === 'today' && todaySubTab === 'completed' ? (
-                <option value="completed">Completed</option>
-              ) : activeTab === 'today' && todaySubTab === 'cancelled' ? (
-                <option value="cancelled">Cancelled</option>
-              ) : (
-                <>
-                  <option value="pending">Pending</option>
-                  <option value="preparing">Preparing</option>
-                  <option value="ready">Ready</option>
-                  <option value="completed">Completed</option>
-                  <option value="cancelled">Cancelled</option>
-                </>
-              )}
-            </select>
-          )}
+          {(() => {
+            const statusOptions = [{ value: 'all', label: 'All Orders' }];
+            if (activeTab === 'today' && todaySubTab === 'active') {
+              statusOptions.push({ value: 'pending', label: 'Pending' }, { value: 'preparing', label: 'Preparing' });
+            } else if (activeTab === 'today' && todaySubTab === 'ready') {
+              statusOptions.push({ value: 'ready', label: 'Ready' });
+            } else if (activeTab === 'today' && todaySubTab === 'completed') {
+              statusOptions.push({ value: 'completed', label: 'Completed' });
+            } else if (activeTab === 'today' && todaySubTab === 'cancelled') {
+              statusOptions.push({ value: 'cancelled', label: 'Cancelled' });
+            } else {
+              statusOptions.push(
+                { value: 'pending', label: 'Pending' },
+                { value: 'preparing', label: 'Preparing' },
+                { value: 'ready', label: 'Ready' },
+                { value: 'completed', label: 'Completed' },
+                { value: 'cancelled', label: 'Cancelled' }
+              );
+            }
+            return (
+              <div className="min-w-[160px]">
+                <Select
+                  options={statusOptions}
+                  value={filterStatus}
+                  onChange={(v) => {
+                    setFilterStatus(v);
+                    setCurrentPage(1);
+                  }}
+                  placeholder="All Orders"
+                />
+              </div>
+            );
+          })()}
           
           {/* Search Bar */}
           <div className="relative">
@@ -870,13 +868,9 @@ const KitchenOrders = ({ cart, setCart }) => {
                 setSearchQuery(e.target.value);
                 setCurrentPage(1); // Reset pagination when search changes
               }}
-              className={`px-3 py-2 pl-10 pr-10 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 w-64 ${
-                isDarkMode 
-                  ? 'bg-gray-800 border-gray-600 text-gray-100 placeholder-gray-400' 
-                  : 'border-gray-300 bg-white text-gray-900 placeholder-gray-500'
-              }`}
+              className="input-field pl-12 pr-10 w-64"
             />
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
               <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
               </svg>
@@ -1027,17 +1021,19 @@ const KitchenOrders = ({ cart, setCart }) => {
                       <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                         Payment Method
                       </label>
-                      <select
+                      <Select
+                        options={[
+                          { value: '', label: 'Select payment method' },
+                          { value: 'cash', label: 'Cash' },
+                          { value: 'card', label: 'Card' },
+                          { value: 'upi', label: 'UPI' },
+                          { value: 'online', label: 'Online' }
+                        ]}
                         value={editFormData.payment_method || ''}
-                        onChange={(e) => updateEditFormData('payment_method', e.target.value)}
-                        className="input-field w-full"
-                      >
-                        <option value="">Select payment method</option>
-                        <option value="cash">Cash</option>
-                        <option value="card">Card</option>
-                        <option value="upi">UPI</option>
-                        <option value="online">Online</option>
-                      </select>
+                        onChange={(v) => updateEditFormData('payment_method', v)}
+                        placeholder="Select payment method"
+                        className="w-full"
+                      />
                     </div>
                     <div className="flex items-center space-x-2">
                       <input
@@ -1056,17 +1052,19 @@ const KitchenOrders = ({ cart, setCart }) => {
                           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                             Split Payment Method
                           </label>
-                          <select
+                          <Select
+                            options={[
+                              { value: '', label: 'Select split payment method' },
+                              { value: 'cash', label: 'Cash' },
+                              { value: 'card', label: 'Card' },
+                              { value: 'upi', label: 'UPI' },
+                              { value: 'online', label: 'Online' }
+                            ]}
                             value={editFormData.split_payment_method || ''}
-                            onChange={(e) => updateEditFormData('split_payment_method', e.target.value)}
-                            className="input-field w-full"
-                          >
-                            <option value="">Select split payment method</option>
-                            <option value="cash">Cash</option>
-                            <option value="card">Card</option>
-                            <option value="upi">UPI</option>
-                            <option value="online">Online</option>
-                          </select>
+                            onChange={(v) => updateEditFormData('split_payment_method', v)}
+                            placeholder="Select split payment method"
+                            className="w-full"
+                          />
                         </div>
                         <div>
                           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
@@ -1206,17 +1204,16 @@ const KitchenOrders = ({ cart, setCart }) => {
                                     <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">
                                       Menu Item
                                     </label>
-                                    <select
-                                      value={item.menu_item_id || ''}
-                                      onChange={(e) => updateOrderItem(index, 'menu_item_id', e.target.value)}
-                                      className="input-field text-sm"
-                                    >
-                                      {menuItems.map(menuItem => (
-                                        <option key={menuItem.id} value={menuItem.id}>
-                                          {menuItem.name} - {formatCurrency(menuItem.price)}
-                                        </option>
-                                      ))}
-                                    </select>
+                                    <Select
+                                      options={menuItems.map(mi => ({
+                                        value: String(mi.id),
+                                        label: `${mi.name} - ${formatCurrency(mi.price)}`
+                                      }))}
+                                      value={item.menu_item_id ? String(item.menu_item_id) : ''}
+                                      onChange={(v) => updateOrderItem(index, 'menu_item_id', v)}
+                                      placeholder="Select item"
+                                      className="text-sm"
+                                    />
                                   </div>
                                   <div>
                                     <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">

@@ -10,6 +10,7 @@ import {
 import Card from './ui/Card';
 import Skeleton, { CardSkeleton } from './ui/Skeleton';
 import LockedFeature from './ui/LockedFeature';
+import Select from './ui/Select';
 
 // Simple Bar Chart Component (CSS-based)
 const SimpleBarChart = ({ data, labelKey = 'date', valueKey = 'count', maxValue, height = 200 }) => {
@@ -309,17 +310,19 @@ const CafeAnalytics = () => {
         {/* Time Range Selector */}
         <div className="flex items-center space-x-2">
           <label className="text-sm text-secondary-600 dark:text-gray-400">Time Range:</label>
-          <select
-            value={timeRange}
-            onChange={(e) => setTimeRange(Math.min(parseInt(e.target.value), 365))}
-            className="px-3 py-1 border border-accent-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-secondary-500 focus:border-secondary-500 dark:bg-gray-700 dark:text-gray-100 text-sm"
-          >
-            <option value={7}>Last 7 days</option>
-            <option value={14}>Last 14 days</option>
-            <option value={30}>Last 30 days</option>
-            <option value={60}>Last 60 days</option>
-            <option value={90}>Last 90 days</option>
-          </select>
+          <Select
+            options={[
+              { value: '7', label: 'Last 7 days' },
+              { value: '14', label: 'Last 14 days' },
+              { value: '30', label: 'Last 30 days' },
+              { value: '60', label: 'Last 60 days' },
+              { value: '90', label: 'Last 90 days' }
+            ]}
+            value={String(timeRange)}
+            onChange={(v) => setTimeRange(Math.min(parseInt(v, 10), 365))}
+            className="text-sm"
+            placeholder="Time range"
+          />
         </div>
       </div>
 
@@ -398,7 +401,7 @@ const CafeAnalytics = () => {
         description="Customer metrics and engagement"
       >
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="text-center p-4 rounded-lg transition-surface" style={{ backgroundColor: 'var(--surface-table)' }}>
+          <div className="card text-center">
             <p className="text-3xl font-bold" style={{ color: 'var(--color-primary)' }}>
               {customers?.total || 0}
             </p>
@@ -406,7 +409,7 @@ const CafeAnalytics = () => {
               Total Customers
             </p>
           </div>
-          <div className="text-center p-4 rounded-lg transition-surface" style={{ backgroundColor: 'var(--surface-table)' }}>
+          <div className="card text-center">
             <p className="text-3xl font-bold" style={{ color: 'var(--color-primary)' }}>
               {customers?.new_this_month || 0}
             </p>
@@ -414,7 +417,7 @@ const CafeAnalytics = () => {
               New This Month
             </p>
           </div>
-          <div className="text-center p-4 rounded-lg transition-surface" style={{ backgroundColor: 'var(--surface-table)' }}>
+          <div className="card text-center">
             <p className="text-3xl font-bold" style={{ color: 'var(--color-primary)' }}>
               {customers?.returning || 0}
             </p>

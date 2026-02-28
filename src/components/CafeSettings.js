@@ -7,6 +7,7 @@ import ColorSchemeTest from './ColorSchemeTest';
 import { getImageUrl } from '../utils/imageUtils';
 import { Copy, ExternalLink, Check, Plus, Pencil, Trash2 } from 'lucide-react';
 import toast from 'react-hot-toast';
+import FileInput from './ui/FileInput';
 
 const CafeSettings = () => {
   const { cafeSettings, loading: cafeSettingsLoading, error: cafeSettingsError, fetchCafeSettings, updateCafeSettings, updateLogo, updateHeroImage, removeHeroImage, removeLogo } = useCafeSettings();
@@ -861,12 +862,12 @@ const CafeSettings = () => {
                   )}
                   <div className="flex items-center space-x-4">
                     <div className="flex-1">
-                      <input
-                        type="file"
-                        onChange={(e) => setSelectedFile(e.target.files[0])}
+                      <FileInput
+                        selectedFile={selectedFile}
+                        onChange={setSelectedFile}
                         accept="image/jpeg,image/png,image/webp"
-                        className="input-field"
                         disabled={uploadingLogo}
+                        placeholder="No file chosen"
                       />
                     </div>
                     <button
@@ -905,12 +906,12 @@ const CafeSettings = () => {
                   )}
                   <div className="flex items-center space-x-4">
                     <div className="flex-1">
-                      <input
-                        type="file"
-                        onChange={(e) => setSelectedHeroFile(e.target.files[0])}
+                      <FileInput
+                        selectedFile={selectedHeroFile}
+                        onChange={setSelectedHeroFile}
                         accept="image/jpeg,image/png,image/webp"
-                        className="input-field"
                         disabled={uploadingHero}
+                        placeholder="No file chosen"
                       />
                     </div>
                     <button
@@ -949,7 +950,7 @@ const CafeSettings = () => {
                   <div className="space-y-4">
                     <div className="flex flex-wrap gap-3">
                       {promoBanners.map((b) => (
-                        <div key={b.id} className="border rounded-lg overflow-hidden bg-white dark:bg-gray-800 w-48">
+                        <div key={b.id} className="card overflow-hidden w-48 p-0">
                           <div className="h-28 bg-gray-100 dark:bg-gray-700">
                             <img src={getImageUrl(b.image_url)} alt="Banner" className="w-full h-full object-cover" />
                           </div>
@@ -989,18 +990,19 @@ const CafeSettings = () => {
                       const b = promoBanners.find((x) => x.id === editingBannerId);
                       if (!b) return null;
                       return (
-                        <div className="border rounded-lg p-4 bg-gray-50 dark:bg-gray-800">
+                        <div className="card card-sm">
                           <p className="text-sm font-medium mb-2">Edit banner</p>
                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                             <div className="sm:col-span-2">
                               <label className="block text-xs text-gray-500 mb-1">Replace image (optional)</label>
-                              <input
-                                type="file"
+                              <FileInput
+                                selectedFile={editingBannerReplaceFile}
+                                onChange={setEditingBannerReplaceFile}
                                 accept="image/jpeg,image/png,image/webp"
-                                onChange={(e) => setEditingBannerReplaceFile(e.target.files?.[0] || null)}
-                                className="input-field text-sm"
+                                disabled={updatingBanner}
+                                placeholder="No file chosen"
+                                className="text-sm"
                               />
-                              {editingBannerReplaceFile && <span className="text-xs text-gray-500 ml-2">{editingBannerReplaceFile.name}</span>}
                             </div>
                             <div>
                               <label className="block text-xs text-gray-500 mb-1">Link URL</label>
@@ -1041,16 +1043,17 @@ const CafeSettings = () => {
                       );
                     })()}
                     {promoBannerForm.show && (
-                      <div className="border rounded-lg p-4 bg-gray-50 dark:bg-gray-800">
+                      <div className="card card-sm">
                         <p className="text-sm font-medium mb-2">Add banner</p>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                           <div>
                             <label className="block text-xs text-gray-500 mb-1">Image *</label>
-                            <input
-                              type="file"
+                            <FileInput
+                              selectedFile={promoBannerForm.file}
+                              onChange={(file) => setPromoBannerForm((f) => ({ ...f, file: file || null }))}
                               accept="image/jpeg,image/png,image/webp"
-                              onChange={(e) => setPromoBannerForm((f) => ({ ...f, file: e.target.files?.[0] || null }))}
-                              className="input-field text-sm"
+                              placeholder="No file chosen"
+                              className="text-sm"
                             />
                           </div>
                           <div>
@@ -1139,7 +1142,7 @@ const CafeSettings = () => {
                         const root = document.documentElement;
                         root.style.setProperty('--color-primary', newColor);
                       }}
-                      className="w-full h-10 rounded border"
+                      className="input-field"
                     />
                   </div>
                   <div>
@@ -1154,7 +1157,7 @@ const CafeSettings = () => {
                         const root = document.documentElement;
                         root.style.setProperty('--color-secondary', newColor);
                       }}
-                      className="w-full h-10 rounded border"
+                      className="input-field"
                     />
                   </div>
                   <div>
@@ -1169,7 +1172,7 @@ const CafeSettings = () => {
                         const root = document.documentElement;
                         root.style.setProperty('--color-accent', newColor);
                       }}
-                      className="w-full h-10 rounded border"
+                      className="input-field"
                     />
                   </div>
                   <div>
@@ -1184,7 +1187,7 @@ const CafeSettings = () => {
                         const root = document.documentElement;
                         root.style.setProperty('--color-background', newColor);
                       }}
-                      className="w-full h-10 rounded border"
+                      className="input-field"
                     />
                   </div>
                   <div>
@@ -1200,7 +1203,7 @@ const CafeSettings = () => {
                         root.style.setProperty('--color-text-primary', newColor);
                         root.style.setProperty('--color-text', newColor);
                       }}
-                      className="w-full h-10 rounded border"
+                      className="input-field"
                     />
                   </div>
                   <div>
@@ -1215,7 +1218,7 @@ const CafeSettings = () => {
                         const root = document.documentElement;
                         root.style.setProperty('--color-surface', newColor);
                       }}
-                      className="w-full h-10 rounded border"
+                      className="input-field"
                     />
                   </div>
                 </div>
@@ -1239,7 +1242,7 @@ const CafeSettings = () => {
                           root.style.setProperty('--color-primary', newColor);
                         }
                       }}
-                      className="w-full h-10 rounded border"
+                      className="input-field"
                     />
                   </div>
                   <div>
@@ -1256,7 +1259,7 @@ const CafeSettings = () => {
                           root.style.setProperty('--color-secondary', newColor);
                         }
                       }}
-                      className="w-full h-10 rounded border"
+                      className="input-field"
                     />
                   </div>
                   <div>
@@ -1273,7 +1276,7 @@ const CafeSettings = () => {
                           root.style.setProperty('--color-accent', newColor);
                         }
                       }}
-                      className="w-full h-10 rounded border"
+                      className="input-field"
                     />
                   </div>
                   <div>
@@ -1290,7 +1293,7 @@ const CafeSettings = () => {
                           root.style.setProperty('--color-background', newColor);
                         }
                       }}
-                      className="w-full h-10 rounded border"
+                      className="input-field"
                     />
                   </div>
                   <div>
@@ -1308,7 +1311,7 @@ const CafeSettings = () => {
                           root.style.setProperty('--color-text', newColor);
                         }
                       }}
-                      className="w-full h-10 rounded border"
+                      className="input-field"
                     />
                   </div>
                   <div>
@@ -1325,7 +1328,7 @@ const CafeSettings = () => {
                           root.style.setProperty('--color-surface', newColor);
                         }
                       }}
-                      className="w-full h-10 rounded border"
+                      className="input-field"
                     />
                   </div>
                 </div>

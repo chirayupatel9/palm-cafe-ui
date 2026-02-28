@@ -142,7 +142,7 @@ const AdminRegister = () => {
                 required
                 value={formData.username}
                 onChange={handleChange}
-                className="mt-1 block w-full px-3 py-2 border border-accent-300 rounded-lg shadow-sm placeholder-accent-400 focus:outline-none focus:ring-2 focus:ring-secondary-500 focus:border-secondary-500"
+                className="input-field mt-1"
                 placeholder="Enter username"
               />
             </div>
@@ -158,7 +158,7 @@ const AdminRegister = () => {
                 required
                 value={formData.email}
                 onChange={handleChange}
-                className="mt-1 block w-full px-3 py-2 border border-accent-300 rounded-lg shadow-sm placeholder-accent-400 focus:outline-none focus:ring-2 focus:ring-secondary-500 focus:border-secondary-500"
+                className="input-field mt-1"
                 placeholder="Enter email"
               />
             </div>
@@ -175,7 +175,7 @@ const AdminRegister = () => {
                   required
                   value={formData.password}
                   onChange={handleChange}
-                  className="block w-full px-3 py-2 pr-10 border border-accent-300 rounded-lg shadow-sm placeholder-accent-400 focus:outline-none focus:ring-2 focus:ring-secondary-500 focus:border-secondary-500"
+                  className="input-field pr-10"
                   placeholder="Enter password"
                 />
                 <button
@@ -204,7 +204,7 @@ const AdminRegister = () => {
                   required
                   value={formData.confirmPassword}
                   onChange={handleChange}
-                  className="block w-full px-3 py-2 pr-10 border border-accent-300 rounded-lg shadow-sm placeholder-accent-400 focus:outline-none focus:ring-2 focus:ring-secondary-500 focus:border-secondary-500"
+                  className="input-field pr-10"
                   placeholder="Confirm password"
                 />
                 <button

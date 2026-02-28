@@ -23,6 +23,7 @@ import {
 } from 'lucide-react';
 import PageHeader from './PageHeader';
 import { TableSkeleton } from './ui/Skeleton';
+import Select from './ui/Select';
 import { EmptyCustomers } from './ui/EmptyState';
 import Dialog from './ui/Dialog';
 
@@ -339,34 +340,29 @@ const CustomerManagement = () => {
       <div className="card">
         <div className="flex flex-col sm:flex-row gap-4">
           <div className="flex-1 relative">
-            <Search className={`absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`} />
+            <Search className={`absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 pointer-events-none ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`} />
             <input
               type="text"
               placeholder="Search customers by name, email, or phone..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               onKeyPress={(e) => e.key === 'Enter' && searchCustomers(searchQuery)}
-              className={`w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-secondary-500 focus:border-transparent ${
-                isDarkMode 
-                  ? 'bg-gray-800 border-gray-600 text-gray-100 placeholder-gray-400' 
-                  : 'border-gray-300 bg-white text-gray-900 placeholder-gray-500'
-              }`}
+              className="input-field pl-12"
             />
           </div>
           
-          <select
-            value={filterActive}
-            onChange={(e) => setFilterActive(e.target.value)}
-            className={`px-4 py-2 border rounded-lg focus:ring-2 focus:ring-secondary-500 focus:border-transparent ${
-              isDarkMode 
-                ? 'bg-gray-800 border-gray-600 text-gray-100' 
-                : 'border-gray-300 bg-white text-gray-900'
-            }`}
-          >
-            <option value="all">All Customers</option>
-            <option value="active">Active Only</option>
-            <option value="inactive">Inactive Only</option>
-          </select>
+          <div className="max-w-[180px]">
+            <Select
+              options={[
+                { value: 'all', label: 'All Customers' },
+                { value: 'active', label: 'Active Only' },
+                { value: 'inactive', label: 'Inactive Only' }
+              ]}
+              value={filterActive}
+              onChange={setFilterActive}
+              placeholder="All Customers"
+            />
+          </div>
           
           <button
             onClick={() => searchCustomers(searchQuery)}
@@ -727,11 +723,9 @@ const CustomerManagement = () => {
             ) : (
               <div className="space-y-4">
                 {orderHistory.map((order) => (
-                  <div 
-                    key={order.id} 
-                    className={`border ${isDarkMode ? 'border-gray-700' : 'border-gray-200'} rounded-lg p-4 cursor-pointer transition-colors ${
-                      isDarkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-50'
-                    }`}
+                  <div
+                    key={order.id}
+                    className="card card-sm cursor-pointer"
                     onClick={() => viewOrderDetails(order)}
                   >
                     <div className="flex justify-between items-start mb-2">

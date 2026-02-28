@@ -4,6 +4,7 @@ import toast from 'react-hot-toast';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Users, ArrowLeft, Plus, Edit, Trash2, Search, Building, Loader, AlertCircle } from 'lucide-react';
 import Dialog from './ui/Dialog';
+import Select from './ui/Select';
 
 const SuperAdminCafeUsers = () => {
   const { cafeId } = useParams();
@@ -176,13 +177,13 @@ const SuperAdminCafeUsers = () => {
       {/* Search */}
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-secondary-400" />
+          <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-secondary-400 pointer-events-none" />
           <input
             type="text"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             placeholder="Search users by username, email, or role..."
-            className="w-full pl-10 pr-3 py-2 border border-accent-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-secondary-500 focus:border-secondary-500 dark:bg-gray-700 dark:text-gray-100"
+            className="input-field pl-12"
           />
         </div>
       </div>
@@ -286,7 +287,7 @@ const SuperAdminCafeUsers = () => {
                   value={formData.username}
                   onChange={handleInputChange}
                   required
-                  className="w-full px-3 py-2 border border-accent-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-secondary-500 focus:border-secondary-500 dark:bg-gray-700 dark:text-gray-100"
+                  className="input-field"
                 />
               </div>
 
@@ -300,7 +301,7 @@ const SuperAdminCafeUsers = () => {
                   value={formData.email}
                   onChange={handleInputChange}
                   required
-                  className="w-full px-3 py-2 border border-accent-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-secondary-500 focus:border-secondary-500 dark:bg-gray-700 dark:text-gray-100"
+                  className="input-field"
                 />
               </div>
 
@@ -315,7 +316,7 @@ const SuperAdminCafeUsers = () => {
                   onChange={handleInputChange}
                   required
                   minLength={12}
-                  className="w-full px-3 py-2 border border-accent-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-secondary-500 focus:border-secondary-500 dark:bg-gray-700 dark:text-gray-100"
+                  className="input-field"
                 />
               </div>
 
@@ -323,17 +324,16 @@ const SuperAdminCafeUsers = () => {
                 <label className="block text-sm font-medium text-secondary-700 dark:text-gray-300 mb-2">
                   Role <span className="text-red-500">*</span>
                 </label>
-                <select
-                  name="role"
+                <Select
+                  options={[
+                    { value: 'admin', label: 'Admin' },
+                    { value: 'chef', label: 'Chef' },
+                    { value: 'reception', label: 'Reception' }
+                  ]}
                   value={formData.role}
-                  onChange={handleInputChange}
-                  required
-                  className="w-full px-3 py-2 border border-accent-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-secondary-500 focus:border-secondary-500 dark:bg-gray-700 dark:text-gray-100"
-                >
-                  <option value="admin">Admin</option>
-                  <option value="chef">Chef</option>
-                  <option value="reception">Reception</option>
-                </select>
+                  onChange={(v) => handleInputChange({ target: { name: 'role', value: v } })}
+                  placeholder="Role"
+                />
               </div>
 
               <div className="flex justify-end space-x-3 pt-4 border-t border-accent-200 dark:border-gray-700">
@@ -343,7 +343,7 @@ const SuperAdminCafeUsers = () => {
                     setShowCreateModal(false);
                     setFormData({ username: '', email: '', password: '', role: 'admin' });
                   }}
-                  className="px-4 py-2 border border-accent-300 dark:border-gray-600 text-secondary-700 dark:text-gray-300 rounded-lg hover:bg-accent-50 dark:hover:bg-gray-700 transition-colors"
+                  className="btn-secondary"
                 >
                   Cancel
                 </button>
@@ -375,7 +375,7 @@ const SuperAdminCafeUsers = () => {
                   value={formData.username}
                   onChange={handleInputChange}
                   required
-                  className="w-full px-3 py-2 border border-accent-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-secondary-500 focus:border-secondary-500 dark:bg-gray-700 dark:text-gray-100"
+                  className="input-field"
                 />
               </div>
 
@@ -389,7 +389,7 @@ const SuperAdminCafeUsers = () => {
                   value={formData.email}
                   onChange={handleInputChange}
                   required
-                  className="w-full px-3 py-2 border border-accent-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-secondary-500 focus:border-secondary-500 dark:bg-gray-700 dark:text-gray-100"
+                  className="input-field"
                 />
               </div>
 
@@ -403,7 +403,7 @@ const SuperAdminCafeUsers = () => {
                   value={formData.password}
                   onChange={handleInputChange}
                   minLength={12}
-                  className="w-full px-3 py-2 border border-accent-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-secondary-500 focus:border-secondary-500 dark:bg-gray-700 dark:text-gray-100"
+                  className="input-field"
                 />
               </div>
 
@@ -411,17 +411,16 @@ const SuperAdminCafeUsers = () => {
                 <label className="block text-sm font-medium text-secondary-700 dark:text-gray-300 mb-2">
                   Role <span className="text-red-500">*</span>
                 </label>
-                <select
-                  name="role"
+                <Select
+                  options={[
+                    { value: 'admin', label: 'Admin' },
+                    { value: 'chef', label: 'Chef' },
+                    { value: 'reception', label: 'Reception' }
+                  ]}
                   value={formData.role}
-                  onChange={handleInputChange}
-                  required
-                  className="w-full px-3 py-2 border border-accent-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-secondary-500 focus:border-secondary-500 dark:bg-gray-700 dark:text-gray-100"
-                >
-                  <option value="admin">Admin</option>
-                  <option value="chef">Chef</option>
-                  <option value="reception">Reception</option>
-                </select>
+                  onChange={(v) => handleInputChange({ target: { name: 'role', value: v } })}
+                  placeholder="Role"
+                />
               </div>
 
               <div className="flex justify-end space-x-3 pt-4 border-t border-accent-200 dark:border-gray-700">
@@ -432,7 +431,7 @@ const SuperAdminCafeUsers = () => {
                     setEditingUser(null);
                     setFormData({ username: '', email: '', password: '', role: 'admin' });
                   }}
-                  className="px-4 py-2 border border-accent-300 dark:border-gray-600 text-secondary-700 dark:text-gray-300 rounded-lg hover:bg-accent-50 dark:hover:bg-gray-700 transition-colors"
+                  className="btn-secondary"
                 >
                   Cancel
                 </button>

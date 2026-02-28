@@ -6,6 +6,7 @@ import {
   Building, Settings, Save, ArrowLeft, CheckCircle, XCircle, 
   AlertCircle, Loader, CreditCard, Lock, Unlock, Crown, RotateCcw, UserCheck
 } from 'lucide-react';
+import Select from './ui/Select';
 
 const SuperAdminCafeSettings = () => {
   const { cafeId } = useParams();
@@ -338,7 +339,7 @@ const SuperAdminCafeSettings = () => {
               value={formData.name}
               onChange={handleInputChange}
               required
-              className="w-full px-3 py-2 border border-accent-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-secondary-500 focus:border-secondary-500 dark:bg-gray-700 dark:text-gray-100"
+              className="input-field"
             />
           </div>
 
@@ -354,7 +355,7 @@ const SuperAdminCafeSettings = () => {
               required
               pattern="[a-z0-9-]+"
               disabled
-              className="w-full px-3 py-2 border border-accent-300 dark:border-gray-600 rounded-lg bg-gray-100 dark:bg-gray-700 dark:text-gray-400 cursor-not-allowed"
+              className="input-field opacity-60 cursor-not-allowed"
             />
             <p className="text-xs text-secondary-500 dark:text-gray-400 mt-1">
               Slug cannot be changed after creation
@@ -371,7 +372,7 @@ const SuperAdminCafeSettings = () => {
             value={formData.description}
             onChange={handleInputChange}
             rows={3}
-            className="w-full px-3 py-2 border border-accent-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-secondary-500 focus:border-secondary-500 dark:bg-gray-700 dark:text-gray-100"
+            className="input-field"
           />
         </div>
 
@@ -408,7 +409,7 @@ const SuperAdminCafeSettings = () => {
                     });
                   }
                 }}
-                className="w-full px-3 py-2 border border-accent-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-secondary-500 focus:border-secondary-500 dark:bg-gray-700 dark:text-gray-100"
+                className="input-field"
               />
             </div>
           </div>
@@ -446,7 +447,7 @@ const SuperAdminCafeSettings = () => {
                   onChange={handleInputChange}
                   placeholder="#6F4E37"
                   pattern="^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$"
-                  className="flex-1 px-3 py-2 border border-accent-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-secondary-500 focus:border-secondary-500 dark:bg-gray-700 dark:text-gray-100"
+                  className="input-field flex-1"
                 />
               </div>
               <p className="text-xs text-secondary-500 dark:text-gray-400 mt-1">
@@ -473,7 +474,7 @@ const SuperAdminCafeSettings = () => {
                   onChange={handleInputChange}
                   placeholder="#D4A574"
                   pattern="^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$"
-                  className="flex-1 px-3 py-2 border border-accent-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-secondary-500 focus:border-secondary-500 dark:bg-gray-700 dark:text-gray-100"
+                  className="input-field flex-1"
                 />
               </div>
               <p className="text-xs text-secondary-500 dark:text-gray-400 mt-1">
@@ -493,7 +494,7 @@ const SuperAdminCafeSettings = () => {
               name="address"
               value={formData.address}
               onChange={handleInputChange}
-              className="w-full px-3 py-2 border border-accent-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-secondary-500 focus:border-secondary-500 dark:bg-gray-700 dark:text-gray-100"
+              className="input-field"
             />
           </div>
 
@@ -506,7 +507,7 @@ const SuperAdminCafeSettings = () => {
               name="phone"
               value={formData.phone}
               onChange={handleInputChange}
-              className="w-full px-3 py-2 border border-accent-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-secondary-500 focus:border-secondary-500 dark:bg-gray-700 dark:text-gray-100"
+              className="input-field"
             />
           </div>
         </div>
@@ -521,7 +522,7 @@ const SuperAdminCafeSettings = () => {
               name="email"
               value={formData.email}
               onChange={handleInputChange}
-              className="w-full px-3 py-2 border border-accent-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-secondary-500 focus:border-secondary-500 dark:bg-gray-700 dark:text-gray-100"
+              className="input-field"
             />
           </div>
 
@@ -534,7 +535,7 @@ const SuperAdminCafeSettings = () => {
               name="website"
               value={formData.website}
               onChange={handleInputChange}
-              className="w-full px-3 py-2 border border-accent-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-secondary-500 focus:border-secondary-500 dark:bg-gray-700 dark:text-gray-100"
+              className="input-field"
             />
           </div>
         </div>
@@ -557,7 +558,7 @@ const SuperAdminCafeSettings = () => {
           <button
             type="button"
             onClick={() => navigate('/superadmin')}
-            className="px-4 py-2 border border-accent-300 dark:border-gray-600 text-secondary-700 dark:text-gray-300 rounded-lg hover:bg-accent-50 dark:hover:bg-gray-700 transition-colors"
+            className="btn-secondary"
           >
             Cancel
           </button>
@@ -645,25 +646,13 @@ const SuperAdminCafeSettings = () => {
                 <label className="block text-sm font-medium text-secondary-700 dark:text-gray-300 mb-2">
                   Subscription Plan
                 </label>
-                <select
+                <Select
                   key={`plan-select-${selectKey}-${subscriptionFormData.plan || subscription?.plan || cafe?.subscription_plan || 'FREE'}`}
+                  options={availablePlans.map(plan => ({ value: plan.toUpperCase(), label: plan }))}
                   value={(subscriptionFormData.plan || subscription?.plan || cafe?.subscription_plan || 'FREE').toUpperCase()}
-                  onChange={(e) => {
-                    const newPlan = e.target.value.toUpperCase();
-                    setSubscriptionFormData(prev => {
-                      const updated = { ...prev, plan: newPlan };
-                      return updated;
-                    });
-                  }}
-                  className="w-full px-3 py-2 border border-accent-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-secondary-500 focus:border-secondary-500 dark:bg-gray-700 dark:text-gray-100"
-                >
-                  {availablePlans.map(plan => {
-                    const planUpper = plan.toUpperCase();
-                    return (
-                      <option key={planUpper} value={planUpper}>{plan}</option>
-                    );
-                  })}
-                </select>
+                  onChange={(v) => setSubscriptionFormData(prev => ({ ...prev, plan: v.toUpperCase() }))}
+                  placeholder="Plan"
+                />
                 <div className="mt-1 text-xs text-secondary-500 dark:text-gray-400 space-y-0.5">
                   <p>Form state: <strong>{subscriptionFormData.plan || 'not set'}</strong></p>
                   <p>Subscription state: <strong>{subscription?.plan || 'not set'}</strong></p>
@@ -676,15 +665,16 @@ const SuperAdminCafeSettings = () => {
                 <label className="block text-sm font-medium text-secondary-700 dark:text-gray-300 mb-2">
                   Subscription Status
                 </label>
-                <select
+                <Select
+                  options={[
+                    { value: 'active', label: 'Active' },
+                    { value: 'inactive', label: 'Inactive' },
+                    { value: 'expired', label: 'Expired' }
+                  ]}
                   value={subscriptionFormData.status}
-                  onChange={(e) => setSubscriptionFormData(prev => ({ ...prev, status: e.target.value }))}
-                  className="w-full px-3 py-2 border border-accent-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-secondary-500 focus:border-secondary-500 dark:bg-gray-700 dark:text-gray-100"
-                >
-                  <option value="active">Active</option>
-                  <option value="inactive">Inactive</option>
-                  <option value="expired">Expired</option>
-                </select>
+                  onChange={(v) => setSubscriptionFormData(prev => ({ ...prev, status: v }))}
+                  placeholder="Status"
+                />
               </div>
             </div>
 

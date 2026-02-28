@@ -9,6 +9,7 @@ import { useFeatures } from '../contexts/FeatureContext';
 import { useCafeSettings } from '../contexts/CafeSettingsContext';
 import { getImageUrl } from '../utils/imageUtils';
 import LockedFeature from './ui/LockedFeature';
+import Select from './ui/Select';
 
 const InventoryManagement = () => {
   const { formatCurrency } = useCurrency();
@@ -511,35 +512,26 @@ const InventoryManagement = () => {
         <div className="flex flex-col sm:flex-row gap-4">
           <div className="flex-1">
             <div className="relative">
-              <Search className={`absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`} />
+              <Search className={`absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 pointer-events-none ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`} />
               <input
                 type="text"
                 placeholder="Search inventory items..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className={`w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-secondary-500 focus:border-transparent ${
-                  isDarkMode 
-                    ? 'bg-gray-800 border-gray-600 text-gray-100 placeholder-gray-400' 
-                    : 'border-gray-300 bg-white text-gray-900 placeholder-gray-500'
-                }`}
+                className="input-field pl-12"
               />
             </div>
           </div>
           <div className="sm:w-48">
-            <select
+            <Select
+              options={[
+                { value: 'all', label: 'All Categories' },
+                ...categories.map(c => ({ value: c.name, label: c.name }))
+              ]}
               value={filterCategory}
-              onChange={(e) => setFilterCategory(e.target.value)}
-              className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-secondary-500 focus:border-transparent ${
-                isDarkMode 
-                  ? '' 
-                  : ''
-              }`}
-            >
-              <option value="all">All Categories</option>
-              {categories.map(category => (
-                <option key={category.name} value={category.name}>{category.name}</option>
-              ))}
-            </select>
+              onChange={setFilterCategory}
+              placeholder="All Categories"
+            />
           </div>
         </div>
       </div>
@@ -564,20 +556,16 @@ const InventoryManagement = () => {
               </div>
               <div>
                 <label className={`block text-sm font-medium mb-1 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>Category *</label>
-                <select
+                <Select
+                  options={[
+                    { value: '', label: 'Select Category' },
+                    ...categories.map(c => ({ value: c.name, label: `${c.name} (${c.item_count} items)` })),
+                    { value: 'new', label: '+ Add New Category' }
+                  ]}
                   value={formData.category}
-                  onChange={(e) => setFormData({...formData, category: e.target.value})}
-                  className="input-field"
-                  required
-                >
-                  <option value="">Select Category</option>
-                  {categories.map(category => (
-                    <option key={category.name} value={category.name}>
-                      {category.name} ({category.item_count} items)
-                    </option>
-                  ))}
-                  <option value="new">+ Add New Category</option>
-                </select>
+                  onChange={(v) => setFormData({ ...formData, category: v })}
+                  placeholder="Select Category"
+                />
                 {formData.category === 'new' && (
                   <input
                     type="text"
@@ -603,22 +591,22 @@ const InventoryManagement = () => {
               </div>
               <div>
                 <label className={`block text-sm font-medium mb-1 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>Unit *</label>
-                <select
+                <Select
+                  options={[
+                    { value: '', label: 'Select Unit' },
+                    { value: 'kg', label: 'Kilograms (kg)' },
+                    { value: 'g', label: 'Grams (g)' },
+                    { value: 'l', label: 'Liters (L)' },
+                    { value: 'ml', label: 'Milliliters (ml)' },
+                    { value: 'pcs', label: 'Pieces (pcs)' },
+                    { value: 'boxes', label: 'Boxes' },
+                    { value: 'bottles', label: 'Bottles' },
+                    { value: 'cans', label: 'Cans' }
+                  ]}
                   value={formData.unit}
-                  onChange={(e) => setFormData({...formData, unit: e.target.value})}
-                  className="input-field"
-                  required
-                >
-                  <option value="">Select Unit</option>
-                  <option value="kg">Kilograms (kg)</option>
-                  <option value="g">Grams (g)</option>
-                  <option value="l">Liters (L)</option>
-                  <option value="ml">Milliliters (ml)</option>
-                  <option value="pcs">Pieces (pcs)</option>
-                  <option value="boxes">Boxes</option>
-                  <option value="bottles">Bottles</option>
-                  <option value="cans">Cans</option>
-                </select>
+                  onChange={(v) => setFormData({ ...formData, unit: v })}
+                  placeholder="Select Unit"
+                />
               </div>
               <div>
                 <label className={`block text-sm font-medium mb-1 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>Cost per Unit</label>

@@ -103,7 +103,7 @@ const SuperadminRegister = ({ onBack }) => {
                 required
                 value={formData.username}
                 onChange={handleChange}
-                className="mt-1 appearance-none relative block w-full px-3 py-2 border border-accent-300 dark:border-gray-600 placeholder-accent-500 dark:placeholder-gray-400 text-secondary-900 dark:text-gray-100 bg-white dark:bg-gray-800 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary-500 focus:border-secondary-500 focus:z-10 sm:text-sm"
+                className="input-field mt-1"
                 placeholder="Enter username"
               />
             </div>
@@ -120,7 +120,7 @@ const SuperadminRegister = ({ onBack }) => {
                 required
                 value={formData.email}
                 onChange={handleChange}
-                className="mt-1 appearance-none relative block w-full px-3 py-2 border border-accent-300 dark:border-gray-600 placeholder-accent-500 dark:placeholder-gray-400 text-secondary-900 dark:text-gray-100 bg-white dark:bg-gray-800 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary-500 focus:border-secondary-500 focus:z-10 sm:text-sm"
+                className="input-field mt-1"
                 placeholder="Enter email address"
               />
             </div>
@@ -138,7 +138,7 @@ const SuperadminRegister = ({ onBack }) => {
                   required
                   value={formData.password}
                   onChange={handleChange}
-                  className="appearance-none relative block w-full px-3 py-2 pr-10 border border-accent-300 dark:border-gray-600 placeholder-accent-500 dark:placeholder-gray-400 text-secondary-900 dark:text-gray-100 bg-white dark:bg-gray-800 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary-500 focus:border-secondary-500 focus:z-10 sm:text-sm"
+                  className="input-field pr-10"
                   placeholder="Enter password (min 12 characters)"
                 />
                 <button
@@ -168,7 +168,7 @@ const SuperadminRegister = ({ onBack }) => {
                   required
                   value={formData.confirmPassword}
                   onChange={handleChange}
-                  className="appearance-none relative block w-full px-3 py-2 pr-10 border border-accent-300 dark:border-gray-600 placeholder-accent-500 dark:placeholder-gray-400 text-secondary-900 dark:text-gray-100 bg-white dark:bg-gray-800 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary-500 focus:border-secondary-500 focus:z-10 sm:text-sm"
+                  className="input-field pr-10"
                   placeholder="Confirm password"
                 />
                 <button
@@ -206,7 +206,7 @@ const SuperadminRegister = ({ onBack }) => {
               <button
                 type="button"
                 onClick={onBack}
-                className="group relative w-full flex justify-center py-2 px-4 border border-accent-300 dark:border-gray-600 text-sm font-medium rounded-lg text-secondary-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-accent-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-secondary-500 transition-colors"
+                className="btn-secondary w-full"
               >
                 <ArrowLeft className="h-5 w-5 mr-2" />
                 Back to User Management

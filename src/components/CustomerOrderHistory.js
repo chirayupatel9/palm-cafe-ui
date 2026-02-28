@@ -376,7 +376,7 @@ const CustomerOrderHistory = ({ customerPhone, cafeSlug, setActiveTab, cart, set
         {filteredOrders.map((order) => (
           <div
             key={order.id}
-            className="flex flex-col sm:flex-row items-stretch justify-between gap-4 rounded-lg bg-white dark:bg-[#2a2218] p-4 shadow-sm border border-[#f3eee7] dark:border-[#382d20] hover:shadow-md transition-shadow cursor-pointer"
+            className="card card-sm flex flex-col sm:flex-row items-stretch justify-between gap-4 cursor-pointer"
           >
             <div className="flex flex-[2_2_0px] flex-col gap-4 justify-between">
               <div className="flex flex-col gap-1">
@@ -451,7 +451,7 @@ const CustomerOrderHistory = ({ customerPhone, cafeSlug, setActiveTab, cart, set
 
       {/* Current Points Balance */}
       {orders.length > 0 && (
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md border border-accent-200 dark:border-gray-700 p-4">
+        <div className="card">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
               <div className="bg-yellow-100 dark:bg-yellow-900 p-2 rounded-full">
@@ -480,7 +480,7 @@ const CustomerOrderHistory = ({ customerPhone, cafeSlug, setActiveTab, cart, set
 
       {/* Total Points Earned (Historical) */}
       {orders.length > 0 && (
-        <div className="bg-gray-50 dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700 p-4">
+        <div className="card">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
               <div className="bg-gray-200 dark:bg-gray-700 p-2 rounded-full">

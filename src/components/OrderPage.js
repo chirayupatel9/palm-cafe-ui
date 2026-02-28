@@ -762,7 +762,7 @@ const OrderPage = ({ menuItems, cart: externalCart, setCart: setExternalCart }) 
 
               {/* UPI QR Code Display */}
               {paymentMethod === 'upi' && (
-                <div className="mb-4 p-4 bg-surface-card border border-[var(--color-outline)] rounded-lg">
+                <div className="card">
                   <div className="text-center">
                     <div className="bg-primary text-on-primary p-3 rounded-t-lg -mt-4 -mx-4 mb-4 flex items-center">
                       <div className="w-8 h-8 bg-on-primary rounded-full flex items-center justify-center mr-2">

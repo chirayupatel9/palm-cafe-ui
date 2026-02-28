@@ -252,7 +252,7 @@ const PrintModal = ({ isOpen, onClose, order, onPrintSuccess }) => {
                 Print Preview
               </h3>
               
-              <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-4">
+              <div className="card card-sm">
                 <pre className="text-xs font-mono text-gray-800 dark:text-gray-200 whitespace-pre-wrap leading-tight">
                   {printPreview || 'Loading preview...'}
                 </pre>
