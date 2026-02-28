@@ -10,13 +10,16 @@
 import { defaultLightTheme, defaultDarkTheme, createTheme } from './tokens';
 
 /**
- * Resolve final theme
- * 
- * @param {Object} params
- * @param {string} params.uiRole - 'superadmin' | 'cafe' | 'customer'
- * @param {boolean} params.isDarkMode - Whether dark mode is enabled
- * @param {Object} params.cafeBranding - Cafe branding overrides (if applicable)
- * @returns {Object} Resolved theme object
+ * Return the final theme object for the given UI role and mode, applying cafe branding overrides when applicable.
+ *
+ * For 'superadmin' the base theme is returned unchanged. For 'cafe' and 'customer', provided cafeBranding values
+ * override corresponding color fields on the base theme before creating the final theme.
+ *
+ * @param {Object} params - Function parameters.
+ * @param {'superadmin'|'cafe'|'customer'} params.uiRole - UI role that determines branding applicability.
+ * @param {boolean} params.isDarkMode - Whether dark mode is active; selects the base theme.
+ * @param {Object|null} [params.cafeBranding=null] - Optional branding overrides (e.g., primaryColor, secondaryColor, accentColor, backgroundColor, textColor, surfaceColor, logoUrl).
+ * @returns {Object} The resolved theme object with branding applied when appropriate.
  */
 export function resolveTheme({ uiRole, isDarkMode, cafeBranding = null }) {
   // Start with base theme based on mode
@@ -26,8 +29,8 @@ export function resolveTheme({ uiRole, isDarkMode, cafeBranding = null }) {
   if (uiRole === 'superadmin') {
     return baseTheme;
   }
-  
-  // For cafe/customer UI, apply branding overrides if provided
+
+  // For cafe and customer UI, apply branding overrides if provided
   if (cafeBranding && (uiRole === 'cafe' || uiRole === 'customer')) {
     const brandingColors = {
       ...baseTheme.colors,
