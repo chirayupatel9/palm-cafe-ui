@@ -241,7 +241,7 @@ const CustomerMenu = ({
     );
     els.forEach((el) => observer.observe(el));
     return () => observer.disconnect();
-  }, [activeTab, Object.keys(groupedMenuItems).length]);
+  }, [activeTab, selectedCategory, Object.keys(groupedMenuItems).length]);
 
   // Handle keyboard navigation for autocomplete
   const handleSearchKeyDown = (e) => {
@@ -1140,7 +1140,11 @@ const CustomerMenu = ({
                       <button
                         onClick={() => {
                           setSelectedCategory('All');
-                          document.getElementById('menu-section')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                          requestAnimationFrame(() => {
+                            requestAnimationFrame(() => {
+                              document.getElementById('categories-section')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                            });
+                          });
                         }}
                         className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-medium text-[#2A2A2A] bg-[#E9E4DA] border border-[#2A2A2A]/10 hover:bg-[#C68E3C] hover:text-white hover:border-[#C68E3C] transition-colors duration-200 min-h-[44px]"
                         aria-label="Back to all categories"
@@ -1172,6 +1176,7 @@ const CustomerMenu = ({
                   )}
 
                   {/* Category Sections - DIR layout: number badge + title + card grid */}
+                  <div key={`menu-list-${selectedCategory}`} className="contents">
                   {Object.entries(searchQuery.trim() ? filteredMenuItems : groupedMenuItems)
                     .filter(([categoryName]) => selectedCategory === 'All' || categoryName === selectedCategory)
                     .map(([categoryName, items], index) => {
@@ -1269,6 +1274,7 @@ const CustomerMenu = ({
                         </section>
                       );
                     })}
+                  </div>
 
                   {/* Promo Banner - DIR placement after category sections */}
                   <PromoBannerSection
