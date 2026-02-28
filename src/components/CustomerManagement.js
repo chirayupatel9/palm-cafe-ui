@@ -376,7 +376,7 @@ const CustomerManagement = () => {
       {/* Customers List */}
       <div className="card">
         {filteredCustomers.length === 0 ? (
-          <EmptyCustomers onAdd={() => setShowAddModal(true)} />
+          <EmptyCustomers />
         ) : (
           <div className="overflow-x-auto">
             <table className="min-w-full" style={{ borderCollapse: 'separate', borderSpacing: 0 }}>
