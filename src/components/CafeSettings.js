@@ -7,10 +7,12 @@ import ColorSchemeTest from './ColorSchemeTest';
 import { getImageUrl } from '../utils/imageUtils';
 import { Copy, ExternalLink, Check, Plus, Pencil, Trash2 } from 'lucide-react';
 import toast from 'react-hot-toast';
+import FileInput from './ui/FileInput';
 
 const CafeSettings = () => {
-  const { cafeSettings, updateCafeSettings, updateLogo, updateHeroImage, removeHeroImage, removeLogo } = useCafeSettings();
+  const { cafeSettings, loading: cafeSettingsLoading, error: cafeSettingsError, fetchCafeSettings, updateCafeSettings, updateLogo, updateHeroImage, removeHeroImage, removeLogo } = useCafeSettings();
   const { user } = useAuth();
+  const publicSlug = user?.cafe_slug || cafeSettings?.cafe_slug || null;
   const [copied, setCopied] = useState(false);
   const [showDebugTest, setShowDebugTest] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -119,14 +121,14 @@ const CafeSettings = () => {
         accent: '#D2691E',
         background: '#FFF8DC',
         text: '#2F1B14',
-        surface: '#F5F5DC'
+        surface: '#FFFFF'
       },
       dark: {
         primary: '#CD853F',
         secondary: '#DEB887',
         accent: '#F4A460',
         background: '#2F1B14',
-        text: '#F5F5DC',
+        text: '#F7F4EF',
         surface: '#3C2A21'
       }
     },
@@ -526,7 +528,7 @@ const CafeSettings = () => {
     try {
       const formData = {
         cafe_name: cafeName,
-        logo_url: cafeSettings.logo_url,
+        logo_url: cafeSettings?.logo_url,
         address,
         phone,
         email,
@@ -593,61 +595,84 @@ const CafeSettings = () => {
   };
 
   return (
-    <div className="min-h-screen bg-accent-50 dark:bg-gray-900">
+    <div className="min-h-screen">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="flex flex-wrap items-center gap-6 mb-6">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Cafe Settings</h1>
-            <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">Manage your cafe configuration and appearance.</p>
+        <div className="flex flex-nowrap justify-between items-start sm:items-center gap-4 mb-6">
+          <div className="min-w-0">
+            <h1 className="text-2xl font-bold text-on-surface truncate">Cafe Settings</h1>
+            <p className="text-sm text-body-muted mt-1">Manage your cafe configuration and appearance.</p>
           </div>
-          <button type="button" onClick={handleSubmit} disabled={isSubmitting} className="btn-primary px-5 py-2.5 text-sm font-medium shrink-0">
+          <button type="button" onClick={handleSubmit} disabled={isSubmitting || cafeSettingsLoading} className="btn-primary px-5 py-2.5 text-sm font-medium shrink-0 disabled:opacity-50 disabled:cursor-not-allowed">
             {isSubmitting ? 'Saving...' : 'Save Changes'}
           </button>
         </div>
 
         {showMessage && (
-          <div className={`mb-6 p-4 rounded-lg text-sm ${
-            message.type === 'success'
-              ? 'bg-green-50 text-green-800 dark:bg-green-900/30 dark:text-green-200 border border-green-200 dark:border-green-800'
-              : 'bg-red-50 text-red-800 dark:bg-red-900/30 dark:text-red-200 border border-red-200 dark:border-red-800'
-          }`}>
-            {message.text}
+          <div className="w-full max-w-4xl mx-auto mb-6">
+            <div
+              className="p-4 rounded-xl text-sm border"
+              style={{
+                backgroundColor: message.type === 'success' ? 'color-mix(in srgb, var(--color-success) 12%, transparent)' : 'color-mix(in srgb, var(--color-error) 12%, transparent)',
+                color: message.type === 'success' ? 'var(--color-success)' : 'var(--color-error)',
+                borderColor: message.type === 'success' ? 'var(--color-success)' : 'var(--color-error)'
+              }}
+            >
+              {message.text}
+            </div>
           </div>
         )}
 
-        <div className=" mx-auto">
+        {cafeSettingsLoading ? (
+          <div className="flex flex-col items-center justify-center py-16">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 mb-4" style={{ borderColor: 'var(--color-primary)' }} />
+            <p className="text-body-muted">Loading cafe settings...</p>
+          </div>
+        ) : cafeSettingsError ? (
+          <div className="w-full max-w-4xl mx-auto">
+            <div className="card border-2 bg-red-50 dark:bg-red-900/20" style={{ borderColor: 'var(--color-error)' }}>
+              <p className="font-medium mb-2" style={{ color: 'var(--color-error)' }}>Failed to load cafe settings</p>
+              <p className="text-sm mb-4" style={{ color: 'var(--color-error)' }}>{cafeSettingsError}</p>
+              <button type="button" onClick={() => fetchCafeSettings()} className="btn-primary">
+                Retry
+              </button>
+            </div>
+          </div>
+        ) : (
+        <div className="w-full max-w-4xl mx-auto">
           <div className="space-y-6">
-            {/* Cafe Slug & Public URL Section */}
-            {(user?.role === 'admin' || user?.role === 'superadmin') && user?.cafe_slug && (
-              <div className="card p-6">
-                <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-1">Public Cafe URL</h2>
-                <p className="text-sm text-gray-600 dark:text-gray-400 mb-5">
-                  Share this URL with your customers to access your cafe menu and place orders.
-                </p>
+            {/* Cafe Slug & Public URL Section (multi-cafe: show when admin/superadmin has a cafe slug) */}
+            {(user?.role === 'admin' || user?.role === 'superadmin') && publicSlug && (
+              <div className="card">
+                <div className="card-header">
+                  <h2 className="card-title">Public Cafe URL</h2>
+                  <p className="card-description">
+                    Share this URL with your customers to access your cafe menu and place orders.
+                  </p>
+                </div>
                 <div className="space-y-5">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Cafe Slug</label>
+                    <label className="block text-sm font-medium text-on-surface mb-1.5">Cafe Slug</label>
                     <input
                       type="text"
-                      value={user.cafe_slug}
+                      value={publicSlug}
                       readOnly
-                      className="input-field w-full bg-gray-100 dark:bg-gray-700/50 cursor-not-allowed font-mono text-sm"
+                      className="input-field w-full bg-[var(--surface-table)] cursor-not-allowed font-mono text-sm truncate"
                     />
-                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Cannot be changed after creation.</p>
+                    <p className="text-xs text-body-muted mt-1">Cannot be changed after creation.</p>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Public Customer URL</label>
+                    <label className="block text-sm font-medium text-on-surface mb-1.5">Public Customer URL</label>
                     <div className="flex flex-wrap gap-2 items-stretch">
                       <input
                         type="text"
-                        value={`${window.location.origin}/cafe/${user.cafe_slug}`}
+                        value={`${window.location.origin}/cafe/${publicSlug}`}
                         readOnly
-                        className="input-field flex-1 min-w-[200px] bg-gray-100 dark:bg-gray-700/50 cursor-not-allowed font-mono text-sm"
+                        className="input-field flex-1 min-w-[200px] bg-[var(--surface-table)] cursor-not-allowed font-mono text-sm truncate"
                       />
                       <button
                         type="button"
                         onClick={() => {
-                          const url = `${window.location.origin}/cafe/${user.cafe_slug}`;
+                          const url = `${window.location.origin}/cafe/${publicSlug}`;
                           navigator.clipboard.writeText(url);
                           setCopied(true);
                           toast.success('URL copied to clipboard!');
@@ -659,10 +684,10 @@ const CafeSettings = () => {
                         {copied ? <><Check className="h-4 w-4" /> Copied!</> : <><Copy className="h-4 w-4" /> Copy</>}
                       </button>
                       <a
-                        href={`/cafe/${user.cafe_slug}`}
+                        href={`/cafe/${publicSlug}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 text-sm font-medium shrink-0"
+                        className="btn-secondary inline-flex items-center gap-2 shrink-0"
                         title="Open in new tab"
                       >
                         <ExternalLink className="h-4 w-4" />
@@ -675,56 +700,58 @@ const CafeSettings = () => {
             )}
 
             {/* Basic Information */}
-            <div className="card p-6">
-              <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-1">Basic Information</h2>
-              <p className="text-sm text-gray-600 dark:text-gray-400 mb-5">Your cafe details shown to customers and used in invoices.</p>
+            <div className="card">
+              <div className="card-header">
+                <h2 className="card-title">Basic Information</h2>
+                <p className="card-description">Your cafe details shown to customers and used in invoices.</p>
+              </div>
               <form onSubmit={handleSubmit} className="space-y-4" id="cafe-settings-form">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Cafe Name *</label>
+                    <label className="block text-sm font-medium text-on-surface mb-1.5">Cafe Name *</label>
                     <input type="text" value={cafeName} onChange={(e) => setCafeName(e.target.value)} className="input-field" required />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Phone</label>
+                    <label className="block text-sm font-medium text-on-surface mb-1.5">Phone</label>
                     <input type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} className="input-field" />
                   </div>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Address</label>
+                  <label className="block text-sm font-medium text-on-surface mb-1.5">Address</label>
                   <input type="text" value={address} onChange={(e) => setAddress(e.target.value)} className="input-field" />
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Email</label>
+                    <label className="block text-sm font-medium text-on-surface mb-1.5">Email</label>
                     <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} className="input-field" />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Website</label>
+                    <label className="block text-sm font-medium text-on-surface mb-1.5">Website</label>
                     <input type="url" value={website} onChange={(e) => setWebsite(e.target.value)} className="input-field" />
                   </div>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Opening Hours</label>
+                  <label className="block text-sm font-medium text-on-surface mb-1.5">Opening Hours</label>
                   <input type="text" value={openingHours} onChange={(e) => setOpeningHours(e.target.value)} className="input-field" placeholder="e.g., Mon-Fri 8AM-6PM, Sat-Sun 9AM-5PM" />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Description</label>
+                  <label className="block text-sm font-medium text-on-surface mb-1.5">Description</label>
                   <textarea value={description} onChange={(e) => setDescription(e.target.value)} className="input-field" rows={3} placeholder="Brief description of your cafe..." />
                 </div>
               </form>
             </div>
 
             {/* Tab & Role Visibility */}
-            <div className="card p-6">
-              <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-1">Tab & Role Visibility</h2>
-              <p className="text-sm text-gray-600 dark:text-gray-400 mb-5">
-                Control which tabs and features are visible to each role.
-              </p>
+            <div className="card">
+              <div className="card-header">
+                <h2 className="card-title">Tab & Role Visibility</h2>
+                <p className="card-description">Control which tabs and features are visible to each role.</p>
+              </div>
               <form onSubmit={handleSubmit} className="space-y-0" id="cafe-visibility-form" noValidate>
                 <div className="space-y-6">
                   {/* Owner */}
-                  <div className="pb-6 border-b border-gray-200 dark:border-gray-700">
-                    <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-3">Owner (your view)</h3>
+                  <div className="pb-6 border-b border-[var(--color-outline)]">
+                    <h3 className="text-sm font-semibold text-on-surface mb-3">Owner (your view)</h3>
                     <div className="grid grid-cols-2 sm:grid-cols-3 gap-x-4 gap-y-2.5">
                       {[
                         [showKitchenTab, setShowKitchenTab, 'Orders'],
@@ -736,65 +763,65 @@ const CafeSettings = () => {
                         [showHistoryTab, setShowHistoryTab, 'History']
                       ].map(([checked, setter, label]) => (
                         <label key={label} className="flex items-center gap-2.5 cursor-pointer py-0.5">
-                          <input type="checkbox" checked={checked} onChange={(e) => setter(e.target.checked)} className="rounded border-gray-300 dark:border-gray-600 text-primary-600 focus:ring-primary-500 focus:ring-offset-0" />
-                          <span className="text-sm text-gray-700 dark:text-gray-300">{label}</span>
+                          <input type="checkbox" checked={checked} onChange={(e) => setter(e.target.checked)} className="rounded border-[var(--color-outline)] text-primary focus:ring-primary focus:ring-offset-0" />
+                          <span className="text-sm text-on-surface">{label}</span>
                         </label>
                       ))}
                     </div>
                   </div>
                   {/* Chef */}
-                  <div className="pb-6 border-b border-gray-200 dark:border-gray-700">
-                    <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-3">Chef</h3>
-                    <p className="text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-2">Visible tabs</p>
+                  <div className="pb-6 border-b border-[var(--color-outline)]">
+                    <h3 className="text-sm font-semibold text-on-surface mb-3">Chef</h3>
+                    <p className="text-xs font-medium uppercase tracking-wider text-body-muted mb-2">Visible tabs</p>
                     <div className="grid grid-cols-2 sm:grid-cols-3 gap-x-4 gap-y-2.5 mb-4">
                       {[[chefShowKitchenTab, setChefShowKitchenTab, 'Orders'], [chefShowMenuTab, setChefShowMenuTab, 'Menu'], [chefShowInventoryTab, setChefShowInventoryTab, 'Inventory'], [chefShowHistoryTab, setChefShowHistoryTab, 'History']].map(([c, s, l]) => (
                         <label key={l} className="flex items-center gap-2.5 cursor-pointer py-0.5">
-                          <input type="checkbox" checked={c} onChange={(e) => s(e.target.checked)} className="rounded border-gray-300 dark:border-gray-600 text-primary-600 focus:ring-primary-500 focus:ring-offset-0" />
-                          <span className="text-sm text-gray-700 dark:text-gray-300">{l}</span>
+                          <input type="checkbox" checked={c} onChange={(e) => s(e.target.checked)} className="rounded border-[var(--color-outline)] text-primary focus:ring-primary focus:ring-offset-0" />
+                          <span className="text-sm text-on-surface">{l}</span>
                         </label>
                       ))}
                     </div>
-                    <p className="text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-2">Permissions</p>
+                    <p className="text-xs font-medium uppercase tracking-wider text-body-muted mb-2">Permissions</p>
                     <div className="grid grid-cols-2 sm:grid-cols-3 gap-x-4 gap-y-2.5">
                       {[[chefCanEditOrders, setChefCanEditOrders, 'Can Edit Orders'], [chefCanViewCustomers, setChefCanViewCustomers, 'Can View Customers'], [chefCanViewPayments, setChefCanViewPayments, 'Can View Payments']].map(([c, s, l]) => (
                         <label key={l} className="flex items-center gap-2.5 cursor-pointer py-0.5">
-                          <input type="checkbox" checked={c} onChange={(e) => s(e.target.checked)} className="rounded border-gray-300 dark:border-gray-600 text-primary-600 focus:ring-primary-500 focus:ring-offset-0" />
-                          <span className="text-sm text-gray-700 dark:text-gray-300">{l}</span>
+                          <input type="checkbox" checked={c} onChange={(e) => s(e.target.checked)} className="rounded border-[var(--color-outline)] text-primary focus:ring-primary focus:ring-offset-0" />
+                          <span className="text-sm text-on-surface">{l}</span>
                         </label>
                       ))}
                     </div>
                   </div>
                   {/* Reception */}
-                  <div className="pb-6 border-b border-gray-200 dark:border-gray-700">
-                    <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-3">Reception</h3>
-                    <p className="text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-2">Visible tabs</p>
+                  <div className="pb-6 border-b border-[var(--color-outline)]">
+                    <h3 className="text-sm font-semibold text-on-surface mb-3">Reception</h3>
+                    <p className="text-xs font-medium uppercase tracking-wider text-body-muted mb-2">Visible tabs</p>
                     <div className="grid grid-cols-2 sm:grid-cols-3 gap-x-4 gap-y-2.5 mb-4">
                       {[[receptionShowKitchenTab, setReceptionShowKitchenTab, 'Orders'], [receptionShowMenuTab, setReceptionShowMenuTab, 'Menu'], [receptionShowInventoryTab, setReceptionShowInventoryTab, 'Inventory'], [receptionShowHistoryTab, setReceptionShowHistoryTab, 'History']].map(([c, s, l]) => (
                         <label key={l} className="flex items-center gap-2.5 cursor-pointer py-0.5">
-                          <input type="checkbox" checked={c} onChange={(e) => s(e.target.checked)} className="rounded border-gray-300 dark:border-gray-600 text-primary-600 focus:ring-primary-500 focus:ring-offset-0" />
-                          <span className="text-sm text-gray-700 dark:text-gray-300">{l}</span>
+                          <input type="checkbox" checked={c} onChange={(e) => s(e.target.checked)} className="rounded border-[var(--color-outline)] text-primary focus:ring-primary focus:ring-offset-0" />
+                          <span className="text-sm text-on-surface">{l}</span>
                         </label>
                       ))}
                     </div>
-                    <p className="text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-2">Permissions</p>
+                    <p className="text-xs font-medium uppercase tracking-wider text-body-muted mb-2">Permissions</p>
                     <div className="grid grid-cols-2 sm:grid-cols-3 gap-x-4 gap-y-2.5">
                       {[[receptionCanEditOrders, setReceptionCanEditOrders, 'Can Edit Orders'], [receptionCanViewCustomers, setReceptionCanViewCustomers, 'Can View Customers'], [receptionCanViewPayments, setReceptionCanViewPayments, 'Can View Payments'], [receptionCanCreateOrders, setReceptionCanCreateOrders, 'Can Create Orders']].map(([c, s, l]) => (
                         <label key={l} className="flex items-center gap-2.5 cursor-pointer py-0.5">
-                          <input type="checkbox" checked={c} onChange={(e) => s(e.target.checked)} className="rounded border-gray-300 dark:border-gray-600 text-primary-600 focus:ring-primary-500 focus:ring-offset-0" />
-                          <span className="text-sm text-gray-700 dark:text-gray-300">{l}</span>
+                          <input type="checkbox" checked={c} onChange={(e) => s(e.target.checked)} className="rounded border-[var(--color-outline)] text-primary focus:ring-primary focus:ring-offset-0" />
+                          <span className="text-sm text-on-surface">{l}</span>
                         </label>
                       ))}
                     </div>
                   </div>
                   {/* Admin */}
                   <div>
-                    <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-3">Admin</h3>
-                    <p className="text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-2">Permissions</p>
+                    <h3 className="text-sm font-semibold text-on-surface mb-3">Admin</h3>
+                    <p className="text-xs font-medium uppercase tracking-wider text-body-muted mb-2">Permissions</p>
                     <div className="grid grid-cols-2 sm:grid-cols-3 gap-x-4 gap-y-2.5">
                       {[[adminCanAccessSettings, setAdminCanAccessSettings, 'Can Access Settings'], [adminCanManageUsers, setAdminCanManageUsers, 'Can Manage Users'], [adminCanViewReports, setAdminCanViewReports, 'Can View Reports'], [adminCanManageInventory, setAdminCanManageInventory, 'Can Manage Inventory'], [adminCanManageMenu, setAdminCanManageMenu, 'Can Manage Menu']].map(([c, s, l]) => (
                         <label key={l} className="flex items-center gap-2.5 cursor-pointer py-0.5">
-                          <input type="checkbox" checked={c} onChange={(e) => s(e.target.checked)} className="rounded border-gray-300 dark:border-gray-600 text-primary-600 focus:ring-primary-500 focus:ring-offset-0" />
-                          <span className="text-sm text-gray-700 dark:text-gray-300">{l}</span>
+                          <input type="checkbox" checked={c} onChange={(e) => s(e.target.checked)} className="rounded border-[var(--color-outline)] text-primary focus:ring-primary focus:ring-offset-0" />
+                          <span className="text-sm text-on-surface">{l}</span>
                         </label>
                       ))}
                     </div>
@@ -804,15 +831,15 @@ const CafeSettings = () => {
             </div>
 
             {/* Branding Section */}
-            <div className="card p-6">
-              <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-1">Branding</h2>
-              <p className="text-sm text-gray-600 dark:text-gray-400 mb-5">
-                Images shown on the customer-facing menu page.
-              </p>
+            <div className="card">
+              <div className="card-header">
+                <h2 className="card-title">Branding</h2>
+                <p className="card-description">Images shown on the customer-facing menu page.</p>
+              </div>
               <div className="space-y-6">
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Logo</label>
-                <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">
+                <label className="block text-sm font-medium text-on-surface mb-1.5">Logo</label>
+                <p className="text-xs text-body-muted mb-2">
                   Headers, invoices, and customer-facing pages.
                 </p>
                 <div className="space-y-3">
@@ -835,12 +862,12 @@ const CafeSettings = () => {
                   )}
                   <div className="flex items-center space-x-4">
                     <div className="flex-1">
-                      <input
-                        type="file"
-                        onChange={(e) => setSelectedFile(e.target.files[0])}
+                      <FileInput
+                        selectedFile={selectedFile}
+                        onChange={setSelectedFile}
                         accept="image/jpeg,image/png,image/webp"
-                        className="input-field"
                         disabled={uploadingLogo}
+                        placeholder="No file chosen"
                       />
                     </div>
                     <button
@@ -855,8 +882,8 @@ const CafeSettings = () => {
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Hero Image</label>
-                <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">
+                <label className="block text-sm font-medium text-on-surface mb-1.5">Hero Image</label>
+                <p className="text-xs text-body-muted mb-2">
                   Main background on the customer menu.
                 </p>
                 <div className="space-y-3">
@@ -879,12 +906,12 @@ const CafeSettings = () => {
                   )}
                   <div className="flex items-center space-x-4">
                     <div className="flex-1">
-                      <input
-                        type="file"
-                        onChange={(e) => setSelectedHeroFile(e.target.files[0])}
+                      <FileInput
+                        selectedFile={selectedHeroFile}
+                        onChange={setSelectedHeroFile}
                         accept="image/jpeg,image/png,image/webp"
-                        className="input-field"
                         disabled={uploadingHero}
+                        placeholder="No file chosen"
                       />
                     </div>
                     <button
@@ -899,11 +926,11 @@ const CafeSettings = () => {
                 </div>
               </div>
 
-              <div className="pt-5 border-t border-gray-200 dark:border-gray-700">
+              <div className="pt-5 border-t border-[var(--color-outline)]">
                 <div className="flex flex-wrap items-start justify-between gap-3 mb-3">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Promotional Banners</label>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                    <label className="block text-sm font-medium text-on-surface mb-1.5">Promotional Banners</label>
+                    <p className="text-xs text-body-muted">
                       Customer menu. Order by priority (lower first). Keep at least one.
                     </p>
                   </div>
@@ -923,7 +950,7 @@ const CafeSettings = () => {
                   <div className="space-y-4">
                     <div className="flex flex-wrap gap-3">
                       {promoBanners.map((b) => (
-                        <div key={b.id} className="border rounded-lg overflow-hidden bg-white dark:bg-gray-800 w-48">
+                        <div key={b.id} className="card overflow-hidden w-48 p-0">
                           <div className="h-28 bg-gray-100 dark:bg-gray-700">
                             <img src={getImageUrl(b.image_url)} alt="Banner" className="w-full h-full object-cover" />
                           </div>
@@ -963,18 +990,19 @@ const CafeSettings = () => {
                       const b = promoBanners.find((x) => x.id === editingBannerId);
                       if (!b) return null;
                       return (
-                        <div className="border rounded-lg p-4 bg-gray-50 dark:bg-gray-800">
+                        <div className="card card-sm">
                           <p className="text-sm font-medium mb-2">Edit banner</p>
                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                             <div className="sm:col-span-2">
                               <label className="block text-xs text-gray-500 mb-1">Replace image (optional)</label>
-                              <input
-                                type="file"
+                              <FileInput
+                                selectedFile={editingBannerReplaceFile}
+                                onChange={setEditingBannerReplaceFile}
                                 accept="image/jpeg,image/png,image/webp"
-                                onChange={(e) => setEditingBannerReplaceFile(e.target.files?.[0] || null)}
-                                className="input-field text-sm"
+                                disabled={updatingBanner}
+                                placeholder="No file chosen"
+                                className="text-sm"
                               />
-                              {editingBannerReplaceFile && <span className="text-xs text-gray-500 ml-2">{editingBannerReplaceFile.name}</span>}
                             </div>
                             <div>
                               <label className="block text-xs text-gray-500 mb-1">Link URL</label>
@@ -1015,16 +1043,17 @@ const CafeSettings = () => {
                       );
                     })()}
                     {promoBannerForm.show && (
-                      <div className="border rounded-lg p-4 bg-gray-50 dark:bg-gray-800">
+                      <div className="card card-sm">
                         <p className="text-sm font-medium mb-2">Add banner</p>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                           <div>
                             <label className="block text-xs text-gray-500 mb-1">Image *</label>
-                            <input
-                              type="file"
+                            <FileInput
+                              selectedFile={promoBannerForm.file}
+                              onChange={(file) => setPromoBannerForm((f) => ({ ...f, file: file || null }))}
                               accept="image/jpeg,image/png,image/webp"
-                              onChange={(e) => setPromoBannerForm((f) => ({ ...f, file: e.target.files?.[0] || null }))}
-                              className="input-field text-sm"
+                              placeholder="No file chosen"
+                              className="text-sm"
                             />
                           </div>
                           <div>
@@ -1113,7 +1142,7 @@ const CafeSettings = () => {
                         const root = document.documentElement;
                         root.style.setProperty('--color-primary', newColor);
                       }}
-                      className="w-full h-10 rounded border"
+                      className="input-field"
                     />
                   </div>
                   <div>
@@ -1128,7 +1157,7 @@ const CafeSettings = () => {
                         const root = document.documentElement;
                         root.style.setProperty('--color-secondary', newColor);
                       }}
-                      className="w-full h-10 rounded border"
+                      className="input-field"
                     />
                   </div>
                   <div>
@@ -1143,7 +1172,7 @@ const CafeSettings = () => {
                         const root = document.documentElement;
                         root.style.setProperty('--color-accent', newColor);
                       }}
-                      className="w-full h-10 rounded border"
+                      className="input-field"
                     />
                   </div>
                   <div>
@@ -1158,7 +1187,7 @@ const CafeSettings = () => {
                         const root = document.documentElement;
                         root.style.setProperty('--color-background', newColor);
                       }}
-                      className="w-full h-10 rounded border"
+                      className="input-field"
                     />
                   </div>
                   <div>
@@ -1174,7 +1203,7 @@ const CafeSettings = () => {
                         root.style.setProperty('--color-text-primary', newColor);
                         root.style.setProperty('--color-text', newColor);
                       }}
-                      className="w-full h-10 rounded border"
+                      className="input-field"
                     />
                   </div>
                   <div>
@@ -1189,7 +1218,7 @@ const CafeSettings = () => {
                         const root = document.documentElement;
                         root.style.setProperty('--color-surface', newColor);
                       }}
-                      className="w-full h-10 rounded border"
+                      className="input-field"
                     />
                   </div>
                 </div>
@@ -1213,7 +1242,7 @@ const CafeSettings = () => {
                           root.style.setProperty('--color-primary', newColor);
                         }
                       }}
-                      className="w-full h-10 rounded border"
+                      className="input-field"
                     />
                   </div>
                   <div>
@@ -1230,7 +1259,7 @@ const CafeSettings = () => {
                           root.style.setProperty('--color-secondary', newColor);
                         }
                       }}
-                      className="w-full h-10 rounded border"
+                      className="input-field"
                     />
                   </div>
                   <div>
@@ -1247,7 +1276,7 @@ const CafeSettings = () => {
                           root.style.setProperty('--color-accent', newColor);
                         }
                       }}
-                      className="w-full h-10 rounded border"
+                      className="input-field"
                     />
                   </div>
                   <div>
@@ -1264,7 +1293,7 @@ const CafeSettings = () => {
                           root.style.setProperty('--color-background', newColor);
                         }
                       }}
-                      className="w-full h-10 rounded border"
+                      className="input-field"
                     />
                   </div>
                   <div>
@@ -1282,7 +1311,7 @@ const CafeSettings = () => {
                           root.style.setProperty('--color-text', newColor);
                         }
                       }}
-                      className="w-full h-10 rounded border"
+                      className="input-field"
                     />
                   </div>
                   <div>
@@ -1299,7 +1328,7 @@ const CafeSettings = () => {
                           root.style.setProperty('--color-surface', newColor);
                         }
                       }}
-                      className="w-full h-10 rounded border"
+                      className="input-field"
                     />
                   </div>
                 </div>
@@ -1322,6 +1351,7 @@ const CafeSettings = () => {
           </div>
           */}
         </div>
+        )}
       </div>
     </div>
   );

@@ -1,7 +1,65 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import axios from 'axios';
+import { useAuth } from './AuthContext';
 
 const CafeSettingsContext = createContext();
+
+const INITIAL_CAFE_SETTINGS = {
+  cafe_name: null,
+  logo_url: null,
+  address: '',
+  phone: '',
+  email: '',
+  website: '',
+  opening_hours: '',
+  description: '',
+  show_kitchen_tab: true,
+  show_customers_tab: true,
+  show_payment_methods_tab: true,
+  show_menu_tab: true,
+  show_inventory_tab: true,
+  show_history_tab: true,
+  show_menu_images: true,
+  chef_show_kitchen_tab: true,
+  chef_show_menu_tab: false,
+  chef_show_inventory_tab: false,
+  chef_show_history_tab: true,
+  chef_can_edit_orders: true,
+  chef_can_view_customers: false,
+  chef_can_view_payments: false,
+  reception_show_kitchen_tab: true,
+  reception_show_menu_tab: false,
+  reception_show_inventory_tab: false,
+  reception_show_history_tab: true,
+  reception_can_edit_orders: true,
+  reception_can_view_customers: true,
+  reception_can_view_payments: true,
+  reception_can_create_orders: true,
+  admin_can_access_settings: false,
+  admin_can_manage_users: false,
+  admin_can_view_reports: true,
+  admin_can_manage_inventory: true,
+  admin_can_manage_menu: true,
+  enable_thermal_printer: false,
+  default_printer_type: 'system',
+  printer_name: null,
+  printer_port: null,
+  printer_baud_rate: 9600,
+  auto_print_new_orders: false,
+  print_order_copies: 1,
+  light_primary_color: '#3B82F6',
+  light_secondary_color: '#6B7280',
+  light_accent_color: '#10B981',
+  light_background_color: '#FFFFFF',
+  light_text_color: '#1F2937',
+  light_surface_color: '#F9FAFB',
+  dark_primary_color: '#60A5FA',
+  dark_secondary_color: '#9CA3AF',
+  dark_accent_color: '#34D399',
+  dark_background_color: '#111827',
+  dark_text_color: '#F9FAFB',
+  dark_surface_color: '#1F2937'
+};
 
 export const useCafeSettings = () => {
   const context = useContext(CafeSettingsContext);
@@ -12,62 +70,10 @@ export const useCafeSettings = () => {
 };
 
 export const CafeSettingsProvider = ({ children }) => {
-  const [cafeSettings, setCafeSettings] = useState({
-    cafe_name: null,
-    logo_url: null,
-    address: '',
-    phone: '',
-    email: '',
-    website: '',
-    opening_hours: '',
-    description: '',
-    show_kitchen_tab: true,
-    show_customers_tab: true,
-    show_payment_methods_tab: true,
-    show_menu_tab: true,
-    show_inventory_tab: true,
-    show_history_tab: true,
-    show_menu_images: true,
-    chef_show_kitchen_tab: true,
-    chef_show_menu_tab: false,
-    chef_show_inventory_tab: false,
-    chef_show_history_tab: true,
-    chef_can_edit_orders: true,
-    chef_can_view_customers: false,
-    chef_can_view_payments: false,
-    reception_show_kitchen_tab: true,
-    reception_show_menu_tab: false,
-    reception_show_inventory_tab: false,
-    reception_show_history_tab: true,
-    reception_can_edit_orders: true,
-    reception_can_view_customers: true,
-    reception_can_view_payments: true,
-    reception_can_create_orders: true,
-    admin_can_access_settings: false,
-    admin_can_manage_users: false,
-    admin_can_view_reports: true,
-    admin_can_manage_inventory: true,
-    admin_can_manage_menu: true,
-    enable_thermal_printer: false,
-    default_printer_type: 'system',
-    printer_name: null,
-    printer_port: null,
-    printer_baud_rate: 9600,
-    auto_print_new_orders: false,
-    print_order_copies: 1,
-    light_primary_color: '#3B82F6',
-    light_secondary_color: '#6B7280',
-    light_accent_color: '#10B981',
-    light_background_color: '#FFFFFF',
-    light_text_color: '#1F2937',
-    light_surface_color: '#F9FAFB',
-    dark_primary_color: '#60A5FA',
-    dark_secondary_color: '#9CA3AF',
-    dark_accent_color: '#34D399',
-    dark_background_color: '#111827',
-    dark_text_color: '#F9FAFB',
-    dark_surface_color: '#1F2937'
-  });
+  const { user, impersonation } = useAuth();
+  const effectiveCafeId = impersonation?.isImpersonating ? impersonation?.cafeId : user?.cafe_id;
+
+  const [cafeSettings, setCafeSettings] = useState(INITIAL_CAFE_SETTINGS);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -82,6 +88,7 @@ export const CafeSettingsProvider = ({ children }) => {
       }
 
       setLoading(true);
+      // GET /cafe-settings uses the current user's token; backend returns the logged-in admin's cafe settings (no query params)
       const response = await axios.get('/cafe-settings');
       
       // Convert numeric boolean values to actual booleans
@@ -295,9 +302,20 @@ export const CafeSettingsProvider = ({ children }) => {
     }
   };
 
+  // When the effective cafe changes (different user login or impersonation), clear previous cafe's data
+  // and refetch so we never show another cafe's name/title. On logout, reset to initial state.
   useEffect(() => {
+    if (effectiveCafeId === undefined || effectiveCafeId === null) {
+      setCafeSettings(INITIAL_CAFE_SETTINGS);
+      setError(null);
+      setLoading(false);
+      return;
+    }
+    setCafeSettings(INITIAL_CAFE_SETTINGS);
+    setError(null);
+    setLoading(true);
     fetchCafeSettings();
-  }, []);
+  }, [effectiveCafeId]);
 
   const value = {
     cafeSettings,

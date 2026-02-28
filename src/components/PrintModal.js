@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { X, Printer, Usb, Wifi, Settings, CheckCircle, AlertCircle, RefreshCw } from 'lucide-react';
+import { Printer, Usb, Wifi, Settings, CheckCircle, RefreshCw } from 'lucide-react';
+import Dialog from './ui/Dialog';
 import thermalPrinterManager from '../utils/thermalPrinter';
 import toast from 'react-hot-toast';
 
@@ -107,29 +108,9 @@ const PrintModal = ({ isOpen, onClose, order, onPrintSuccess }) => {
     setPrinterType(printer.type);
   };
 
-  if (!isOpen) return null;
-
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-end lg:items-center justify-center z-50 p-0 lg:p-4">
-      <div className="bg-white dark:bg-gray-800 rounded-t-lg lg:rounded-lg shadow-xl max-w-4xl w-full lg:mx-4 h-[90vh] lg:h-auto max-h-[90vh] flex flex-col">
-        {/* Header */}
-        <div className="flex items-center justify-between p-4 sm:p-6 border-b border-gray-200 dark:border-gray-700 flex-shrink-0">
-          <div className="flex items-center space-x-3">
-            <Printer className="h-6 w-6 text-secondary-600" />
-            <h2 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-gray-100">
-              Print Order #{order?.order_number}
-            </h2>
-          </div>
-          <button
-            onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 min-h-[44px] min-w-[44px] flex items-center justify-center"
-            aria-label="Close"
-          >
-            <X className="h-6 w-6" />
-          </button>
-        </div>
-
-        <div className="flex flex-col lg:flex-row flex-1 overflow-hidden">
+    <Dialog open={isOpen} onClose={onClose} title={`Print Order #${order?.order_number || ''}`} size="4xl">
+      <div className="flex flex-col lg:flex-row flex-1 overflow-hidden min-h-0">
           {/* Left Panel - Printer Selection */}
           <div className="w-full lg:w-1/3 border-b lg:border-b-0 lg:border-r border-gray-200 dark:border-gray-700 p-4 sm:p-6 overflow-y-auto">
             <div className="space-y-6">
@@ -271,7 +252,7 @@ const PrintModal = ({ isOpen, onClose, order, onPrintSuccess }) => {
                 Print Preview
               </h3>
               
-              <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-4">
+              <div className="card card-sm">
                 <pre className="text-xs font-mono text-gray-800 dark:text-gray-200 whitespace-pre-wrap leading-tight">
                   {printPreview || 'Loading preview...'}
                 </pre>
@@ -279,8 +260,7 @@ const PrintModal = ({ isOpen, onClose, order, onPrintSuccess }) => {
             </div>
           </div>
         </div>
-      </div>
-    </div>
+    </Dialog>
   );
 };
 

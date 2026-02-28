@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Clock, CheckCircle, XCircle, Printer, RefreshCw, AlertTriangle, Coffee, Utensils, ChevronDown, ChevronUp, ShoppingCart, Plus, Edit, Save, X, Trash2 } from 'lucide-react';
+import { Clock, CheckCircle, XCircle, Printer, RefreshCw, AlertTriangle, Coffee, Utensils, ChevronDown, ChevronUp, ShoppingCart, Plus, Edit, Save, X, Trash2, FileText } from 'lucide-react';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 import { useAuth } from '../contexts/AuthContext';
@@ -9,6 +9,7 @@ import { useCurrency } from '../contexts/CurrencyContext';
 import { getImageUrl } from '../utils/imageUtils';
 import useOrders from '../hooks/useOrders';
 import PrintModal from './PrintModal';
+import Select from './ui/Select';
 
 const KitchenOrders = ({ cart, setCart }) => {
   const { isAuthenticated, user, loading: authLoading } = useAuth();
@@ -28,6 +29,7 @@ const KitchenOrders = ({ cart, setCart }) => {
   } = useOrders(true, 30000, true);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [showPrintModal, setShowPrintModal] = useState(false);
+  const [generatingInvoiceId, setGeneratingInvoiceId] = useState(null);
   const [autoRefresh, setAutoRefresh] = useState(true);
   const [filterStatus, setFilterStatus] = useState('all');
   const [activeTab, setActiveTab] = useState('today');
@@ -273,7 +275,28 @@ const KitchenOrders = ({ cart, setCart }) => {
     setShowPrintModal(true);
   };
 
-
+  const handleGenerateInvoice = async (order) => {
+    setGeneratingInvoiceId(order.id);
+    try {
+      const response = await axios.post('/invoices/generate', { order_id: order.id });
+      const invoiceNumber = response.data.invoiceNumber;
+      if (!invoiceNumber) {
+        toast.error('Failed to generate invoice');
+        return;
+      }
+      const pdfResponse = await axios.get(`/invoices/${invoiceNumber}/download`);
+      const pdfBlob = new Blob([Uint8Array.from(atob(pdfResponse.data.pdf), function (c) { return c.charCodeAt(0); })], { type: 'application/pdf' });
+      const pdfUrl = URL.createObjectURL(pdfBlob);
+      window.open(pdfUrl, '_blank');
+      setTimeout(function () { URL.revokeObjectURL(pdfUrl); }, 1000);
+      toast.success('Invoice generated');
+    } catch (error) {
+      console.error('Error generating invoice:', error);
+      toast.error(error.response?.data?.error || 'Failed to generate invoice');
+    } finally {
+      setGeneratingInvoiceId(null);
+    }
+  };
 
   const addOrderToCart = (order) => {
     try {
@@ -627,14 +650,12 @@ const KitchenOrders = ({ cart, setCart }) => {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <div className="card">
           <div className="flex items-center">
-            <div className={`p-2 rounded-lg ${isDarkMode ? 'bg-yellow-900' : 'bg-yellow-100'}`}>
-              <Clock className={`h-6 w-6 ${isDarkMode ? 'text-yellow-400' : 'text-yellow-600'}`} />
+            <div className="p-2 rounded-lg bg-[var(--color-primary-container)]">
+              <Clock className="h-6 w-6" style={{ color: 'var(--color-warning)' }} />
             </div>
             <div className="ml-4">
-              <p className={`text-sm font-medium ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                {activeTab === 'today' && todaySubTab === 'active' ? 'Pending' : 'Pending'}
-              </p>
-              <p className={`text-2xl font-bold ${isDarkMode ? 'text-yellow-400' : 'text-yellow-600'}`}>
+              <p className="text-sm font-medium text-body-muted">Pending</p>
+              <p className="text-2xl font-bold text-on-surface">
                 {todayOrders.filter(o => o.status === 'pending').length}
               </p>
             </div>
@@ -642,14 +663,12 @@ const KitchenOrders = ({ cart, setCart }) => {
         </div>
         <div className="card">
           <div className="flex items-center">
-            <div className={`p-2 rounded-lg ${isDarkMode ? 'bg-blue-900' : 'bg-blue-100'}`}>
-              <Utensils className={`h-6 w-6 ${isDarkMode ? 'text-blue-400' : 'text-blue-600'}`} />
+            <div className="p-2 rounded-lg bg-[var(--color-primary-container)]">
+              <Utensils className="h-6 w-6" style={{ color: 'var(--color-info)' }} />
             </div>
             <div className="ml-4">
-              <p className={`text-sm font-medium ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                {activeTab === 'today' && todaySubTab === 'active' ? 'Preparing' : 'Preparing'}
-              </p>
-              <p className={`text-2xl font-bold ${isDarkMode ? 'text-blue-400' : 'text-blue-600'}`}>
+              <p className="text-sm font-medium text-body-muted">Preparing</p>
+              <p className="text-2xl font-bold text-on-surface">
                 {todayOrders.filter(o => o.status === 'preparing').length}
               </p>
             </div>
@@ -657,14 +676,12 @@ const KitchenOrders = ({ cart, setCart }) => {
         </div>
         <div className="card">
           <div className="flex items-center">
-            <div className={`p-2 rounded-lg ${isDarkMode ? 'bg-green-900' : 'bg-green-100'}`}>
-              <CheckCircle className={`h-6 w-6 ${isDarkMode ? 'text-green-400' : 'text-green-600'}`} />
+            <div className="p-2 rounded-lg bg-[var(--color-primary-container)]">
+              <CheckCircle className="h-6 w-6" style={{ color: 'var(--color-success)' }} />
             </div>
             <div className="ml-4">
-              <p className={`text-sm font-medium ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                Ready
-              </p>
-              <p className={`text-2xl font-bold ${isDarkMode ? 'text-green-400' : 'text-green-600'}`}>
+              <p className="text-sm font-medium text-body-muted">Ready</p>
+              <p className="text-2xl font-bold text-on-surface">
                 {todayOrders.filter(o => o.status === 'ready').length}
               </p>
             </div>
@@ -672,17 +689,17 @@ const KitchenOrders = ({ cart, setCart }) => {
         </div>
         <div className="card">
           <div className="flex items-center">
-            <div className="p-2 rounded-lg transition-surface" style={{ backgroundColor: 'var(--surface-table)' }}>
+            <div className="p-2 rounded-lg bg-[var(--surface-table)]">
               <Coffee className="h-6 w-6" style={{ color: 'var(--color-on-surface-variant)' }} />
             </div>
             <div className="ml-4">
-              <p className="text-sm font-medium" style={{ color: 'var(--color-on-surface-variant)' }}>
+              <p className="text-sm font-medium text-body-muted">
                 {activeTab === 'today' && todaySubTab === 'active' ? 'Total Active' : 
                  activeTab === 'today' && todaySubTab === 'ready' ? 'Total Ready' :
                  activeTab === 'today' && todaySubTab === 'completed' ? 'Total Completed' :
                  activeTab === 'today' && todaySubTab === 'cancelled' ? 'Total Cancelled' : 'Total Active'}
               </p>
-              <p className="text-2xl font-bold" style={{ color: 'var(--color-primary)' }}>
+              <p className="text-2xl font-bold text-on-surface">
                 {activeTab === 'today' && todaySubTab === 'active'
                   ? pendingOrders.length
                   : activeTab === 'today' && todaySubTab === 'ready'
@@ -807,42 +824,39 @@ const KitchenOrders = ({ cart, setCart }) => {
       {/* Filters */}
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-4">
-          {(
-            <select
-              value={filterStatus}
-              onChange={(e) => {
-                setFilterStatus(e.target.value);
-                setCurrentPage(1); // Reset pagination when filter changes
-              }}
-              className={`px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 ${
-                isDarkMode 
-                  ? 'bg-gray-800 border-gray-600 text-gray-100' 
-                  : 'border-gray-300 bg-white text-gray-900'
-              }`}
-            >
-              <option value="all">All Orders</option>
-              {activeTab === 'today' && todaySubTab === 'active' ? (
-                <>
-                  <option value="pending">Pending</option>
-                  <option value="preparing">Preparing</option>
-                </>
-              ) : activeTab === 'today' && todaySubTab === 'ready' ? (
-                <option value="ready">Ready</option>
-              ) : activeTab === 'today' && todaySubTab === 'completed' ? (
-                <option value="completed">Completed</option>
-              ) : activeTab === 'today' && todaySubTab === 'cancelled' ? (
-                <option value="cancelled">Cancelled</option>
-              ) : (
-                <>
-                  <option value="pending">Pending</option>
-                  <option value="preparing">Preparing</option>
-                  <option value="ready">Ready</option>
-                  <option value="completed">Completed</option>
-                  <option value="cancelled">Cancelled</option>
-                </>
-              )}
-            </select>
-          )}
+          {(() => {
+            const statusOptions = [{ value: 'all', label: 'All Orders' }];
+            if (activeTab === 'today' && todaySubTab === 'active') {
+              statusOptions.push({ value: 'pending', label: 'Pending' }, { value: 'preparing', label: 'Preparing' });
+            } else if (activeTab === 'today' && todaySubTab === 'ready') {
+              statusOptions.push({ value: 'ready', label: 'Ready' });
+            } else if (activeTab === 'today' && todaySubTab === 'completed') {
+              statusOptions.push({ value: 'completed', label: 'Completed' });
+            } else if (activeTab === 'today' && todaySubTab === 'cancelled') {
+              statusOptions.push({ value: 'cancelled', label: 'Cancelled' });
+            } else {
+              statusOptions.push(
+                { value: 'pending', label: 'Pending' },
+                { value: 'preparing', label: 'Preparing' },
+                { value: 'ready', label: 'Ready' },
+                { value: 'completed', label: 'Completed' },
+                { value: 'cancelled', label: 'Cancelled' }
+              );
+            }
+            return (
+              <div className="min-w-[160px]">
+                <Select
+                  options={statusOptions}
+                  value={filterStatus}
+                  onChange={(v) => {
+                    setFilterStatus(v);
+                    setCurrentPage(1);
+                  }}
+                  placeholder="All Orders"
+                />
+              </div>
+            );
+          })()}
           
           {/* Search Bar */}
           <div className="relative">
@@ -854,13 +868,9 @@ const KitchenOrders = ({ cart, setCart }) => {
                 setSearchQuery(e.target.value);
                 setCurrentPage(1); // Reset pagination when search changes
               }}
-              className={`px-3 py-2 pl-10 pr-10 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 w-64 ${
-                isDarkMode 
-                  ? 'bg-gray-800 border-gray-600 text-gray-100 placeholder-gray-400' 
-                  : 'border-gray-300 bg-white text-gray-900 placeholder-gray-500'
-              }`}
+              className="input-field pl-12 pr-10 w-64"
             />
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
               <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
               </svg>
@@ -921,13 +931,7 @@ const KitchenOrders = ({ cart, setCart }) => {
               return (
                 <div
                   key={order.id}
-                  className={`card border-l-4 ${
-                    order.status === 'pending' ? 'border-l-yellow-500' :
-                    order.status === 'preparing' ? 'border-l-blue-500' :
-                    order.status === 'ready' ? 'border-l-green-500' :
-                    order.status === 'completed' ? 'border-l-green-600' :
-                    'border-l-red-500'
-                  }`}
+                  className={`card card-status-${order.status}`}
                 >
                 {/* Order Header */}
                 <div className="flex items-center justify-between mb-4">
@@ -1017,17 +1021,19 @@ const KitchenOrders = ({ cart, setCart }) => {
                       <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                         Payment Method
                       </label>
-                      <select
+                      <Select
+                        options={[
+                          { value: '', label: 'Select payment method' },
+                          { value: 'cash', label: 'Cash' },
+                          { value: 'card', label: 'Card' },
+                          { value: 'upi', label: 'UPI' },
+                          { value: 'online', label: 'Online' }
+                        ]}
                         value={editFormData.payment_method || ''}
-                        onChange={(e) => updateEditFormData('payment_method', e.target.value)}
-                        className="input-field w-full"
-                      >
-                        <option value="">Select payment method</option>
-                        <option value="cash">Cash</option>
-                        <option value="card">Card</option>
-                        <option value="upi">UPI</option>
-                        <option value="online">Online</option>
-                      </select>
+                        onChange={(v) => updateEditFormData('payment_method', v)}
+                        placeholder="Select payment method"
+                        className="w-full"
+                      />
                     </div>
                     <div className="flex items-center space-x-2">
                       <input
@@ -1046,17 +1052,19 @@ const KitchenOrders = ({ cart, setCart }) => {
                           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                             Split Payment Method
                           </label>
-                          <select
+                          <Select
+                            options={[
+                              { value: '', label: 'Select split payment method' },
+                              { value: 'cash', label: 'Cash' },
+                              { value: 'card', label: 'Card' },
+                              { value: 'upi', label: 'UPI' },
+                              { value: 'online', label: 'Online' }
+                            ]}
                             value={editFormData.split_payment_method || ''}
-                            onChange={(e) => updateEditFormData('split_payment_method', e.target.value)}
-                            className="input-field w-full"
-                          >
-                            <option value="">Select split payment method</option>
-                            <option value="cash">Cash</option>
-                            <option value="card">Card</option>
-                            <option value="upi">UPI</option>
-                            <option value="online">Online</option>
-                          </select>
+                            onChange={(v) => updateEditFormData('split_payment_method', v)}
+                            placeholder="Select split payment method"
+                            className="w-full"
+                          />
                         </div>
                         <div>
                           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
@@ -1196,17 +1204,16 @@ const KitchenOrders = ({ cart, setCart }) => {
                                     <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">
                                       Menu Item
                                     </label>
-                                    <select
-                                      value={item.menu_item_id || ''}
-                                      onChange={(e) => updateOrderItem(index, 'menu_item_id', e.target.value)}
-                                      className="input-field text-sm"
-                                    >
-                                      {menuItems.map(menuItem => (
-                                        <option key={menuItem.id} value={menuItem.id}>
-                                          {menuItem.name} - {formatCurrency(menuItem.price)}
-                                        </option>
-                                      ))}
-                                    </select>
+                                    <Select
+                                      options={menuItems.map(mi => ({
+                                        value: String(mi.id),
+                                        label: `${mi.name} - ${formatCurrency(mi.price)}`
+                                      }))}
+                                      value={item.menu_item_id ? String(item.menu_item_id) : ''}
+                                      onChange={(v) => updateOrderItem(index, 'menu_item_id', v)}
+                                      placeholder="Select item"
+                                      className="text-sm"
+                                    />
                                   </div>
                                   <div>
                                     <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">
@@ -1402,42 +1409,64 @@ const KitchenOrders = ({ cart, setCart }) => {
                       </>
                     )}
                   </div>
-                  <div className="flex items-center space-x-2">
+                  <div className="flex items-center flex-wrap gap-2">
                     {editingOrder !== order.id && (
                       <>
                         {(user?.role === 'admin' || (user?.role === 'chef' && cafeSettings?.chef_can_edit_orders) || (user?.role === 'reception' && cafeSettings?.reception_can_edit_orders)) && (
                           <button
                             onClick={() => startEditing(order)}
-                            className={`text-sm px-3 py-1 rounded border flex items-center ${
+                            className={`inline-flex items-center justify-center h-8 min-w-[5.5rem] text-sm px-3 rounded border ${
                               isDarkMode 
                                 ? 'text-blue-400 border-blue-600 hover:bg-blue-900' 
                                 : 'text-blue-600 border-blue-300 hover:bg-blue-50'
                             }`}
                             title="Edit Order"
                           >
-                            <Edit className="h-3 w-3 mr-1" />
+                            <Edit className="h-4 w-4 mr-1 shrink-0" />
                             Edit
                           </button>
                         )}
                         <button
                           onClick={() => addOrderToCart(order)}
-                          className={`text-sm px-3 py-1 rounded border flex items-center ${
+                          className={`inline-flex items-center justify-center h-8 min-w-[5.5rem] text-sm px-3 rounded border ${
                             isDarkMode 
                               ? 'text-green-400 border-green-600 hover:bg-green-900' 
                               : 'text-green-600 border-green-300 hover:bg-green-50'
                           }`}
                           title="Add to Cart"
                         >
-                          <ShoppingCart className="h-3 w-3 mr-1" />
+                          <ShoppingCart className="h-4 w-4 mr-1 shrink-0" />
                           Add to Cart
                         </button>
                         <button
                           onClick={() => printOrder(order)}
-                          className="btn-secondary text-sm px-3 py-1"
+                          className="btn-secondary inline-flex items-center justify-center h-8 min-w-[5.5rem] text-sm px-3 rounded border"
                           title="Print Order"
                         >
-                          <Printer className="h-4 w-4" />
+                          <Printer className="h-4 w-4 shrink-0" />
+                          Print
                         </button>
+                        {user?.role === 'admin' && (
+                          <button
+                            onClick={() => handleGenerateInvoice(order)}
+                            disabled={generatingInvoiceId === order.id}
+                            className={`inline-flex items-center justify-center h-8 min-w-[5.5rem] text-sm px-3 rounded border ${
+                              isDarkMode
+                                ? 'text-purple-400 border-purple-600 hover:bg-purple-900 disabled:opacity-50'
+                                : 'text-purple-600 border-purple-300 hover:bg-purple-50 disabled:opacity-50'
+                            }`}
+                            title="Generate Invoice"
+                          >
+                            {generatingInvoiceId === order.id ? (
+                              <RefreshCw className="h-4 w-4 shrink-0 animate-spin" />
+                            ) : (
+                              <>
+                                <FileText className="h-4 w-4 mr-1 shrink-0" />
+                                Invoice
+                              </>
+                            )}
+                          </button>
+                        )}
                       </>
                     )}
                   </div>

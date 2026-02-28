@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import toast from 'react-hot-toast';
-import { Users, Building, Search, Edit, X, Check } from 'lucide-react';
+import { Users, Building, Search, Edit, Check } from 'lucide-react';
+import Dialog from './ui/Dialog';
+import Select from './ui/Select';
 
 const SuperAdminUserManagement = () => {
   const [users, setUsers] = useState([]);
@@ -98,29 +100,28 @@ const SuperAdminUserManagement = () => {
             <label className="block text-sm font-medium text-secondary-700 dark:text-gray-300 mb-2">
               Filter by Cafe
             </label>
-            <select
-              value={filterCafeId}
-              onChange={(e) => setFilterCafeId(e.target.value)}
-              className="w-full px-3 py-2 border border-accent-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-secondary-500 focus:border-secondary-500 dark:bg-gray-700 dark:text-gray-100"
-            >
-              <option value="">All Cafes</option>
-              {cafes.map(cafe => (
-                <option key={cafe.id} value={cafe.id}>{cafe.name}</option>
-              ))}
-            </select>
+            <Select
+              options={[
+                { value: '', label: 'All Cafes' },
+                ...cafes.map(c => ({ value: String(c.id), label: c.name }))
+              ]}
+              value={filterCafeId === '' ? '' : String(filterCafeId)}
+              onChange={(v) => setFilterCafeId(v)}
+              placeholder="All Cafes"
+            />
           </div>
           <div>
             <label className="block text-sm font-medium text-secondary-700 dark:text-gray-300 mb-2">
               Search Users
             </label>
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-secondary-400" />
+              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-secondary-400 pointer-events-none" />
               <input
                 type="text"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 placeholder="Search by username, email, or role..."
-                className="w-full pl-10 pr-3 py-2 border border-accent-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-secondary-500 focus:border-secondary-500 dark:bg-gray-700 dark:text-gray-100"
+                className="input-field pl-12"
               />
             </div>
           </div>
@@ -215,28 +216,14 @@ const SuperAdminUserManagement = () => {
         )}
       </div>
 
-      {/* Assign Cafe Modal */}
-      {editingUser && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full">
-            <div className="p-6 border-b border-accent-200 dark:border-gray-700">
-              <div className="flex justify-between items-center">
-                <h3 className="text-lg font-semibold text-secondary-700 dark:text-gray-100">
-                  Assign User to Cafe
-                </h3>
-                <button
-                  onClick={() => {
-                    setEditingUser(null);
-                    setSelectedCafeId('');
-                  }}
-                  className="text-secondary-500 hover:text-secondary-700 dark:text-gray-400 dark:hover:text-gray-200"
-                >
-                  <X className="h-6 w-6" />
-                </button>
-              </div>
-            </div>
-
-            <div className="p-6 space-y-4">
+      {/* Assign Cafe Modal - Template Dialog */}
+      <Dialog
+        open={!!editingUser}
+        onClose={() => { setEditingUser(null); setSelectedCafeId(''); }}
+        title="Assign User to Cafe"
+      >
+        {editingUser && (
+            <div className="space-y-4 pt-0">
               <div>
                 <p className="text-sm text-secondary-600 dark:text-gray-400 mb-2">
                   User: <span className="font-semibold">{editingUser.username}</span>
@@ -250,16 +237,15 @@ const SuperAdminUserManagement = () => {
                 <label className="block text-sm font-medium text-secondary-700 dark:text-gray-300 mb-2">
                   Select Cafe
                 </label>
-                <select
-                  value={selectedCafeId}
-                  onChange={(e) => setSelectedCafeId(e.target.value)}
-                  className="w-full px-3 py-2 border border-accent-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-secondary-500 focus:border-secondary-500 dark:bg-gray-700 dark:text-gray-100"
-                >
-                  <option value="">No Cafe (Unassign)</option>
-                  {cafes.map(cafe => (
-                    <option key={cafe.id} value={cafe.id}>{cafe.name}</option>
-                  ))}
-                </select>
+                <Select
+                  options={[
+                    { value: '', label: 'No Cafe (Unassign)' },
+                    ...cafes.map(c => ({ value: String(c.id), label: c.name }))
+                  ]}
+                  value={selectedCafeId === '' ? '' : String(selectedCafeId)}
+                  onChange={setSelectedCafeId}
+                  placeholder="No Cafe (Unassign)"
+                />
               </div>
 
               <div className="flex justify-end space-x-3 pt-4 border-t border-accent-200 dark:border-gray-700">
@@ -268,7 +254,7 @@ const SuperAdminUserManagement = () => {
                     setEditingUser(null);
                     setSelectedCafeId('');
                   }}
-                  className="px-4 py-2 border border-accent-300 dark:border-gray-600 text-secondary-700 dark:text-gray-300 rounded-lg hover:bg-accent-50 dark:hover:bg-gray-700 transition-colors"
+                  className="btn-secondary"
                 >
                   Cancel
                 </button>
@@ -280,9 +266,8 @@ const SuperAdminUserManagement = () => {
                 </button>
               </div>
             </div>
-          </div>
-        </div>
-      )}
+        )}
+      </Dialog>
     </div>
   );
 };

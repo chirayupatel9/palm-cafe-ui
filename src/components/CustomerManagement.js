@@ -23,7 +23,9 @@ import {
 } from 'lucide-react';
 import PageHeader from './PageHeader';
 import { TableSkeleton } from './ui/Skeleton';
+import Select from './ui/Select';
 import { EmptyCustomers } from './ui/EmptyState';
+import Dialog from './ui/Dialog';
 
 const CustomerManagement = () => {
   const { isAuthenticated, user, loading: authLoading } = useAuth();
@@ -287,42 +289,47 @@ const CustomerManagement = () => {
       {/* Statistics Cards */}
       {statistics && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <div className="card bg-gradient-to-r from-blue-500 to-blue-600 text-white">
+          <div className="card">
             <div className="flex items-center">
-              <Users className="h-8 w-8 mr-3" />
-              <div>
-                <p className="text-sm opacity-90">Total Customers</p>
-                <p className="text-2xl font-bold">{statistics.totalCustomers}</p>
+              <div className="p-2 rounded-lg bg-[var(--color-primary-container)]">
+                <Users className="h-6 w-6" style={{ color: 'var(--color-primary)' }} />
+              </div>
+              <div className="ml-4">
+                <p className="text-sm font-medium text-body-muted">Total Customers</p>
+                <p className="text-2xl font-bold text-on-surface">{statistics.totalCustomers}</p>
               </div>
             </div>
           </div>
-          
-          <div className="card bg-gradient-to-r from-green-500 to-green-600 text-white">
+          <div className="card">
             <div className="flex items-center">
-              <UserCheck className="h-8 w-8 mr-3" />
-              <div>
-                <p className="text-sm opacity-90">Active Customers</p>
-                <p className="text-2xl font-bold">{statistics.activeCustomers}</p>
+              <div className="p-2 rounded-lg bg-[var(--color-primary-container)]">
+                <UserCheck className="h-6 w-6" style={{ color: 'var(--color-success)' }} />
+              </div>
+              <div className="ml-4">
+                <p className="text-sm font-medium text-body-muted">Active Customers</p>
+                <p className="text-2xl font-bold text-on-surface">{statistics.activeCustomers}</p>
               </div>
             </div>
           </div>
-          
-          <div className="card bg-gradient-to-r from-yellow-500 to-yellow-600 text-white">
+          <div className="card">
             <div className="flex items-center">
-              <Star className="h-8 w-8 mr-3" />
-              <div>
-                <p className="text-sm opacity-90">Total Points</p>
-                <p className="text-2xl font-bold">{statistics.totalLoyaltyPoints}</p>
+              <div className="p-2 rounded-lg bg-[var(--color-primary-container)]">
+                <Star className="h-6 w-6" style={{ color: 'var(--color-warning)' }} />
+              </div>
+              <div className="ml-4">
+                <p className="text-sm font-medium text-body-muted">Total Points</p>
+                <p className="text-2xl font-bold text-on-surface">{statistics.totalLoyaltyPoints}</p>
               </div>
             </div>
           </div>
-          
-          <div className="card text-white" style={{ background: 'linear-gradient(to right, var(--color-primary), var(--color-primary))' }}>
+          <div className="card">
             <div className="flex items-center">
-              <TrendingUp className="h-8 w-8 mr-3" />
-              <div>
-                <p className="text-sm opacity-90">Total Spent</p>
-                <p className="text-2xl font-bold">{formatCurrency(statistics.totalSpent)}</p>
+              <div className="p-2 rounded-lg bg-[var(--color-primary-container)]">
+                <TrendingUp className="h-6 w-6" style={{ color: 'var(--color-primary)' }} />
+              </div>
+              <div className="ml-4">
+                <p className="text-sm font-medium text-body-muted">Total Spent</p>
+                <p className="text-2xl font-bold text-on-surface">{formatCurrency(statistics.totalSpent)}</p>
               </div>
             </div>
           </div>
@@ -333,34 +340,29 @@ const CustomerManagement = () => {
       <div className="card">
         <div className="flex flex-col sm:flex-row gap-4">
           <div className="flex-1 relative">
-            <Search className={`absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`} />
+            <Search className={`absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 pointer-events-none ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`} />
             <input
               type="text"
               placeholder="Search customers by name, email, or phone..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               onKeyPress={(e) => e.key === 'Enter' && searchCustomers(searchQuery)}
-              className={`w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-secondary-500 focus:border-transparent ${
-                isDarkMode 
-                  ? 'bg-gray-800 border-gray-600 text-gray-100 placeholder-gray-400' 
-                  : 'border-gray-300 bg-white text-gray-900 placeholder-gray-500'
-              }`}
+              className="input-field pl-12"
             />
           </div>
           
-          <select
-            value={filterActive}
-            onChange={(e) => setFilterActive(e.target.value)}
-            className={`px-4 py-2 border rounded-lg focus:ring-2 focus:ring-secondary-500 focus:border-transparent ${
-              isDarkMode 
-                ? 'bg-gray-800 border-gray-600 text-gray-100' 
-                : 'border-gray-300 bg-white text-gray-900'
-            }`}
-          >
-            <option value="all">All Customers</option>
-            <option value="active">Active Only</option>
-            <option value="inactive">Inactive Only</option>
-          </select>
+          <div className="max-w-[180px]">
+            <Select
+              options={[
+                { value: 'all', label: 'All Customers' },
+                { value: 'active', label: 'Active Only' },
+                { value: 'inactive', label: 'Inactive Only' }
+              ]}
+              value={filterActive}
+              onChange={setFilterActive}
+              placeholder="All Customers"
+            />
+          </div>
           
           <button
             onClick={() => searchCustomers(searchQuery)}
@@ -374,7 +376,7 @@ const CustomerManagement = () => {
       {/* Customers List */}
       <div className="card">
         {filteredCustomers.length === 0 ? (
-          <EmptyCustomers onAdd={() => setShowAddModal(true)} />
+          <EmptyCustomers />
         ) : (
           <div className="overflow-x-auto">
             <table className="min-w-full" style={{ borderCollapse: 'separate', borderSpacing: 0 }}>
@@ -527,12 +529,9 @@ const CustomerManagement = () => {
         )}
       </div>
 
-      {/* Add Customer Modal */}
-      {showAddModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className={`${isDarkMode ? 'bg-gray-800' : 'bg-white'} rounded-lg p-6 w-full max-w-md`}>
-            <h3 className={`text-lg font-medium mb-4 ${isDarkMode ? 'text-gray-100' : 'text-gray-900'}`}>Add New Customer</h3>
-            <form onSubmit={handleSubmit}>
+      {/* Add Customer Modal - Template Dialog */}
+      <Dialog open={showAddModal} onClose={() => setShowAddModal(false)} title="Add New Customer">
+        <form onSubmit={handleSubmit} className="pt-0">
               <div className="space-y-4">
                 <div>
                   <label className={`block text-sm font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>Name *</label>
@@ -609,16 +608,16 @@ const CustomerManagement = () => {
                 </button>
               </div>
             </form>
-          </div>
-        </div>
-      )}
+      </Dialog>
 
-      {/* Edit Customer Modal */}
-      {showEditModal && selectedCustomer && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg p-6 w-full max-w-md">
-            <h3 className="text-lg font-medium mb-4">Edit Customer</h3>
-            <form onSubmit={handleSubmit}>
+      {/* Edit Customer Modal - Template Dialog */}
+      <Dialog
+        open={!!(showEditModal && selectedCustomer)}
+        onClose={() => setShowEditModal(false)}
+        title="Edit Customer"
+      >
+        {showEditModal && selectedCustomer && (
+            <form onSubmit={handleSubmit} className="pt-0">
               <div className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700">Name *</label>
@@ -707,34 +706,26 @@ const CustomerManagement = () => {
                 </button>
               </div>
             </form>
-          </div>
-        </div>
-      )}
+        )}
+      </Dialog>
 
-      {/* Order History Modal */}
-      {showOrderHistoryModal && selectedCustomer && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className={`${isDarkMode ? 'bg-gray-800' : 'bg-white'} rounded-lg p-6 w-full max-w-4xl max-h-[80vh] overflow-y-auto`}>
-            <div className="flex justify-between items-center mb-4">
-              <h3 className={`text-lg font-medium ${isDarkMode ? 'text-gray-100' : 'text-gray-900'}`}>Order History - {selectedCustomer.name}</h3>
-              <button
-                onClick={() => setShowOrderHistoryModal(false)}
-                className={`text-gray-400 hover:text-gray-600 ${isDarkMode ? 'dark:hover:text-gray-300' : ''}`}
-              >
-                ✕
-              </button>
-            </div>
-            
+      {/* Order History Modal - Template Dialog */}
+      <Dialog
+        open={!!(showOrderHistoryModal && selectedCustomer)}
+        onClose={() => setShowOrderHistoryModal(false)}
+        title={selectedCustomer ? `Order History - ${selectedCustomer.name}` : 'Order History'}
+        size="4xl"
+      >
+        {showOrderHistoryModal && selectedCustomer && (
+            <>
             {orderHistory.length === 0 ? (
               <p className={`${isDarkMode ? 'text-gray-400' : 'text-gray-500'} text-center py-8`}>This customer hasn't placed any orders yet. Orders will appear here once they make a purchase.</p>
             ) : (
               <div className="space-y-4">
                 {orderHistory.map((order) => (
-                  <div 
-                    key={order.id} 
-                    className={`border ${isDarkMode ? 'border-gray-700' : 'border-gray-200'} rounded-lg p-4 cursor-pointer transition-colors ${
-                      isDarkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-50'
-                    }`}
+                  <div
+                    key={order.id}
+                    className="card card-sm cursor-pointer"
                     onClick={() => viewOrderDetails(order)}
                   >
                     <div className="flex justify-between items-start mb-2">
@@ -763,32 +754,20 @@ const CustomerManagement = () => {
                 ))}
               </div>
             )}
-          </div>
-        </div>
-      )}
+            </>
+        )}
+      </Dialog>
 
-      {/* Order Details Modal */}
-      {showOrderDetailsModal && selectedOrder && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className={`${isDarkMode ? 'bg-gray-800' : 'bg-white'} rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto`}>
-            <div className="p-6">
-              <div className="flex justify-between items-start mb-4">
-                <div>
-                  <h3 className={`text-lg font-semibold ${isDarkMode ? 'text-secondary-300' : 'text-secondary-700'}`}>
-                    Order #{selectedOrder.order_number}
-                  </h3>
-                  <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                    {formatDate(selectedOrder.created_at)}
-                  </p>
-                </div>
-                <button
-                  onClick={() => setShowOrderDetailsModal(false)}
-                  className={`text-gray-400 hover:text-gray-600 ${isDarkMode ? 'dark:hover:text-gray-300' : ''}`}
-                >
-                  ✕
-                </button>
-              </div>
-
+      {/* Order Details Modal - Template Dialog */}
+      <Dialog
+        open={!!(showOrderDetailsModal && selectedOrder)}
+        onClose={() => setShowOrderDetailsModal(false)}
+        title={selectedOrder ? `Order #${selectedOrder.order_number}` : 'Order Details'}
+        size="2xl"
+      >
+        {showOrderDetailsModal && selectedOrder && (
+            <>
+              <p className="text-sm text-[#6F6A63] mb-4">{formatDate(selectedOrder.created_at)}</p>
               <div className="space-y-4">
                 <div className="grid grid-cols-2 gap-4 text-sm">
                   <div>
@@ -841,10 +820,9 @@ const CustomerManagement = () => {
                   </button>
                 </div>
               </div>
-            </div>
-          </div>
-        </div>
-      )}
+            </>
+        )}
+      </Dialog>
     </div>
   );
 };

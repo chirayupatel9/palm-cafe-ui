@@ -4,7 +4,7 @@ import axios from 'axios';
 import toast from 'react-hot-toast';
 import { useCurrency } from '../contexts/CurrencyContext';
 
-const CustomerOrderHistory = ({ customerPhone, setActiveTab, cart, setCart }) => {
+const CustomerOrderHistory = ({ customerPhone, cafeSlug, setActiveTab, cart, setCart }) => {
   const { formatCurrency } = useCurrency();
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -22,7 +22,7 @@ const CustomerOrderHistory = ({ customerPhone, setActiveTab, cart, setCart }) =>
     }
     fetchOrderHistory();
     fetchCustomerInfo();
-  }, [customerPhone]);
+  }, [customerPhone, cafeSlug]);
 
   useEffect(() => {
     if (orders.length > 0) {
@@ -39,7 +39,9 @@ const CustomerOrderHistory = ({ customerPhone, setActiveTab, cart, setCart }) =>
     }
     try {
       setLoading(true);
-      const response = await axios.get(`/customer/orders?customer_phone=${encodeURIComponent(phone)}`);
+      const params = new URLSearchParams({ customer_phone: phone });
+      if (cafeSlug) params.set('cafeSlug', cafeSlug);
+      const response = await axios.get(`/customer/orders?${params.toString()}`);
       const data = response.data;
       setOrders(Array.isArray(data) ? data : []);
     } catch (error) {
@@ -53,7 +55,9 @@ const CustomerOrderHistory = ({ customerPhone, setActiveTab, cart, setCart }) =>
 
   const fetchCustomerInfo = async () => {
     try {
-      const response = await axios.post('/customer/login', { phone: customerPhone });
+      const payload = { phone: customerPhone };
+      if (cafeSlug) payload.cafeSlug = cafeSlug;
+      const response = await axios.post('/customer/login', payload);
       if (response.data) {
         setCustomerInfo(response.data);
       }
@@ -319,36 +323,32 @@ const CustomerOrderHistory = ({ customerPhone, setActiveTab, cart, setCart }) =>
         </p>
       </div>
 
-      {/* Customer Points Display */}
+      {/* Customer Points Display - no card */}
       {customerInfo && (
-        <div className="mb-6 bg-gradient-to-r from-[#ec9213]/10 to-[#ec9213]/20 dark:from-[#ec9213]/20 dark:to-[#ec9213]/30 border border-[#ec9213]/30 dark:border-[#ec9213]/40 rounded-lg p-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <div className="bg-[#ec9213]/20 dark:bg-[#ec9213]/30 p-2 rounded-full">
-                <Star className="h-6 w-6 text-[#ec9213]" />
-              </div>
-              <div>
-                <h3 className="text-lg font-semibold text-text-light dark:text-text-dark">
-                  Loyalty Points
-                </h3>
-                <p className="text-sm text-text-light/70 dark:text-text-dark/70">
-                  Total points earned from all orders
-                </p>
-              </div>
+        <div className="mb-6 flex items-center justify-between">
+          <div className="flex items-center space-x-3">
+            <Star className="h-5 w-5 text-text-light/60 dark:text-text-dark/60" />
+            <div>
+              <h3 className="text-base font-semibold text-text-light dark:text-text-dark">
+                Loyalty Points
+              </h3>
+              <p className="text-sm text-text-light/70 dark:text-text-dark/70">
+                Total points earned from all orders
+              </p>
             </div>
-            <div className="text-right">
-              <div className="text-2xl font-bold text-text-light dark:text-text-dark">
-                {customerInfo.loyalty_points || 0}
-              </div>
-              <div className="text-sm text-text-light/70 dark:text-text-dark/70">
-                points
-              </div>
+          </div>
+          <div className="text-right">
+            <div className="text-xl font-bold text-text-light dark:text-text-dark">
+              {customerInfo.loyalty_points || 0}
+            </div>
+            <div className="text-sm text-text-light/70 dark:text-text-dark/70">
+              points
             </div>
           </div>
         </div>
       )}
 
-      {/* Filter Chips */}
+      {/* Filter Chips - no orange background */}
       <div className="mb-6 flex gap-3 overflow-x-auto pb-2">
         {['All', 'Completed', 'Preparing', 'Pending', 'Cancelled'].map((status) => (
           <button
@@ -356,23 +356,23 @@ const CustomerOrderHistory = ({ customerPhone, setActiveTab, cart, setCart }) =>
             onClick={() => setFilterStatus(status)}
             className={`flex h-9 shrink-0 cursor-pointer items-center justify-center gap-x-2 rounded-full px-4 transition-colors ${
               filterStatus === status
-                ? 'bg-[#ec9213] text-[#1b160d] dark:text-[#1b160d]'
-                : 'bg-[#f3eee7] dark:bg-[#382d20] text-text-light dark:text-text-dark hover:bg-[#f3eee7]/80 dark:hover:bg-[#382d20]/80'
+                ? 'font-semibold text-text-light dark:text-text-dark'
+                : 'text-text-light/70 dark:text-text-dark/70 hover:text-text-light dark:hover:text-text-dark'
             }`}
           >
-            <p className={`text-sm ${filterStatus === status ? 'font-bold' : 'font-medium'}`}>
+            <p className="text-sm">
               {status}
             </p>
           </button>
         ))}
       </div>
 
-      {/* Order Cards List */}
+      {/* Order list - no cards */}
       <div className="flex flex-col gap-4">
         {filteredOrders.map((order) => (
           <div
             key={order.id}
-            className="flex flex-col sm:flex-row items-stretch justify-between gap-4 rounded-lg bg-white dark:bg-[#2a2218] p-4 shadow-sm border border-[#f3eee7] dark:border-[#382d20] hover:shadow-md transition-shadow cursor-pointer"
+            className="flex flex-col sm:flex-row items-stretch justify-between gap-4 py-4 border-b border-[#E0E0E0] last:border-b-0"
           >
             <div className="flex flex-[2_2_0px] flex-col gap-4 justify-between">
               <div className="flex flex-col gap-1">
@@ -390,7 +390,7 @@ const CustomerOrderHistory = ({ customerPhone, setActiveTab, cart, setCart }) =>
                 </p>
                 <div className="flex items-center gap-2">
                   <p className="text-sm text-text-light/60 dark:text-text-dark/60">Status:</p>
-                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(order.status)}`}>
+                  <span className="text-sm font-medium text-text-light dark:text-text-dark">
                     {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
                   </span>
                 </div>
@@ -401,7 +401,7 @@ const CustomerOrderHistory = ({ customerPhone, setActiveTab, cart, setCart }) =>
               <div className="flex gap-2">
                 <button
                   onClick={() => addOrderToCart(order)}
-                  className="flex w-fit cursor-pointer items-center justify-center gap-2 overflow-hidden rounded-lg h-9 bg-[#f3eee7] dark:bg-[#382d20] px-4 text-sm font-bold text-text-light dark:text-text-dark hover:bg-[#f3eee7]/80 dark:hover:bg-[#382d20]/80 transition-colors"
+                  className="flex w-fit cursor-pointer items-center justify-center gap-2 overflow-hidden rounded-lg h-9 px-4 text-sm font-medium text-text-light dark:text-text-dark hover:bg-black/5 transition-colors"
                   title="Re-order"
                 >
                   <Plus className="h-4 w-4" />
@@ -410,12 +410,12 @@ const CustomerOrderHistory = ({ customerPhone, setActiveTab, cart, setCart }) =>
                 <button
                   onClick={() => downloadInvoice(order.order_number)}
                   disabled={downloadingInvoices.has(order.order_number) || !['completed', 'ready', 'cancelled'].includes(order.status)}
-                  className={`flex w-fit cursor-pointer items-center justify-center gap-2 overflow-hidden rounded-lg h-9 px-4 text-sm font-bold transition-colors ${
+                  className={`flex w-fit cursor-pointer items-center justify-center gap-2 overflow-hidden rounded-lg h-9 px-4 text-sm font-medium transition-colors ${
                     downloadingInvoices.has(order.order_number)
-                      ? 'bg-gray-400 text-white cursor-not-allowed'
+                      ? 'text-text-light/50 dark:text-text-dark/50 cursor-not-allowed'
                       : ordersWithInvoices.has(order.order_number) || ['completed', 'ready', 'cancelled'].includes(order.status)
-                      ? 'bg-primary text-on-primary hover:opacity-90'
-                      : 'bg-gray-400 text-white cursor-not-allowed'
+                      ? 'text-primary hover:bg-black/5'
+                      : 'text-text-light/50 dark:text-text-dark/50 cursor-not-allowed'
                   }`}
                   title={
                     downloadingInvoices.has(order.order_number)
@@ -429,7 +429,7 @@ const CustomerOrderHistory = ({ customerPhone, setActiveTab, cart, setCart }) =>
                 >
                   {downloadingInvoices.has(order.order_number) ? (
                     <>
-                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current"></div>
                       <span className="truncate">Downloading...</span>
                     </>
                   ) : (
@@ -445,59 +445,51 @@ const CustomerOrderHistory = ({ customerPhone, setActiveTab, cart, setCart }) =>
         ))}
       </div>
 
-      {/* Current Points Balance */}
+      {/* Current Points Balance - no card */}
       {orders.length > 0 && (
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md border border-accent-200 dark:border-gray-700 p-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <div className="bg-yellow-100 dark:bg-yellow-900 p-2 rounded-full">
-                <Star className="h-5 w-5 text-yellow-600 dark:text-yellow-400" />
-              </div>
-              <div>
-                <h3 className="font-semibold text-gray-900 dark:text-gray-100">
-                  Current Points Balance
-                </h3>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
-                  Available for redemption
-                </p>
-              </div>
+        <div className="flex items-center justify-between py-4 border-b border-[#E0E0E0]">
+          <div className="flex items-center space-x-3">
+            <Star className="h-5 w-5 text-text-light/60 dark:text-text-dark/60" />
+            <div>
+              <h3 className="font-semibold text-text-light dark:text-text-dark">
+                Current Points Balance
+              </h3>
+              <p className="text-sm text-text-light/70 dark:text-text-dark/70">
+                Available for redemption
+              </p>
             </div>
-            <div className="text-right">
-              <div className="text-xl font-bold text-yellow-600 dark:text-yellow-400">
-                {customerInfo?.loyalty_points || 0}
-              </div>
-              <div className="text-sm text-gray-600 dark:text-gray-400">
-                points available
-              </div>
+          </div>
+          <div className="text-right">
+            <div className="text-xl font-bold text-text-light dark:text-text-dark">
+              {customerInfo?.loyalty_points || 0}
+            </div>
+            <div className="text-sm text-text-light/70 dark:text-text-dark/70">
+              points available
             </div>
           </div>
         </div>
       )}
 
-      {/* Total Points Earned (Historical) */}
+      {/* Total Points Earned (Historical) - no card */}
       {orders.length > 0 && (
-        <div className="bg-gray-50 dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700 p-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <div className="bg-gray-200 dark:bg-gray-700 p-2 rounded-full">
-                <Star className="h-5 w-5 text-gray-600 dark:text-gray-400" />
-              </div>
-              <div>
-                <h3 className="font-medium text-gray-700 dark:text-gray-300">
-                  Total Points Earned
-                </h3>
-                <p className="text-sm text-gray-500 dark:text-gray-400">
-                  From {orders.length} order{orders.length !== 1 ? 's' : ''} (including redeemed)
-                </p>
-              </div>
+        <div className="flex items-center justify-between py-4">
+          <div className="flex items-center space-x-3">
+            <Star className="h-5 w-5 text-text-light/60 dark:text-text-dark/60" />
+            <div>
+              <h3 className="font-medium text-text-light dark:text-text-dark">
+                Total Points Earned
+              </h3>
+              <p className="text-sm text-text-light/70 dark:text-text-dark/70">
+                From {orders.length} order{orders.length !== 1 ? 's' : ''} (including redeemed)
+              </p>
             </div>
-            <div className="text-right">
-              <div className="text-lg font-semibold text-gray-600 dark:text-gray-400">
-                {orders.reduce((total, order) => total + calculatePointsEarned(order.final_amount), 0)}
-              </div>
-              <div className="text-sm text-gray-500 dark:text-gray-400">
-                points earned
-              </div>
+          </div>
+          <div className="text-right">
+            <div className="text-lg font-semibold text-text-light dark:text-text-dark">
+              {orders.reduce((total, order) => total + calculatePointsEarned(order.final_amount), 0)}
+            </div>
+            <div className="text-sm text-text-light/70 dark:text-text-dark/70">
+              points earned
             </div>
           </div>
         </div>

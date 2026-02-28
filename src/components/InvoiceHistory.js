@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Download, Calendar, User, DollarSign, Percent, Heart, BarChart3, Plus, ShoppingCart, X, FileText } from 'lucide-react';
+import { Download, Calendar, User, DollarSign, Percent, Heart, BarChart3, Plus, ShoppingCart, FileText } from 'lucide-react';
+import Dialog from './ui/Dialog';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 import { useCurrency } from '../contexts/CurrencyContext';
@@ -85,8 +86,7 @@ const InvoiceHistory = ({ cart, setCart, setCurrentPage }) => {
   };
 
   const openInvoice = async (invoiceNumber) => {
-    if (!invoiceNumber) {
-      console.error('Invoice number is undefined');
+    if (!invoiceNumber || String(invoiceNumber).toLowerCase() === 'unknown') {
       toast.error('Invalid invoice number');
       return;
     }
@@ -351,10 +351,10 @@ const InvoiceHistory = ({ cart, setCart, setCurrentPage }) => {
          ) : (
           <>
                          {/* Search Bar */}
-             <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700 p-6">
+             <div className="card">
                <div className="flex items-center space-x-4">
                  <div className="flex-1 relative">
-                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none z-10">
                      <svg
                        className="h-5 w-5 text-gray-400"
                        fill="none"
@@ -374,13 +374,13 @@ const InvoiceHistory = ({ cart, setCart, setCurrentPage }) => {
                      placeholder="Search by invoice number, order number, customer name, or phone..."
                      value={searchQuery}
                      onChange={(e) => setSearchQuery(e.target.value)}
-                     className="w-full pl-12 pr-4 py-4 text-lg border-0 bg-gray-50 dark:bg-gray-700 rounded-xl focus:ring-2 focus:ring-secondary-500 focus:bg-white dark:focus:bg-gray-600 transition-all duration-200 placeholder-gray-400 dark:placeholder-gray-500"
+                     className="input-field pl-12 text-base"
                    />
                  </div>
                  {searchQuery && (
                    <button
                      onClick={() => setSearchQuery('')}
-                     className="px-6 py-4 text-sm font-medium text-gray-600 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200 bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 rounded-xl transition-all duration-200"
+                     className="btn-secondary"
                      title="Clear search"
                    >
                      Clear
@@ -399,70 +399,64 @@ const InvoiceHistory = ({ cart, setCart, setCurrentPage }) => {
              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 sm:gap-6 mb-6">
                <div className="card">
                  <div className="flex items-center">
-                   <div className="flex-shrink-0">
-                     <div className="h-6 w-6 sm:h-8 sm:w-8 bg-secondary-500 rounded-full flex items-center justify-center">
-                       <span className="text-white text-xs sm:text-sm font-bold">{currencySettings.currency_symbol}</span>
-                     </div>
+                   <div className="p-2 rounded-lg bg-[var(--color-primary-container)] flex-shrink-0">
+                     <span className="text-sm font-bold text-primary">{currencySettings.currency_symbol}</span>
                    </div>
                    <div className="ml-3 sm:ml-4">
-                     <div className="text-xs sm:text-sm font-medium text-gray-500 dark:text-gray-400">Total Revenue</div>
-                     <div className="text-lg sm:text-2xl font-semibold text-secondary-700 dark:text-secondary-300">
+                     <div className="text-xs sm:text-sm font-medium text-body-muted">Total Revenue</div>
+                     <div className="text-lg sm:text-2xl font-semibold text-on-surface">
                        {formatCurrency(statistics.totalRevenue)}
                      </div>
                    </div>
                  </div>
                </div>
-               
                <div className="card">
                  <div className="flex items-center">
-                   <div className="flex-shrink-0">
-                     <Calendar className="h-6 w-6 sm:h-8 sm:w-8 text-secondary-500" />
+                   <div className="p-2 rounded-lg bg-[var(--color-primary-container)] flex-shrink-0">
+                     <Calendar className="h-6 w-6 sm:h-8 sm:w-8 text-primary" />
                    </div>
                    <div className="ml-3 sm:ml-4">
-                     <div className="text-xs sm:text-sm font-medium text-gray-500 dark:text-gray-400">Total Orders</div>
-                     <div className="text-lg sm:text-2xl font-semibold text-secondary-700 dark:text-secondary-300">
+                     <div className="text-xs sm:text-sm font-medium text-body-muted">Total Orders</div>
+                     <div className="text-lg sm:text-2xl font-semibold text-on-surface">
                        {statistics.totalOrders}
                      </div>
                    </div>
                  </div>
                </div>
-               
                <div className="card">
                  <div className="flex items-center">
-                   <div className="flex-shrink-0">
-                     <User className="h-6 w-6 sm:h-8 sm:w-8 text-secondary-500" />
+                   <div className="p-2 rounded-lg bg-[var(--color-primary-container)] flex-shrink-0">
+                     <User className="h-6 w-6 sm:h-8 sm:w-8 text-primary" />
                    </div>
                    <div className="ml-3 sm:ml-4">
-                     <div className="text-xs sm:text-sm font-medium text-gray-500 dark:text-gray-400">Unique Customers</div>
-                     <div className="text-lg sm:text-2xl font-semibold text-secondary-700 dark:text-secondary-300">
+                     <div className="text-xs sm:text-sm font-medium text-body-muted">Unique Customers</div>
+                     <div className="text-lg sm:text-2xl font-semibold text-on-surface">
                        {statistics.uniqueCustomers}
                      </div>
                    </div>
                  </div>
                </div>
-
                <div className="card">
                  <div className="flex items-center">
-                   <div className="flex-shrink-0">
-                     <Percent className="h-6 w-6 sm:h-8 sm:w-8 text-green-500" />
+                   <div className="p-2 rounded-lg bg-[var(--color-primary-container)] flex-shrink-0">
+                     <Percent className="h-6 w-6 sm:h-8 sm:w-8 text-success" />
                    </div>
                    <div className="ml-3 sm:ml-4">
-                     <div className="text-xs sm:text-sm font-medium text-gray-500 dark:text-gray-400">Total Tax Collected</div>
-                     <div className="text-lg sm:text-2xl font-semibold text-secondary-700 dark:text-secondary-300">
+                     <div className="text-xs sm:text-sm font-medium text-body-muted">Total Tax Collected</div>
+                     <div className="text-lg sm:text-2xl font-semibold text-on-surface">
                        {formatCurrency(statistics.totalTax)}
                      </div>
                    </div>
                  </div>
                </div>
-
                <div className="card">
                  <div className="flex items-center">
-                   <div className="flex-shrink-0">
-                     <Heart className="h-6 w-6 sm:h-8 sm:w-8 text-red-500" />
+                   <div className="p-2 rounded-lg bg-[var(--color-primary-container)] flex-shrink-0">
+                     <Heart className="h-6 w-6 sm:h-8 sm:w-8 text-error" />
                    </div>
                    <div className="ml-3 sm:ml-4">
-                     <div className="text-xs sm:text-sm font-medium text-gray-500 dark:text-gray-400">Total Tips</div>
-                     <div className="text-lg sm:text-2xl font-semibold text-secondary-700 dark:text-secondary-300">
+                     <div className="text-xs sm:text-sm font-medium text-body-muted">Total Tips</div>
+                     <div className="text-lg sm:text-2xl font-semibold text-on-surface">
                        {formatCurrency(statistics.totalTips)}
                      </div>
                    </div>
@@ -490,7 +484,7 @@ const InvoiceHistory = ({ cart, setCart, setCurrentPage }) => {
                 {/* Desktop Table */}
                 <div className="hidden lg:block overflow-x-auto">
                   <table className="min-w-full divide-y divide-accent-200">
-                    <thead className="bg-accent-50">
+                    <thead className="bg-accent-50 dark:bg-gray-700">
                       <tr>
                         <th className="px-6 py-3 text-left text-xs font-medium text-secondary-600 uppercase tracking-wider">
                           Invoice #
@@ -518,9 +512,9 @@ const InvoiceHistory = ({ cart, setCart, setCurrentPage }) => {
                         </th>
                       </tr>
                     </thead>
-                    <tbody className="bg-white divide-y divide-accent-200">
+                    <tbody className="bg-white dark:bg-gray-800 divide-y divide-accent-200 dark:divide-gray-700">
                       {displayedInvoices.map((invoice) => (
-                        <tr key={getInvoiceNumber(invoice)} className="hover:bg-accent-50">
+                        <tr key={getInvoiceNumber(invoice)} className="hover:bg-accent-50 dark:hover:bg-gray-700">
                           <td className="px-6 py-4 whitespace-nowrap">
                             <div className="text-sm font-medium text-secondary-700 dark:text-secondary-300">
                               #{getInvoiceNumber(invoice)}
@@ -628,7 +622,7 @@ const InvoiceHistory = ({ cart, setCart, setCurrentPage }) => {
                 {/* Mobile Cards */}
                 <div className="lg:hidden space-y-4">
                   {displayedInvoices.map((invoice) => (
-                    <div key={getInvoiceNumber(invoice)} className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-accent-200 dark:border-gray-700 p-4">
+                    <div key={getInvoiceNumber(invoice)} className="card card-sm">
                       <div className="flex justify-between items-start mb-3">
                         <div>
                           <div className="font-medium text-secondary-700 dark:text-secondary-300">
@@ -726,29 +720,16 @@ const InvoiceHistory = ({ cart, setCart, setCurrentPage }) => {
                  </>
        )}
 
-      {/* Invoice Details Modal */}
-      {showInvoiceDetails && selectedInvoice && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-end lg:items-center justify-center z-50 p-0 lg:p-4">
-          <div className="bg-white dark:bg-gray-800 rounded-t-lg lg:rounded-lg shadow-xl max-w-2xl lg:max-w-2xl w-full h-[90vh] lg:h-auto max-h-[90vh] flex flex-col">
-            <div className="p-4 sm:p-6 flex-1 overflow-y-auto">
-              <div className="flex justify-between items-start mb-4">
-                <div>
-                  <h3 className="text-lg font-semibold text-secondary-700 dark:text-secondary-300">
-                    Invoice #{getInvoiceNumber(selectedInvoice)}
-                  </h3>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">
-                    Order #{selectedInvoice.order_number}
-                  </p>
-                </div>
-                <button
-                  onClick={() => setShowInvoiceDetails(false)}
-                  className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 min-h-[44px] min-w-[44px] flex items-center justify-center"
-                  aria-label="Close"
-                >
-                  <X className="h-6 w-6" />
-                </button>
-              </div>
-
+      {/* Invoice Details Modal - Template Dialog */}
+      <Dialog
+        open={!!(showInvoiceDetails && selectedInvoice)}
+        onClose={() => setShowInvoiceDetails(false)}
+        title={selectedInvoice ? `Invoice #${getInvoiceNumber(selectedInvoice)}` : 'Invoice'}
+        size="2xl"
+      >
+        {showInvoiceDetails && selectedInvoice && (
+            <>
+              <p className="text-sm text-[#6F6A63] mb-4">Order #{selectedInvoice.order_number}</p>
               <div className="space-y-4">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
                   <div>
@@ -803,10 +784,9 @@ const InvoiceHistory = ({ cart, setCart, setCurrentPage }) => {
                   )}
                 </div>
               </div>
-            </div>
-          </div>
-        </div>
-      )}
+            </>
+        )}
+      </Dialog>
     </div>
   );
 };

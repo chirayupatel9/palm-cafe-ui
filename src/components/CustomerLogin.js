@@ -3,7 +3,7 @@ import { Phone, ArrowRight, UserPlus, User, Mail, MapPin } from 'lucide-react';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 
-const CustomerLogin = ({ onLogin, onRegister }) => {
+const CustomerLogin = ({ cafeSlug, onLogin, onRegister }) => {
   const [phone, setPhone] = useState('');
   const [loading, setLoading] = useState(false);
   const [showRegister, setShowRegister] = useState(false);
@@ -25,7 +25,9 @@ const CustomerLogin = ({ onLogin, onRegister }) => {
     setLoading(true);
 
     try {
-      const response = await axios.post('/customer/login', { phone });
+      const payload = { phone };
+      if (cafeSlug) payload.cafeSlug = cafeSlug;
+      const response = await axios.post('/customer/login', payload);
       
       if (response.data) {
         const customer = response.data;
@@ -59,7 +61,9 @@ const CustomerLogin = ({ onLogin, onRegister }) => {
     setLoading(true);
 
     try {
-      const customer = await axios.post('/customer/register', registerData);
+      const dataToSend = { ...registerData };
+      if (cafeSlug) dataToSend.cafeSlug = cafeSlug;
+      const customer = await axios.post('/customer/register', dataToSend);
       toast.success(`Welcome, ${customer.data.name}! You've been registered successfully.`);
       onLogin(customer.data);
     } catch (error) {
@@ -77,17 +81,17 @@ const CustomerLogin = ({ onLogin, onRegister }) => {
           // Login Form
           <>
             <div className="text-center mb-6">
-              <h1 className="text-text-light dark:text-[#F5F5DC] tracking-tight text-3xl font-bold leading-tight">
+              <h1 className="text-text-light dark:text-[#F7F4EF] tracking-tight text-3xl font-bold leading-tight">
                 Welcome Back!
               </h1>
-              <p className="text-text-light/70 dark:text-[#F5F5DC]/70 text-base font-normal leading-normal pt-2">
+              <p className="text-text-light/70 dark:text-[#F7F4EF]/70 text-base font-normal leading-normal pt-2">
                 Login to your account to continue
               </p>
             </div>
             <form onSubmit={handleLogin} className="flex flex-col gap-4">
               <div className="flex flex-col">
                 <label
-                  className="text-text-light dark:text-[#F5F5DC] text-base font-medium leading-normal pb-2"
+                  className="text-text-light dark:text-[#F7F4EF] text-base font-medium leading-normal pb-2"
                   htmlFor="phone"
                 >
                   Phone Number
@@ -97,7 +101,7 @@ const CustomerLogin = ({ onLogin, onRegister }) => {
                     <Phone className="h-5 w-5 text-[#9a794c] dark:text-[#8a6d4c]" />
                   </div>
                   <input
-                    className="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-text-light dark:text-[#F5F5DC] focus:outline-0 focus:ring-2 focus:ring-[#6F4E37]/50 border border-[#e7ddcf] dark:border-[#443d34] bg-transparent dark:bg-[#221a10] h-14 placeholder:text-[#9a794c] dark:placeholder:text-[#8a6d4c] pl-12 pr-4 text-base font-normal leading-normal"
+                    className="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-text-light dark:text-[#F7F4EF] focus:outline-0 focus:ring-2 focus:ring-[#6F4E37]/50 border border-[#e7ddcf] dark:border-[#443d34] bg-transparent dark:bg-[#221a10] h-14 placeholder:text-[#9a794c] dark:placeholder:text-[#8a6d4c] pl-12 pr-4 text-base font-normal leading-normal"
                     id="phone"
                     placeholder="Enter your phone number"
                     type="tel"
@@ -129,11 +133,11 @@ const CustomerLogin = ({ onLogin, onRegister }) => {
             </form>
             <div className="flex items-center my-8">
               <hr className="flex-grow border-t border-[#e7ddcf] dark:border-[#443d34]" />
-              <span className="px-4 text-sm text-text-light/60 dark:text-[#F5F5DC]/60">Or</span>
+              <span className="px-4 text-sm text-text-light/60 dark:text-[#F7F4EF]/60">Or</span>
               <hr className="flex-grow border-t border-[#e7ddcf] dark:border-[#443d34]" />
             </div>
             <div className="text-center">
-              <p className="text-text-light dark:text-[#F5F5DC] text-base font-normal leading-normal">
+              <p className="text-text-light dark:text-[#F7F4EF] text-base font-normal leading-normal">
                 Don't have an account?{' '}
                 <button
                   type="button"
@@ -149,17 +153,17 @@ const CustomerLogin = ({ onLogin, onRegister }) => {
           // Register Form
           <>
             <div className="text-center mb-6">
-              <h1 className="text-text-light dark:text-[#F5F5DC] tracking-tight text-3xl font-bold leading-tight">
+              <h1 className="text-text-light dark:text-[#F7F4EF] tracking-tight text-3xl font-bold leading-tight">
                 Create Account
               </h1>
-              <p className="text-text-light/70 dark:text-[#F5F5DC]/70 text-base font-normal leading-normal pt-2">
+              <p className="text-text-light/70 dark:text-[#F7F4EF]/70 text-base font-normal leading-normal pt-2">
                 Join us to start ordering
               </p>
             </div>
             <form onSubmit={handleRegister} className="flex flex-col gap-4">
               <div className="flex flex-col">
                 <label
-                  className="text-text-light dark:text-[#F5F5DC] text-base font-medium leading-normal pb-2"
+                  className="text-text-light dark:text-[#F7F4EF] text-base font-medium leading-normal pb-2"
                   htmlFor="name"
                 >
                   Full Name *
@@ -169,7 +173,7 @@ const CustomerLogin = ({ onLogin, onRegister }) => {
                     <User className="h-5 w-5 text-[#9a794c] dark:text-[#8a6d4c]" />
                   </div>
                   <input
-                    className="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-text-light dark:text-[#F5F5DC] focus:outline-0 focus:ring-2 focus:ring-[#6F4E37]/50 border border-[#e7ddcf] dark:border-[#443d34] bg-transparent dark:bg-[#221a10] h-14 placeholder:text-[#9a794c] dark:placeholder:text-[#8a6d4c] pl-12 pr-4 text-base font-normal leading-normal"
+                    className="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-text-light dark:text-[#F7F4EF] focus:outline-0 focus:ring-2 focus:ring-[#6F4E37]/50 border border-[#e7ddcf] dark:border-[#443d34] bg-transparent dark:bg-[#221a10] h-14 placeholder:text-[#9a794c] dark:placeholder:text-[#8a6d4c] pl-12 pr-4 text-base font-normal leading-normal"
                     id="name"
                     placeholder="Enter your full name"
                     type="text"
@@ -181,7 +185,7 @@ const CustomerLogin = ({ onLogin, onRegister }) => {
               </div>
               <div className="flex flex-col">
                 <label
-                  className="text-text-light dark:text-[#F5F5DC] text-base font-medium leading-normal pb-2"
+                  className="text-text-light dark:text-[#F7F4EF] text-base font-medium leading-normal pb-2"
                   htmlFor="registerPhone"
                 >
                   Phone Number *
@@ -191,7 +195,7 @@ const CustomerLogin = ({ onLogin, onRegister }) => {
                     <Phone className="h-5 w-5 text-[#9a794c] dark:text-[#8a6d4c]" />
                   </div>
                   <input
-                    className="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-text-light dark:text-[#F5F5DC] focus:outline-0 focus:ring-2 focus:ring-[#6F4E37]/50 border border-[#e7ddcf] dark:border-[#443d34] bg-transparent dark:bg-[#221a10] h-14 placeholder:text-[#9a794c] dark:placeholder:text-[#8a6d4c] pl-12 pr-4 text-base font-normal leading-normal"
+                    className="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-text-light dark:text-[#F7F4EF] focus:outline-0 focus:ring-2 focus:ring-[#6F4E37]/50 border border-[#e7ddcf] dark:border-[#443d34] bg-transparent dark:bg-[#221a10] h-14 placeholder:text-[#9a794c] dark:placeholder:text-[#8a6d4c] pl-12 pr-4 text-base font-normal leading-normal"
                     id="registerPhone"
                     placeholder="Enter your phone number"
                     type="tel"
@@ -203,7 +207,7 @@ const CustomerLogin = ({ onLogin, onRegister }) => {
               </div>
               <div className="flex flex-col">
                 <label
-                  className="text-text-light dark:text-[#F5F5DC] text-base font-medium leading-normal pb-2"
+                  className="text-text-light dark:text-[#F7F4EF] text-base font-medium leading-normal pb-2"
                   htmlFor="email"
                 >
                   Email Address
@@ -213,7 +217,7 @@ const CustomerLogin = ({ onLogin, onRegister }) => {
                     <Mail className="h-5 w-5 text-[#9a794c] dark:text-[#8a6d4c]" />
                   </div>
                   <input
-                    className="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-text-light dark:text-[#F5F5DC] focus:outline-0 focus:ring-2 focus:ring-[#6F4E37]/50 border border-[#e7ddcf] dark:border-[#443d34] bg-transparent dark:bg-[#221a10] h-14 placeholder:text-[#9a794c] dark:placeholder:text-[#8a6d4c] pl-12 pr-4 text-base font-normal leading-normal"
+                    className="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-text-light dark:text-[#F7F4EF] focus:outline-0 focus:ring-2 focus:ring-[#6F4E37]/50 border border-[#e7ddcf] dark:border-[#443d34] bg-transparent dark:bg-[#221a10] h-14 placeholder:text-[#9a794c] dark:placeholder:text-[#8a6d4c] pl-12 pr-4 text-base font-normal leading-normal"
                     id="email"
                     placeholder="Enter your email address"
                     type="email"
@@ -224,7 +228,7 @@ const CustomerLogin = ({ onLogin, onRegister }) => {
               </div>
               <div className="flex flex-col">
                 <label
-                  className="text-text-light dark:text-[#F5F5DC] text-base font-medium leading-normal pb-2"
+                  className="text-text-light dark:text-[#F7F4EF] text-base font-medium leading-normal pb-2"
                   htmlFor="address"
                 >
                   Address
@@ -234,7 +238,7 @@ const CustomerLogin = ({ onLogin, onRegister }) => {
                     <MapPin className="h-5 w-5 text-[#9a794c] dark:text-[#8a6d4c]" />
                   </div>
                   <textarea
-                    className="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-text-light dark:text-[#F5F5DC] focus:outline-0 focus:ring-2 focus:ring-[#6F4E37]/50 border border-[#e7ddcf] dark:border-[#443d34] bg-transparent dark:bg-[#221a10] placeholder:text-[#9a794c] dark:placeholder:text-[#8a6d4c] pl-12 pr-4 py-4 text-base font-normal leading-normal"
+                    className="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-text-light dark:text-[#F7F4EF] focus:outline-0 focus:ring-2 focus:ring-[#6F4E37]/50 border border-[#e7ddcf] dark:border-[#443d34] bg-transparent dark:bg-[#221a10] placeholder:text-[#9a794c] dark:placeholder:text-[#8a6d4c] pl-12 pr-4 py-4 text-base font-normal leading-normal"
                     id="address"
                     placeholder="Enter your address"
                     rows="3"
@@ -265,11 +269,11 @@ const CustomerLogin = ({ onLogin, onRegister }) => {
             </form>
             <div className="flex items-center my-8">
               <hr className="flex-grow border-t border-[#e7ddcf] dark:border-[#443d34]" />
-              <span className="px-4 text-sm text-text-light/60 dark:text-[#F5F5DC]/60">Or</span>
+              <span className="px-4 text-sm text-text-light/60 dark:text-[#F7F4EF]/60">Or</span>
               <hr className="flex-grow border-t border-[#e7ddcf] dark:border-[#443d34]" />
             </div>
             <div className="text-center">
-              <p className="text-text-light dark:text-[#F5F5DC] text-base font-normal leading-normal">
+              <p className="text-text-light dark:text-[#F7F4EF] text-base font-normal leading-normal">
                 Already have an account?{' '}
                 <button
                   type="button"

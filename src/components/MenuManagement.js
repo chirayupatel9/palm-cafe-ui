@@ -9,6 +9,8 @@ import { getImageUrl, getPlaceholderImage } from '../utils/imageUtils';
 import { TableSkeleton, CardSkeleton } from './ui/Skeleton';
 import { EmptyMenu } from './ui/EmptyState';
 import ConfirmModal from './ui/ConfirmModal';
+import Dialog from './ui/Dialog';
+import Select from './ui/Select';
 
 const MenuManagement = ({ menuItems, onUpdate, onAdd, onDelete }) => {
   const { formatCurrency } = useCurrency();
@@ -222,16 +224,26 @@ const MenuManagement = ({ menuItems, onUpdate, onAdd, onDelete }) => {
     event.target.value = ''; // Reset file input
   };
 
-  const handleImageUpload = async () => {
-    if (!selectedImageFile) {
+  const handleImageUpload = async (fileFromEvent) => {
+    const fileToUpload = fileFromEvent || selectedImageFile;
+    if (!fileToUpload) {
       toast.error('Please select an image file first');
+      return;
+    }
+    if (!fileToUpload.type.startsWith('image/')) {
+      toast.error('Please select an image file');
+      return;
+    }
+    const maxSize = 5 * 1024 * 1024; // 5MB
+    if (fileToUpload.size > maxSize) {
+      toast.error('Image size must be less than 5MB');
       return;
     }
 
     try {
       setImageUploading(true);
       const formData = new FormData();
-      formData.append('image', selectedImageFile);
+      formData.append('image', fileToUpload);
 
       // If editing an existing item, use item-specific endpoint
       if (editingId) {
@@ -247,7 +259,6 @@ const MenuManagement = ({ menuItems, onUpdate, onAdd, onDelete }) => {
           setSelectedImageFile(null);
           // Refresh menu items to show updated image
           if (onUpdate) {
-            // Trigger a refresh by calling onUpdate with current formData
             await onUpdate(editingId, { ...formData, image_url: response.data.image_url });
           }
         } else {
@@ -663,18 +674,16 @@ const MenuManagement = ({ menuItems, onUpdate, onAdd, onDelete }) => {
           <div className="card">
             <div className="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-4">
               <label className={`text-sm font-medium ${isDarkMode ? 'text-secondary-300' : 'text-secondary-700'}`}>Filter by Category:</label>
-              <select
-                value={selectedCategory}
-                onChange={(e) => setSelectedCategory(e.target.value)}
-                className="input-field sm:max-w-xs"
-              >
-                <option value="all">All Categories</option>
-                {categories.map(category => (
-                  <option key={category.id} value={category.id}>
-                    {category.name}
-                  </option>
-                ))}
-              </select>
+              <Select
+                options={[
+                  { value: 'all', label: 'All Categories' },
+                  ...categories.map(c => ({ value: String(c.id), label: c.name }))
+                ]}
+                value={String(selectedCategory)}
+                onChange={setSelectedCategory}
+                className="sm:max-w-xs"
+                placeholder="All Categories"
+              />
             </div>
           </div>
 
@@ -683,19 +692,15 @@ const MenuManagement = ({ menuItems, onUpdate, onAdd, onDelete }) => {
             <div className="card">
               <h3 className={`text-lg font-semibold mb-4 ${isDarkMode ? 'text-secondary-300' : 'text-secondary-700'}`}>Add New Menu Item</h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4">
-                <select
-                  value={formData.category_id}
-                  onChange={(e) => handleInputChange('category_id', e.target.value)}
-                  className="input-field"
-                  required
-                >
-                  <option value="">Select Category *</option>
-                  {categories.map(category => (
-                    <option key={category.id} value={category.id}>
-                      {category.name}
-                    </option>
-                  ))}
-                </select>
+                <Select
+                  options={[
+                    { value: '', label: 'Select Category *' },
+                    ...categories.map(c => ({ value: String(c.id), label: c.name }))
+                  ]}
+                  value={formData.category_id === '' || formData.category_id == null ? '' : String(formData.category_id)}
+                  onChange={(v) => handleInputChange('category_id', v)}
+                  placeholder="Select Category *"
+                />
                 <input
                   type="text"
                   placeholder="Item Name *"
@@ -852,194 +857,105 @@ const MenuManagement = ({ menuItems, onUpdate, onAdd, onDelete }) => {
           ) : (
             Object.entries(groupedMenuItems).map(([categoryName, items], index) => {
               return (
-                <div key={categoryName} className="card">
-                  <h3 className={`text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4 flex items-center`}>
-                    <FolderOpen className={`h-5 w-5 mr-2 text-gray-600 dark:text-gray-400`} />
-                    {categoryName} ({items.length} items)
-                  </h3>
-                
+                <div key={categoryName} className="card overflow-hidden">
+                  <div className="card-header !mb-4">
+                    <h3 className="card-title flex items-center">
+                      <FolderOpen className="h-5 w-5 mr-2.5 opacity-80" />
+                      {categoryName}
+                      <span className="card-description ml-2 !mt-0">
+                        {items.length} item{items.length !== 1 ? 's' : ''}
+                      </span>
+                    </h3>
+                  </div>
+
                 {/* Desktop Table */}
-                <div className="hidden lg:block overflow-x-auto">
-                  <table className={`min-w-full divide-y ${isDarkMode ? 'divide-gray-700' : 'divide-accent-200'}`}>
-                    <thead style={{ backgroundColor: 'var(--surface-table)' }}>
-                      <tr>
-                        <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${isDarkMode ? 'text-gray-300' : 'text-secondary-600'}`}>
-                          Image
-                        </th>
-                        <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${isDarkMode ? 'text-gray-300' : 'text-secondary-600'}`}>
-                          Category
-                        </th>
-                        <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${isDarkMode ? 'text-gray-300' : 'text-secondary-600'}`}>
-                          Item
-                        </th>
-                        <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${isDarkMode ? 'text-gray-300' : 'text-secondary-600'}`}>
-                          Description
-                        </th>
-                        <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${isDarkMode ? 'text-gray-300' : 'text-secondary-600'}`}>
-                          Price
-                        </th>
-                        <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${isDarkMode ? 'text-gray-300' : 'text-secondary-600'}`}>
-                          Sort Order
-                        </th>
-                        <th className={`px-6 py-3 text-right text-xs font-medium uppercase tracking-wider ${isDarkMode ? 'text-gray-300' : 'text-secondary-600'}`}>
-                          Actions
-                        </th>
+                <div className="hidden lg:block overflow-x-auto scrollbar-hide">
+                  <table className={`w-full table-fixed ${isDarkMode ? 'divide-gray-700' : 'divide-gray-100'}`} style={{ tableLayout: 'fixed' }}>
+                    <colgroup>
+                      <col style={{ width: '72px' }} />
+                      <col style={{ width: '110px' }} />
+                      <col style={{ width: '160px' }} />
+                      <col />
+                      <col style={{ width: '100px' }} />
+                      <col style={{ width: '88px' }} />
+                      <col style={{ width: '88px' }} />
+                      <col style={{ width: '96px' }} />
+                    </colgroup>
+                    <thead>
+                      <tr className={`text-left text-xs font-medium uppercase tracking-wider ${isDarkMode ? 'text-gray-400 bg-gray-800/60' : 'text-gray-500 bg-gray-50/90'}`}>
+                        <th className="px-4 py-3.5">Image</th>
+                        <th className="px-4 py-3.5">Category</th>
+                        <th className="px-4 py-3.5">Item</th>
+                        <th className="px-4 py-3.5 min-w-0">Description</th>
+                        <th className="px-4 py-3.5">Price</th>
+                        <th className="px-4 py-3.5">Sort</th>
+                        <th className="px-4 py-3.5">Priority</th>
+                        <th className="px-4 py-3.5 text-right">Actions</th>
                       </tr>
                     </thead>
-                    <tbody className={`${isDarkMode ? 'bg-gray-800 divide-gray-700' : 'bg-white divide-accent-200'}`}>
+                    <tbody className={`divide-y ${isDarkMode ? 'divide-gray-700/80' : 'divide-gray-100'}`}>
                       {items.map((item) => (
-                        <tr key={item.id} className={`h-14 ${isDarkMode ? 'hover:bg-gray-700' : 'hover:bg-accent-50'} transition-colors`}>
-                          {editingId === item.id ? (
-                            // Edit Mode
-                            <>
-                              <td className="px-6 py-4 whitespace-nowrap">
-                                <div className="flex items-center space-x-2">
-                                  {formData.image_url && (
-                                    <img
-                                      src={getImageUrl(formData.image_url)}
-                                      alt="Menu Item"
-                                      className="w-12 h-12 object-cover rounded-lg border"
-                                    />
-                                  )}
-                                  <input
-                                    type="file"
-                                    accept="image/jpeg,image/png,image/webp"
-                                    onChange={handleImageUpload}
-                                    className="text-xs"
-                                    disabled={imageUploading}
-                                  />
-                                </div>
-                                {imageUploading && (
-                                  <div className="mt-1">
-                                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-secondary-500"></div>
-                                  </div>
-                                )}
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap">
-                                <select
-                                  value={formData.category_id}
-                                  onChange={(e) => handleInputChange('category_id', e.target.value)}
-                                  className="input-field"
-                                >
-                                  {categories.map(category => (
-                                    <option key={category.id} value={category.id}>
-                                      {category.name}
-                                    </option>
-                                  ))}
-                                </select>
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap">
-                                <input
-                                  type="text"
-                                  value={formData.name}
-                                  onChange={(e) => handleInputChange('name', e.target.value)}
-                                  className="input-field"
-                                />
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap">
-                                <input
-                                  type="text"
-                                  value={formData.description}
-                                  onChange={(e) => handleInputChange('description', e.target.value)}
-                                  className="input-field"
-                                />
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap">
-                                <input
-                                  type="number"
-                                  step="0.01"
-                                  min="0"
-                                  value={formData.price}
-                                  onChange={(e) => handleInputChange('price', e.target.value)}
-                                  className="input-field"
-                                />
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap">
-                                <input
-                                  type="number"
-                                  min="0"
-                                  value={formData.sort_order}
-                                  onChange={(e) => handleInputChange('sort_order', e.target.value)}
-                                  className="input-field"
-                                />
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap">
-                                <input
-                                  type="number"
-                                  min="0"
-                                  placeholder="Priority"
-                                  value={formData.featured_priority}
-                                  onChange={(e) => handleInputChange('featured_priority', e.target.value)}
-                                  className="input-field"
-                                  title="Set priority to feature this item (higher = more prominent)"
-                                />
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                <div className="flex justify-end space-x-2">
-                                  <button onClick={handleSave} className="text-green-600 hover:text-green-900">
-                                    <Save className="h-4 w-4" />
-                                  </button>
-                                  <button onClick={handleCancel} className={`${isDarkMode ? 'text-gray-400 hover:text-gray-200' : 'text-gray-600 hover:text-gray-900'}`}>
-                                    <X className="h-4 w-4" />
-                                  </button>
-                                </div>
-                              </td>
-                            </>
-                          ) : (
-                            // View Mode
-                            <>
-                              <td className="px-6 py-4 whitespace-nowrap">
-                                <img
-                                  src={item.image_url ? getImageUrl(item.image_url) : getPlaceholderImage(item.category_name, item.name)}
-                                  alt={item.name}
-                                  className="w-12 h-12 object-cover rounded-lg border"
-                                />
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap">
-                                <div className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                                  {categories.find(cat => cat.id === item.category_id)?.name || 'Unknown'}
-                                </div>
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap">
-                                <div className={`text-sm font-medium ${isDarkMode ? 'text-secondary-300' : 'text-secondary-700'}`}>{item.name}</div>
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap">
-                                <div className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>{item.description}</div>
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap">
-                                <div className={`text-sm font-semibold ${isDarkMode ? 'text-secondary-400' : 'text-secondary-600'}`}>
-                                  {formatCurrency(ensureNumber(item.price))}
-                                </div>
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap">
-                                <div className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>{item.sort_order || 0}</div>
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap">
-                                <div className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                                  {item.featured_priority !== null && item.featured_priority !== undefined 
-                                    ? item.featured_priority 
-                                    : '-'}
-                                </div>
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                <div className="flex justify-end space-x-2">
-                                  <button
-                                    onClick={() => handleEdit(item)}
-                                    className={`${isDarkMode ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-900'}`}
-                                  >
-                                    <Edit className="h-4 w-4" />
-                                  </button>
-                                  <button
-                                    onClick={() => setDeleteConfirm({ id: item.id, name: item.name })}
-                                    className={`${isDarkMode ? 'text-red-400 hover:text-red-300' : 'text-red-600 hover:text-red-900'}`}
-                                    disabled={isDeleting}
-                                  >
-                                    <Trash2 className="h-4 w-4" />
-                                  </button>
-                                </div>
-                              </td>
-                            </>
-                          )}
+                        <tr
+                          key={item.id}
+                          className={`transition-colors ${editingId === item.id
+                            ? isDarkMode
+                              ? 'bg-gray-700/50'
+                              : 'bg-gray-50'
+                            : isDarkMode
+                              ? 'hover:bg-gray-700/40'
+                              : 'hover:bg-gray-50'
+                          }`}
+                        >
+                          <td className="px-4 py-3 align-middle">
+                            <img
+                              src={item.image_url ? getImageUrl(item.image_url) : getPlaceholderImage(item.category_name, item.name)}
+                              alt={item.name}
+                              className="w-12 h-12 object-cover rounded-lg border border-gray-200 dark:border-gray-600"
+                            />
+                          </td>
+                          <td className="px-4 py-3 align-middle">
+                            <div className={`text-sm truncate ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                              {categories.find(cat => cat.id === item.category_id)?.name || 'Unknown'}
+                            </div>
+                          </td>
+                          <td className="px-4 py-3 align-middle">
+                            <div className={`text-sm font-medium truncate ${isDarkMode ? 'text-gray-200' : 'text-gray-900'}`}>{item.name}</div>
+                          </td>
+                          <td className="px-4 py-3 align-middle min-w-0">
+                            <div className={`text-sm truncate ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`} title={item.description}>{item.description}</div>
+                          </td>
+                          <td className="px-4 py-3 align-middle">
+                            <div className={`text-sm font-semibold tabular-nums ${isDarkMode ? 'text-gray-300' : 'text-gray-800'}`}>
+                              {formatCurrency(ensureNumber(item.price))}
+                            </div>
+                          </td>
+                          <td className="px-4 py-3 align-middle">
+                            <div className={`text-sm tabular-nums ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>{item.sort_order ?? 0}</div>
+                          </td>
+                          <td className="px-4 py-3 align-middle">
+                            <div className={`text-sm tabular-nums ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                              {item.featured_priority !== null && item.featured_priority !== undefined ? item.featured_priority : '–'}
+                            </div>
+                          </td>
+                          <td className="px-4 py-3 align-middle text-right">
+                            <div className="flex justify-end space-x-2">
+                              <button
+                                onClick={() => handleEdit(item)}
+                                className={`${isDarkMode ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-900'}`}
+                                aria-label="Edit"
+                              >
+                                <Edit className="h-4 w-4" />
+                              </button>
+                              <button
+                                onClick={() => setDeleteConfirm({ id: item.id, name: item.name })}
+                                className={`${isDarkMode ? 'text-red-400 hover:text-red-300' : 'text-red-600 hover:text-red-900'}`}
+                                disabled={isDeleting}
+                                aria-label="Delete"
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </button>
+                            </div>
+                          </td>
                         </tr>
                       ))}
                     </tbody>
@@ -1047,112 +963,13 @@ const MenuManagement = ({ menuItems, onUpdate, onAdd, onDelete }) => {
                 </div>
 
                 {/* Mobile Cards */}
-                <div className="lg:hidden space-y-3">
+                <div className="lg:hidden p-4 space-y-3">
                   {items.map((item) => (
-                    <div 
-                      key={item.id} 
-                      className="border rounded-lg p-4 transition-surface hover-lift"
-                      style={{ 
-                        borderColor: 'var(--color-outline)',
-                        backgroundColor: 'var(--surface-card)',
-                        boxShadow: 'var(--elevation-1)'
-                      }}
+                    <div
+                      key={item.id}
+                      className={`card card-sm ${editingId === item.id ? (isDarkMode ? '!bg-gray-700/50' : '!bg-gray-50') : ''}`}
                     >
-                      {editingId === item.id ? (
-                        // Edit Mode Mobile
-                        <div className="space-y-3">
-                          <div className="flex items-center space-x-2">
-                            {formData.image_url && (
-                              <img
-                                src={getImageUrl(formData.image_url)}
-                                alt="Menu Item"
-                                className="w-12 h-12 object-cover rounded-lg border"
-                              />
-                            )}
-                            <input
-                              type="file"
-                              accept="image/jpeg,image/png,image/webp"
-                              onChange={handleImageUpload}
-                              className="text-xs"
-                              disabled={imageUploading}
-                            />
-                          </div>
-                          {imageUploading && (
-                            <div className="mt-1">
-                              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-secondary-500"></div>
-                            </div>
-                          )}
-                          <select
-                            value={formData.category_id}
-                            onChange={(e) => handleInputChange('category_id', e.target.value)}
-                            className="input-field"
-                          >
-                            {categories.map(category => (
-                              <option key={category.id} value={category.id}>
-                                {category.name}
-                              </option>
-                            ))}
-                          </select>
-                          <input
-                            type="text"
-                            placeholder="Item Name"
-                            value={formData.name}
-                            onChange={(e) => handleInputChange('name', e.target.value)}
-                            className="input-field"
-                          />
-                          <input
-                            type="text"
-                            placeholder="Description"
-                            value={formData.description}
-                            onChange={(e) => handleInputChange('description', e.target.value)}
-                            className="input-field"
-                          />
-                          <div className="grid grid-cols-2 gap-3">
-                            <input
-                              type="number"
-                              step="0.01"
-                              min="0"
-                              placeholder="Price"
-                              value={formData.price}
-                              onChange={(e) => handleInputChange('price', e.target.value)}
-                              className="input-field"
-                            />
-                            <input
-                              type="number"
-                              min="0"
-                              placeholder="Sort Order"
-                              value={formData.sort_order}
-                              onChange={(e) => handleInputChange('sort_order', e.target.value)}
-                              className="input-field"
-                            />
-                          </div>
-                          <div className="flex space-x-2">
-                            <button 
-                              onClick={handleSave} 
-                              className="flex-1 btn-primary flex items-center justify-center"
-                              disabled={isSaving}
-                            >
-                              {isSaving ? (
-                                <>
-                                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                                  Saving...
-                                </>
-                              ) : (
-                                <>
-                                  <Save className="h-4 w-4 mr-2" />
-                                  Save
-                                </>
-                              )}
-                            </button>
-                            <button onClick={handleCancel} className="flex-1 btn-secondary flex items-center justify-center">
-                              <X className="h-4 w-4 mr-2" />
-                              Cancel
-                            </button>
-                          </div>
-                        </div>
-                      ) : (
-                        // View Mode Mobile
-                        <div>
+                      <div>
                           <div className="flex items-start space-x-3 mb-3">
                             <img
                               src={item.image_url ? getImageUrl(item.image_url) : getPlaceholderImage(item.category_name, item.name)}
@@ -1188,7 +1005,6 @@ const MenuManagement = ({ menuItems, onUpdate, onAdd, onDelete }) => {
                             </div>
                           </div>
                         </div>
-                      )}
                     </div>
                   ))}
                 </div>
@@ -1310,7 +1126,7 @@ const MenuManagement = ({ menuItems, onUpdate, onAdd, onDelete }) => {
             ) : (
               <>
                 {/* Desktop Table */}
-                <div className="hidden lg:block overflow-x-auto">
+                <div className="hidden lg:block overflow-x-auto scrollbar-hide">
                   <table className={`min-w-full divide-y ${isDarkMode ? 'divide-gray-700' : 'divide-accent-200'}`}>
                     <thead style={{ backgroundColor: 'var(--surface-table)' }}>
                       <tr>
@@ -1429,15 +1245,7 @@ const MenuManagement = ({ menuItems, onUpdate, onAdd, onDelete }) => {
                 {/* Mobile Cards */}
                 <div className="lg:hidden space-y-3">
                   {categories.map((category) => (
-                    <div 
-                      key={category.id} 
-                      className="border rounded-lg p-4 transition-elevation hover-lift"
-                      style={{ 
-                        borderColor: 'var(--color-outline)',
-                        backgroundColor: 'var(--surface-card)',
-                        boxShadow: 'var(--elevation-1)'
-                      }}
-                    >
+                    <div key={category.id} className="card card-sm">
                       {categoryEditingId === category.id ? (
                         // Edit Mode Mobile
                         <div className="space-y-3">
@@ -1520,6 +1328,159 @@ const MenuManagement = ({ menuItems, onUpdate, onAdd, onDelete }) => {
           </div>
         </div>
       )}
+
+      {/* Edit Menu Item Modal */}
+      <Dialog
+        open={!!editingId}
+        onClose={handleCancel}
+        title={editingId ? `Edit: ${formData.name || 'Menu Item'}` : 'Edit Menu Item'}
+        size="2xl"
+      >
+        {editingId && (
+          <div className="space-y-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className={`block text-sm font-medium mb-1 ${isDarkMode ? 'text-gray-300' : 'text-secondary-700'}`}>Category *</label>
+                <Select
+                  options={categories.map(c => ({ value: String(c.id), label: c.name }))}
+                  value={formData.category_id === '' || formData.category_id == null ? '' : String(formData.category_id)}
+                  onChange={(v) => handleInputChange('category_id', v)}
+                  placeholder="Category"
+                  className="w-full text-base py-2.5"
+                />
+              </div>
+              <div>
+                <label className={`block text-sm font-medium mb-1 ${isDarkMode ? 'text-gray-300' : 'text-secondary-700'}`}>Item Name *</label>
+                <input
+                  type="text"
+                  value={formData.name}
+                  onChange={(e) => handleInputChange('name', e.target.value)}
+                  className="input-field w-full text-base py-2.5"
+                  placeholder="Item name"
+                />
+              </div>
+            </div>
+            <div>
+              <label className={`block text-sm font-medium mb-1 ${isDarkMode ? 'text-gray-300' : 'text-secondary-700'}`}>Description</label>
+              <input
+                type="text"
+                value={formData.description}
+                onChange={(e) => handleInputChange('description', e.target.value)}
+                className="input-field w-full text-base py-2.5"
+                placeholder="Description"
+              />
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div>
+                <label className={`block text-sm font-medium mb-1 ${isDarkMode ? 'text-gray-300' : 'text-secondary-700'}`}>Price *</label>
+                <input
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  value={formData.price}
+                  onChange={(e) => handleInputChange('price', e.target.value)}
+                  className="input-field w-full text-base py-2.5"
+                />
+              </div>
+              <div>
+                <label className={`block text-sm font-medium mb-1 ${isDarkMode ? 'text-gray-300' : 'text-secondary-700'}`}>Sort Order</label>
+                <input
+                  type="number"
+                  min="0"
+                  value={formData.sort_order}
+                  onChange={(e) => handleInputChange('sort_order', e.target.value)}
+                  className="input-field w-full text-base py-2.5"
+                />
+              </div>
+              <div>
+                <label className={`block text-sm font-medium mb-1 ${isDarkMode ? 'text-gray-300' : 'text-secondary-700'}`}>Featured Priority</label>
+                <input
+                  type="number"
+                  min="0"
+                  placeholder="Optional"
+                  value={formData.featured_priority}
+                  onChange={(e) => handleInputChange('featured_priority', e.target.value)}
+                  className="input-field w-full text-base py-2.5"
+                  title="Higher = more prominent on featured section"
+                />
+              </div>
+            </div>
+            <div>
+              <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-300' : 'text-secondary-700'}`}>Item Image</label>
+              <p className={`text-xs mb-2 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>Upload an image for this menu item (max 5MB)</p>
+              <div className="flex items-start space-x-4 flex-wrap gap-2">
+                {(formData.image_url || selectedImageFile) && (
+                  <div className="relative">
+                    <img
+                      src={selectedImageFile ? URL.createObjectURL(selectedImageFile) : getImageUrl(formData.image_url)}
+                      alt="Preview"
+                      className="w-24 h-24 object-cover border rounded-lg"
+                    />
+                    {selectedImageFile && (
+                      <div className="absolute -top-2 -right-2 bg-blue-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs">New</div>
+                    )}
+                  </div>
+                )}
+                <div className="flex items-center gap-2 flex-wrap">
+                  <label className="btn-secondary flex items-center justify-center cursor-pointer text-sm">
+                    <Upload className="h-4 w-4 mr-2" />
+                    {formData.image_url || selectedImageFile ? 'Replace' : 'Select'} Image
+                    <input
+                      type="file"
+                      accept="image/jpeg,image/png,image/webp"
+                      onChange={handleImageFileChange}
+                      className="hidden"
+                      disabled={imageUploading || removingImage}
+                    />
+                  </label>
+                  {selectedImageFile && (
+                    <button
+                      type="button"
+                      onClick={handleImageUpload}
+                      disabled={imageUploading}
+                      className="btn-primary flex items-center justify-center text-sm"
+                    >
+                      {imageUploading ? (
+                        <><div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent mr-2" /> Uploading...</>
+                      ) : (
+                        <><Upload className="h-4 w-4 mr-2" /> Upload</>
+                      )}
+                    </button>
+                  )}
+                  {(formData.image_url || selectedImageFile) && (
+                    <button
+                      type="button"
+                      onClick={handleRemoveImage}
+                      disabled={removingImage || imageUploading}
+                      className="btn-secondary text-red-600 hover:text-red-700 text-sm"
+                    >
+                      {removingImage ? 'Removing...' : 'Remove'}
+                    </button>
+                  )}
+                </div>
+              </div>
+            </div>
+            <div className="flex justify-end gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
+              <button type="button" onClick={handleCancel} className="btn-secondary flex items-center justify-center">
+                <X className="h-4 w-4 mr-2" />
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleSave}
+                className="btn-primary flex items-center justify-center"
+                disabled={isSaving}
+              >
+                {isSaving ? (
+                  <><div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" /> Saving...</>
+                ) : (
+                  <><Save className="h-4 w-4 mr-2" /> Save</>
+                )}
+              </button>
+            </div>
+          </div>
+        )}
+      </Dialog>
 
       {/* Delete Confirmation Modal */}
       <ConfirmModal

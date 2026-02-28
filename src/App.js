@@ -46,16 +46,23 @@ const API_BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
 const API_PATH = '/api'; // change to '/api/v1' when backend versioning is deployed
 axios.defaults.baseURL = `${API_BASE_URL}${API_PATH}`;
 
-// Component to update document title based on user's cafe
+// Redirect /customer to the logged-in user's cafe slug so customer menu matches admin menu
+const CustomerRedirect = () => {
+  const { user } = useAuth();
+  const slug = (user && user.cafe_slug) ? user.cafe_slug : 'default';
+  return <Navigate to={`/cafe/${slug}`} replace />;
+};
+
+// Component to update document title based on user's cafe (uses user.cafe_name so it works outside CafeSettingsProvider)
 const TitleUpdater = () => {
   const { user } = useAuth();
-  
+
   React.useEffect(() => {
     if (user) {
-      if (user.cafe_name) {
-        document.title = user.cafe_name;
-      } else if (user.role === 'superadmin') {
+      if (user.role === 'superadmin') {
         document.title = 'Super Admin Dashboard';
+      } else if (user.cafe_name) {
+        document.title = user.cafe_name;
       } else {
         document.title = 'Cafe Management System';
       }
@@ -63,7 +70,7 @@ const TitleUpdater = () => {
       document.title = 'Cafe Management System';
     }
   }, [user]);
-  
+
   return null;
 };
 
@@ -89,10 +96,10 @@ function MainApp() {
     return hasModuleAccess ? hasModuleAccess(featureKey) : false;
   };
 
-  // Memoize fetchMenuItems to prevent unnecessary re-renders
+  // Memoize fetchMenuItems to prevent unnecessary re-renders (use admin endpoint so cafe context matches auth/impersonation)
   const fetchMenuItems = useCallback(async () => {
     try {
-      const response = await axios.get('/menu');
+      const response = await axios.get('/admin/menu');
       setMenuItems(response.data || []);
     } catch (error) {
       console.error('Error fetching menu items:', error);
@@ -107,9 +114,7 @@ function MainApp() {
             duration: 5000
           });
         } else if (errorCode === 'FEATURE_ACCESS_DENIED') {
-          toast.error(`Menu management is not available on your current plan (${error.response?.data?.current_plan || 'FREE'}).`, {
-            duration: 5000
-          });
+          toast.error('Locked feature. Upgrade your plan to access.', { duration: 4000 });
         } else {
           toast.error('Access denied. Please check your subscription status.', {
             duration: 5000
@@ -220,20 +225,19 @@ function MainApp() {
     }
   };
 
-  // Reorganized navigation structure: Dashboard, Orders, Menu, Users, Settings
-  // PRO features: Analytics, Inventory, Advanced Reports, User Management
+  // Same 9 tabs for every cafe so the nav bar layout is consistent (same API, same UI structure).
+  // Access is enforced on each page: PRO tabs show upgrade/locked when the plan does not include them.
   const navigationItems = [
-    { id: 'order', label: 'Dashboard', icon: BarChart3, module: 'orders', primary: true, show: checkFeatureAccess('orders') },
-    { id: 'kitchen', label: 'Orders', icon: Receipt, module: 'orders', show: cafeSettings?.show_kitchen_tab !== false && checkFeatureAccess('orders') },
-    { id: 'menu', label: 'Menu', icon: Utensils, module: 'menu_management', show: cafeSettings?.admin_can_manage_menu !== false && checkFeatureAccess('menu_management') },
-    { id: 'customers', label: 'Customers', icon: Users, module: 'customers', show: cafeSettings?.show_customers_tab !== false && checkFeatureAccess('customers') },
-    // PRO Features
-    { id: 'analytics', label: 'Analytics', icon: TrendingUp, module: 'analytics', show: checkFeatureAccess('analytics') },
-    { id: 'inventory', label: 'Inventory', icon: Package, module: 'inventory', show: checkFeatureAccess('inventory') },
-    { id: 'users', label: 'User Management', icon: User, module: 'users', show: checkFeatureAccess('users') },
-    { id: 'advanced-reports', label: 'Reports', icon: FileText, module: 'advanced_reports', show: checkFeatureAccess('advanced_reports') },
-    { id: 'cafe-settings', label: 'Settings', icon: Settings, module: 'settings', show: (user?.role === 'admin' || cafeSettings?.admin_can_access_settings !== false) && checkFeatureAccess('settings') },
-  ].filter(item => item.show !== false); // Filter out items that should be hidden
+    { id: 'order', label: 'Dashboard', icon: BarChart3, module: 'orders', primary: true },
+    { id: 'kitchen', label: 'Orders', icon: Receipt, module: 'orders' },
+    { id: 'menu', label: 'Menu', icon: Utensils, module: 'menu_management' },
+    { id: 'customers', label: 'Customers', icon: Users, module: 'customers' },
+    { id: 'analytics', label: 'Analytics', icon: TrendingUp, module: 'analytics' },
+    { id: 'inventory', label: 'Inventory', icon: Package, module: 'inventory' },
+    { id: 'users', label: 'User Management', icon: User, module: 'users' },
+    { id: 'advanced-reports', label: 'Reports', icon: FileText, module: 'advanced_reports' },
+    { id: 'cafe-settings', label: 'Settings', icon: Settings, module: 'settings' }
+  ];
 
   if (loading || cafeSettingsLoading || subscriptionLoading || featuresLoading) {
     return (
@@ -375,14 +379,14 @@ function MainApp() {
     {/* Desktop Navigation - Distinct elevated surface */}
     <nav className="hidden lg:block surface-nav p-2">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex space-x-8">
+        <div className="flex flex-wrap gap-2">
           {navigationItems.map((item) => {
             const Icon = item.icon;
             return (
               <button
                 key={item.id}
                 onClick={() => handlePageChange(item.id)}
-                className={`flex items-center px-5 py-1 text-sm font-medium ${
+                className={`flex items-center px-4 py-2 text-sm font-medium ${
                   currentPage === item.id
                     ? 'nav-active'
                     : 'nav-inactive'
@@ -398,7 +402,7 @@ function MainApp() {
       </div>
     </nav>
 
-    {/* Main Content - Container surface with distinct background */}
+    {/* Main Content - Plain background */}
     <main className="surface-container max-w-7xl mx-auto my-8 sm:my-12 px-4 sm:px-6 lg:px-8">
       {renderPage()}
     </main>
@@ -418,7 +422,7 @@ function App() {
   }, []);
 
   return (
-    <Router>
+    <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
       <AuthProvider>
         <TitleUpdater />
         <DarkModeProvider>
@@ -450,8 +454,8 @@ function App() {
                   <Route path="/cafe/:slug" element={<CustomerApp />} />
                   <Route path="/cafe/:slug/menu" element={<CustomerApp />} />
                   <Route path="/cafe/:slug/order" element={<CustomerApp />} />
-                  {/* Legacy customer route - redirect to default */}
-                  <Route path="/customer" element={<Navigate to="/cafe/default" replace />} />
+                  {/* Legacy customer route - redirect to logged-in user's cafe (same menu as admin) or default */}
+                  <Route path="/customer" element={<CustomerRedirect />} />
                   <Route path="/admin" element={
                     <ProtectedRoute>
                       <OnboardingGuard>

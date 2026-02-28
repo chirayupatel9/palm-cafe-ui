@@ -9,6 +9,8 @@ import { useFeatures } from '../contexts/FeatureContext';
 import { useCafeSettings } from '../contexts/CafeSettingsContext';
 import { getImageUrl } from '../utils/imageUtils';
 import LockedFeature from './ui/LockedFeature';
+import Select from './ui/Select';
+import Dialog from './ui/Dialog';
 
 const InventoryManagement = () => {
   const { formatCurrency } = useCurrency();
@@ -51,7 +53,7 @@ const InventoryManagement = () => {
       setInventory(response.data);
     } catch (error) {
       console.error('Error fetching inventory:', error);
-      toast.error('Failed to load inventory');
+      toast.error('Locked feature. Upgrade your plan to access.', { duration: 4000 });
     } finally {
       setLoading(false);
     }
@@ -116,7 +118,11 @@ const InventoryManagement = () => {
       reorder_level: item.reorder_level,
       description: item.description || ''
     });
-    setShowAddForm(true);
+  };
+
+  const handleCloseEditModal = () => {
+    setEditingItem(null);
+    resetForm();
   };
 
   const handleDelete = async (id) => {
@@ -415,48 +421,45 @@ const InventoryManagement = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="card">
           <div className="flex items-center">
-            <div className={`p-2 rounded-lg ${isDarkMode ? 'bg-blue-900' : 'bg-blue-100'}`}>
-              <Package className={`h-6 w-6 ${isDarkMode ? 'text-blue-400' : 'text-blue-600'}`} />
+            <div className="p-2 rounded-lg bg-[var(--color-primary-container)]">
+              <Package className="h-6 w-6" style={{ color: 'var(--color-primary)' }} />
             </div>
             <div className="ml-4">
-              <p className={`text-sm font-medium ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Total Items</p>
-              <p className={`text-2xl font-bold ${isDarkMode ? 'text-gray-100' : 'text-gray-900'}`}>{stats.totalItems}</p>
+              <p className="text-sm font-medium text-body-muted">Total Items</p>
+              <p className="text-2xl font-bold text-on-surface">{stats.totalItems}</p>
             </div>
           </div>
         </div>
-
         <div className="card">
           <div className="flex items-center">
-            <div className={`p-2 rounded-lg ${isDarkMode ? 'bg-orange-900' : 'bg-orange-100'}`}>
-              <AlertTriangle className={`h-6 w-6 ${isDarkMode ? 'text-orange-400' : 'text-orange-600'}`} />
+            <div className="p-2 rounded-lg bg-[var(--color-primary-container)]">
+              <AlertTriangle className="h-6 w-6" style={{ color: 'var(--color-warning)' }} />
             </div>
             <div className="ml-4">
-              <p className={`text-sm font-medium ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Low Stock</p>
-              <p className={`text-2xl font-bold ${isDarkMode ? 'text-gray-100' : 'text-gray-900'}`}>{stats.lowStockItems}</p>
+              <p className="text-sm font-medium text-body-muted">Low Stock</p>
+              <p className="text-2xl font-bold text-on-surface">{stats.lowStockItems}</p>
             </div>
           </div>
         </div>
-
         <div className="card">
           <div className="flex items-center">
-            <div className={`p-2 rounded-lg ${isDarkMode ? 'bg-red-900' : 'bg-red-100'}`}>
-              <AlertTriangle className={`h-6 w-6 ${isDarkMode ? 'text-red-400' : 'text-red-600'}`} />
+            <div className="p-2 rounded-lg bg-[var(--color-primary-container)]">
+              <AlertTriangle className="h-6 w-6" style={{ color: 'var(--color-error)' }} />
             </div>
             <div className="ml-4">
-              <p className={`text-sm font-medium ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Out of Stock</p>
-              <p className={`text-2xl font-bold ${isDarkMode ? 'text-gray-100' : 'text-gray-900'}`}>{stats.outOfStockItems}</p>
+              <p className="text-sm font-medium text-body-muted">Out of Stock</p>
+              <p className="text-2xl font-bold text-on-surface">{stats.outOfStockItems}</p>
             </div>
           </div>
         </div>
-
         <div className="card">
           <div className="flex items-center">
-            <div className={`p-2 rounded-lg ${isDarkMode ? 'bg-green-900' : 'bg-green-100'}`}>
-              <TrendingUp className={`h-6 w-6 ${isDarkMode ? 'text-green-400' : 'text-green-600'}`} />
+            <div className="p-2 rounded-lg bg-[var(--color-primary-container)]">
+              <TrendingUp className="h-6 w-6" style={{ color: 'var(--color-success)' }} />
             </div>
             <div className="ml-4">
-              <p className={`text-sm font-medium ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Total Value</p>
-              <p className={`text-2xl font-bold ${isDarkMode ? 'text-gray-100' : 'text-gray-900'}`}>{formatCurrency(stats.totalValue)}</p>
+              <p className="text-sm font-medium text-body-muted">Total Value</p>
+              <p className="text-2xl font-bold text-on-surface">{formatCurrency(stats.totalValue)}</p>
             </div>
           </div>
         </div>
@@ -465,7 +468,7 @@ const InventoryManagement = () => {
       {/* Import Results */}
       {importResults && (
         <div className="card">
-          <h3 className={`text-lg font-semibold mb-3 ${isDarkMode ? 'text-gray-100' : 'text-gray-900'}`}>Import Results</h3>
+          <h3 className="text-lg font-semibold mb-3 text-on-surface">Import Results</h3>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
             <div className="text-center">
               <div className="text-2xl font-bold text-blue-600">{importResults.total}</div>
@@ -514,41 +517,32 @@ const InventoryManagement = () => {
         <div className="flex flex-col sm:flex-row gap-4">
           <div className="flex-1">
             <div className="relative">
-              <Search className={`absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`} />
+              <Search className={`absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 pointer-events-none ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`} />
               <input
                 type="text"
                 placeholder="Search inventory items..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className={`w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-secondary-500 focus:border-transparent ${
-                  isDarkMode 
-                    ? 'bg-gray-800 border-gray-600 text-gray-100 placeholder-gray-400' 
-                    : 'border-gray-300 bg-white text-gray-900 placeholder-gray-500'
-                }`}
+                className="input-field pl-12"
               />
             </div>
           </div>
           <div className="sm:w-48">
-            <select
+            <Select
+              options={[
+                { value: 'all', label: 'All Categories' },
+                ...categories.map(c => ({ value: c.name, label: c.name }))
+              ]}
               value={filterCategory}
-              onChange={(e) => setFilterCategory(e.target.value)}
-              className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-secondary-500 focus:border-transparent ${
-                isDarkMode 
-                  ? '' 
-                  : ''
-              }`}
-            >
-              <option value="all">All Categories</option>
-              {categories.map(category => (
-                <option key={category.name} value={category.name}>{category.name}</option>
-              ))}
-            </select>
+              onChange={setFilterCategory}
+              placeholder="All Categories"
+            />
           </div>
         </div>
       </div>
 
-      {/* Add/Edit Form */}
-      {showAddForm && (
+      {/* Add Form - only when adding, not when editing (edit uses modal) */}
+      {showAddForm && !editingItem && (
         <div className="card">
           <h2 className={`text-lg font-semibold mb-4 ${isDarkMode ? 'text-gray-100' : 'text-gray-900'}`}>
             {editingItem ? 'Edit Inventory Item' : 'Add New Inventory Item'}
@@ -567,20 +561,16 @@ const InventoryManagement = () => {
               </div>
               <div>
                 <label className={`block text-sm font-medium mb-1 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>Category *</label>
-                <select
+                <Select
+                  options={[
+                    { value: '', label: 'Select Category' },
+                    ...categories.map(c => ({ value: c.name, label: `${c.name} (${c.item_count} items)` })),
+                    { value: 'new', label: '+ Add New Category' }
+                  ]}
                   value={formData.category}
-                  onChange={(e) => setFormData({...formData, category: e.target.value})}
-                  className="input-field"
-                  required
-                >
-                  <option value="">Select Category</option>
-                  {categories.map(category => (
-                    <option key={category.name} value={category.name}>
-                      {category.name} ({category.item_count} items)
-                    </option>
-                  ))}
-                  <option value="new">+ Add New Category</option>
-                </select>
+                  onChange={(v) => setFormData({ ...formData, category: v })}
+                  placeholder="Select Category"
+                />
                 {formData.category === 'new' && (
                   <input
                     type="text"
@@ -606,22 +596,22 @@ const InventoryManagement = () => {
               </div>
               <div>
                 <label className={`block text-sm font-medium mb-1 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>Unit *</label>
-                <select
+                <Select
+                  options={[
+                    { value: '', label: 'Select Unit' },
+                    { value: 'kg', label: 'Kilograms (kg)' },
+                    { value: 'g', label: 'Grams (g)' },
+                    { value: 'l', label: 'Liters (L)' },
+                    { value: 'ml', label: 'Milliliters (ml)' },
+                    { value: 'pcs', label: 'Pieces (pcs)' },
+                    { value: 'boxes', label: 'Boxes' },
+                    { value: 'bottles', label: 'Bottles' },
+                    { value: 'cans', label: 'Cans' }
+                  ]}
                   value={formData.unit}
-                  onChange={(e) => setFormData({...formData, unit: e.target.value})}
-                  className="input-field"
-                  required
-                >
-                  <option value="">Select Unit</option>
-                  <option value="kg">Kilograms (kg)</option>
-                  <option value="g">Grams (g)</option>
-                  <option value="l">Liters (L)</option>
-                  <option value="ml">Milliliters (ml)</option>
-                  <option value="pcs">Pieces (pcs)</option>
-                  <option value="boxes">Boxes</option>
-                  <option value="bottles">Bottles</option>
-                  <option value="cans">Cans</option>
-                </select>
+                  onChange={(v) => setFormData({ ...formData, unit: v })}
+                  placeholder="Select Unit"
+                />
               </div>
               <div>
                 <label className={`block text-sm font-medium mb-1 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>Cost per Unit</label>
@@ -728,13 +718,13 @@ const InventoryManagement = () => {
                 return (
                   <tr 
                     key={item.id} 
-                    className="transition-surface"
+                    className={`transition-surface ${editingItem?.id === item.id ? (isDarkMode ? '!bg-gray-700/50' : '!bg-gray-50') : ''}`}
                     style={{ borderBottom: '1px solid var(--color-outline-variant)' }}
                     onMouseEnter={(e) => {
-                      e.currentTarget.style.backgroundColor = 'var(--surface-table)';
+                      if (editingItem?.id !== item.id) e.currentTarget.style.backgroundColor = 'var(--surface-table)';
                     }}
                     onMouseLeave={(e) => {
-                      e.currentTarget.style.backgroundColor = 'var(--surface-card)';
+                      if (editingItem?.id !== item.id) e.currentTarget.style.backgroundColor = 'var(--surface-card)';
                     }}
                   >
                     <td className="px-6 py-4 whitespace-nowrap">
@@ -807,6 +797,137 @@ const InventoryManagement = () => {
           </div>
         )}
       </div>
+
+      {/* Edit Inventory Item Modal - same pattern as menu item edit */}
+      <Dialog
+        open={!!editingItem}
+        onClose={handleCloseEditModal}
+        title={editingItem ? `Edit: ${formData.name || 'Inventory Item'}` : 'Edit Inventory Item'}
+        size="2xl"
+      >
+        {editingItem && (
+          <form onSubmit={handleSubmit} className="space-y-4 pt-0">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className={`block text-sm font-medium mb-1 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>Name *</label>
+                <input
+                  type="text"
+                  value={formData.name}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  className="input-field"
+                  required
+                />
+              </div>
+              <div>
+                <label className={`block text-sm font-medium mb-1 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>Category *</label>
+                <Select
+                  options={[
+                    { value: '', label: 'Select Category' },
+                    ...categories.map(c => ({ value: c.name, label: `${c.name} (${c.item_count} items)` })),
+                    { value: 'new', label: '+ Add New Category' }
+                  ]}
+                  value={formData.category}
+                  onChange={(v) => setFormData({ ...formData, category: v })}
+                  placeholder="Select Category"
+                />
+                {formData.category === 'new' && (
+                  <input
+                    type="text"
+                    value={formData.newCategory}
+                    onChange={(e) => setFormData({ ...formData, newCategory: e.target.value })}
+                    className="input-field mt-2"
+                    placeholder="Enter new category name"
+                    required
+                  />
+                )}
+              </div>
+              <div>
+                <label className={`block text-sm font-medium mb-1 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>Quantity *</label>
+                <input
+                  type="number"
+                  value={formData.quantity}
+                  onChange={(e) => setFormData({ ...formData, quantity: e.target.value })}
+                  className="input-field"
+                  min="0"
+                  step="0.01"
+                  required
+                />
+              </div>
+              <div>
+                <label className={`block text-sm font-medium mb-1 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>Unit *</label>
+                <Select
+                  options={[
+                    { value: '', label: 'Select Unit' },
+                    { value: 'kg', label: 'Kilograms (kg)' },
+                    { value: 'g', label: 'Grams (g)' },
+                    { value: 'l', label: 'Liters (L)' },
+                    { value: 'ml', label: 'Milliliters (ml)' },
+                    { value: 'pcs', label: 'Pieces (pcs)' },
+                    { value: 'boxes', label: 'Boxes' },
+                    { value: 'bottles', label: 'Bottles' },
+                    { value: 'cans', label: 'Cans' }
+                  ]}
+                  value={formData.unit}
+                  onChange={(v) => setFormData({ ...formData, unit: v })}
+                  placeholder="Select Unit"
+                />
+              </div>
+              <div>
+                <label className={`block text-sm font-medium mb-1 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>Cost per Unit</label>
+                <input
+                  type="number"
+                  value={formData.cost_per_unit}
+                  onChange={(e) => setFormData({ ...formData, cost_per_unit: e.target.value })}
+                  className="input-field"
+                  min="0"
+                  step="0.01"
+                  placeholder="0.00"
+                />
+              </div>
+              <div>
+                <label className={`block text-sm font-medium mb-1 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>Reorder Level</label>
+                <input
+                  type="number"
+                  value={formData.reorder_level}
+                  onChange={(e) => setFormData({ ...formData, reorder_level: e.target.value })}
+                  className="input-field"
+                  min="0"
+                  step="0.01"
+                  placeholder="0"
+                />
+              </div>
+              <div className="sm:col-span-2">
+                <label className={`block text-sm font-medium mb-1 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>Supplier</label>
+                <input
+                  type="text"
+                  value={formData.supplier}
+                  onChange={(e) => setFormData({ ...formData, supplier: e.target.value })}
+                  className="input-field"
+                  placeholder="Supplier name"
+                />
+              </div>
+            </div>
+            <div>
+              <label className={`block text-sm font-medium mb-1 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>Description</label>
+              <textarea
+                value={formData.description}
+                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                className="input-field"
+                rows="3"
+                placeholder="Additional notes about this item"
+              />
+            </div>
+            <div className="flex justify-end space-x-3 pt-4 border-t border-[var(--color-outline)]">
+              <button type="button" onClick={handleCloseEditModal} className="btn-secondary">
+                Cancel
+              </button>
+              <button type="submit" className="btn-primary">
+                Save
+              </button>
+            </div>
+          </form>
+        )}
+      </Dialog>
     </div>
   );
 };

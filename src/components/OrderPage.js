@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { Plus, Minus, Trash2, Receipt, ShoppingCart, FolderOpen, X, Star } from 'lucide-react';
+import { Plus, Minus, Trash2, Receipt, ShoppingCart, FolderOpen, Star, ShoppingBag } from 'lucide-react';
+import Dialog from './ui/Dialog';
+import Sheet from './ui/Sheet';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 import { useCurrency } from '../contexts/CurrencyContext';
@@ -28,6 +30,7 @@ const useDebounce = (value, delay) => {
 const OrderPage = ({ menuItems, cart: externalCart, setCart: setExternalCart }) => {
   const { formatCurrency } = useCurrency();
   const { cafeSettings } = useCafeSettings();
+  const { isDarkMode } = useDarkMode();
   const { user } = useAuth();
   const [cart, setCart] = useState([]);
   const [customerName, setCustomerName] = useState('');
@@ -242,6 +245,11 @@ const OrderPage = ({ menuItems, cart: externalCart, setCart: setExternalCart }) 
     toast.success('Item removed from cart');
   };
 
+  const getCartQuantity = (itemId) => {
+    const item = currentCart.find((i) => i.id === itemId);
+    return item ? item.quantity : 0;
+  };
+
   const updateQuantity = (itemId, newQuantity) => {
     if (newQuantity <= 0) {
       removeFromCart(itemId);
@@ -365,201 +373,180 @@ const OrderPage = ({ menuItems, cart: externalCart, setCart: setExternalCart }) 
   const total = getTotal();
 
   return (
-    <div className="lg:grid lg:grid-cols-3 lg:gap-6 pt-6 pb-6 sm:pt-8 sm:pb-8">
-      {/* Invoice prompt modal */}
-      {showInvoicePrompt && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4" aria-modal="true" role="dialog" aria-labelledby="invoice-prompt-title">
-          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-xl max-w-sm w-full p-6" style={{ color: 'var(--color-on-surface)' }}>
-            <h2 id="invoice-prompt-title" className="text-lg font-semibold mb-3">Complete order</h2>
-            <p className="text-sm mb-6" style={{ color: 'var(--color-on-surface-variant)' }}>Do you want to see the invoice?</p>
-            <div className="flex gap-3">
-              <button
-                type="button"
-                onClick={() => completeOrder(false)}
-                disabled={loading}
-                className="flex-1 px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-50"
-              >
-                No
-              </button>
-              <button
-                type="button"
-                onClick={() => completeOrder(true)}
-                disabled={loading}
-                className="btn-primary flex-1 px-4 py-2"
-              >
-                Yes, show invoice
-              </button>
-            </div>
-            <button
-              type="button"
-              onClick={() => setShowInvoicePrompt(false)}
-              disabled={loading}
-              className="mt-4 w-full text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
-            >
-              Cancel
-            </button>
-          </div>
+    <div className="min-h-screen pt-6 pb-6 sm:pt-8 sm:pb-8 px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto surface-page">
+      {/* Invoice prompt - Template Dialog */}
+      <Dialog open={showInvoicePrompt} onClose={() => setShowInvoicePrompt(false)} title="Complete order" maxHeight={false}>
+        <p className="text-sm text-body-muted mb-6">Do you want to see the invoice?</p>
+        <div className="flex gap-3">
+          <button
+            type="button"
+            onClick={() => completeOrder(false)}
+            disabled={loading}
+            className="flex-1 px-4 py-2 rounded-lg border btn-secondary disabled:opacity-50"
+          >
+            No
+          </button>
+          <button
+            type="button"
+            onClick={() => completeOrder(true)}
+            disabled={loading}
+            className="flex-1 px-4 py-2 rounded-lg bg-primary hover:opacity-90 text-on-primary font-medium disabled:opacity-50"
+          >
+            Yes, show invoice
+          </button>
         </div>
-      )}
+        <button
+          type="button"
+          onClick={() => setShowInvoicePrompt(false)}
+          disabled={loading}
+          className="mt-4 w-full text-sm text-body-muted hover:text-on-surface"
+        >
+          Cancel
+        </button>
+      </Dialog>
 
-      {/* Menu Items */}
-      <div className="lg:col-span-2 mb-6 lg:mb-0">
-        <div className="card">
-          <div className="mb-6">
-            <h2 className="text-2xl font-bold mb-1" style={{ color: 'var(--color-on-surface)' }}>Dashboard</h2>
-            <p className="text-sm" style={{ color: 'var(--color-on-surface-variant)' }}>Create new orders and manage your cafe operations</p>
+      {/* Menu Items - full width; cart opens in right-side sheet */}
+      <div className="mb-6">
+        <div className="mb-8 sm:mb-12">
+          <span className="font-mono text-xs uppercase tracking-[0.2em] mb-2 block text-primary">Dashboard</span>
+          <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-on-surface">Create new orders</h2>
+          <p className="max-w-xl text-base sm:text-lg mt-2 leading-relaxed text-body-muted">
+            Manage your cafe operations. Add items to the cart and complete the order.
+          </p>
+        </div>
+
+        {Object.keys(groupedMenuItems).length === 0 ? (
+          <div className="text-center py-16">
+            {cafeSettings.logo_url && (
+              <img
+                src={getImageUrl(cafeSettings.logo_url)}
+                alt={`${cafeSettings.cafe_name || 'Cafe'} Logo`}
+                className="h-24 w-24 mx-auto mb-6 opacity-50"
+              />
+            )}
+            <h3 className="text-xl font-semibold mb-2 text-on-surface">No menu items available</h3>
+            <p className="text-body-muted">Add items in Menu Management to get started</p>
           </div>
-          
-          {Object.keys(groupedMenuItems).length === 0 ? (
-            <div className="text-center py-12" style={{ color: 'var(--color-on-surface-variant)' }}>
-              {cafeSettings.logo_url && (
-                <img 
-                  src={getImageUrl(cafeSettings.logo_url)} 
-                  alt={`${cafeSettings.cafe_name || 'Cafe'} Logo`} 
-                  className="h-24 w-24 mx-auto mb-6 opacity-50"
-                />
-              )}
-              <h3 className="text-xl font-semibold mb-2" style={{ color: 'var(--color-on-surface)' }}>No menu items available</h3>
-              <p className="text-base">Add items in Menu Management to get started</p>
-            </div>
-          ) : (
-            <div className="space-y-4 sm:space-y-6">
-              {Object.entries(groupedMenuItems).map(([categoryName, items], index) => {
-                return (
-                <div 
-                  key={categoryName} 
-                  className="rounded-xl p-4 sm:p-6 transition-surface"
-                  style={{ 
-                    backgroundColor: 'var(--surface-table)',
-                    border: '1px solid var(--color-outline-variant)',
-                    boxShadow: 'var(--elevation-0)'
-                  }}
+        ) : (
+          <div className="space-y-12 sm:space-y-16">
+            {Object.entries(groupedMenuItems).map(([categoryName, items], catIndex) => {
+              const categoryNumber = String(catIndex + 1).padStart(2, '0');
+              return (
+                <section
+                  key={categoryName}
+                  id={`category-${categoryName.replace(/\s+/g, '-')}`}
+                  className="relative"
                 >
-                  <h3 className="text-xl font-bold mb-4 sm:mb-6 flex items-center" style={{ color: 'var(--color-on-surface)' }}>
-                    <div className="p-2 rounded-lg mr-3 transition-surface" style={{ backgroundColor: 'var(--color-primary-container)' }}>
-                      <FolderOpen className="h-5 w-5" style={{ color: 'var(--color-primary)' }} />
+                  <div className="mb-6 sm:mb-8">
+                    <div className="flex items-baseline gap-4 mb-2">
+                      <span className="font-mono text-sm px-3 py-1 rounded-full text-primary bg-primary-container">
+                        {categoryNumber}
+                      </span>
+                      <h3 className="text-2xl sm:text-3xl font-bold tracking-tight text-on-surface">
+                        {categoryName}
+                      </h3>
                     </div>
-                    {categoryName}
-                  </h3>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-                    {items.map((item) => (
-                      <div
-                        key={item.id}
-                        className="group relative rounded-xl p-4 sm:p-5 cursor-pointer overflow-hidden transition-elevation hover-lift"
-                        style={{ 
-                          backgroundColor: 'var(--surface-card)',
-                          border: '1px solid var(--color-outline)',
-                          boxShadow: 'var(--elevation-1)'
-                        }}
-                        onClick={() => addToCart(item)}
-                        onMouseEnter={(e) => {
-                          e.currentTarget.style.boxShadow = 'var(--elevation-2)';
-                          e.currentTarget.style.backgroundColor = 'var(--surface-table)';
-                        }}
-                        onMouseLeave={(e) => {
-                          e.currentTarget.style.boxShadow = 'var(--elevation-1)';
-                          e.currentTarget.style.backgroundColor = 'var(--surface-card)';
-                        }}
-                      >
-                        {/* Add to cart indicator */}
-                        <div 
-                          className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity rounded-full p-2 z-10 transition-elevation"
-                          style={{ 
-                            backgroundColor: 'var(--color-primary)',
-                            boxShadow: 'var(--elevation-1)',
-                            transition: 'opacity var(--motion-duration-normal) var(--motion-easing-out)'
-                          }}
-                        >
-                          <Plus className="h-4 w-4" style={{ color: 'var(--color-on-primary)' }} />
-                        </div>
-                        
-                        {/* Menu Item Image */}
-                        {cafeSettings?.show_menu_images && item.image_url && (
-                          <div className="w-full h-32 mb-3 overflow-hidden rounded-lg">
-                            <img
-                              src={getImageUrl(item.image_url)}
-                              alt={item.name}
-                              className="w-full h-full object-cover"
-                            />
-                          </div>
-                        )}
-                        
-                        <div className="flex justify-between items-start mb-3">
-                          <h4 className="font-semibold text-sm sm:text-base leading-tight flex-1" style={{ color: 'var(--color-on-surface)' }}>
-                            {item.name}
-                          </h4>
-                          <span 
-                            className="text-lg sm:text-xl font-extrabold ml-2 whitespace-nowrap"
-                            style={{ 
-                              color: 'var(--color-primary)',
-                              fontWeight: 700
-                            }}
-                          >
-                            {formatCurrency(ensureNumber(item.price))}
-                          </span>
-                        </div>
-                        
-                        <p className="text-xs sm:text-sm leading-relaxed" style={{ color: 'var(--color-on-surface-variant)' }}>
-                          {item.description}
-                        </p>
-                      </div>
-                    ))}
                   </div>
-                </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6">
+                    {items.map((item) => {
+                      const quantity = getCartQuantity(item.id);
+                      return (
+                        <div
+                          key={item.id}
+                          className="group overflow-hidden border-b last:border-b-0 transition-colors border-[var(--color-outline)] hover:bg-[var(--color-outline-variant)]"
+                        >
+                          <div className="relative aspect-[4/3] overflow-hidden flex-shrink-0 bg-[var(--surface-table)]">
+                            {cafeSettings?.show_menu_images && item.image_url ? (
+                              <img
+                                src={getImageUrl(item.image_url)}
+                                alt={item.name}
+                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                              />
+                            ) : (
+                              <div className="w-full h-full flex items-center justify-center">
+                                <FolderOpen className="h-12 w-12 text-primary opacity-40" />
+                              </div>
+                            )}
+                            <div className="absolute top-3 right-3 px-3 py-1.5 rounded-full bg-[var(--surface-card)]/95">
+                              <span className="font-mono text-sm font-medium text-primary">
+                                {formatCurrency(ensureNumber(item.price))}
+                              </span>
+                            </div>
+                          </div>
+                          <div className="p-4 sm:p-5">
+                            <h4 className="font-semibold text-lg mb-2 group-hover:text-primary transition-colors text-on-surface">
+                              {item.name}
+                            </h4>
+                            <p className="text-sm mb-4 line-clamp-2 leading-relaxed text-body-muted">
+                              {item.description || '—'}
+                            </p>
+                            {quantity === 0 ? (
+                              <button
+                                type="button"
+                                onClick={(e) => { e.stopPropagation(); addToCart(item); }}
+                                className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-primary hover:opacity-90 text-on-primary font-medium transition-colors duration-300"
+                              >
+                                <ShoppingBag className="h-4 w-4" />
+                                Add to cart
+                              </button>
+                            ) : (
+                              <div className="flex items-center justify-between rounded-xl p-2 bg-[var(--surface-table)]">
+                                <button
+                                  type="button"
+                                  onClick={(e) => { e.stopPropagation(); updateQuantity(item.id, quantity - 1); }}
+                                  className="h-10 w-10 rounded-full shadow-sm flex items-center justify-center transition-all hover:scale-105 bg-[var(--surface-card)] hover:bg-[var(--surface-elevated)] border border-[var(--color-outline)]"
+                                  aria-label="Decrease quantity"
+                                >
+                                  <Minus className="h-4 w-4 text-on-surface" />
+                                </button>
+                                <span className="font-mono text-lg font-medium text-on-surface">{quantity}</span>
+                                <button
+                                  type="button"
+                                  onClick={(e) => { e.stopPropagation(); updateQuantity(item.id, quantity + 1); }}
+                                  className="h-10 w-10 rounded-full shadow-sm flex items-center justify-center transition-all hover:scale-105 bg-[var(--surface-card)] hover:bg-[var(--surface-elevated)] border border-[var(--color-outline)]"
+                                  aria-label="Increase quantity"
+                                >
+                                  <Plus className="h-4 w-4 text-on-surface" />
+                                </button>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </section>
               );
             })}
-            </div>
-          )}
-        </div>
+          </div>
+        )}
       </div>
 
-      {/* Cart - Mobile Floating Button */}
-      <div className="lg:hidden fixed bottom-4 right-4 z-50">
+      {/* Cart - FAB opens right-side sheet on all screen sizes */}
+      <div className="fixed bottom-6 right-6 z-40">
         <button
-          onClick={() => setShowCart(!showCart)}
-          className="bg-secondary-500 text-white p-4 rounded-full shadow-lg hover:bg-secondary-600 transition-colors"
+          onClick={() => setShowCart(true)}
+          className="flex items-center gap-2 rounded-full px-4 py-3 text-white shadow-lg hover:shadow-xl transition-all duration-200 min-h-[56px] min-w-[56px] focus:ring-4 focus:ring-primary/30"
+          style={{ backgroundColor: 'var(--color-primary)' }}
+          aria-label="Open cart"
         >
-          <ShoppingCart className="h-6 w-6" />
-          {currentCart.length > 0 && (
-            <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-6 w-6 flex items-center justify-center">
-              {currentCart.length}
-            </span>
+          <ShoppingCart className="h-6 w-6 flex-shrink-0" />
+          {currentCart.length > 0 ? (
+            <>
+              <span className="hidden sm:inline font-medium">Cart</span>
+              <span className="bg-on-primary text-primary text-xs font-semibold rounded-full h-6 min-w-[24px] flex items-center justify-center px-1.5">
+                {currentCart.length}
+              </span>
+            </>
+          ) : (
+            <span className="hidden sm:inline font-medium">Cart</span>
           )}
         </button>
       </div>
 
-      {/* Mobile Cart Overlay - Authoritative elevated surface */}
+      {/* Cart - Right-side sheet (mobile + desktop) */}
       {showCart && (
-        <div className="lg:hidden fixed inset-0 bg-black bg-opacity-50 z-40">
-          <div 
-            className="absolute bottom-0 left-0 right-0 rounded-t-lg max-h-[80vh] overflow-y-auto"
-            style={{ 
-              backgroundColor: 'var(--surface-elevated)',
-              boxShadow: 'var(--elevation-4)'
-            }}
-          >
-            <div className="p-4">
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center">
-                  {cafeSettings.logo_url && (
-                    <img 
-                      src={getImageUrl(cafeSettings.logo_url)} 
-                      alt={`${cafeSettings.cafe_name || 'Cafe'} Logo`} 
-                      className="h-8 w-8 mr-2"
-                    />
-                  )}
-                  <h2 className="text-xl font-semibold text-secondary-700 dark:text-secondary-300">
-                    Cart ({currentCart.length})
-                  </h2>
-                </div>
-                <button
-                  onClick={() => setShowCart(false)}
-                  className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
-                >
-                  <X className="h-6 w-6" />
-                </button>
-              </div>
-              
+        <Sheet open={showCart} onClose={() => setShowCart(false)} title={currentCart.length > 0 ? `Cart (${currentCart.length})` : 'Cart'}>
               {/* Customer Info */}
               <div className="space-form">
                 <input
@@ -584,8 +571,8 @@ const OrderPage = ({ menuItems, cart: externalCart, setCart: setExternalCart }) 
                   className="input-field"
                 />
                 {customerInfo && (
-                  <div className="mb-2 p-2 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
-                    <div className="flex items-center text-sm text-green-700 dark:text-green-300">
+                  <div className="mb-2 p-2 bg-[var(--color-primary-container)] border border-[var(--color-outline)] rounded-lg">
+                    <div className="flex items-center text-sm text-success">
                       <Star className="h-4 w-4 mr-1" />
                       <span>Welcome back! {customerInfo.loyalty_points} loyalty points available</span>
                     </div>
@@ -595,31 +582,31 @@ const OrderPage = ({ menuItems, cart: externalCart, setCart: setExternalCart }) 
                 {/* Points Redemption */}
                 {currentCart.length > 0 && customerInfo?.loyalty_points > 0 && (
                   <div className="mb-4">
-                    <label className="block text-sm font-medium text-secondary-700 dark:text-secondary-300 mb-2 flex items-center">
-                      <Star className="h-4 w-4 mr-2 text-yellow-500" />
+                    <label className="block text-sm font-medium text-on-surface mb-2 flex items-center">
+                      <Star className="h-4 w-4 mr-2 text-warning" />
                       Redeem Points
-                      <span className="ml-2 text-sm text-gray-500">
+                      <span className="ml-2 text-sm text-body-muted">
                         (1 point = {formatCurrency(0.10)})
                       </span>
                     </label>
                     
-                    <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-3 mb-3">
+                    <div className="bg-[var(--color-primary-container)] border border-[var(--color-outline)] rounded-lg p-3 mb-3">
                       <div className="flex justify-between items-center text-sm">
-                        <span className="text-gray-600 dark:text-gray-400">Available Points:</span>
-                        <span className="font-medium text-yellow-700 dark:text-yellow-300">
+                        <span className="text-body-muted">Available Points:</span>
+                        <span className="font-medium text-on-primary-container">
                           {customerInfo.loyalty_points}
                         </span>
                       </div>
                       <div className="flex justify-between items-center text-sm mt-1">
-                        <span className="text-gray-600 dark:text-gray-400">Max Redeemable:</span>
-                        <span className="font-medium text-yellow-700 dark:text-yellow-300">
+                        <span className="text-body-muted">Max Redeemable:</span>
+                        <span className="font-medium text-on-primary-container">
                           {maxRedeemablePoints} points
                         </span>
                       </div>
                     </div>
                     
                     <div className="flex items-center space-x-2">
-                      <span className="text-sm text-gray-600 dark:text-gray-400">Points to redeem:</span>
+                      <span className="text-sm text-body-muted">Points to redeem:</span>
                       <input
                         type="number"
                         value={pointsToRedeem}
@@ -632,7 +619,7 @@ const OrderPage = ({ menuItems, cart: externalCart, setCart: setExternalCart }) 
                     </div>
                     
                     {pointsToRedeem > 0 && (
-                      <div className="mt-2 text-sm text-green-600 dark:text-green-400">
+                      <div className="mt-2 text-sm text-success">
                         Customer will save: ₹{(pointsToRedeem * 0.1).toFixed(2)}
                       </div>
                     )}
@@ -641,7 +628,7 @@ const OrderPage = ({ menuItems, cart: externalCart, setCart: setExternalCart }) 
                 
                 {/* Payment Method */}
                 <div className="mb-2">
-                  <label className="block text-sm font-medium text-secondary-700 dark:text-secondary-300 mb-2">
+                  <label className="block text-sm font-medium text-on-surface mb-2">
                     Payment Method
                   </label>
                   <div className="grid grid-cols-2 gap-2">
@@ -652,7 +639,7 @@ const OrderPage = ({ menuItems, cart: externalCart, setCart: setExternalCart }) 
                         onClick={() => setPaymentMethod(method.code)}
                         className={`h-10 flex items-center justify-center rounded-lg border transition-colors text-sm font-medium ${
                           paymentMethod === method.code
-                            ? 'bg-secondary-600 text-white border-secondary-600'
+                            ? 'bg-primary text-on-primary border-primary'
                             : 'btn-secondary'
                         }`}
                       >
@@ -667,7 +654,7 @@ const OrderPage = ({ menuItems, cart: externalCart, setCart: setExternalCart }) 
                 {currentCart.length > 0 && user?.role === 'admin' && (
                   <div className="mb-2">
                     <div className="flex items-center justify-between mb-3">
-                      <h3 className="font-medium text-secondary-700 dark:text-secondary-300">Split Payment</h3>
+                      <h3 className="font-medium text-on-surface">Split Payment</h3>
                       <label className="flex items-center space-x-2 cursor-pointer">
                         <input
                           type="checkbox"
@@ -680,14 +667,14 @@ const OrderPage = ({ menuItems, cart: externalCart, setCart: setExternalCart }) 
                           }}
                           className="rounded"
                         />
-                        <span className="text-sm text-gray-600 dark:text-gray-400">Enable split payment</span>
+                        <span className="text-sm text-body-muted">Enable split payment</span>
                       </label>
                     </div>
                     
                     {splitPayment && (
-                      <div className="space-y-3 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                      <div className="space-y-3 p-4 bg-[var(--surface-table)] rounded-lg">
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                          <label className="block text-sm font-medium text-on-surface mb-2">
                             Split Payment Method
                           </label>
                           <div className="grid grid-cols-2 gap-2">
@@ -698,7 +685,7 @@ const OrderPage = ({ menuItems, cart: externalCart, setCart: setExternalCart }) 
                                 onClick={() => setSplitPaymentMethod(method.code)}
                                 className={`h-10 flex items-center justify-center rounded-lg border transition-colors text-sm font-medium ${
                                   splitPaymentMethod === method.code
-                                    ? 'bg-secondary-600 text-white border-secondary-600'
+                                    ? 'bg-primary text-on-primary border-primary'
                                     : 'btn-secondary'
                                 }`}
                               >
@@ -710,7 +697,7 @@ const OrderPage = ({ menuItems, cart: externalCart, setCart: setExternalCart }) 
                         </div>
                         
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                          <label className="block text-sm font-medium text-on-surface mb-2">
                             Amount paid via {paymentMethods.find(m => m.code === splitPaymentMethod)?.name || 'split method'}
                           </label>
                           <input
@@ -723,7 +710,7 @@ const OrderPage = ({ menuItems, cart: externalCart, setCart: setExternalCart }) 
                             className="input-field"
                             placeholder="Enter amount"
                           />
-                          <p className="text-xs text-gray-500 mt-1">
+                          <p className="text-xs text-body-muted mt-1">
                             Remaining amount: {formatCurrency(getTotal() - splitAmount)} via {paymentMethods.find(m => m.code === paymentMethod)?.name || 'primary method'}
                           </p>
                         </div>
@@ -736,7 +723,7 @@ const OrderPage = ({ menuItems, cart: externalCart, setCart: setExternalCart }) 
 
                 {/* Pickup Option */}
                 <div className="mb-2">
-                  <label className="block text-sm font-medium text-secondary-700 dark:text-secondary-300 mb-2">
+                  <label className="block text-sm font-medium text-on-surface mb-2">
                     Pickup Option
                   </label>
                   <div className="grid grid-cols-2 gap-2">
@@ -765,7 +752,7 @@ const OrderPage = ({ menuItems, cart: externalCart, setCart: setExternalCart }) 
                       <span>Dine-in</span>
                     </button>
                   </div>
-                  <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
+                  <p className="text-xs text-body-muted mt-1">
                     {pickupOption === 'pickup' 
                       ? 'Order will be ready for pickup at the counter' 
                       : 'Order will be served at the table'}
@@ -775,16 +762,16 @@ const OrderPage = ({ menuItems, cart: externalCart, setCart: setExternalCart }) 
 
               {/* UPI QR Code Display */}
               {paymentMethod === 'upi' && (
-                <div className="mb-4 p-4 bg-white border border-accent-200 rounded-lg">
+                <div className="card">
                   <div className="text-center">
-                    <div className="bg-[#6F4E37] text-white p-3 rounded-t-lg -mt-4 -mx-4 mb-4 flex items-center">
-                      <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center mr-2">
-                        <span className="text-[#6F4E37] font-bold text-sm">पे</span>
+                    <div className="bg-primary text-on-primary p-3 rounded-t-lg -mt-4 -mx-4 mb-4 flex items-center">
+                      <div className="w-8 h-8 bg-on-primary rounded-full flex items-center justify-center mr-2">
+                        <span className="text-primary font-bold text-sm">पे</span>
                       </div>
                       <span className="font-semibold">PhonePe</span>
                     </div>
                     
-                    <p className="text-sm text-gray-600 mb-4">Scan & Pay with any UPI App</p>
+                    <p className="text-sm text-body-muted mb-4">Scan & Pay with any UPI App</p>
                     
                     <img 
                       src="/images/upi-qr-code.png" 
@@ -792,23 +779,23 @@ const OrderPage = ({ menuItems, cart: externalCart, setCart: setExternalCart }) 
                       className="w-40 h-40 mx-auto mb-4"
                     />
                     
-                    <div className="text-sm text-gray-600 mb-2">UPI ID: Q966641592@ybl</div>
+                    <div className="text-sm text-body-muted mb-2">UPI ID: Q966641592@ybl</div>
                     
                     <div className="flex justify-center items-center space-x-4 mb-3">
                       <div className="text-center">
-                        <div className="text-base font-bold text-gray-700">BHIM</div>
-                        <div className="text-xs text-gray-500">BHARAT INTERFACE</div>
-                        <div className="text-xs text-gray-500">FOR MONEY</div>
+                        <div className="text-base font-bold text-on-surface">BHIM</div>
+                        <div className="text-xs text-body-muted">BHARAT INTERFACE</div>
+                        <div className="text-xs text-body-muted">FOR MONEY</div>
                       </div>
-                      <div className="w-px h-6 bg-gray-300"></div>
+                      <div className="w-px h-6 bg-[var(--color-outline)]"></div>
                       <div className="text-center">
-                        <div className="text-base font-bold text-gray-700">UPI</div>
-                        <div className="text-xs text-gray-500">UNIFIED PAYMENTS</div>
-                        <div className="text-xs text-gray-500">INTERFACE</div>
+                        <div className="text-base font-bold text-on-surface">UPI</div>
+                        <div className="text-xs text-body-muted">UNIFIED PAYMENTS</div>
+                        <div className="text-xs text-body-muted">INTERFACE</div>
                       </div>
                     </div>
                     
-                    <div className="text-sm font-medium text-gray-700">{cafeSettings?.cafe_name || 'Cafe'}</div>
+                    <div className="text-sm font-medium text-on-surface">{cafeSettings?.cafe_name || 'Cafe'}</div>
                     
                     <div className="h-2 -mx-4 -mb-4 rounded-b-lg" style={{ backgroundColor: 'var(--color-primary)' }}></div>
                   </div>
@@ -817,15 +804,15 @@ const OrderPage = ({ menuItems, cart: externalCart, setCart: setExternalCart }) 
 
               {/* Cart Items */}
               {currentCart.length === 0 ? (
-                <div className="text-center py-8 text-gray-500 dark:text-gray-400">
-                  <ShoppingCart className="h-12 w-12 mx-auto mb-2 text-gray-300 dark:text-gray-500" />
-                  <p className="font-medium mb-1">Your cart is empty</p>
+                <div className="text-center py-8 text-body-muted">
+                  <ShoppingCart className="h-12 w-12 mx-auto mb-2 opacity-60" style={{ color: 'var(--color-on-surface-variant)' }} />
+                  <p className="font-medium mb-1 text-on-surface">Your cart is empty</p>
                   <p className="text-sm">Select items from the menu to add them to your order</p>
                 </div>
               ) : (
                 <div className="space-y-3 mb-4">
                   {currentCart.map((item) => (
-                    <div key={item.id} className="flex items-center justify-between p-3 bg-accent-50 dark:bg-gray-700 rounded-lg border border-accent-200 dark:border-gray-600">
+                    <div key={item.id} className="flex items-center justify-between p-3 bg-[var(--surface-table)] rounded-lg border border-[var(--color-outline)]">
                       <div className="flex items-center space-x-3 flex-1">
                         {/* Cart Item Image */}
                         {cafeSettings?.show_menu_images && item.image_url && (
@@ -909,8 +896,8 @@ const OrderPage = ({ menuItems, cart: externalCart, setCart: setExternalCart }) 
 
               {/* Tip Selection */}
               {currentCart.length > 0 && (
-                <div className="border-t border-accent-200 pt-4 mb-4">
-                  <h3 className="font-medium text-secondary-700 dark:text-secondary-300 mb-3">Tip</h3>
+                <div className="border-t border-[var(--color-outline)] pt-4 mb-4">
+                  <h3 className="font-medium text-on-surface mb-3">Tip</h3>
                   
                   {/* Quick tip buttons */}
                   <div className="grid grid-cols-3 gap-2 mb-3">
@@ -920,7 +907,7 @@ const OrderPage = ({ menuItems, cart: externalCart, setCart: setExternalCart }) 
                         onClick={() => handleTipPercentageChange(percentage)}
                         className={`h-10 text-sm rounded-lg border transition-colors font-medium ${
                           tipPercentage === percentage
-                            ? 'bg-secondary-600 text-white border-secondary-600'
+                            ? 'bg-primary text-on-primary border-primary'
                             : 'btn-secondary'
                         }`}
                       >
@@ -931,7 +918,7 @@ const OrderPage = ({ menuItems, cart: externalCart, setCart: setExternalCart }) 
                   
                   {/* Custom tip amount */}
                   <div className="flex items-center space-x-2">
-                    <span className="text-sm text-gray-600 dark:text-gray-400">Custom:</span>
+                    <span className="text-sm text-body-muted">Custom:</span>
                     <input
                       type="number"
                       value={tipAmount.toFixed(2)}
@@ -947,43 +934,43 @@ const OrderPage = ({ menuItems, cart: externalCart, setCart: setExternalCart }) 
 
               {/* Totals */}
               {currentCart.length > 0 && (
-                <div className="border-t border-accent-200 pt-4 mb-4 space-y-2">
-                  <div className="flex justify-between text-sm text-gray-600 dark:text-gray-400">
+                <div className="border-t border-[var(--color-outline)] pt-4 mb-4 space-y-2">
+                  <div className="flex justify-between text-sm text-body-muted">
                     <span>Subtotal:</span>
                     <span>{formatCurrency(subtotal)}</span>
                   </div>
                   
                   {taxInfo.taxAmount > 0 && (
-                    <div className="flex justify-between text-sm text-gray-600 dark:text-gray-400">
+                    <div className="flex justify-between text-sm text-body-muted">
                       <span>{taxInfo.taxName} ({taxInfo.taxRate}%):</span>
                       <span>{formatCurrency(taxInfo.taxAmount)}</span>
                     </div>
                   )}
                   
                   {tipAmount > 0 && (
-                    <div className="flex justify-between text-sm text-gray-600 dark:text-gray-400">
+                    <div className="flex justify-between text-sm text-body-muted">
                       <span>Tip:</span>
                       <span>{formatCurrency(tipAmount)}</span>
                     </div>
                   )}
                   
                   {pointsToRedeem > 0 && (
-                    <div className="flex justify-between text-sm text-green-600 dark:text-green-400">
+                    <div className="flex justify-between text-sm text-success">
                       <span>Points Redeemed ({pointsToRedeem} pts):</span>
                       <span>-{formatCurrency(pointsToRedeem * 0.1)}</span>
                     </div>
                   )}
 
                   {extraCharge > 0 && (
-                    <div className="flex justify-between text-sm text-gray-600 dark:text-gray-400">
+                    <div className="flex justify-between text-sm text-body-muted">
                       <span>Extra Charge:</span>
                       <span>{formatCurrency(extraCharge)}</span>
                     </div>
                   )}
                   
-                  <div className="flex justify-between items-center text-lg font-semibold border-t border-accent-200 pt-2">
-                    <span className="text-secondary-700 dark:text-secondary-300">Total:</span>
-                    <span className="text-secondary-600 dark:text-secondary-400">{formatCurrency(total)}</span>
+                  <div className="flex justify-between items-center text-lg font-semibold border-t border-[var(--color-outline)] pt-2">
+                    <span className="text-on-surface">Total:</span>
+                    <span className="text-on-surface">{formatCurrency(total)}</span>
                   </div>
                 </div>
               )}
@@ -1000,485 +987,8 @@ const OrderPage = ({ menuItems, cart: externalCart, setCart: setExternalCart }) 
                 <Receipt className="h-4 w-4 mr-2" />
                 {loading ? 'Completing...' : 'Complete order'}
               </button>
-            </div>
-          </div>
-        </div>
+          </Sheet>
       )}
-
-      {/* Desktop Cart - Authoritative elevated surface */}
-      <div className="hidden lg:block lg:col-span-1">
-        <div className="card-elevated sticky top-6" style={{ boxShadow: 'var(--elevation-3)' }}>
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center">
-              {cafeSettings.logo_url && (
-                <img 
-                  src={getImageUrl(cafeSettings.logo_url)} 
-                  alt={`${cafeSettings.cafe_name || 'Cafe'} Logo`} 
-                  className="h-8 w-8 mr-2"
-                />
-              )}
-              <h2 className="text-xl font-semibold text-secondary-700 dark:text-secondary-300">Cart</h2>
-            </div>
-            {currentCart.length > 0 && (
-              <button
-                onClick={clearCart}
-                className="text-red-500 hover:text-red-700 text-sm"
-              >
-                Clear
-              </button>
-            )}
-          </div>
-
-          {/* Customer Info */}
-          <div className="space-form">
-            <input
-              type="text"
-              placeholder="Customer Name *"
-              value={customerName}
-              onChange={(e) => setCustomerName(e.target.value)}
-              className="input-field"
-            />
-            <input
-              type="tel"
-              placeholder="Phone Number (optional)"
-              value={customerPhone}
-              onChange={(e) => setCustomerPhone(e.target.value)}
-              className="input-field"
-            />
-            <input
-              type="text"
-              placeholder="Table Number/Character (optional)"
-              value={tableNumber}
-              onChange={(e) => setTableNumber(e.target.value)}
-              className="input-field"
-            />
-            {customerInfo && (
-              <div className="mb-2 p-2 bg-green-50 border border-green-200 rounded-lg">
-                <div className="flex items-center text-sm text-green-700">
-                  <Star className="h-4 w-4 mr-1" />
-                  <span>Welcome back! {customerInfo.loyalty_points} loyalty points available</span>
-                </div>
-              </div>
-            )}
-
-            {/* Points Redemption */}
-            {currentCart.length > 0 && customerInfo?.loyalty_points > 0 && (
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-secondary-700 dark:text-secondary-300 mb-2 flex items-center">
-                  <Star className="h-4 w-4 mr-2 text-yellow-500" />
-                  Redeem Points
-                  <span className="ml-2 text-sm text-gray-500">
-                    (1 point = {formatCurrency(0.10)})
-                  </span>
-                </label>
-                
-                <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-3 mb-3">
-                  <div className="flex justify-between items-center text-sm">
-                    <span className="text-gray-600 dark:text-gray-400">Available:</span>
-                    <span className="font-medium text-yellow-700 dark:text-yellow-300">
-                      {customerInfo.loyalty_points} pts
-                    </span>
-                  </div>
-                  <div className="flex justify-between items-center text-sm mt-1">
-                    <span className="text-gray-600 dark:text-gray-400">Max:</span>
-                    <span className="font-medium text-yellow-700 dark:text-yellow-300">
-                      {maxRedeemablePoints} pts
-                    </span>
-                  </div>
-                </div>
-                
-                <div className="flex items-center space-x-2">
-                  <span className="text-sm text-gray-600">Points:</span>
-                  <input
-                    type="number"
-                    value={pointsToRedeem}
-                    onChange={(e) => handlePointsRedemption(parseInt(e.target.value) || 0)}
-                    min="0"
-                    max={maxRedeemablePoints}
-                    className="flex-1 input-field"
-                    placeholder="0"
-                  />
-                </div>
-                
-                {pointsToRedeem > 0 && (
-                  <div className="mt-2 text-sm text-green-600 dark:text-green-400">
-                    Save: ₹{(pointsToRedeem * 0.1).toFixed(2)}
-                  </div>
-                )}
-              </div>
-            )}
-            
-            {/* Payment Method */}
-            <div className="mb-6">
-              <h3 className="font-medium text-secondary-700 dark:text-secondary-300 mb-3">Payment Method</h3>
-              <div className="grid grid-cols-2 gap-2">
-                {paymentMethods.map((method) => (
-                  <button
-                    key={method.code}
-                    type="button"
-                    onClick={() => setPaymentMethod(method.code)}
-                    className={`h-10 flex items-center justify-center rounded-lg border transition-colors text-sm font-medium ${
-                      paymentMethod === method.code
-                        ? 'bg-secondary-600 text-white border-secondary-600'
-                        : 'btn-secondary'
-                    }`}
-                  >
-                    <span className="mr-2">{method.icon}</span>
-                    <span>{method.name}</span>
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Split Payment Option */}
-            {currentCart.length > 0 && user?.role === 'admin' && (
-              <div className="mb-6">
-                <div className="flex items-center justify-between mb-3">
-                  <h3 className="font-medium text-secondary-700 dark:text-secondary-300">Split Payment</h3>
-                  <label className="flex items-center space-x-2 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={splitPayment}
-                      onChange={(e) => {
-                        setSplitPayment(e.target.checked);
-                        if (!e.target.checked) {
-                          setSplitAmount(0);
-                        }
-                      }}
-                      className="rounded"
-                    />
-                    <span className="text-sm text-gray-600 dark:text-gray-400">Enable split payment</span>
-                  </label>
-                </div>
-                
-                {splitPayment && (
-                  <div className="space-y-3 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        Split Payment Method
-                      </label>
-                      <div className="grid grid-cols-2 gap-2">
-                        {paymentMethods.filter(method => method.code !== paymentMethod).map((method) => (
-                          <button
-                            key={method.code}
-                            type="button"
-                            onClick={() => setSplitPaymentMethod(method.code)}
-                            className={`h-10 flex items-center justify-center rounded-lg border transition-colors text-sm font-medium ${
-                              splitPaymentMethod === method.code
-                                ? 'bg-secondary-600 text-white border-secondary-600'
-                                : 'btn-secondary'
-                            }`}
-                          >
-                            <span className="mr-2">{method.icon}</span>
-                            <span>{method.name}</span>
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                    
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        Amount paid via {paymentMethods.find(m => m.code === splitPaymentMethod)?.name || 'split method'}
-                      </label>
-                      <input
-                        type="number"
-                        value={splitAmount}
-                        onChange={(e) => setSplitAmount(parseFloat(e.target.value) || 0)}
-                        min="0"
-                        max={getTotal() - 0.01}
-                        step="0.01"
-                        className="input-field"
-                        placeholder="Enter amount"
-                      />
-                      <p className="text-xs text-gray-500 mt-1">
-                        Remaining amount: {formatCurrency(getTotal() - splitAmount)} via {paymentMethods.find(m => m.code === paymentMethod)?.name || 'primary method'}
-                      </p>
-                    </div>
-                  </div>
-                )}
-              </div>
-            )}
-
-
-
-            {/* Pickup Option */}
-            <div className="mb-2">
-              <label className="block text-sm font-medium text-secondary-700 dark:text-secondary-300 mb-2">
-                Pickup Option
-              </label>
-              <div className="grid grid-cols-2 gap-2">
-                <button
-                  type="button"
-                  onClick={() => setPickupOption('pickup')}
-                  className={`h-10 flex items-center justify-center rounded-lg border transition-colors text-sm font-medium ${
-                    pickupOption === 'pickup'
-                      ? 'bg-secondary-600 text-white border-secondary-600'
-                      : 'btn-secondary'
-                  }`}
-                >
-                  <span className="mr-2">🏪</span>
-                  <span>Pickup</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setPickupOption('dine-in')}
-                  className={`h-10 flex items-center justify-center rounded-lg border transition-colors text-sm font-medium ${
-                    pickupOption === 'dine-in'
-                      ? 'bg-secondary-600 text-white border-secondary-600'
-                      : 'btn-secondary'
-                  }`}
-                >
-                  <span className="mr-2">🍽️</span>
-                  <span>Dine-in</span>
-                </button>
-              </div>
-              <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
-                {pickupOption === 'pickup' 
-                  ? 'Order will be ready for pickup at the counter' 
-                  : 'Order will be served at the table'}
-              </p>
-            </div>
-
-            {/* UPI QR Code Display */}
-            {paymentMethod === 'upi' && (
-              <div className="mb-4 p-4 bg-white border border-accent-200 rounded-lg">
-                <div className="text-center">
-                  <div className="p-3 rounded-t-lg -mt-4 -mx-4 mb-4 flex items-center" style={{ backgroundColor: 'var(--color-primary)', color: 'var(--color-on-primary)' }}>
-                    <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center mr-2">
-                      <span className="font-bold text-sm" style={{ color: 'var(--color-primary)' }}>पे</span>
-                    </div>
-                    <span className="font-semibold">PhonePe</span>
-                  </div>
-                  
-                  <p className="text-sm text-gray-600 mb-4">Scan & Pay with any UPI App</p>
-                  
-                  <img 
-                    src="/images/upi-qr-code.png" 
-                    alt="UPI QR Code" 
-                    className="w-48 h-48 mx-auto mb-4"
-                  />
-                  
-                  <div className="text-sm text-gray-600 mb-2">UPI ID: Q966641592@ybl</div>
-                  
-                  <div className="flex justify-center items-center space-x-4 mb-3">
-                    <div className="text-center">
-                      <div className="text-lg font-bold text-gray-700">BHIM</div>
-                      <div className="text-xs text-gray-500">BHARAT INTERFACE</div>
-                      <div className="text-xs text-gray-500">FOR MONEY</div>
-                    </div>
-                    <div className="w-px h-8 bg-gray-300"></div>
-                    <div className="text-center">
-                      <div className="text-lg font-bold text-gray-700">UPI</div>
-                      <div className="text-xs text-gray-500">UNIFIED PAYMENTS</div>
-                      <div className="text-xs text-gray-500">INTERFACE</div>
-                    </div>
-                  </div>
-                  
-                  <div className="text-sm font-medium text-gray-700">{cafeSettings?.cafe_name || 'Cafe'}</div>
-                  
-                  <div className="h-2 -mx-4 -mb-4 rounded-b-lg" style={{ backgroundColor: 'var(--color-primary)' }}></div>
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* Cart Items */}
-          {currentCart.length === 0 ? (
-            <div className="text-center py-8 text-gray-500 dark:text-gray-400">
-              <ShoppingCart className="h-12 w-12 mx-auto mb-2 text-gray-300 dark:text-gray-500" />
-              <p className="font-medium mb-1">Your cart is empty</p>
-              <p className="text-sm">Select items from the menu to add them to your order</p>
-            </div>
-          ) : (
-            <div className="space-y-3 mb-4">
-              {currentCart.map((item) => (
-                <div key={item.id} className="flex items-center justify-between p-3 bg-accent-50 dark:bg-gray-700 rounded-lg border border-accent-200 dark:border-gray-600">
-                  <div className="flex items-center space-x-3 flex-1">
-                    {/* Cart Item Image */}
-                    {cafeSettings?.show_menu_images && item.image_url && (
-                      <div className="w-12 h-12 overflow-hidden rounded-lg flex-shrink-0">
-                        <img
-                          src={getImageUrl(item.image_url)}
-                          alt={item.name}
-                          className="w-full h-full object-cover"
-                        />
-                      </div>
-                    )}
-                    <div className="flex-1">
-                      <h4 className="font-medium text-secondary-700 dark:text-secondary-300">{item.name}</h4>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">{formatCurrency(ensureNumber(item.price))} each</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <button
-                      onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                      className="p-1 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
-                    >
-                      <Minus className="h-4 w-4" />
-                    </button>
-                    <span className="w-8 text-center font-medium text-gray-900 dark:text-gray-100">{item.quantity}</span>
-                    <button
-                      onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                      className="p-1 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
-                    >
-                      <Plus className="h-4 w-4" />
-                    </button>
-                    <button
-                      onClick={() => removeFromCart(item.id)}
-                      className="p-1 text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 ml-2"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-
-          {/* Tip Selection */}
-          {currentCart.length > 0 && (
-            <div className="border-t border-accent-200 pt-4 mb-4">
-              <h3 className="font-medium text-secondary-700 dark:text-secondary-300 mb-3">Tip</h3>
-              
-              {/* Quick tip buttons */}
-              <div className="grid grid-cols-3 gap-2 mb-3">
-                {[0, 10, 15, 18, 20, 25].map((percentage) => (
-                  <button
-                    key={percentage}
-                    onClick={() => handleTipPercentageChange(percentage)}
-                                            className={`py-2 px-3 text-sm rounded-lg border transition-colors ${
-                          tipPercentage === percentage
-                            ? 'bg-secondary-500 text-white border-secondary-500'
-                            : 'bg-white dark:bg-gray-700 text-secondary-700 dark:text-gray-200 border-accent-300 dark:border-gray-600 hover:bg-accent-50 dark:hover:bg-gray-600'
-                        }`}
-                  >
-                    {percentage === 0 ? 'No Tip' : `${percentage}%`}
-                  </button>
-                ))}
-              </div>
-              
-              {/* Custom tip amount */}
-              <div className="flex items-center space-x-2">
-                <span className="text-sm text-gray-600 dark:text-gray-400">Custom:</span>
-                <input
-                  type="number"
-                  value={tipAmount.toFixed(2)}
-                  onChange={(e) => handleTipAmountChange(e.target.value)}
-                  step="0.01"
-                  min="0"
-                  className="flex-1 input-field"
-                  placeholder="0.00"
-                />
-              </div>
-            </div>
-          )}
-
-          {/* Extra Charge */}
-          {currentCart.length > 0 && (
-            <div className="border-t border-accent-200 pt-4 mb-4">
-              <h3 className="font-medium text-secondary-700 dark:text-secondary-300 mb-3">Extra Charge</h3>
-              <div className="flex items-center space-x-2">
-                <input
-                  type="checkbox"
-                  checked={extraChargeEnabled}
-                  onChange={(e) => {
-                    setExtraChargeEnabled(e.target.checked);
-                    if (!e.target.checked) {
-                      setExtraCharge(0);
-                      setExtraChargeNote('');
-                    }
-                  }}
-                  className="rounded"
-                />
-                <span className="text-sm text-gray-600 dark:text-gray-400">Add extra charge</span>
-              </div>
-              {extraChargeEnabled && (
-                <div className="space-y-3 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      Extra Charge Amount
-                    </label>
-                    <input
-                      type="number"
-                      value={extraCharge}
-                      onChange={(e) => setExtraCharge(parseFloat(e.target.value) || 0)}
-                      min="0"
-                      step="0.01"
-                      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-secondary-500 focus:border-transparent"
-                      placeholder="Enter extra charge amount"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      Extra Charge Note (optional)
-                    </label>
-                    <input
-                      type="text"
-                      value={extraChargeNote}
-                      onChange={(e) => setExtraChargeNote(e.target.value)}
-                      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-secondary-500 focus:border-transparent"
-                      placeholder="e.g., Service fee, Delivery charge"
-                    />
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* Totals */}
-          {currentCart.length > 0 && (
-            <div className="border-t border-accent-200 pt-4 mb-4 space-y-2">
-              <div className="flex justify-between text-sm text-gray-600 dark:text-gray-400">
-                <span>Subtotal:</span>
-                                    <span>{formatCurrency(subtotal)}</span>
-              </div>
-              
-              {taxInfo.taxAmount > 0 && (
-                <div className="flex justify-between text-sm text-gray-600 dark:text-gray-400">
-                  <span>{taxInfo.taxName} ({taxInfo.taxRate}%):</span>
-                  <span>{formatCurrency(taxInfo.taxAmount)}</span>
-                </div>
-              )}
-              
-              {tipAmount > 0 && (
-                <div className="flex justify-between text-sm text-gray-600 dark:text-gray-400">
-                  <span>Tip:</span>
-                  <span>{formatCurrency(tipAmount)}</span>
-                </div>
-              )}
-              
-              {pointsToRedeem > 0 && (
-                <div className="flex justify-between text-sm text-green-600 dark:text-green-400">
-                  <span>Points Redeemed ({pointsToRedeem} pts):</span>
-                  <span>-{formatCurrency(pointsToRedeem * 0.1)}</span>
-                </div>
-              )}
-
-              {extraCharge > 0 && (
-                <div className="flex justify-between text-sm text-gray-600 dark:text-gray-400">
-                  <span>Extra Charge:</span>
-                  <span>{formatCurrency(extraCharge)}</span>
-                </div>
-              )}
-              
-              <div className="flex justify-between items-center text-lg font-semibold border-t border-accent-200 pt-2">
-                <span className="text-secondary-700 dark:text-secondary-300">Total:</span>
-                <span className="text-secondary-600 dark:text-secondary-400">{formatCurrency(total)}</span>
-              </div>
-            </div>
-          )}
-
-          {/* Complete order button */}
-          <button
-            onClick={startCheckout}
-            disabled={currentCart.length === 0 || loading}
-            className="btn-primary w-full flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            <Receipt className="h-4 w-4 mr-2" />
-            {loading ? 'Completing...' : 'Complete order'}
-          </button>
-        </div>
-      </div>
     </div>
   );
 };

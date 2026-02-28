@@ -26,8 +26,8 @@ export function resolveTheme({ uiRole, isDarkMode, cafeBranding = null }) {
   if (uiRole === 'superadmin') {
     return baseTheme;
   }
-  
-  // For cafe/customer UI, apply branding overrides if provided
+
+  // For cafe and customer UI, apply branding overrides if provided
   if (cafeBranding && (uiRole === 'cafe' || uiRole === 'customer')) {
     const brandingColors = {
       ...baseTheme.colors,

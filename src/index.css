@@ -10,7 +10,8 @@
    ============================================ */
 
 body {
-  @apply bg-background text-text-primary;
+  /* background-color: var(--surface-page); */
+  color: var(--on-surface-page);
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
     sans-serif;
@@ -136,28 +137,35 @@ body {
     padding: 2px;
   }
   
-  /* Card component - Redesigned with better composition */
+  /* Card component - Consistent modern style across app (Menu, Customers, Analytics, Inventory, Reports, User Management) */
   .card {
-    @apply rounded-lg;
+    @apply rounded-2xl;
     background-color: var(--surface-card);
     color: var(--on-surface-card);
     border: 1px solid var(--color-outline);
-    box-shadow: var(--elevation-1);
+    box-shadow: var(--elevation-2);
     padding: var(--spacing-xl);
     transition: box-shadow var(--motion-duration-normal) var(--motion-easing),
-                transform var(--motion-duration-normal) var(--motion-easing),
                 border-color var(--motion-duration-normal) var(--motion-easing);
   }
   
-  /* Card header - clear separation with increased spacing */
+  .card:hover {
+    box-shadow: var(--elevation-3);
+  }
+  
+  /* Card header - strip style for consistent section titles across tabs */
   .card-header {
-    padding-bottom: var(--spacing-lg);
+    margin-left: calc(-1 * var(--spacing-xl));
+    margin-right: calc(-1 * var(--spacing-xl));
+    margin-top: calc(-1 * var(--spacing-xl));
     margin-bottom: var(--spacing-xl);
-    border-bottom: 2px solid var(--color-outline-variant);
+    padding: var(--spacing-lg) var(--spacing-xl);
+    background-color: var(--surface-table);
+    border-bottom: 1px solid var(--color-outline-variant);
   }
   
   .card-title {
-    font-size: 1.375rem;
+    font-size: 1rem;
     font-weight: 600;
     color: var(--on-surface-card);
     margin: 0;
@@ -165,9 +173,9 @@ body {
   }
   
   .card-description {
-    font-size: 0.9375rem;
+    font-size: 0.875rem;
     color: var(--color-on-surface-variant);
-    margin-top: var(--spacing-sm);
+    margin-top: var(--spacing-xs);
     margin: 0;
     line-height: 1.5;
   }
@@ -176,31 +184,52 @@ body {
     padding: var(--spacing-lg);
   }
   
+  .card-sm .card-header {
+    margin-left: calc(-1 * var(--spacing-lg));
+    margin-right: calc(-1 * var(--spacing-lg));
+    margin-top: calc(-1 * var(--spacing-lg));
+    margin-bottom: var(--spacing-lg);
+    padding: var(--spacing-md) var(--spacing-lg);
+  }
+  
   .card-lg {
     padding: var(--spacing-2xl);
   }
   
-  /* Elevated card for KPIs and important content */
+  .card-lg .card-header {
+    margin-left: calc(-1 * var(--spacing-2xl));
+    margin-right: calc(-1 * var(--spacing-2xl));
+    margin-top: calc(-1 * var(--spacing-2xl));
+    margin-bottom: var(--spacing-2xl);
+    padding: var(--spacing-lg) var(--spacing-2xl);
+  }
+  
+  /* Elevated card for KPIs and important content - same radius and shadow as .card */
   .card-elevated {
-    @apply rounded-lg;
+    @apply rounded-2xl;
     background-color: var(--surface-elevated);
     color: var(--on-surface-elevated);
     border: 1px solid var(--color-outline);
     box-shadow: var(--elevation-2);
     padding: var(--spacing-xl);
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: box-shadow var(--motion-duration-normal) var(--motion-easing);
   }
   
-  /* KPI Card - Special style for dashboard metrics */
+  .card-elevated:hover {
+    box-shadow: var(--elevation-3);
+  }
+  
+  /* KPI Card - Same as card, with optional top accent */
   .card-kpi {
-    @apply rounded-lg;
-    background-color: var(--surface-elevated);
-    color: var(--on-surface-elevated);
+    @apply rounded-2xl;
+    background-color: var(--surface-card);
+    color: var(--on-surface-card);
     border: 1px solid var(--color-outline);
     box-shadow: var(--elevation-2);
     padding: var(--spacing-xl);
     position: relative;
     overflow: hidden;
+    transition: box-shadow var(--motion-duration-normal) var(--motion-easing);
   }
   
   .card-kpi::before {
@@ -209,43 +238,35 @@ body {
     top: 0;
     left: 0;
     right: 0;
-    height: 4px;
+    height: 3px;
     background: linear-gradient(90deg, var(--color-primary), var(--color-accent));
-  }
-  
-  .card:hover {
-    box-shadow: var(--elevation-2);
-    transform: translateY(-2px);
-  }
-  
-  .card-elevated {
-    transition: box-shadow var(--motion-duration-normal) var(--motion-easing),
-                transform var(--motion-duration-normal) var(--motion-easing),
-                border-color var(--motion-duration-normal) var(--motion-easing);
-  }
-  
-  .card-elevated:hover {
-    box-shadow: var(--elevation-3);
-    transform: translateY(-2px);
-  }
-  
-  .card-kpi {
-    transition: box-shadow var(--motion-duration-normal) var(--motion-easing),
-                transform var(--motion-duration-normal) var(--motion-easing);
   }
   
   .card-kpi:hover {
     box-shadow: var(--elevation-3);
-    transform: translateY(-2px);
   }
   
-  /* Disable hover lift on mobile/touch devices */
   @media (hover: none) {
     .card:hover,
     .card-elevated:hover,
     .card-kpi:hover {
-      transform: none;
+      box-shadow: var(--elevation-2);
     }
+  }
+
+  /* Card status accent (left border) - same card, semantic accent */
+  .card-status-pending {
+    border-left: 4px solid var(--color-warning);
+  }
+  .card-status-preparing {
+    border-left: 4px solid var(--color-info);
+  }
+  .card-status-ready,
+  .card-status-completed {
+    border-left: 4px solid var(--color-success);
+  }
+  .card-status-cancelled {
+    border-left: 4px solid var(--color-error);
   }
 
   /* Button styles - Stronger primary color presence with motion */
@@ -334,24 +355,62 @@ body {
     background-color: var(--color-surface-variant);
   }
 
-  /* Input field styles - refined with subtle elevation */
-  .input-field {
-    @apply w-full h-10 px-3 py-2 text-sm border rounded-lg transition-all duration-200;
+  /* Input and select - consistent across app (theme vars for light/dark) */
+  .input-field,
+  input.input-field,
+  select.input-field,
+  textarea.input-field {
+    @apply w-full min-h-[40px] py-2 pr-3 pl-3 text-sm border rounded-xl transition-all duration-200;
     background-color: var(--color-surface);
     border-color: var(--color-outline);
     color: var(--color-on-surface);
     box-shadow: var(--elevation-0);
   }
-  
-  .input-field:focus {
-    @apply focus:ring-2 focus:ring-primary focus:border-transparent;
+  textarea.input-field {
+    min-height: 80px;
+  }
+  /* Search / inputs with left icon: reserve space so text never overlaps icon (pl-* overrides pl-3) */
+  .input-field.pl-10 { padding-left: 2.5rem; }
+  .input-field.pl-12 { padding-left: 3rem; }
+  .input-field:focus,
+  input.input-field:focus,
+  select.input-field:focus,
+  textarea.input-field:focus {
+    @apply focus:ring-2 focus:ring-primary focus:border-transparent outline-none;
     border-color: var(--color-primary);
-    outline: none;
     box-shadow: var(--elevation-1), 0 0 0 3px rgba(var(--color-primary-rgb, 111, 78, 55), 0.1);
   }
-  
   .input-field::placeholder {
     color: var(--color-on-surface-variant);
+  }
+  select.input-field {
+    appearance: none;
+    cursor: pointer;
+    padding-right: 2.5rem;
+    background-color: var(--color-surface);
+    box-shadow: var(--elevation-1);
+    /* Chevron in theme primary (brown) - encoded #6F4E37 */
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236F4E37'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.75rem center;
+    background-size: 1.25rem;
+  }
+  [data-theme="dark"] select.input-field,
+  .dark select.input-field {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%238B6F47'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+  }
+  select.input-field option {
+    background-color: var(--color-surface);
+    color: var(--color-on-surface);
+  }
+  /* Material-style focus: primary border + soft ring */
+  select.input-field:focus {
+    border-color: var(--color-primary);
+    box-shadow: var(--elevation-2), 0 0 0 3px rgba(111, 78, 55, 0.12);
+  }
+  .dark select.input-field:focus,
+  [data-theme="dark"] select.input-field:focus {
+    box-shadow: var(--elevation-2), 0 0 0 3px rgba(139, 111, 71, 0.25);
   }
 
   /* Navigation styles - Gradient button active state */
@@ -539,6 +598,14 @@ body {
   line-height: 1.6;
 }
 
+.text-on-surface-variant {
+  color: var(--color-on-surface-variant);
+}
+
+.sheet-header-border {
+  border-color: var(--color-outline);
+}
+
 /* Responsive text sizes */
 .text-responsive-xl {
   @apply text-lg sm:text-xl;
@@ -560,9 +627,15 @@ body {
 /* Mobile-specific styles */
 @media (max-width: 640px) {
   .card {
-    @apply p-3;
+    padding: var(--spacing-lg);
   }
-  
+  .card-header {
+    margin-left: calc(-1 * var(--spacing-lg));
+    margin-right: calc(-1 * var(--spacing-lg));
+    margin-top: calc(-1 * var(--spacing-lg));
+    margin-bottom: var(--spacing-lg);
+    padding: var(--spacing-md) var(--spacing-lg);
+  }
   .btn-primary, .btn-secondary {
     @apply px-3 py-2 text-sm;
   }
@@ -695,6 +768,37 @@ img {
   display: none;
 }
 
+/* DIR reference: grain overlay, float, glass */
+.grain-overlay {
+  position: relative;
+}
+.grain-overlay::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  opacity: 0.025;
+  mix-blend-mode: overlay;
+  pointer-events: none;
+  z-index: 1;
+}
+.float {
+  animation: float 6s ease-in-out infinite;
+}
+.float-slow {
+  animation: float 10s ease-in-out infinite;
+}
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-20px); }
+}
+.glass-dark {
+  background: rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
 /* ============================================
    MOTION & TRANSITIONS
    ============================================ */
@@ -728,6 +832,14 @@ img {
 .transition-elevation {
   transition: box-shadow var(--motion-duration-normal) var(--motion-easing),
               transform var(--motion-duration-normal) var(--motion-easing);
+}
+
+/* Material-style elevation utilities */
+.elevation-1 {
+  box-shadow: var(--elevation-1);
+}
+.elevation-2 {
+  box-shadow: var(--elevation-2);
 }
 
 .transition-surface {
@@ -786,6 +898,90 @@ img {
 .animate-slideIn {
   animation: slideIn var(--motion-duration-slow) var(--motion-easing-out);
 }
+
+@keyframes slideInFromRight {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+.animate-slide-in-right {
+  animation: slideInFromRight 0.3s ease-out;
+}
+
+/* ============================================
+   SCROLL-TRIGGERED ANIMATIONS (template-style)
+   ============================================ */
+
+/* Base: elements start hidden and slide up; when .in-view they animate in */
+.scroll-animate-in {
+  opacity: 0;
+  transform: translateY(40px);
+  transition: opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1), transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.scroll-animate-in.in-view,
+[data-scroll-animate].in-view .scroll-animate-in {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Slide from left (for section headers) */
+.scroll-animate-left {
+  opacity: 0;
+  transform: translateX(-40px);
+  transition: opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1), transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.scroll-animate-left.in-view,
+[data-scroll-animate].in-view .scroll-animate-left {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+/* Slight scale + fade (for cards) */
+.scroll-animate-scale {
+  opacity: 0;
+  transform: translateY(50px) scale(0.97);
+  transition: opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1), transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.scroll-animate-scale.in-view,
+[data-scroll-animate].in-view .scroll-animate-scale {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+/* Stagger delays for children */
+.scroll-stagger-1 { transition-delay: 0.05s; }
+.scroll-stagger-2 { transition-delay: 0.1s; }
+.scroll-stagger-3 { transition-delay: 0.15s; }
+.scroll-stagger-4 { transition-delay: 0.2s; }
+.scroll-stagger-5 { transition-delay: 0.25s; }
+.scroll-stagger-6 { transition-delay: 0.3s; }
+.scroll-stagger-7 { transition-delay: 0.35s; }
+.scroll-stagger-8 { transition-delay: 0.4s; }
+.scroll-stagger-9 { transition-delay: 0.45s; }
+.scroll-stagger-10 { transition-delay: 0.5s; }
+
+/* Hero entrance (on load) */
+@keyframes heroFadeUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes heroFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.hero-animate {
+  animation: heroFadeUp 1s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+.hero-animate-delay-0 { animation-delay: 0.1s; opacity: 0; }
+.hero-animate-delay-1 { animation-delay: 0.25s; opacity: 0; }
+.hero-animate-delay-2 { animation-delay: 0.4s; opacity: 0; }
+.hero-animate-delay-3 { animation-delay: 0.55s; opacity: 0; }
+.hero-animate-delay-4 { animation-delay: 0.7s; opacity: 0; }
+.hero-animate-delay-5 { animation-delay: 0.85s; opacity: 0; }
+.hero-animate-delay-6 { animation-delay: 1s; opacity: 0; }
+.hero-animate-delay-7 { animation-delay: 1.15s; opacity: 0; }
+.hero-animate-delay-8 { animation-delay: 1.3s; opacity: 0; }
+.hero-animate-delay-9 { animation-delay: 1.45s; opacity: 0; }
+.hero-animate-delay-10 { animation-delay: 1.6s; opacity: 0; }
 
 /* ============================================
    VIEWPORT & MOBILE

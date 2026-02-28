@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import toast, { Toaster, ToastBar } from 'react-hot-toast';
 import CustomerLogin from './CustomerLogin';
 import CustomerMenu from './CustomerMenu';
 import CafeNotFound from './CafeNotFound';
-import { LogOut, User, ShoppingCart, History, LogIn, X } from 'lucide-react';
+import LoginDialog from './ui/Dialog';
 import { useDarkMode } from '../contexts/DarkModeContext';
 import { getImageUrl } from '../utils/imageUtils';
 import axios from 'axios';
@@ -63,7 +63,6 @@ const getStoredWithExpiry = (key) => {
 
 const CustomerApp = () => {
   const { slug } = useParams();
-  const navigate = useNavigate();
   const { isDarkMode } = useDarkMode();
   const [cafeBranding, setCafeBranding] = useState({
     logo_url: null,
@@ -248,71 +247,43 @@ const CustomerApp = () => {
         onClearOpenProfileOrdersAfterLogin={() => setOpenProfileOrdersAfterLogin(false)}
       />
 
-             {/* Login Modal - Full screen on mobile */}
-       {showLoginModal && (
-         <div className="fixed inset-0 bg-black bg-opacity-60 flex items-end lg:items-center justify-center z-50 p-0 lg:p-4 animate-fadeIn backdrop-blur-sm">
-           <div className={`${isDarkMode ? 'bg-gray-800' : 'bg-white'} rounded-t-2xl lg:rounded-2xl shadow-material-5 max-w-md lg:max-w-md w-full lg:mx-4 h-[90vh] max-h-[90vh] lg:h-auto lg:max-h-[90vh] flex flex-col transform transition-all duration-300 animate-slideIn hover-lift min-h-0`}>
-             {/* Modal Header - fixed so body can scroll */}
-             <div className={`relative flex-shrink-0 p-6 border-b ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}`}>
-               <div className="flex items-center justify-center mb-4">
-                 {cafeBranding.logo_url && (
-                   <div className="w-16 h-16 bg-secondary-500 rounded-full flex items-center justify-center shadow-lg">
-                     <img 
-                       src={getImageUrl(cafeBranding.logo_url)} 
-                       alt={`${cafeBranding.cafe_name || 'Cafe'} Logo`} 
-                       className="w-10 h-10"
-                     />
-                   </div>
-                 )}
-               </div>
-               <h2 className={`text-2xl font-bold text-center mb-2 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                 {(() => {
-                   const name = (cafeBranding.cafe_name || '').trim();
-                   const isPlaceholder = !name || /^default\s*cafe$/i.test(name);
-                   return isPlaceholder ? 'Welcome' : `Welcome to ${cafeBranding.cafe_name}`;
-                 })()}
-               </h2>
-               <p className={`text-center text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                 Enter your phone number to continue
-               </p>
-               
-               {/* Close Button */}
-               <button
-                 onClick={() => { setShowLoginModal(false); setLoginIntent(null); }}
-                 className={`absolute top-4 right-4 p-2 rounded-full transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center ${
-                   isDarkMode 
-                     ? 'hover:bg-gray-700 text-gray-400' 
-                     : 'hover:bg-gray-100 text-gray-500'
-                 }`}
-                 aria-label="Close"
-               >
-                 <X className="h-5 w-5" />
-               </button>
-             </div>
-
-             {/* Modal Body - scrollable when content exceeds viewport (Create Account); no blank block when short (Login) */}
-             <div className="p-4 sm:p-6 flex-1 min-h-0 overflow-y-auto overscroll-contain flex flex-col">
-               <div className="flex-shrink-0">
-                 <CustomerLogin onLogin={handleLogin} />
-               </div>
-               {/* Continue Browsing Option - no extra space below */}
-               <div className={`flex-shrink-0 mt-6 pt-4 border-t ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}`}>
-                 <button
-                   onClick={() => { setShowLoginModal(false); setLoginIntent(null); }}
-                   className={`w-full text-sm transition-colors flex items-center justify-center min-h-[44px] py-2 ${
-                     isDarkMode 
-                       ? 'text-gray-400 hover:text-gray-200' 
-                       : 'text-gray-500 hover:text-gray-700'
-                   }`}
-                 >
-                   <span className="mr-2">←</span>
-                   Continue browsing without login
-                 </button>
-               </div>
-             </div>
-           </div>
-         </div>
-       )}
+      {/* Login Modal - Template Dialog */}
+      <LoginDialog
+        open={showLoginModal}
+        onClose={() => { setShowLoginModal(false); setLoginIntent(null); }}
+        title={(() => {
+          const name = (cafeBranding.cafe_name || '').trim();
+          const isPlaceholder = !name || /^default\s*cafe$/i.test(name);
+          return isPlaceholder ? 'Welcome' : `Welcome to ${cafeBranding.cafe_name}`;
+        })()}
+      >
+        {showLoginModal && (
+          <>
+            {cafeBranding.logo_url && (
+              <div className="flex justify-center mb-4">
+                <div className="w-14 h-14 rounded-full flex items-center justify-center overflow-hidden bg-[#E9E4DA]">
+                  <img
+                    src={getImageUrl(cafeBranding.logo_url)}
+                    alt=""
+                    className="w-9 h-9 object-contain"
+                  />
+                </div>
+              </div>
+            )}
+            <p className="text-[#6F6A63] text-sm text-center mb-4">Enter your phone number to continue</p>
+            <CustomerLogin cafeSlug={slug} onLogin={handleLogin} />
+            <div className="mt-6 pt-4 border-t border-[#E9E4DA]">
+              <button
+                onClick={() => { setShowLoginModal(false); setLoginIntent(null); }}
+                className="w-full text-sm text-[#6F6A63] hover:text-[#2A2A2A] transition-colors flex items-center justify-center min-h-[44px] py-2"
+              >
+                <span className="mr-2">←</span>
+                Continue browsing without login
+              </button>
+            </div>
+          </>
+        )}
+      </LoginDialog>
     </div>
   );
 };

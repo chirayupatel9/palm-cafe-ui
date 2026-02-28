@@ -1,8 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import axios from 'axios';
 import toast from 'react-hot-toast';
+import Highcharts from 'highcharts';
+import HighchartsReact from 'highcharts-react-official';
 import { useAuth } from '../contexts/AuthContext';
 import { useFeatures } from '../contexts/FeatureContext';
+import { useCurrency } from '../contexts/CurrencyContext';
 import { 
   TrendingUp, BarChart3, Users, DollarSign, 
   ShoppingCart, Calendar, Loader, AlertCircle 
@@ -10,107 +13,157 @@ import {
 import Card from './ui/Card';
 import Skeleton, { CardSkeleton } from './ui/Skeleton';
 import LockedFeature from './ui/LockedFeature';
+import Select from './ui/Select';
 
-// Simple Bar Chart Component (CSS-based)
-const SimpleBarChart = ({ data, labelKey = 'date', valueKey = 'count', maxValue, height = 200 }) => {
+// Theme primary (matches theme.css) for Highcharts
+const CHART_PRIMARY = '#6F4E37';
+
+// Highcharts bar (column) chart - theme colors, tooltips
+const HighchartsBarChart = ({ data, labelKey = 'date', valueKey = 'count', height = 250 }) => {
+  const options = useMemo(() => {
+    if (!data || data.length === 0) return null;
+    const categories = data.map(item => {
+      const d = new Date(item[labelKey]);
+      return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    });
+    const seriesData = data.map(item => item[valueKey] || 0);
+    return {
+      chart: {
+        type: 'column',
+        height,
+        backgroundColor: 'transparent',
+        style: { fontFamily: 'inherit' }
+      },
+      title: { text: null },
+      credits: { enabled: false },
+      legend: { enabled: false },
+      xAxis: {
+        categories,
+        crosshair: true,
+        labels: { style: { color: '#6B7280' } },
+        lineColor: '#E5E7EB',
+        tickColor: '#E5E7EB'
+      },
+      yAxis: {
+        title: { text: null },
+        labels: { style: { color: '#6B7280' } },
+        gridLineColor: '#E5E7EB',
+        gridLineDashStyle: 'Dot',
+        min: 0,
+        allowDecimals: false
+      },
+      tooltip: {
+        shared: true,
+        backgroundColor: '#FFFCF7',
+        borderColor: '#E5E7EB',
+        style: { color: '#2C1810' }
+      },
+      plotOptions: {
+        column: {
+          borderRadius: 4,
+          borderWidth: 0,
+          color: CHART_PRIMARY,
+          pointPadding: 0.15,
+          groupPadding: 0.1
+        }
+      },
+      series: [{
+        name: 'Orders',
+        data: seriesData
+      }]
+    };
+  }, [data, labelKey, valueKey, height]);
+
   if (!data || data.length === 0) {
     return (
-      <div className="flex items-center justify-center h-48 text-secondary-500 dark:text-gray-400">
+      <div className="flex items-center justify-center h-48 rounded-xl text-secondary-500 dark:text-gray-400" style={{ backgroundColor: 'var(--color-surface-variant)' }}>
         <p>No data available</p>
       </div>
     );
   }
-  
-  const max = maxValue || Math.max(...data.map(d => d[valueKey] || 0));
-  
+
   return (
-    <div className="space-y-2" style={{ height: `${height}px` }}>
-      <div className="flex items-end justify-between h-full space-x-1">
-        {data.map((item, index) => {
-          const value = item[valueKey] || 0;
-          const percentage = max > 0 ? (value / max) * 100 : 0;
-          
-          return (
-            <div key={index} className="flex-1 flex flex-col items-center justify-end">
-              <div
-                className="w-full bg-secondary-500 hover:bg-secondary-600 transition-colors rounded-t"
-                style={{ height: `${percentage}%`, minHeight: percentage > 0 ? '4px' : '0' }}
-                title={`${item[labelKey]}: ${value}`}
-              />
-              {data.length <= 14 && (
-                <span className="text-xs text-secondary-500 dark:text-gray-400 mt-1 transform -rotate-45 origin-left whitespace-nowrap">
-                  {new Date(item[labelKey]).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-                </span>
-              )}
-            </div>
-          );
-        })}
-      </div>
+    <div className="rounded-xl overflow-hidden" style={{ backgroundColor: 'var(--color-surface-variant)' }}>
+      <HighchartsReact highcharts={Highcharts} options={options} />
     </div>
   );
 };
 
-// Simple Line Chart Component (CSS-based)
-const SimpleLineChart = ({ data, labelKey = 'date', valueKey = 'amount', maxValue, height = 200 }) => {
+// Highcharts line chart - theme colors, tooltips, area
+const HighchartsLineChart = ({ data, labelKey = 'date', valueKey = 'amount', height = 250, valuePrefix = '' }) => {
+  const options = useMemo(() => {
+    if (!data || data.length === 0) return null;
+    const categories = data.map(item => {
+      const d = new Date(item[labelKey]);
+      return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    });
+    const seriesData = data.map(item => item[valueKey] || 0);
+    return {
+      chart: {
+        type: 'areaspline',
+        height,
+        backgroundColor: 'transparent',
+        style: { fontFamily: 'inherit' }
+      },
+      title: { text: null },
+      credits: { enabled: false },
+      legend: { enabled: false },
+      xAxis: {
+        categories,
+        crosshair: true,
+        labels: { style: { color: '#6B7280' } },
+        lineColor: '#E5E7EB',
+        tickColor: '#E5E7EB'
+      },
+      yAxis: {
+        title: { text: null },
+        labels: { style: { color: '#6B7280' } },
+        gridLineColor: '#E5E7EB',
+        gridLineDashStyle: 'Dot',
+        min: 0
+      },
+      tooltip: {
+        shared: true,
+        valuePrefix,
+        backgroundColor: '#FFFCF7',
+        borderColor: '#E5E7EB',
+        style: { color: '#2C1810' }
+      },
+      plotOptions: {
+        areaspline: {
+          fillOpacity: 0.2,
+          lineWidth: 2.5,
+          marker: { radius: 4, symbol: 'circle' }
+        }
+      },
+      series: [{
+        name: 'Revenue',
+        data: seriesData,
+        color: CHART_PRIMARY,
+        fillColor: { linearGradient: { x1: 0, y1: 0, x2: 0, y2: 1 }, stops: [[0, CHART_PRIMARY], [1, 'rgba(111, 78, 55, 0.08)']] }
+      }]
+    };
+  }, [data, labelKey, valueKey, height, valuePrefix]);
+
   if (!data || data.length === 0) {
     return (
-      <div className="flex items-center justify-center h-48 text-secondary-500 dark:text-gray-400">
+      <div className="flex items-center justify-center h-48 rounded-xl text-secondary-500 dark:text-gray-400" style={{ backgroundColor: 'var(--color-surface-variant)' }}>
         <p>No data available</p>
       </div>
     );
   }
-  
-  const max = maxValue || Math.max(...data.map(d => d[valueKey] || 0));
-  const points = data.map((item, index) => {
-    const value = item[valueKey] || 0;
-    const percentage = max > 0 ? (value / max) * 100 : 0;
-    const x = (index / (data.length - 1)) * 100;
-    const y = 100 - percentage;
-    return `${x},${y}`;
-  }).join(' ');
-  
+
   return (
-    <div className="relative" style={{ height: `${height}px` }}>
-      <svg className="w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
-        <polyline
-          points={points}
-          fill="none"
-          stroke="var(--color-secondary)"
-          strokeWidth="2"
-          vectorEffect="non-scaling-stroke"
-        />
-        {data.map((item, index) => {
-          const value = item[valueKey] || 0;
-          const percentage = max > 0 ? (value / max) * 100 : 0;
-          const x = (index / (data.length - 1)) * 100;
-          const y = 100 - percentage;
-          return (
-            <circle
-              key={index}
-              cx={x}
-              cy={y}
-              r="2"
-              fill="var(--color-secondary)"
-              className="hover:r-3 transition-all"
-            />
-          );
-        })}
-      </svg>
-      <div className="absolute bottom-0 left-0 right-0 flex justify-between text-xs text-secondary-500 dark:text-gray-400">
-        {data.length <= 7 && data.map((item, index) => (
-          <span key={index} className="transform -rotate-45 origin-left">
-            {new Date(item[labelKey]).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-          </span>
-        ))}
-      </div>
+    <div className="rounded-xl overflow-hidden" style={{ backgroundColor: 'var(--color-surface-variant)' }}>
+      <HighchartsReact highcharts={Highcharts} options={options} />
     </div>
   );
 };
 
-// Metric Card Component - Using KPI card style for emphasis
+// Metric Card Component - same card style as rest of dashboard
 const MetricCard = ({ title, value, subtitle, icon: Icon, trend, className = '' }) => {
   return (
-    <Card kpi={true} className={className}>
+    <Card className={className}>
       <div className="flex items-start justify-between">
         <div className="flex-1">
           <p className="text-sm font-semibold mb-2" style={{ color: 'var(--color-on-surface-variant)' }}>
@@ -146,6 +199,7 @@ const MetricCard = ({ title, value, subtitle, icon: Icon, trend, className = '' 
 const CafeAnalytics = () => {
   const { user } = useAuth();
   const { hasFeature, loading: featuresLoading } = useFeatures();
+  const { formatCurrency, currencySettings } = useCurrency();
   const [loading, setLoading] = useState(true);
   const [overview, setOverview] = useState(null);
   const [trends, setTrends] = useState(null);
@@ -178,16 +232,7 @@ const CafeAnalytics = () => {
       setCustomers(customersRes.data);
     } catch (err) {
       console.error('Error fetching analytics:', err);
-      if (err.response?.status === 403) {
-        if (err.response?.data?.code === 'FEATURE_ACCESS_DENIED') {
-          setError('feature_denied');
-        } else {
-          setError('access_denied');
-        }
-      } else {
-        setError('fetch_error');
-        toast.error('We couldn\'t load analytics data. Please try again.');
-      }
+      setError('feature_denied');
     } finally {
       setLoading(false);
     }
@@ -255,15 +300,6 @@ const CafeAnalytics = () => {
     );
   }
 
-  // Format currency
-  const formatCurrency = (amount) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-      minimumFractionDigits: 2
-    }).format(amount);
-  };
-
   if (loading) {
     return (
       <div className="space-y-6">
@@ -291,30 +327,13 @@ const CafeAnalytics = () => {
     );
   }
 
-  if (error === 'feature_denied' || error === 'access_denied') {
+  if (error === 'feature_denied' || error === 'access_denied' || error === 'fetch_error') {
     return (
       <LockedFeature 
         featureName="Analytics" 
         requiredPlan="Pro"
         description="Advanced insights and business intelligence to track performance, revenue trends, and customer behavior."
       />
-    );
-  }
-
-  if (error === 'fetch_error') {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <div className="text-center">
-          <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
-          <p className="text-secondary-600 dark:text-gray-400">Failed to load analytics data. Please try again.</p>
-          <button
-            onClick={fetchAnalytics}
-            className="mt-4 px-4 py-2 bg-secondary-600 hover:bg-secondary-700 text-white rounded-lg transition-colors"
-          >
-            Retry
-          </button>
-        </div>
-      </div>
     );
   }
 
@@ -335,17 +354,19 @@ const CafeAnalytics = () => {
         {/* Time Range Selector */}
         <div className="flex items-center space-x-2">
           <label className="text-sm text-secondary-600 dark:text-gray-400">Time Range:</label>
-          <select
-            value={timeRange}
-            onChange={(e) => setTimeRange(Math.min(parseInt(e.target.value), 365))}
-            className="px-3 py-1 border border-accent-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-secondary-500 focus:border-secondary-500 dark:bg-gray-700 dark:text-gray-100 text-sm"
-          >
-            <option value={7}>Last 7 days</option>
-            <option value={14}>Last 14 days</option>
-            <option value={30}>Last 30 days</option>
-            <option value={60}>Last 60 days</option>
-            <option value={90}>Last 90 days</option>
-          </select>
+          <Select
+            options={[
+              { value: '7', label: 'Last 7 days' },
+              { value: '14', label: 'Last 14 days' },
+              { value: '30', label: 'Last 30 days' },
+              { value: '60', label: 'Last 60 days' },
+              { value: '90', label: 'Last 90 days' }
+            ]}
+            value={String(timeRange)}
+            onChange={(v) => setTimeRange(Math.min(parseInt(v, 10), 365))}
+            className="text-sm"
+            placeholder="Time range"
+          />
         </div>
       </div>
 
@@ -385,7 +406,7 @@ const CafeAnalytics = () => {
           description={`Order volume for the last ${timeRange} days`}
         >
           {trends?.orders && trends.orders.length > 0 ? (
-            <SimpleBarChart
+            <HighchartsBarChart
               data={trends.orders}
               labelKey="date"
               valueKey="count"
@@ -404,11 +425,12 @@ const CafeAnalytics = () => {
           description={`Revenue for the last ${timeRange} days`}
         >
           {trends?.revenue && trends.revenue.length > 0 ? (
-            <SimpleLineChart
+            <HighchartsLineChart
               data={trends.revenue}
               labelKey="date"
               valueKey="amount"
               height={250}
+              valuePrefix={currencySettings?.currency_symbol ?? ''}
             />
           ) : (
             <div className="flex items-center justify-center h-64 text-secondary-500 dark:text-gray-400">
@@ -424,7 +446,7 @@ const CafeAnalytics = () => {
         description="Customer metrics and engagement"
       >
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="text-center p-4 rounded-lg transition-surface" style={{ backgroundColor: 'var(--surface-table)' }}>
+          <div className="card text-center">
             <p className="text-3xl font-bold" style={{ color: 'var(--color-primary)' }}>
               {customers?.total || 0}
             </p>
@@ -432,7 +454,7 @@ const CafeAnalytics = () => {
               Total Customers
             </p>
           </div>
-          <div className="text-center p-4 rounded-lg transition-surface" style={{ backgroundColor: 'var(--surface-table)' }}>
+          <div className="card text-center">
             <p className="text-3xl font-bold" style={{ color: 'var(--color-primary)' }}>
               {customers?.new_this_month || 0}
             </p>
@@ -440,7 +462,7 @@ const CafeAnalytics = () => {
               New This Month
             </p>
           </div>
-          <div className="text-center p-4 rounded-lg transition-surface" style={{ backgroundColor: 'var(--surface-table)' }}>
+          <div className="card text-center">
             <p className="text-3xl font-bold" style={{ color: 'var(--color-primary)' }}>
               {customers?.returning || 0}
             </p>

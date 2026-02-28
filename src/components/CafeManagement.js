@@ -2,10 +2,11 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import toast from 'react-hot-toast';
-import { Plus, Edit, Trash2, Building, X, Check, AlertCircle, AlertTriangle } from 'lucide-react';
+import { Plus, Edit, Trash2, Building, Check, AlertCircle, AlertTriangle } from 'lucide-react';
 import { CardSkeleton, TableSkeleton } from './ui/Skeleton';
 import EmptyState from './ui/EmptyState';
 import ConfirmModal from './ui/ConfirmModal';
+import Dialog from './ui/Dialog';
 import { useFormChanges } from '../hooks/useUnsavedChanges';
 
 const CafeManagement = () => {
@@ -274,37 +275,24 @@ const CafeManagement = () => {
         </div>
       )}
 
-      {/* Modal for Create/Edit - Full screen on mobile */}
-      {showModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-end lg:items-center justify-center z-50 p-0 lg:p-4">
-          <div className="bg-white dark:bg-gray-800 rounded-t-lg lg:rounded-lg shadow-xl max-w-2xl w-full h-[90vh] lg:h-auto max-h-[90vh] flex flex-col">
-            <div className="sticky top-0 bg-white dark:bg-gray-800 border-b border-accent-200 dark:border-gray-700 px-4 sm:px-6 py-4 flex justify-between items-center flex-shrink-0">
-              <h3 className="text-lg sm:text-xl font-bold text-secondary-700 dark:text-gray-100">
-                Create New Cafe
-              </h3>
-              <button
-                onClick={() => {
-                  if (hasUnsavedChanges && !window.confirm('You have unsaved changes. Are you sure you want to close?')) {
-                    return;
-                  }
-                  setShowModal(false);
-                  initialFormDataRef.current = null;
-                }}
-                className="text-secondary-500 hover:text-secondary-700 dark:text-gray-400 dark:hover:text-gray-200 min-h-[44px] min-w-[44px] flex items-center justify-center"
-                aria-label="Close"
-              >
-                <X className="h-6 w-6" />
-              </button>
-            </div>
-
-            {hasUnsavedChanges && (
-              <div className="mx-6 mt-4 p-3 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg flex items-center">
-                <AlertTriangle className="h-4 w-4 text-yellow-600 dark:text-yellow-400 mr-2 flex-shrink-0" />
-                <p className="text-sm text-yellow-800 dark:text-yellow-200">You have unsaved changes</p>
-              </div>
-            )}
-            <div className="flex-1 overflow-y-auto">
-            <form onSubmit={handleSubmit} className="p-4 sm:p-6 space-form">
+      {/* Modal for Create/Edit - Template Dialog */}
+      <Dialog
+        open={showModal}
+        onClose={() => {
+          if (hasUnsavedChanges && !window.confirm('You have unsaved changes. Are you sure you want to close?')) return;
+          setShowModal(false);
+          initialFormDataRef.current = null;
+        }}
+        title="Create New Cafe"
+        size="2xl"
+      >
+        {hasUnsavedChanges && (
+          <div className="mb-4 p-3 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg flex items-center">
+            <AlertTriangle className="h-4 w-4 text-yellow-600 dark:text-yellow-400 mr-2 flex-shrink-0" />
+            <p className="text-sm text-yellow-800 dark:text-yellow-200">You have unsaved changes</p>
+          </div>
+        )}
+        <form onSubmit={handleSubmit} className="space-form pt-0">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-secondary-700 dark:text-gray-300 mb-1">
@@ -487,10 +475,7 @@ const CafeManagement = () => {
                 </button>
               </div>
             </form>
-            </div>
-          </div>
-        </div>
-      )}
+      </Dialog>
 
       {/* Delete Confirmation Modal */}
       <ConfirmModal

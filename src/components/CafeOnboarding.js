@@ -16,6 +16,7 @@ import {
   Clock,
   Globe
 } from 'lucide-react';
+import Select from './ui/Select';
 
 const CafeOnboarding = () => {
   const { user } = useAuth();
@@ -349,7 +350,7 @@ const CafeOnboarding = () => {
                   type="text"
                   value={cafeName}
                   onChange={(e) => setCafeName(e.target.value)}
-                  className="w-full px-4 py-2 border border-accent-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-secondary-500 focus:border-secondary-500 dark:bg-gray-700 dark:text-gray-100"
+                  className="input-field"
                   placeholder="Enter your cafe name"
                   required
                 />
@@ -388,17 +389,12 @@ const CafeOnboarding = () => {
                   <Globe className="h-4 w-4 inline mr-1" />
                   Timezone *
                 </label>
-                <select
+                <Select
+                  options={timezones.map(tz => ({ value: tz.value, label: tz.label }))}
                   value={timezone}
-                  onChange={(e) => setTimezone(e.target.value)}
-                  className="w-full px-4 py-2 border border-accent-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-secondary-500 focus:border-secondary-500 dark:bg-gray-700 dark:text-gray-100"
-                >
-                  {timezones.map((tz) => (
-                    <option key={tz.value} value={tz.value}>
-                      {tz.label}
-                    </option>
-                  ))}
-                </select>
+                  onChange={setTimezone}
+                  placeholder="Select timezone"
+                />
               </div>
 
               <div>
@@ -523,7 +519,7 @@ const CafeOnboarding = () => {
                     step="0.1"
                     value={taxRate}
                     onChange={(e) => setTaxRate(parseFloat(e.target.value) || 0)}
-                    className="w-full px-4 py-2 border border-accent-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-secondary-500 focus:border-secondary-500 dark:bg-gray-700 dark:text-gray-100"
+                    className="input-field"
                   />
                 </div>
               )}
