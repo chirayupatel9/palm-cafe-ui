@@ -7,6 +7,7 @@ import {
   AlertCircle, Loader, CreditCard, Lock, Unlock, Crown, RotateCcw, UserCheck
 } from 'lucide-react';
 import Select from './ui/Select';
+import { getImageUrl } from '../utils/imageUtils';
 
 const SuperAdminCafeSettings = () => {
   const { cafeId } = useParams();
@@ -383,7 +384,7 @@ const SuperAdminCafeSettings = () => {
           <div className="flex items-center space-x-4">
             {formData.logo_url && (
               <img
-                src={formData.logo_url.startsWith('http') ? formData.logo_url : `http://localhost:5000${formData.logo_url}`}
+                src={getImageUrl(formData.logo_url)}
                 alt="Cafe Logo"
                 className="w-16 h-16 object-contain border rounded-lg"
               />
@@ -394,10 +395,10 @@ const SuperAdminCafeSettings = () => {
                 accept="image/jpeg,image/png,image/webp"
                 onChange={(e) => {
                   const file = e.target.files[0];
-                  if (file) {
+                  if (file && cafeId) {
                     const formDataUpload = new FormData();
                     formDataUpload.append('logo', file);
-                    // Upload logo first
+                    formDataUpload.append('cafeId', cafeId);
                     axios.post('/cafe-settings/logo', formDataUpload, {
                       headers: { 'Content-Type': 'multipart/form-data' }
                     }).then(response => {
