@@ -10,6 +10,7 @@ import { useCafeSettings } from '../contexts/CafeSettingsContext';
 import { getImageUrl } from '../utils/imageUtils';
 import LockedFeature from './ui/LockedFeature';
 import Select from './ui/Select';
+import Dialog from './ui/Dialog';
 
 const InventoryManagement = () => {
   const { formatCurrency } = useCurrency();
@@ -117,7 +118,11 @@ const InventoryManagement = () => {
       reorder_level: item.reorder_level,
       description: item.description || ''
     });
-    setShowAddForm(true);
+  };
+
+  const handleCloseEditModal = () => {
+    setEditingItem(null);
+    resetForm();
   };
 
   const handleDelete = async (id) => {
@@ -536,8 +541,8 @@ const InventoryManagement = () => {
         </div>
       </div>
 
-      {/* Add/Edit Form */}
-      {showAddForm && (
+      {/* Add Form - only when adding, not when editing (edit uses modal) */}
+      {showAddForm && !editingItem && (
         <div className="card">
           <h2 className={`text-lg font-semibold mb-4 ${isDarkMode ? 'text-gray-100' : 'text-gray-900'}`}>
             {editingItem ? 'Edit Inventory Item' : 'Add New Inventory Item'}
@@ -713,13 +718,13 @@ const InventoryManagement = () => {
                 return (
                   <tr 
                     key={item.id} 
-                    className="transition-surface"
+                    className={`transition-surface ${editingItem?.id === item.id ? (isDarkMode ? '!bg-gray-700/50' : '!bg-gray-50') : ''}`}
                     style={{ borderBottom: '1px solid var(--color-outline-variant)' }}
                     onMouseEnter={(e) => {
-                      e.currentTarget.style.backgroundColor = 'var(--surface-table)';
+                      if (editingItem?.id !== item.id) e.currentTarget.style.backgroundColor = 'var(--surface-table)';
                     }}
                     onMouseLeave={(e) => {
-                      e.currentTarget.style.backgroundColor = 'var(--surface-card)';
+                      if (editingItem?.id !== item.id) e.currentTarget.style.backgroundColor = 'var(--surface-card)';
                     }}
                   >
                     <td className="px-6 py-4 whitespace-nowrap">
@@ -792,6 +797,137 @@ const InventoryManagement = () => {
           </div>
         )}
       </div>
+
+      {/* Edit Inventory Item Modal - same pattern as menu item edit */}
+      <Dialog
+        open={!!editingItem}
+        onClose={handleCloseEditModal}
+        title={editingItem ? `Edit: ${formData.name || 'Inventory Item'}` : 'Edit Inventory Item'}
+        size="2xl"
+      >
+        {editingItem && (
+          <form onSubmit={handleSubmit} className="space-y-4 pt-0">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className={`block text-sm font-medium mb-1 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>Name *</label>
+                <input
+                  type="text"
+                  value={formData.name}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  className="input-field"
+                  required
+                />
+              </div>
+              <div>
+                <label className={`block text-sm font-medium mb-1 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>Category *</label>
+                <Select
+                  options={[
+                    { value: '', label: 'Select Category' },
+                    ...categories.map(c => ({ value: c.name, label: `${c.name} (${c.item_count} items)` })),
+                    { value: 'new', label: '+ Add New Category' }
+                  ]}
+                  value={formData.category}
+                  onChange={(v) => setFormData({ ...formData, category: v })}
+                  placeholder="Select Category"
+                />
+                {formData.category === 'new' && (
+                  <input
+                    type="text"
+                    value={formData.newCategory}
+                    onChange={(e) => setFormData({ ...formData, newCategory: e.target.value })}
+                    className="input-field mt-2"
+                    placeholder="Enter new category name"
+                    required
+                  />
+                )}
+              </div>
+              <div>
+                <label className={`block text-sm font-medium mb-1 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>Quantity *</label>
+                <input
+                  type="number"
+                  value={formData.quantity}
+                  onChange={(e) => setFormData({ ...formData, quantity: e.target.value })}
+                  className="input-field"
+                  min="0"
+                  step="0.01"
+                  required
+                />
+              </div>
+              <div>
+                <label className={`block text-sm font-medium mb-1 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>Unit *</label>
+                <Select
+                  options={[
+                    { value: '', label: 'Select Unit' },
+                    { value: 'kg', label: 'Kilograms (kg)' },
+                    { value: 'g', label: 'Grams (g)' },
+                    { value: 'l', label: 'Liters (L)' },
+                    { value: 'ml', label: 'Milliliters (ml)' },
+                    { value: 'pcs', label: 'Pieces (pcs)' },
+                    { value: 'boxes', label: 'Boxes' },
+                    { value: 'bottles', label: 'Bottles' },
+                    { value: 'cans', label: 'Cans' }
+                  ]}
+                  value={formData.unit}
+                  onChange={(v) => setFormData({ ...formData, unit: v })}
+                  placeholder="Select Unit"
+                />
+              </div>
+              <div>
+                <label className={`block text-sm font-medium mb-1 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>Cost per Unit</label>
+                <input
+                  type="number"
+                  value={formData.cost_per_unit}
+                  onChange={(e) => setFormData({ ...formData, cost_per_unit: e.target.value })}
+                  className="input-field"
+                  min="0"
+                  step="0.01"
+                  placeholder="0.00"
+                />
+              </div>
+              <div>
+                <label className={`block text-sm font-medium mb-1 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>Reorder Level</label>
+                <input
+                  type="number"
+                  value={formData.reorder_level}
+                  onChange={(e) => setFormData({ ...formData, reorder_level: e.target.value })}
+                  className="input-field"
+                  min="0"
+                  step="0.01"
+                  placeholder="0"
+                />
+              </div>
+              <div className="sm:col-span-2">
+                <label className={`block text-sm font-medium mb-1 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>Supplier</label>
+                <input
+                  type="text"
+                  value={formData.supplier}
+                  onChange={(e) => setFormData({ ...formData, supplier: e.target.value })}
+                  className="input-field"
+                  placeholder="Supplier name"
+                />
+              </div>
+            </div>
+            <div>
+              <label className={`block text-sm font-medium mb-1 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>Description</label>
+              <textarea
+                value={formData.description}
+                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                className="input-field"
+                rows="3"
+                placeholder="Additional notes about this item"
+              />
+            </div>
+            <div className="flex justify-end space-x-3 pt-4 border-t border-[var(--color-outline)]">
+              <button type="button" onClick={handleCloseEditModal} className="btn-secondary">
+                Cancel
+              </button>
+              <button type="submit" className="btn-primary">
+                Save
+              </button>
+            </div>
+          </form>
+        )}
+      </Dialog>
     </div>
   );
 };
