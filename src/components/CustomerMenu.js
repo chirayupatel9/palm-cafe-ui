@@ -126,14 +126,14 @@ const CustomerMenu = ({
     return isNaN(num) ? 0 : num;
   };
 
-  // Fetch menu items, tax settings, and payment methods
+  // Fetch menu items, tax settings, and payment methods; re-fetch branding when cafeSlug changes
   useEffect(() => {
     fetchMenuItems();
     fetchTaxSettings();
     fetchPaymentMethods();
     fetchMostOrderedItems();
     fetchCafeBranding();
-  }, []);
+  }, [cafeSlug]);
 
   // Generate autocomplete suggestions
   useEffect(() => {
@@ -914,15 +914,20 @@ const CustomerMenu = ({
         <div id="menu-section" className="w-full max-w-full pb-12 sm:pb-16 bg-[#F6F4F0]">
           {activeTab === 'menu' ? (
             <div>
-              {cafeSettings.show_menu_images && cafeBranding.hero_image_url && (
+              {(() => {
+                const hasHeroOrPromo = Boolean(
+                  cafeBranding.hero_image_url ||
+                  cafeBranding.promo_banner_image_url ||
+                  (promoBanners.length > 0 && promoBanners.some(b => b.image_url))
+                );
+                const showHeroSection = hasHeroOrPromo && (cafeSettings.show_menu_images !== false);
+                const primaryImageUrl = cafeBranding.hero_image_url || cafeBranding.promo_banner_image_url || promoBanners.find(b => b.image_url)?.image_url;
+                const secondaryImageUrl = cafeBranding.promo_banner_image_url || cafeBranding.hero_image_url;
+                return showHeroSection ? (
                 <ScrollExpandMedia
                   mediaType="image"
-                  mediaSrc={getImageUrl(cafeBranding.hero_image_url)}
-                  bgImageSrc={
-                    cafeBranding.promo_banner_image_url
-                      ? getImageUrl(cafeBranding.promo_banner_image_url)
-                      : getImageUrl(cafeBranding.hero_image_url)
-                  }
+                  mediaSrc={getImageUrl(primaryImageUrl)}
+                  bgImageSrc={getImageUrl(secondaryImageUrl || primaryImageUrl)}
                   title={cafeBranding.cafe_name || 'Welcome to our cafe'}
                   date={cafeBranding.address || ''}
                   scrollToExpand="Scroll to expand menu"
@@ -1037,7 +1042,8 @@ const CustomerMenu = ({
                     )}
                   </div>
                 </ScrollExpandMedia>
-              )}
+                ) : null;
+              })()}
 
               {/* Legacy hero kept out for now; search and categories are shown after scroll expansion above */}
 
