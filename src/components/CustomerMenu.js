@@ -13,6 +13,7 @@ import Sheet from './ui/Sheet';
 import Dialog from './ui/Dialog';
 import ScrollExpandMedia from './ui/ScrollExpandMedia';
 import { GlassButton } from './ui/GlassButton';
+import { FlowButton } from './ui/FlowButton';
 
 const CustomerMenu = ({
   cafeSlug,
@@ -1183,7 +1184,9 @@ const CustomerMenu = ({
                   {/* Back to categories - when viewing a single category */}
                   {!searchQuery.trim() && selectedCategory !== 'All' && (
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 mb-6">
-                      <button
+                      <FlowButton
+                        text="Back to categories"
+                        direction="back"
                         onClick={() => {
                           setSelectedCategory('All');
                           requestAnimationFrame(() => {
@@ -1192,12 +1195,8 @@ const CustomerMenu = ({
                             });
                           });
                         }}
-                        className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-medium text-[#2A2A2A] bg-[#E9E4DA] border border-[#2A2A2A]/10 hover:bg-[#C68E3C] hover:text-white hover:border-[#C68E3C] transition-colors duration-200 min-h-[44px]"
                         aria-label="Back to all categories"
-                      >
-                        <ChevronLeft className="h-4 w-4" strokeWidth={2.5} />
-                        <span>Back to categories</span>
-                      </button>
+                      />
                     </div>
                   )}
 
@@ -1538,13 +1537,12 @@ const CustomerMenu = ({
                         <p className="text-sm text-[#6F6A63]">
                           © {new Date().getFullYear()} {cafeBranding.cafe_name || 'Café'}. Crafted with care.
                         </p>
-                        <button
+                        <FlowButton
+                          text="Back to top"
+                          direction="back"
                           onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-                          className="text-[#6F6A63] hover:text-[#2A2A2A] hover:bg-[#E9E4DA] min-h-[44px] px-4 rounded-full text-sm font-medium transition-colors inline-flex items-center gap-2"
-                        >
-                          <span>Back to top</span>
-                          <ChevronLeft className="h-4 w-4 rotate-[-90deg]" />
-                        </button>
+                          aria-label="Back to top"
+                        />
                       </div>
                     </div>
                   </footer>
