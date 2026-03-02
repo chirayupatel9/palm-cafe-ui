@@ -120,7 +120,7 @@ const CurrencySettings = () => {
     return (
       <div className="flex flex-col items-center justify-center py-12">
         <img 
-          src={cafeSettings.logo_url ? getImageUrl(cafeSettings.logo_url) : '/images/palm-cafe-logo.png'} 
+          src={cafeSettings.logo_url ? getImageUrl(cafeSettings.logo_url) : getImageUrl('/images/palm-cafe-logo.png')} 
           alt={`${cafeSettings.cafe_name || 'Cafe'} Logo`} 
           className="h-12 w-12 mb-3"
         />

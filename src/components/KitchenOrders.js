@@ -561,7 +561,7 @@ const KitchenOrders = ({ cart, setCart }) => {
     return (
       <div className="flex flex-col items-center justify-center py-12">
         <img 
-          src={cafeSettings.logo_url ? getImageUrl(cafeSettings.logo_url) : '/images/palm-cafe-logo.png'} 
+          src={cafeSettings.logo_url ? getImageUrl(cafeSettings.logo_url) : getImageUrl('/images/palm-cafe-logo.png')} 
           alt={`${cafeSettings.cafe_name || 'Cafe'} Logo`} 
           className="h-16 w-16 mb-4 opacity-50"
         />
