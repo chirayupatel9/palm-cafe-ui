@@ -237,39 +237,53 @@ const ScrollExpandMedia = ({
                   </div>
                 )}
 
-                <div
-                  className={
-                    'pointer-events-none absolute inset-0 flex flex-col items-center justify-center text-center z-20 transition-none ' +
-                    (textBlend ? 'mix-blend-difference' : 'mix-blend-normal')
-                  }
-                >
-                  <motion.h2
-                    className="text-4xl md:text-5xl lg:text-6xl font-bold text-blue-200 transition-none"
-                    style={{ transform: `translateX(-${textTranslateX}vw)` }}
-                  >
-                    {firstWord}
-                  </motion.h2>
-                  <motion.h2
-                    className="text-4xl md:text-5xl lg:text-6xl font-bold text-center text-blue-200 transition-none"
-                    style={{ transform: `translateX(${textTranslateX}vw)` }}
-                  >
-                    {restOfTitle}
-                  </motion.h2>
+                {/* Readable title overlay: dark gradient + white text with shadow */}
+                <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center text-center z-20 transition-none">
+                  <div
+                    className="absolute inset-0 rounded-xl bg-gradient-to-b from-black/50 via-black/40 to-black/50"
+                    aria-hidden
+                  />
+                  <div className="relative z-10 flex flex-col items-center justify-center">
+                    <motion.h2
+                      className="text-4xl md:text-5xl lg:text-6xl font-bold text-white transition-none drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]"
+                      style={{
+                        transform: `translateX(-${textTranslateX}vw)`,
+                        textShadow: '0 2px 4px rgba(0,0,0,0.9), 0 0 20px rgba(0,0,0,0.5)'
+                      }}
+                    >
+                      {firstWord}
+                    </motion.h2>
+                    <motion.h2
+                      className="text-4xl md:text-5xl lg:text-6xl font-bold text-center text-white transition-none drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]"
+                      style={{
+                        transform: `translateX(${textTranslateX}vw)`,
+                        textShadow: '0 2px 4px rgba(0,0,0,0.9), 0 0 20px rgba(0,0,0,0.5)'
+                      }}
+                    >
+                      {restOfTitle}
+                    </motion.h2>
+                  </div>
                 </div>
 
-                <div className="flex flex-col items-center text-center relative z-10 mt-4 transition-none">
+                <div className="flex flex-col items-center text-center relative z-10 mt-4 transition-none pointer-events-none">
                   {date && (
                     <p
-                      className="text-2xl text-blue-200"
-                      style={{ transform: `translateX(-${textTranslateX}vw)` }}
+                      className="text-2xl text-white font-medium"
+                      style={{
+                        transform: `translateX(-${textTranslateX}vw)`,
+                        textShadow: '0 2px 4px rgba(0,0,0,0.9), 0 0 12px rgba(0,0,0,0.6)'
+                      }}
                     >
                       {date}
                     </p>
                   )}
                   {scrollToExpand && (
                     <p
-                      className="text-blue-200 font-medium text-center"
-                      style={{ transform: `translateX(${textTranslateX}vw)` }}
+                      className="text-white font-medium text-center"
+                      style={{
+                        transform: `translateX(${textTranslateX}vw)`,
+                        textShadow: '0 2px 4px rgba(0,0,0,0.9), 0 0 12px rgba(0,0,0,0.6)'
+                      }}
                     >
                       {scrollToExpand}
                     </p>

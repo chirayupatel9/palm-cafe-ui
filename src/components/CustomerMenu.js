@@ -914,25 +914,18 @@ const CustomerMenu = ({
         <div id="menu-section" className="w-full max-w-full pb-12 sm:pb-16 bg-[#F6F4F0]">
           {activeTab === 'menu' ? (
             <div>
-              {cafeSettings.show_menu_images && (
+              {cafeSettings.show_menu_images && cafeBranding.hero_image_url && (
                 <ScrollExpandMedia
                   mediaType="image"
-                  mediaSrc={
-                    cafeBranding.hero_image_url
-                      ? getImageUrl(cafeBranding.hero_image_url)
-                      : 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=1400&q=80'
-                  }
+                  mediaSrc={getImageUrl(cafeBranding.hero_image_url)}
                   bgImageSrc={
                     cafeBranding.promo_banner_image_url
                       ? getImageUrl(cafeBranding.promo_banner_image_url)
-                      : cafeBranding.hero_image_url
-                        ? getImageUrl(cafeBranding.hero_image_url)
-                        : 'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&w=1920&q=80'
+                      : getImageUrl(cafeBranding.hero_image_url)
                   }
                   title={cafeBranding.cafe_name || 'Welcome to our cafe'}
                   date={cafeBranding.address || ''}
                   scrollToExpand="Scroll to expand menu"
-                  textBlend
                 >
                   <div className="max-w-3xl mx-auto text-center space-y-4 mb-10">
                     {/* {cafeBranding.cafe_name && (
