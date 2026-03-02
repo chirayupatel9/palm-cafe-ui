@@ -60,6 +60,7 @@ const CustomerMenu = ({
   const [categoryMenuOpen, setCategoryMenuOpen] = useState(false); // Hamburger menu state
   const [categoriesExpanded, setCategoriesExpanded] = useState(false);
   const INITIAL_CATEGORIES_VISIBLE = 6;
+  const [openCategoryMobile, setOpenCategoryMobile] = useState(null);
   const [searchExpanded, setSearchExpanded] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
   const [profileOpenSection, setProfileOpenSection] = useState(null); // 'orders' = open profile on My Orders section
@@ -1215,22 +1216,38 @@ const CustomerMenu = ({
                           key={categoryName}
                           id={slug ? `category-${slug}` : undefined}
                           data-scroll-animate
-                          className="py-16 sm:py-24 bg-[#F6F4F0] relative scroll-mt-24"
+                          className="py-6 sm:py-24 bg-[#F6F4F0] relative scroll-mt-24"
                         >
                           <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#C68E3C]/[0.02] to-transparent pointer-events-none" />
                           <div className="px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto relative z-10">
-                            <div className="mb-12 sm:mb-16">
-                              <div className="scroll-animate-left flex items-baseline gap-4 mb-4">
-                                <span className="font-mono text-sm text-[#C68E3C] bg-[#C68E3C]/10 px-3 py-1 rounded-full">
-                                  {categoryNumber}
+                            <button
+                              type="button"
+                              onClick={() => setOpenCategoryMobile(openCategoryMobile === categoryName ? null : categoryName)}
+                              className="sm:pointer-events-none sm:static w-full text-left mb-4 sm:mb-16"
+                              aria-expanded={openCategoryMobile === categoryName}
+                              aria-controls={slug ? `category-content-${slug}` : undefined}
+                              id={slug ? `category-heading-${slug}` : undefined}
+                            >
+                              <div className="scroll-animate-left flex items-center justify-between gap-4">
+                                <div className="flex items-baseline gap-4">
+                                  <span className="font-mono text-sm text-[#C68E3C] bg-[#C68E3C]/10 px-3 py-1 rounded-full">
+                                    {categoryNumber}
+                                  </span>
+                                  <h2 className="text-2xl sm:text-4xl lg:text-5xl font-bold text-[#2A2A2A] tracking-tight">
+                                    {categoryName}
+                                  </h2>
+                                </div>
+                                <span className="sm:hidden flex-shrink-0 transition-transform duration-200" aria-hidden>
+                                  <ChevronDown className={`h-6 w-6 text-[#2A2A2A] ${openCategoryMobile === categoryName ? 'rotate-180' : ''}`} />
                                 </span>
-                                <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-[#2A2A2A] tracking-tight">
-                                  {categoryName}
-                                </h2>
                               </div>
-                            </div>
+                            </button>
 
-                            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+                            <div
+                              id={slug ? `category-content-${slug}` : undefined}
+                              aria-labelledby={slug ? `category-heading-${slug}` : undefined}
+                              className={`grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 ${openCategoryMobile !== categoryName ? 'max-sm:hidden' : ''}`}
+                            >
                               {items.map((item, itemIndex) => {
                                 const itemImage = item.image_url
                                   ? getImageUrl(item.image_url)
