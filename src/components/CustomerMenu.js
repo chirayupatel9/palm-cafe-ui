@@ -1063,10 +1063,10 @@ const CustomerMenu = ({
                         </h2>
                       </div>
                       <div className="scroll-animate-left hidden sm:flex items-center gap-3">
-                        <GlassButton size="icon" type="button" onClick={() => scrollCarousel('left')} aria-label="Scroll left">
+                        <GlassButton className="glass-button-carousel-arrow" size="icon" type="button" onClick={() => scrollCarousel('left')} aria-label="Scroll left">
                           <ChevronLeft className="h-5 w-5" />
                         </GlassButton>
-                        <GlassButton size="icon" type="button" onClick={() => scrollCarousel('right')} aria-label="Scroll right">
+                        <GlassButton className="glass-button-carousel-arrow" size="icon" type="button" onClick={() => scrollCarousel('right')} aria-label="Scroll right">
                           <ChevronRight className="h-5 w-5" />
                         </GlassButton>
                       </div>
