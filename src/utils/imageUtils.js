@@ -1,22 +1,38 @@
-// Utility function to get the correct image URL for menu items
+// Base URL for image requests. Images are served at /images on the API server (not under /api).
+function getImageBaseUrl() {
+  const raw = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+  const base = String(raw).replace(/\/api\/?$/i, '').replace(/\/$/, '').trim();
+  return base || 'http://localhost:5000';
+}
+
+/**
+ * Builds a full image URL from API response values.
+ * API may return: "/images/foo.jpg", "images/foo.jpg", "foo.jpg", or a full http(s) URL.
+ */
 export const getImageUrl = (imageUrl) => {
-  if (!imageUrl) return null;
-  
-  // If the image URL is already a full URL, return it as is
-  if (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) {
-    return imageUrl;
+  if (imageUrl == null) return null;
+  const s = String(imageUrl).trim();
+  if (!s) return null;
+
+  // Already a full URL – return as is
+  if (s.startsWith('http://') || s.startsWith('https://')) {
+    return s;
   }
-  
-  // Get the API base URL from App.js (hardcoded since env vars not working)
-  const API_BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
-  
-  // If it's a relative path starting with /images/, construct the full URL
-  if (imageUrl.startsWith('/images/')) {
-    return `${API_BASE_URL}${imageUrl}`;
+
+  const imageBase = getImageBaseUrl();
+
+  // Path starting with / (e.g. /images/cafe-logo-123.jpg) – append to origin
+  if (s.startsWith('/')) {
+    return `${imageBase}${s}`;
   }
-  
-  // If it's just a filename, construct the full URL
-  return `${API_BASE_URL}/images/${imageUrl}`;
+
+  // "images/foo.jpg" without leading slash – avoid double "images" in URL
+  if (s.toLowerCase().startsWith('images/')) {
+    return `${imageBase}/${s}`;
+  }
+
+  // Plain filename (e.g. cafe-logo-123.jpg)
+  return `${imageBase}/images/${s}`;
 };
 
 // Utility function to get the correct logo URL (deprecated - use getImageUrl instead)

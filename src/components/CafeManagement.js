@@ -8,6 +8,7 @@ import EmptyState from './ui/EmptyState';
 import ConfirmModal from './ui/ConfirmModal';
 import Dialog from './ui/Dialog';
 import { useFormChanges } from '../hooks/useUnsavedChanges';
+import { getImageUrl } from '../utils/imageUtils';
 
 const CafeManagement = () => {
   const navigate = useNavigate();
@@ -350,7 +351,7 @@ const CafeManagement = () => {
                 <div className="flex items-center space-x-4">
                   {formData.logo_url && (
                     <img
-                      src={formData.logo_url.startsWith('http') ? formData.logo_url : `http://localhost:5000${formData.logo_url}`}
+                      src={getImageUrl(formData.logo_url)}
                       alt="Cafe Logo"
                       className="w-16 h-16 object-contain border rounded-lg"
                     />
