@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
-import { Plus, Minus, Trash2, ShoppingCart, X, Search, User, Phone, Mail, MapPin, CheckCircle, ChevronLeft, ChevronRight, ChevronDown, Utensils, Star, LogOut, Edit3, Save, Menu, ShoppingBag } from 'lucide-react';
+import { Plus, Minus, Trash2, ShoppingCart, X, Search, User, Phone, Mail, MapPin, CheckCircle, ChevronLeft, ChevronRight, ChevronDown, Utensils, Star, LogOut, Edit3, Save, ShoppingBag } from 'lucide-react';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 import { useCurrency } from '../contexts/CurrencyContext';
@@ -58,6 +58,8 @@ const CustomerMenu = ({
   const [tableNumber, setTableNumber] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [categoryMenuOpen, setCategoryMenuOpen] = useState(false); // Hamburger menu state
+  const [categoriesExpanded, setCategoriesExpanded] = useState(false);
+  const INITIAL_CATEGORIES_VISIBLE = 6;
   const [searchExpanded, setSearchExpanded] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
   const [profileOpenSection, setProfileOpenSection] = useState(null); // 'orders' = open profile on My Orders section
@@ -800,31 +802,8 @@ const CustomerMenu = ({
             isScrolled ? 'bg-black/10 backdrop-blur-md' : 'bg-transparent'
           }`}
         >
-          <div className="flex items-center justify-between px-4 sm:px-6 lg:px-8 h-16 sm:h-20">
-            <div className="flex items-center relative category-menu-container">
-              <GlassButton
-                size="icon"
-                onClick={() => setCategoryMenuOpen(!categoryMenuOpen)}
-                className={`lg:hidden ${!isScrolled ? 'glass-button-on-dark' : ''}`}
-                aria-label="Open menu"
-              >
-                <Menu className="h-5 w-5" />
-              </GlassButton>
-              {categoryMenuOpen && (
-                <div className="lg:hidden absolute top-full left-0 mt-2 w-64 bg-[#F6F4F0] rounded-xl shadow-xl border border-[#2A2A2A]/10 overflow-hidden z-50">
-                  <div ref={categoryScrollRef} className="max-h-[60vh] overflow-y-auto p-2">
-                    <button onClick={() => { setSelectedCategory('All'); setCategoryMenuOpen(false); document.getElementById('menu-section')?.scrollIntoView({ behavior: 'smooth' }); }} className="w-full text-left px-4 py-3.5 text-base font-medium rounded-xl hover:bg-white transition-colors min-h-[44px]">All</button>
-                    {Object.keys(groupedMenuItems).map((cat) => (
-                      <button key={cat} onClick={() => { setSelectedCategory(cat); setCategoryMenuOpen(false); scrollToCategory(cat); }} className="w-full text-left px-4 py-3.5 text-base font-medium rounded-xl hover:bg-white transition-colors min-h-[44px]">{cat}</button>
-                    ))}
-                    <div className="border-t border-[#2A2A2A]/10 my-4" />
-                    <button onClick={() => { if (customer) { setShowProfile(true); setProfileOpenSection('orders'); } else onOpenLoginForOrders?.(); setCategoryMenuOpen(false); }} className="w-full text-left px-4 py-3.5 text-base font-medium rounded-xl hover:bg-white transition-colors min-h-[44px] flex items-center gap-3">
-                      <CheckCircle className="h-5 w-5 text-[#6F6A63]" />
-                      My Orders
-                    </button>
-                  </div>
-                </div>
-              )}
+          <div className="relative flex items-center justify-between gap-2 px-3 sm:px-6 lg:px-8 h-14 sm:h-20 min-h-0">
+            <div className="flex items-center relative category-menu-container flex-1 min-w-0 justify-start">
               <nav className="hidden lg:flex items-center gap-1">
                 <GlassButton
                   size="sm"
@@ -850,45 +829,34 @@ const CustomerMenu = ({
                 </GlassButton>
               </nav>
             </div>
-            <div className="absolute left-1/2 -translate-x-1/2">
+            <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center justify-center w-full max-w-[60%] pointer-events-none">
               <GlassButton
                 size="sm"
                 type="button"
                 onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-                contentClassName={'font-bold text-xl sm:text-2xl tracking-tight ' + (isScrolled ? 'text-[#2A2A2A]' : 'text-white')}
-                className={!isScrolled ? 'glass-button-on-dark [&_.glass-button]:!bg-transparent [&_.glass-button]:!border-transparent [&_.glass-button]:!shadow-none' : ''}
+                contentClassName={'font-bold text-base sm:text-xl lg:text-2xl tracking-tight truncate max-w-full ' + (isScrolled ? 'text-[#2A2A2A]' : 'text-white')}
+                className={'min-w-0 max-w-full pointer-events-auto ' + (!isScrolled ? 'glass-button-on-dark [&_.glass-button]:!bg-transparent [&_.glass-button]:!border-transparent [&_.glass-button]:!shadow-none' : '')}
               >
-                {cafeBranding.cafe_name || 'Brew & Bloom'}
+                <span className="truncate block">{cafeBranding.cafe_name || 'Brew & Bloom'}</span>
               </GlassButton>
             </div>
-            <div className="flex items-center gap-2 sm:gap-3">
+            <div className="flex items-center flex-1 min-w-0 justify-end gap-1.5 sm:gap-3">
               <GlassButton
-                size="sm"
+                size="icon"
                 onClick={() => {
                   setCategoryMenuOpen(false);
                   if (customer) {
+                    setProfileOpenSection(null);
                     setShowProfile(true);
-                    setProfileOpenSection('orders');
                   } else {
                     setShowLoginModal(true);
                   }
                 }}
-                contentClassName="font-mono text-xs uppercase tracking-[0.15em] items-center justify-center"
-                className={`hidden sm:inline-block ${!isScrolled ? 'glass-button-on-dark' : ''}`}
-                aria-label={customer ? 'My Orders' : 'Login'}
+                className={!isScrolled ? 'glass-button-on-dark' : ''}
+                aria-label={customer ? 'Profile' : 'Login'}
               >
-                {customer ? 'My Orders' : 'Login'}
+                <User className="h-4 w-4 sm:h-5 sm:w-5" />
               </GlassButton>
-              {customer && (
-                <GlassButton
-                  size="icon"
-                  onClick={() => { setCategoryMenuOpen(false); setProfileOpenSection(null); setShowProfile(true); }}
-                  className={!isScrolled ? 'glass-button-on-dark' : ''}
-                  aria-label="Profile"
-                >
-                  <User className="h-5 w-5" />
-                </GlassButton>
-              )}
               <div className="relative">
                 <GlassButton
                   size="icon"
@@ -896,10 +864,10 @@ const CustomerMenu = ({
                   className={!isScrolled ? 'glass-button-on-dark' : ''}
                   aria-label="Cart"
                 >
-                  <ShoppingBag className="h-5 w-5" />
+                  <ShoppingBag className="h-4 w-4 sm:h-5 sm:w-5" />
                 </GlassButton>
                 {cart.length > 0 && (
-                  <span className={`absolute -top-0.5 -right-0.5 min-w-[20px] h-5 flex items-center justify-center px-1.5 text-xs font-bold text-white bg-[#C68E3C] rounded-full shadow-md ${isScrolled ? 'border-2 border-white' : 'border-2 border-[#2A2A2A]'}`}>
+                  <span className={`absolute -top-0.5 -right-0.5 min-w-[18px] h-4.5 sm:min-w-[20px] sm:h-5 flex items-center justify-center px-1 sm:px-1.5 text-[10px] sm:text-xs font-bold text-white bg-[#C68E3C] rounded-full shadow-md ${isScrolled ? 'border-2 border-white' : 'border-2 border-[#2A2A2A]'}`}>
                     {cart.reduce((t, i) => t + i.quantity, 0)}
                   </span>
                 )}
@@ -1011,8 +979,13 @@ const CustomerMenu = ({
                       )}
                     </div>
 
-                    {!searchQuery.trim() && Object.keys(groupedMenuItems).length > 0 && (
-                      <div className="flex flex-wrap justify-center gap-3">
+                    {!searchQuery.trim() && Object.keys(groupedMenuItems).length > 0 && (() => {
+                      const categoryNames = Object.keys(groupedMenuItems);
+                      const visibleCount = categoriesExpanded ? categoryNames.length : Math.min(INITIAL_CATEGORIES_VISIBLE, categoryNames.length);
+                      const visibleCategories = categoryNames.slice(0, visibleCount);
+                      const hasMoreCategories = categoryNames.length > INITIAL_CATEGORIES_VISIBLE;
+                      return (
+                      <div className="flex flex-wrap justify-center gap-3 items-center">
                         <GlassButton
                           size="sm"
                           onClick={() => {
@@ -1025,7 +998,7 @@ const CustomerMenu = ({
                         >
                           All
                         </GlassButton>
-                        {Object.keys(groupedMenuItems).map((categoryName) => (
+                        {visibleCategories.map((categoryName) => (
                           <GlassButton
                             key={categoryName}
                             size="sm"
@@ -1038,8 +1011,19 @@ const CustomerMenu = ({
                             {categoryName}
                           </GlassButton>
                         ))}
+                        {hasMoreCategories && (
+                          <GlassButton
+                            size="sm"
+                            onClick={() => setCategoriesExpanded(!categoriesExpanded)}
+                            contentClassName="font-mono text-xs sm:text-sm"
+                            aria-label={categoriesExpanded ? 'Show fewer categories' : 'Show more categories'}
+                          >
+                            {categoriesExpanded ? 'Show less' : 'Show more'}
+                          </GlassButton>
+                        )}
                       </div>
-                    )}
+                    );
+                    })()}
                   </div>
                 </ScrollExpandMedia>
                 ) : null;
@@ -1246,7 +1230,7 @@ const CustomerMenu = ({
                               </div>
                             </div>
 
-                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+                            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
                               {items.map((item, itemIndex) => {
                                 const itemImage = item.image_url
                                   ? getImageUrl(item.image_url)
@@ -1283,11 +1267,11 @@ const CustomerMenu = ({
                                         <GlassButton
                                           size="default"
                                           onClick={(e) => { e.stopPropagation(); addToCart(item); }}
-                                          contentClassName="w-full flex items-center justify-center gap-2 !py-5"
+                                          contentClassName="w-full flex items-center justify-center gap-1.5 sm:gap-2 text-sm sm:text-base !py-3 sm:!py-5"
                                           className="w-full glass-button-primary"
                                           aria-label={`Add ${item.name} to cart`}
                                         >
-                                          <ShoppingBag className="h-4 w-4" />
+                                          <ShoppingBag className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                                           Add to cart
                                         </GlassButton>
                                       ) : (
@@ -1351,7 +1335,7 @@ const CustomerMenu = ({
                           </p>
                         </div>
 
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+                        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
                           {loadingMostOrdered ? (
                             [1, 2, 3].map((i) => (
                               <div key={`special-skeleton-${i}`} className="bg-white rounded-2xl overflow-hidden shadow-lg animate-pulse">
@@ -1403,11 +1387,11 @@ const CustomerMenu = ({
                                     <GlassButton
                                       size="default"
                                       onClick={() => addToCart(item)}
-                                      contentClassName="w-full flex items-center justify-center gap-2 !py-5"
+                                      contentClassName="w-full flex items-center justify-center gap-1.5 sm:gap-2 text-sm sm:text-base !py-3 sm:!py-5"
                                       className="w-full glass-button-primary"
                                       aria-label={`Add ${item.name} to cart`}
                                     >
-                                      <ShoppingBag className="h-4 w-4" />
+                                      <ShoppingBag className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                                       Add to cart
                                     </GlassButton>
                                   ) : (
