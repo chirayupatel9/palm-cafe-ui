@@ -4,6 +4,7 @@ import { useCafeSettings } from '../contexts/CafeSettingsContext';
 import { getImageUrl } from '../utils/imageUtils';
 import { Link, useNavigate } from 'react-router-dom';
 import { Eye, EyeOff, UserPlus, Shield, ArrowLeft } from 'lucide-react';
+import { FlowButton } from './ui/FlowButton';
 import toast from 'react-hot-toast';
 
 const AdminRegister = () => {
@@ -240,12 +241,7 @@ const AdminRegister = () => {
           </div>
 
           <div className="text-center">
-            <Link
-              to="/admin"
-              className="text-secondary-600 hover:text-secondary-500 dark:text-gray-400 dark:hover:text-gray-300"
-            >
-              Back to Admin Panel
-            </Link>
+            <FlowButton text="Back to Admin Panel" direction="back" onClick={() => navigate('/admin')} />
           </div>
         </form>
       </div>

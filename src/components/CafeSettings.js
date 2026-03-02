@@ -10,7 +10,7 @@ import toast from 'react-hot-toast';
 import FileInput from './ui/FileInput';
 
 const CafeSettings = () => {
-  const { cafeSettings, loading: cafeSettingsLoading, error: cafeSettingsError, fetchCafeSettings, updateCafeSettings, updateLogo, updateHeroImage, removeHeroImage, removeLogo } = useCafeSettings();
+  const { cafeSettings, loading: cafeSettingsLoading, error: cafeSettingsError, fetchCafeSettings, updateCafeSettings, updateLogo, updateHeroImage, updatePromoBannerImage, removeHeroImage, removePromoBannerImage, removeLogo } = useCafeSettings();
   const { user } = useAuth();
   const publicSlug = user?.cafe_slug || cafeSettings?.cafe_slug || null;
   const [copied, setCopied] = useState(false);
@@ -20,8 +20,10 @@ const CafeSettings = () => {
   const [message, setMessage] = useState({ type: '', text: '' });
   const [selectedFile, setSelectedFile] = useState(null);
   const [selectedHeroFile, setSelectedHeroFile] = useState(null);
+  const [selectedPromoMenuFile, setSelectedPromoMenuFile] = useState(null);
   const [uploadingLogo, setUploadingLogo] = useState(false);
   const [uploadingHero, setUploadingHero] = useState(false);
+  const [uploadingPromoMenu, setUploadingPromoMenu] = useState(false);
 
   // Promo banners (multiple per cafe)
   const [promoBanners, setPromoBanners] = useState([]);
@@ -521,6 +523,53 @@ const CafeSettings = () => {
     }
   };
 
+  const handlePromoMenuImageUpload = async () => {
+    if (!selectedPromoMenuFile) {
+      setMessage({ type: 'error', text: 'Please select a file first' });
+      setShowMessage(true);
+      return;
+    }
+    setUploadingPromoMenu(true);
+    const formData = new FormData();
+    formData.append('promo_banner_image', selectedPromoMenuFile);
+    try {
+      const result = await updatePromoBannerImage(formData);
+      if (result.success) {
+        setMessage({ type: 'success', text: 'Second menu image uploaded successfully!' });
+        setSelectedPromoMenuFile(null);
+      } else {
+        setMessage({ type: 'error', text: result.error || 'Failed to upload second menu image' });
+      }
+      setShowMessage(true);
+      setTimeout(() => setShowMessage(false), 3000);
+    } catch (error) {
+      setMessage({ type: 'error', text: 'An error occurred while uploading second menu image' });
+      setShowMessage(true);
+    } finally {
+      setUploadingPromoMenu(false);
+    }
+  };
+
+  const handleRemovePromoMenuImage = async () => {
+    if (!window.confirm('Are you sure you want to remove the second menu image?')) return;
+    setUploadingPromoMenu(true);
+    try {
+      const result = await removePromoBannerImage();
+      if (result.success) {
+        setMessage({ type: 'success', text: 'Second menu image removed successfully!' });
+      } else {
+        setMessage({ type: 'error', text: result.error || 'Failed to remove second menu image' });
+      }
+      setShowMessage(true);
+      setTimeout(() => setShowMessage(false), 3000);
+    } catch (error) {
+      setMessage({ type: 'error', text: 'An error occurred while removing second menu image' });
+      setShowMessage(true);
+    } finally {
+      setUploadingPromoMenu(false);
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
@@ -921,6 +970,51 @@ const CafeSettings = () => {
                       className="btn-primary disabled:opacity-50"
                     >
                       {uploadingHero ? 'Uploading...' : 'Upload'}
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-on-surface mb-1.5">Second menu image</label>
+                <p className="text-xs text-body-muted mb-2">
+                  Background image on the customer menu (when scrolling). If empty, the hero image is used.
+                </p>
+                <div className="space-y-3">
+                  {cafeSettings?.promo_banner_image_url && (
+                    <div className="relative">
+                      <img
+                        src={getImageUrl(cafeSettings.promo_banner_image_url)}
+                        alt="Second menu image"
+                        className="w-full h-48 object-cover border rounded-lg"
+                      />
+                      <button
+                        type="button"
+                        onClick={handleRemovePromoMenuImage}
+                        disabled={uploadingPromoMenu}
+                        className="mt-2 px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg text-sm disabled:opacity-50"
+                      >
+                        {uploadingPromoMenu ? 'Removing...' : 'Remove'}
+                      </button>
+                    </div>
+                  )}
+                  <div className="flex items-center space-x-4">
+                    <div className="flex-1">
+                      <FileInput
+                        selectedFile={selectedPromoMenuFile}
+                        onChange={setSelectedPromoMenuFile}
+                        accept="image/jpeg,image/png,image/webp"
+                        disabled={uploadingPromoMenu}
+                        placeholder="No file chosen"
+                      />
+                    </div>
+                    <button
+                      type="button"
+                      onClick={handlePromoMenuImageUpload}
+                      disabled={!selectedPromoMenuFile || uploadingPromoMenu}
+                      className="btn-primary disabled:opacity-50"
+                    >
+                      {uploadingPromoMenu ? 'Uploading...' : 'Upload'}
                     </button>
                   </div>
                 </div>

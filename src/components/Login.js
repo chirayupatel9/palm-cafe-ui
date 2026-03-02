@@ -3,6 +3,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { useCafeSettings } from '../contexts/CafeSettingsContext';
 import { Link, useNavigate } from 'react-router-dom';
 import { Eye, EyeOff, Coffee } from 'lucide-react';
+import { FlowButton } from './ui/FlowButton';
 import toast from 'react-hot-toast';
 import { getImageUrl } from '../utils/imageUtils';
 
@@ -147,12 +148,7 @@ const Login = () => {
               </Link>
             </p>
             <p className="text-sm text-secondary-600 dark:text-gray-400">
-              <Link 
-                to="/" 
-                className="font-medium text-secondary-600 hover:text-secondary-500 dark:text-secondary-400 dark:hover:text-secondary-300"
-              >
-                ← Back to Home
-              </Link>
+              <FlowButton text="Back to Home" direction="back" onClick={() => navigate('/')} />
             </p>
           </div>
         </form>

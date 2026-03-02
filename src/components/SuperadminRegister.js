@@ -3,6 +3,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { useCafeSettings } from '../contexts/CafeSettingsContext';
 import { Eye, EyeOff, Crown, ArrowLeft } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { FlowButton } from './ui/FlowButton';
 import { getImageUrl } from '../utils/imageUtils';
 
 const SuperadminRegister = ({ onBack }) => {
@@ -203,14 +204,7 @@ const SuperadminRegister = ({ onBack }) => {
             </button>
             
             {onBack && (
-              <button
-                type="button"
-                onClick={onBack}
-                className="btn-secondary w-full"
-              >
-                <ArrowLeft className="h-5 w-5 mr-2" />
-                Back to User Management
-              </button>
+              <FlowButton text="Back to User Management" direction="back" onClick={onBack} />
             )}
           </div>
 
