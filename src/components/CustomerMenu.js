@@ -11,6 +11,8 @@ import { normalizeBannersFromBranding } from '../utils/bannerUtils';
 import PromoBannerSection from './PromoBannerSection';
 import Sheet from './ui/Sheet';
 import Dialog from './ui/Dialog';
+import ScrollExpandMedia from './ui/ScrollExpandMedia';
+import { GlassButton } from './ui/GlassButton';
 
 const CustomerMenu = ({
   cafeSlug,
@@ -799,15 +801,14 @@ const CustomerMenu = ({
         >
           <div className="flex items-center justify-between px-4 sm:px-6 lg:px-8 h-16 sm:h-20">
             <div className="flex items-center relative category-menu-container">
-              <button
+              <GlassButton
+                size="icon"
                 onClick={() => setCategoryMenuOpen(!categoryMenuOpen)}
-                className={`lg:hidden min-h-[44px] min-w-[44px] flex items-center justify-center rounded-full transition-colors ${
-                  isScrolled ? 'hover:bg-[#E9E4DA] text-[#2A2A2A]' : 'hover:bg-white/10 text-white'
-                }`}
+                className={`lg:hidden ${!isScrolled ? 'glass-button-on-dark' : ''}`}
                 aria-label="Open menu"
               >
                 <Menu className="h-5 w-5" />
-              </button>
+              </GlassButton>
               {categoryMenuOpen && (
                 <div className="lg:hidden absolute top-full left-0 mt-2 w-64 bg-[#F6F4F0] rounded-xl shadow-xl border border-[#2A2A2A]/10 overflow-hidden z-50">
                   <div ref={categoryScrollRef} className="max-h-[60vh] overflow-y-auto p-2">
@@ -824,31 +825,44 @@ const CustomerMenu = ({
                 </div>
               )}
               <nav className="hidden lg:flex items-center gap-1">
-                <button
+                <GlassButton
+                  size="sm"
                   onClick={() => {
                     const el = document.getElementById('categories-section') || document.getElementById('menu-items-section') || document.getElementById('menu-section');
                     if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
                   }}
-                  className={`font-mono text-xs uppercase tracking-[0.15em] min-h-[44px] rounded-full px-5 transition-all ${isScrolled ? 'text-[#2A2A2A] hover:bg-[#E9E4DA]' : 'text-white hover:bg-white/10'}`}
+                  contentClassName="font-mono text-xs uppercase tracking-[0.15em]"
+                  className={!isScrolled ? 'glass-button-on-dark' : ''}
                 >
                   Menu
-                </button>
-                <button
+                </GlassButton>
+                <GlassButton
+                  size="sm"
                   onClick={() => {
                     setCategoryMenuOpen(false);
                     if (customer) { setShowProfile(true); setProfileOpenSection('orders'); } else onOpenLoginForOrders?.();
                   }}
-                  className={`font-mono text-xs uppercase tracking-[0.15em] min-h-[44px] rounded-full px-5 transition-all ${isScrolled ? 'text-[#2A2A2A] hover:bg-[#E9E4DA]' : 'text-white hover:bg-white/10'}`}
+                  contentClassName="font-mono text-xs uppercase tracking-[0.15em]"
+                  className={!isScrolled ? 'glass-button-on-dark' : ''}
                 >
                   Order History
-                </button>
+                </GlassButton>
               </nav>
             </div>
-            <div className={`absolute left-1/2 -translate-x-1/2 font-bold text-xl sm:text-2xl tracking-tight transition-colors duration-300 ${isScrolled ? 'text-[#2A2A2A]' : 'text-white'}`}>
-              <button type="button" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>{cafeBranding.cafe_name || 'Brew & Bloom'}</button>
+            <div className="absolute left-1/2 -translate-x-1/2">
+              <GlassButton
+                size="sm"
+                type="button"
+                onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+                contentClassName={'font-bold text-xl sm:text-2xl tracking-tight ' + (isScrolled ? 'text-[#2A2A2A]' : 'text-white')}
+                className={!isScrolled ? 'glass-button-on-dark [&_.glass-button]:!bg-transparent [&_.glass-button]:!border-transparent [&_.glass-button]:!shadow-none' : ''}
+              >
+                {cafeBranding.cafe_name || 'Brew & Bloom'}
+              </GlassButton>
             </div>
             <div className="flex items-center gap-2 sm:gap-3">
-              <button
+              <GlassButton
+                size="sm"
                 onClick={() => {
                   setCategoryMenuOpen(false);
                   if (customer) {
@@ -858,32 +872,37 @@ const CustomerMenu = ({
                     setShowLoginModal(true);
                   }
                 }}
-                className={`hidden sm:inline-flex items-center justify-center font-mono text-xs uppercase tracking-[0.15em] min-h-[44px] rounded-full px-5 transition-all ${isScrolled ? 'text-[#2A2A2A] hover:bg-[#E9E4DA]' : 'text-white bg-white/10 hover:bg-white/20 shadow-sm'}`}
+                contentClassName="font-mono text-xs uppercase tracking-[0.15em] items-center justify-center"
+                className={`hidden sm:inline-block ${!isScrolled ? 'glass-button-on-dark' : ''}`}
                 aria-label={customer ? 'My Orders' : 'Login'}
               >
                 {customer ? 'My Orders' : 'Login'}
-              </button>
+              </GlassButton>
               {customer && (
-                <button
+                <GlassButton
+                  size="icon"
                   onClick={() => { setCategoryMenuOpen(false); setProfileOpenSection(null); setShowProfile(true); }}
-                  className={`min-h-[44px] min-w-[44px] flex items-center justify-center rounded-full transition-all ${isScrolled ? 'text-[#2A2A2A] hover:bg-[#E9E4DA]' : 'text-white hover:bg-white/10'}`}
+                  className={!isScrolled ? 'glass-button-on-dark' : ''}
                   aria-label="Profile"
                 >
                   <User className="h-5 w-5" />
-                </button>
+                </GlassButton>
               )}
-              <button
-                onClick={() => { setCategoryMenuOpen(false); setShowCart(true); }}
-                className={`relative min-h-[44px] min-w-[44px] flex items-center justify-center rounded-full transition-all ${isScrolled ? 'text-[#2A2A2A] hover:bg-[#E9E4DA]' : 'text-white hover:bg-white/10'}`}
-                aria-label="Cart"
-              >
-                <ShoppingBag className="h-5 w-5" />
+              <div className="relative">
+                <GlassButton
+                  size="icon"
+                  onClick={() => { setCategoryMenuOpen(false); setShowCart(true); }}
+                  className={!isScrolled ? 'glass-button-on-dark' : ''}
+                  aria-label="Cart"
+                >
+                  <ShoppingBag className="h-5 w-5" />
+                </GlassButton>
                 {cart.length > 0 && (
                   <span className={`absolute -top-0.5 -right-0.5 min-w-[20px] h-5 flex items-center justify-center px-1.5 text-xs font-bold text-white bg-[#C68E3C] rounded-full shadow-md ${isScrolled ? 'border-2 border-white' : 'border-2 border-[#2A2A2A]'}`}>
                     {cart.reduce((t, i) => t + i.quantity, 0)}
                   </span>
                 )}
-              </button>
+              </div>
             </div>
           </div>
         </header>
@@ -894,113 +913,139 @@ const CustomerMenu = ({
         <div id="menu-section" className="w-full max-w-full pb-12 sm:pb-16 bg-[#F6F4F0]">
           {activeTab === 'menu' ? (
             <div>
-              {/* Hero - DIR: min-h-screen, gradients, blobs, REF headline, scroll hint */}
-              <section className="relative min-h-screen w-full flex items-center justify-center overflow-hidden">
-                <div
-                  className="absolute inset-0 z-0 bg-cover bg-center bg-no-repeat"
-                  style={{
-                    backgroundImage: cafeBranding.hero_image_url
-                      ? `url('${getImageUrl(cafeBranding.hero_image_url)}')`
-                      : 'linear-gradient(135deg, #2A2A2A 0%, #1a1a1a 100%)'
-                  }}
+              {cafeSettings.show_menu_images && (
+                <ScrollExpandMedia
+                  mediaType="image"
+                  mediaSrc={
+                    cafeBranding.hero_image_url
+                      ? getImageUrl(cafeBranding.hero_image_url)
+                      : 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=1400&q=80'
+                  }
+                  bgImageSrc={
+                    cafeBranding.promo_banner_image_url
+                      ? getImageUrl(cafeBranding.promo_banner_image_url)
+                      : cafeBranding.hero_image_url
+                        ? getImageUrl(cafeBranding.hero_image_url)
+                        : 'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&w=1920&q=80'
+                  }
+                  title={cafeBranding.cafe_name || 'Welcome to our cafe'}
+                  date={cafeBranding.address || ''}
+                  scrollToExpand="Scroll to expand menu"
+                  textBlend
                 >
-                  <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/30 to-black/60" />
-                  <div className="absolute inset-0 bg-gradient-to-r from-black/30 via-transparent to-black/30" />
-                  <div className="absolute inset-0 opacity-[0.03] mix-blend-overlay pointer-events-none" style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E")` }} />
-                </div>
-                <div className="absolute inset-0 z-[1] pointer-events-none overflow-hidden">
-                  <div className="absolute top-1/4 -left-20 w-64 h-64 bg-[#C68E3C]/10 rounded-full blur-3xl float-slow" />
-                  <div className="absolute bottom-1/4 -right-20 w-80 h-80 bg-[#C68E3C]/5 rounded-full blur-3xl float" />
-                </div>
-                <div className="relative z-10 w-full max-w-4xl mx-auto px-6 py-20 text-center">
-                  {/* Logo - DIR (glass-dark for icon, border for image) + hero entrance */}
-                  <div className="mb-10 hero-animate hero-animate-delay-0">
-                    {cafeBranding.logo_url ? (
-                      <img src={getImageUrl(cafeBranding.logo_url)} alt="" className="inline-block w-20 h-20 sm:w-24 sm:h-24 rounded-full border border-white/10 shadow-2xl object-cover" />
-                    ) : (
-                      <div className="inline-flex items-center justify-center w-20 h-20 sm:w-24 sm:h-24 rounded-full glass-dark border border-white/10 shadow-2xl">
-                        <Utensils className="w-10 h-10 sm:w-12 sm:h-12 text-white" />
-                      </div>
+                  <div className="max-w-3xl mx-auto text-center space-y-4 mb-10">
+                    {/* {cafeBranding.cafe_name && (
+                      // <h2 className="text-3xl sm:text-4xl font-bold text-[#2A2A2A]">
+                      //   {cafeBranding.cafe_name}
+                      // </h2>
+                    )} */}
+                    {cafeSettings.description && (
+                      <p className="text-base sm:text-lg text-[#6F6A63]">
+                        {cafeSettings.description}
+                      </p>
                     )}
                   </div>
-                  {/* Headline - REF exact copy + hero entrance */}
-                  <h1 className="hero-animate hero-animate-delay-1 text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-8 leading-[1.1] tracking-tight">
-                    <span className="inline-block">Crafted</span>{' '}
-                    <span className="inline-block">coffee</span>{' '}
-                    <span className="inline-block italic font-serif font-medium">&</span>
-                    <br className="hidden sm:block" />
-                    <span className="inline-block">seasonal</span>{' '}
-                    <span className="inline-block">plates</span>
-                    <br className="hidden sm:block" />
-                    <span className="inline-block text-[#C68E3C]">made</span>{' '}
-                    <span className="inline-block text-[#C68E3C]">to</span>{' '}
-                    <span className="inline-block text-[#C68E3C]">linger.</span>
-                  </h1>
-                  <p className="hero-animate hero-animate-delay-2 text-lg sm:text-xl text-white/70 mb-10 max-w-xl mx-auto font-light leading-relaxed">
-                    Search the menu, pick a category, or scroll to see what&apos;s fresh today.
-                  </p>
 
-                  {/* Search - always visible, DIR py-6 + hero entrance */}
-                  <div className="hero-animate hero-animate-delay-3 relative max-w-xl mx-auto mb-10">
-                    <div className="relative group">
-                      <Search className="absolute left-5 top-1/2 -translate-y-1/2 h-5 w-5 text-white/50 group-focus-within:text-[#C68E3C] transition-colors" />
-                      <input
-                        ref={searchInputRef}
-                        type="text"
-                        placeholder="Search menu items, categories..."
-                        value={searchQuery}
-                        onChange={(e) => { setSearchQuery(e.target.value); setSelectedSuggestionIndex(-1); }}
-                        onKeyDown={handleSearchKeyDown}
-                        onFocus={() => { if (autocompleteSuggestions.length > 0) setShowAutocomplete(true); }}
-                        onBlur={(e) => {
-                          if (!e.relatedTarget?.closest('.autocomplete-suggestion') && !e.relatedTarget?.closest('.search-clear-btn')) {
-                            setTimeout(() => setShowAutocomplete(false), 200);
-                          }
-                        }}
-                        className="w-full pl-14 pr-12 py-6 text-base rounded-2xl bg-white/10 backdrop-blur-xl border border-white/20 text-white placeholder:text-white/40 focus:bg-white/15 focus:border-[#C68E3C]/50 focus:ring-2 focus:ring-[#C68E3C]/20 transition-all duration-300"
-                      />
-                      {searchQuery && (
-                        <button type="button" onClick={() => { setSearchQuery(''); setShowAutocomplete(false); setSelectedSuggestionIndex(-1); }} className="search-clear-btn absolute right-4 top-1/2 -translate-y-1/2 p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors" aria-label="Clear search">
-                          <X className="h-4 w-4 text-white/60" />
-                        </button>
+                  {/* Search and categories appear after full expansion */}
+                  <div className="max-w-3xl mx-auto">
+                    <div className="relative max-w-xl mx-auto mb-10">
+                      <div className="relative group">
+                        <Search className="absolute left-5 top-1/2 -translate-y-1/2 h-5 w-5 text-[#6F6A63] group-focus-within:text-[#C68E3C] transition-colors" />
+                        <input
+                          ref={searchInputRef}
+                          type="text"
+                          placeholder="Search menu items, categories..."
+                          value={searchQuery}
+                          onChange={(e) => { setSearchQuery(e.target.value); setSelectedSuggestionIndex(-1); }}
+                          onKeyDown={handleSearchKeyDown}
+                          onFocus={() => { if (autocompleteSuggestions.length > 0) setShowAutocomplete(true); }}
+                          onBlur={(e) => {
+                            if (!e.relatedTarget?.closest('.autocomplete-suggestion') && !e.relatedTarget?.closest('.search-clear-btn')) {
+                              setTimeout(() => setShowAutocomplete(false), 200);
+                            }
+                          }}
+                          className="glass-input w-full pl-14 pr-12 py-4 text-base rounded-2xl text-[#2A2A2A] placeholder:text-[#B0AAA0] transition-all duration-300"
+                        />
+                        {searchQuery && (
+                          <div className="search-clear-btn absolute right-4 top-1/2 -translate-y-1/2">
+                            <GlassButton
+                              size="icon"
+                              type="button"
+                              onClick={() => { setSearchQuery(''); setShowAutocomplete(false); setSelectedSuggestionIndex(-1); }}
+                              aria-label="Clear search"
+                            >
+                              <X className="h-4 w-4 text-[#8A8478]" />
+                            </GlassButton>
+                          </div>
+                        )}
+                      </div>
+                      {showAutocomplete && autocompleteSuggestions.length > 0 && (
+                        <div
+                          ref={autocompleteRef}
+                          className="absolute top-full left-0 right-0 mt-3 bg-white rounded-2xl shadow-xl overflow-hidden z-50 border border-[#E0DED8]"
+                        >
+                          {autocompleteSuggestions.map((suggestion, index) => (
+                            <button
+                              key={`${suggestion.name}-${index}`}
+                              type="button"
+                              onClick={() => handleSuggestionClick(suggestion)}
+                              onMouseDown={(e) => e.preventDefault()}
+                              className={
+                                'autocomplete-suggestion w-full px-5 py-4 text-left flex items-center justify-between hover:bg-[#F6F4F0] transition-colors ' +
+                                (selectedSuggestionIndex === index ? 'bg-[#F6F4F0]' : '')
+                              }
+                            >
+                              <span className="font-medium text-[#2A2A2A]">{suggestion.name}</span>
+                              {suggestion.category && (
+                                <span className="font-mono text-xs uppercase tracking-wider text-[#6F6A63] bg-[#E9E4DA] px-2 py-1 rounded">
+                                  {suggestion.category}
+                                </span>
+                              )}
+                            </button>
+                          ))}
+                        </div>
+                      )}
+                      {showAutocomplete && searchQuery && autocompleteSuggestions.length === 0 && (
+                        <div className="absolute top-full left-0 right-0 mt-3 bg-white rounded-2xl shadow-xl p-6 text-center z-50 border border-[#E0DED8]">
+                          <p className="text-[#6F6A63]">No results found</p>
+                        </div>
                       )}
                     </div>
-                    {showAutocomplete && autocompleteSuggestions.length > 0 && (
-                      <div ref={autocompleteRef} className="absolute top-full left-0 right-0 mt-3 bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl overflow-hidden z-50 border border-white/20">
-                        {autocompleteSuggestions.map((suggestion, index) => (
-                          <button key={`${suggestion.name}-${index}`} type="button" onClick={() => handleSuggestionClick(suggestion)} onMouseDown={(e) => e.preventDefault()} className={`autocomplete-suggestion w-full px-5 py-4 text-left flex items-center justify-between hover:bg-[#F6F4F0] transition-colors ${selectedSuggestionIndex === index ? 'bg-[#F6F4F0]' : ''}`}>
-                            <span className="font-medium text-[#2A2A2A]">{suggestion.name}</span>
-                            {suggestion.category && <span className="font-mono text-xs uppercase tracking-wider text-[#6F6A63] bg-[#E9E4DA] px-2 py-1 rounded">{suggestion.category}</span>}
-                          </button>
+
+                    {!searchQuery.trim() && Object.keys(groupedMenuItems).length > 0 && (
+                      <div className="flex flex-wrap justify-center gap-3">
+                        <GlassButton
+                          size="sm"
+                          onClick={() => {
+                            setSelectedCategory('All');
+                            document.getElementById('menu-section')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                          }}
+                          contentClassName="font-mono text-xs sm:text-sm uppercase tracking-widest"
+                          className={selectedCategory === 'All' ? 'glass-button-selected' : ''}
+                          aria-label="Show all categories"
+                        >
+                          All
+                        </GlassButton>
+                        {Object.keys(groupedMenuItems).map((categoryName) => (
+                          <GlassButton
+                            key={categoryName}
+                            size="sm"
+                            onClick={() => scrollToCategory(categoryName)}
+                            contentClassName={'font-mono text-xs sm:text-sm uppercase tracking-widest truncate max-w-[180px]'}
+                            className={selectedCategory === categoryName ? 'glass-button-selected' : ''}
+                            aria-label={`Filter by ${categoryName}`}
+                            title={categoryName}
+                          >
+                            {categoryName}
+                          </GlassButton>
                         ))}
                       </div>
                     )}
-                    {showAutocomplete && searchQuery && autocompleteSuggestions.length === 0 && (
-                      <div className="absolute top-full left-0 right-0 mt-3 bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl p-6 text-center z-50">
-                        <p className="text-[#6F6A63]">No results found</p>
-                      </div>
-                    )}
                   </div>
+                </ScrollExpandMedia>
+              )}
 
-                  {/* Category Chips - DIR + hero entrance */}
-                  {!searchQuery.trim() && Object.keys(groupedMenuItems).length > 0 && (
-                    <div className="hero-animate hero-animate-delay-4 flex flex-wrap justify-center gap-3">
-                      <button onClick={() => { setSelectedCategory('All'); document.getElementById('menu-section')?.scrollIntoView({ behavior: 'smooth', block: 'start' }); }} className={`px-5 sm:px-6 py-3 rounded-full font-mono text-xs sm:text-sm uppercase tracking-widest transition-all duration-300 min-h-[44px] ${selectedCategory === 'All' ? 'bg-[#C68E3C] text-white shadow-lg shadow-[#C68E3C]/30' : 'bg-white/10 backdrop-blur-sm text-white border border-white/20 hover:bg-white/20 hover:border-white/40 hover:shadow-lg'}`} aria-label="Show all categories">All</button>
-                      {Object.keys(groupedMenuItems).map((categoryName) => (
-                        <button key={categoryName} onClick={() => scrollToCategory(categoryName)} className={`px-5 sm:px-6 py-3 rounded-full font-mono text-xs sm:text-sm uppercase tracking-widest transition-all duration-300 min-h-[44px] truncate max-w-[180px] ${selectedCategory === categoryName ? 'bg-[#C68E3C] text-white shadow-lg shadow-[#C68E3C]/30' : 'bg-white/10 backdrop-blur-sm text-white border border-white/20 hover:bg-white/20 hover:border-white/40 hover:shadow-lg'}`} aria-label={`Filter by ${categoryName}`} title={categoryName}>{categoryName}</button>
-                      ))}
-                    </div>
-                  )}
-
-                  {/* Scroll hint - DIR + hero entrance */}
-                  <div className="hero-animate hero-animate-delay-5 mt-16 flex flex-col items-center gap-3">
-                    <span className="font-mono text-xs uppercase tracking-[0.2em] text-white/40">Scroll to explore</span>
-                    <div className="w-6 h-10 rounded-full border-2 border-white/30 flex justify-center pt-2">
-                      <div className="w-1.5 h-3 bg-white/50 rounded-full animate-bounce" />
-                    </div>
-                  </div>
-                </div>
-              </section>
+              {/* Legacy hero kept out for now; search and categories are shown after scroll expansion above */}
 
               {/* Categories Showcase Section - DIR "Our Categories" carousel + scroll animate */}
               {!searchQuery.trim() && selectedCategory === 'All' && Object.keys(groupedMenuItems).length > 0 && (
@@ -1018,12 +1063,12 @@ const CustomerMenu = ({
                         </h2>
                       </div>
                       <div className="scroll-animate-left hidden sm:flex items-center gap-3">
-                        <button type="button" onClick={() => scrollCarousel('left')} className="rounded-full border border-[#2A2A2A]/10 hover:bg-[#2A2A2A] hover:text-white hover:border-[#2A2A2A] transition-all duration-300 min-h-[44px] min-w-[44px] w-12 h-12 flex items-center justify-center" aria-label="Scroll left">
+                        <GlassButton size="icon" type="button" onClick={() => scrollCarousel('left')} aria-label="Scroll left">
                           <ChevronLeft className="h-5 w-5" />
-                        </button>
-                        <button type="button" onClick={() => scrollCarousel('right')} className="rounded-full border border-[#2A2A2A]/10 hover:bg-[#2A2A2A] hover:text-white hover:border-[#2A2A2A] transition-all duration-300 min-h-[44px] min-w-[44px] w-12 h-12 flex items-center justify-center" aria-label="Scroll right">
+                        </GlassButton>
+                        <GlassButton size="icon" type="button" onClick={() => scrollCarousel('right')} aria-label="Scroll right">
                           <ChevronRight className="h-5 w-5" />
-                        </button>
+                        </GlassButton>
                       </div>
                     </div>
 
@@ -1121,16 +1166,17 @@ const CustomerMenu = ({
                   <p className="text-base text-[#6F6A63] mb-4">
                     We couldn&apos;t find any items matching &quot;{searchQuery}&quot;
                   </p>
-                  <button
+                  <GlassButton
+                    size="sm"
                     onClick={() => {
                       setSearchQuery('');
                       setShowAutocomplete(false);
                       setSelectedSuggestionIndex(-1);
                     }}
-                    className="px-6 py-3 bg-[#2A2A2A] hover:bg-[#C68E3C] text-white font-medium rounded-xl transition-colors min-h-[44px]"
+                    className="glass-button-primary"
                   >
                     Clear search
-                  </button>
+                  </GlassButton>
                 </div>
               ) : (
                 <div id="menu-items-section" className="w-full space-y-0 scroll-mt-40">
@@ -1236,33 +1282,35 @@ const CustomerMenu = ({
                                         {item.description || 'Delicious choice from our menu.'}
                                       </p>
                                       {quantity === 0 ? (
-                                        <button
+                                        <GlassButton
+                                          size="default"
                                           onClick={(e) => { e.stopPropagation(); addToCart(item); }}
-                                          className="w-full bg-[#2A2A2A] hover:bg-[#C68E3C] text-white transition-all duration-300 rounded-xl py-5 flex items-center justify-center gap-2 min-h-[44px] font-medium"
+                                          contentClassName="w-full flex items-center justify-center gap-2 !py-5"
+                                          className="w-full glass-button-primary"
                                           aria-label={`Add ${item.name} to cart`}
                                         >
                                           <ShoppingBag className="h-4 w-4" />
                                           Add to cart
-                                        </button>
+                                        </GlassButton>
                                       ) : (
                                         <div className="flex items-center justify-between bg-[#F6F4F0] rounded-xl p-2">
-                                          <button
+                                          <GlassButton
+                                            size="icon"
                                             type="button"
                                             onClick={() => updateQuantity(item.id, quantity - 1)}
-                                            className="h-11 w-11 rounded-full bg-white hover:bg-[#E9E4DA] shadow-sm flex items-center justify-center min-w-[44px] min-h-[44px] transition-all duration-200 hover:scale-105"
                                             aria-label="Decrease quantity"
                                           >
                                             <Minus className="h-4 w-4" />
-                                          </button>
+                                          </GlassButton>
                                           <span className="font-mono text-lg font-medium text-[#2A2A2A]">{quantity}</span>
-                                          <button
+                                          <GlassButton
+                                            size="icon"
                                             type="button"
                                             onClick={() => updateQuantity(item.id, quantity + 1)}
-                                            className="h-11 w-11 rounded-full bg-white hover:bg-[#E9E4DA] shadow-sm flex items-center justify-center min-w-[44px] min-h-[44px] transition-all duration-200 hover:scale-105"
                                             aria-label="Increase quantity"
                                           >
                                             <Plus className="h-4 w-4" />
-                                          </button>
+                                          </GlassButton>
                                         </div>
                                       )}
                                     </div>
@@ -1354,33 +1402,35 @@ const CustomerMenu = ({
                                     {item.description || 'A customer favorite.'}
                                   </p>
                                   {quantity === 0 ? (
-                                    <button
+                                    <GlassButton
+                                      size="default"
                                       onClick={() => addToCart(item)}
-                                      className="w-full bg-[#2A2A2A] hover:bg-[#C68E3C] text-white transition-all duration-300 rounded-xl py-5 flex items-center justify-center gap-2 min-h-[44px] font-medium"
+                                      contentClassName="w-full flex items-center justify-center gap-2 !py-5"
+                                      className="w-full glass-button-primary"
                                       aria-label={`Add ${item.name} to cart`}
                                     >
                                       <ShoppingBag className="h-4 w-4" />
                                       Add to cart
-                                    </button>
+                                    </GlassButton>
                                   ) : (
                                     <div className="flex items-center justify-between bg-[#F6F4F0] rounded-xl p-2">
-                                      <button
+                                      <GlassButton
+                                        size="icon"
                                         type="button"
                                         onClick={() => updateQuantity(item.id, quantity - 1)}
-                                        className="h-11 w-11 rounded-full bg-white hover:bg-[#E9E4DA] shadow-sm flex items-center justify-center min-w-[44px] min-h-[44px] transition-all duration-200 hover:scale-105"
                                         aria-label="Decrease quantity"
                                       >
                                         <Minus className="h-4 w-4" />
-                                      </button>
+                                      </GlassButton>
                                       <span className="font-mono text-lg font-medium text-[#2A2A2A]">{quantity}</span>
-                                      <button
+                                      <GlassButton
+                                        size="icon"
                                         type="button"
                                         onClick={() => updateQuantity(item.id, quantity + 1)}
-                                        className="h-11 w-11 rounded-full bg-white hover:bg-[#E9E4DA] shadow-sm flex items-center justify-center min-w-[44px] min-h-[44px] transition-all duration-200 hover:scale-105"
                                         aria-label="Increase quantity"
                                       >
                                         <Plus className="h-4 w-4" />
-                                      </button>
+                                      </GlassButton>
                                     </div>
                                   )}
                                 </div>
@@ -1390,13 +1440,14 @@ const CustomerMenu = ({
                         </div>
 
                         <div className="text-center mt-14">
-                          <button
+                          <GlassButton
+                            size="lg"
                             onClick={() => document.getElementById('menu-items-section')?.scrollIntoView({ behavior: 'smooth' })}
-                            className="border border-[#2A2A2A]/20 hover:bg-[#2A2A2A] hover:text-white hover:border-[#2A2A2A] text-[#2A2A2A] transition-all duration-300 min-h-[44px] px-8 py-6 rounded-xl text-base font-medium inline-flex items-center gap-2 group"
+                            contentClassName="flex items-center justify-center gap-2"
                           >
                             <span>View All Products</span>
-                            <ChevronDown className="h-5 w-5 group-hover:translate-y-1 transition-transform" />
-                          </button>
+                            <ChevronDown className="h-5 w-5" />
+                          </GlassButton>
                         </div>
                       </div>
                     </section>
@@ -1573,30 +1624,33 @@ const CustomerMenu = ({
                               <p className="text-xs text-secondary-600">{formatCurrency(item.price)}</p>
                             </div>
                             <div className="flex items-center gap-2">
-                              <button
+                              <GlassButton
+                                size="icon"
                                 onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                                className="flex h-9 w-9 items-center justify-center rounded-full bg-accent-100 hover:bg-secondary-100 min-h-[36px] min-w-[36px]"
+                                className="!min-w-[36px] !min-h-[36px] [&_.glass-button]:!h-9 [&_.glass-button]:!w-9 [&_.glass-button-text]:!h-9 [&_.glass-button-text]:!w-9"
                                 aria-label="Decrease quantity"
                               >
                                 <Minus className="h-4 w-4" />
-                              </button>
+                              </GlassButton>
                               <span className="w-8 text-center text-sm font-medium text-secondary-700">{item.quantity}</span>
-                              <button
+                              <GlassButton
+                                size="icon"
                                 onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                                className="flex h-9 w-9 items-center justify-center rounded-full bg-accent-100 hover:bg-secondary-100 min-h-[36px] min-w-[36px]"
+                                className="!min-w-[36px] !min-h-[36px] [&_.glass-button]:!h-9 [&_.glass-button]:!w-9 [&_.glass-button-text]:!h-9 [&_.glass-button-text]:!w-9"
                                 aria-label="Increase quantity"
                               >
                                 <Plus className="h-4 w-4" />
-                              </button>
+                              </GlassButton>
                             </div>
                             <p className="text-sm font-semibold text-secondary-700 w-16 text-right">{formatCurrency(item.price * item.quantity)}</p>
-                            <button
+                            <GlassButton
+                              size="icon"
                               onClick={() => removeFromCart(item.id)}
-                              className="text-secondary-600 hover:text-red-500 p-2"
+                              className="[&_.glass-button]:!bg-transparent [&_.glass-button]:!border-transparent [&_.glass-button]:!shadow-none [&_.glass-button:hover]:!bg-red-50 [&_.glass-button]:text-secondary-600 [&_.glass-button:hover]:!text-red-500"
                               aria-label="Remove item"
                             >
                               <Trash2 className="h-4 w-4" />
-                            </button>
+                            </GlassButton>
                           </div>
                         ))}
                       </div>
@@ -1841,15 +1895,17 @@ const CustomerMenu = ({
                     </>
 
                     <div className="flex flex-col gap-3 pt-2">
-                      <button
+                      <GlassButton
                         type="button"
                         onClick={placeOrder}
                         disabled={orderLoading || !customer}
-                        className="w-full rounded-lg bg-secondary-500 py-3 min-h-[44px] text-base font-bold text-white transition-opacity hover:bg-secondary-600 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                        size="default"
+                        contentClassName="w-full flex items-center justify-center gap-2"
+                        className="w-full glass-button-primary disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         {orderLoading ? (
                           <>
-                            <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent"></div>
+                            <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent" />
                             <span>Placing Order...</span>
                           </>
                         ) : (
@@ -1858,14 +1914,15 @@ const CustomerMenu = ({
                             <span>Proceed to Checkout</span>
                           </>
                         )}
-                      </button>
+                      </GlassButton>
 
-                      <button
+                      <GlassButton
+                        size="sm"
                         onClick={clearCart}
-                        className="w-full rounded-lg bg-white border-2 border-accent-200 py-2.5 min-h-[44px] text-sm font-semibold text-secondary-700 hover:border-secondary-500 transition-colors"
+                        contentClassName="w-full flex items-center justify-center"
                       >
                         Clear Cart
-                      </button>
+                      </GlassButton>
                     </div>
                   </div>
                 )}
@@ -1961,21 +2018,24 @@ const CustomerMenu = ({
                 </div>
 
                 <div className="flex flex-col sm:flex-row gap-3 pt-4">
-                  <button
+                  <GlassButton
                     type="button"
                     onClick={() => setShowEditProfile(false)}
-                    className="flex-1 px-4 py-3 min-h-[44px] bg-white border-2 border-accent-200 text-secondary-700 rounded-lg font-medium hover:border-secondary-500 transition-colors"
+                    size="default"
+                    contentClassName="flex-1 flex items-center justify-center"
                   >
                     Cancel
-                  </button>
-                  <button
+                  </GlassButton>
+                  <GlassButton
                     type="submit"
                     disabled={profileLoading}
-                    className="flex-1 px-4 py-3 min-h-[44px] bg-secondary-500 text-white rounded-lg font-medium hover:bg-secondary-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                    size="default"
+                    contentClassName="flex-1 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="glass-button-primary"
                   >
                     {profileLoading ? (
                       <>
-                        <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
+                        <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent" />
                         <span>Updating...</span>
                       </>
                     ) : (
@@ -1984,7 +2044,7 @@ const CustomerMenu = ({
                         <span>Save Changes</span>
                       </>
                     )}
-                  </button>
+                  </GlassButton>
                 </div>
               </form>
             </div>

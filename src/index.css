@@ -799,6 +799,119 @@ img {
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
+/* Glass button – glassmorphic pills (translucent, frosted, soft glow) */
+.glass-button-wrap {
+  position: relative;
+  display: inline-block;
+}
+.glass-button-wrap.w-full {
+  width: 100%;
+}
+.glass-button-wrap.w-full .glass-button {
+  width: 100%;
+}
+.glass-button {
+  all: unset;
+  box-sizing: border-box;
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border-radius: 9999px;
+  transition: background 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease, transform 0.15s ease;
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  color: #fff;
+  font-weight: 500;
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.15) inset,
+    0 4px 20px rgba(0, 0, 0, 0.08);
+}
+.glass-button:hover {
+  background: rgba(255, 255, 255, 0.28);
+  border-color: rgba(255, 255, 255, 0.45);
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.2) inset,
+    0 4px 24px rgba(0, 0, 0, 0.1),
+    0 0 20px rgba(255, 255, 255, 0.15);
+}
+.glass-button:active {
+  transform: scale(0.98);
+}
+.glass-button-text {
+  position: relative;
+  z-index: 1;
+}
+.glass-button-shadow {
+  position: absolute;
+  inset: 0;
+  border-radius: 9999px;
+  pointer-events: none;
+  z-index: -1;
+  box-shadow: 0 0 24px rgba(255, 255, 255, 0.2);
+  opacity: 0.8;
+  transition: opacity 0.2s ease;
+}
+.glass-button-wrap:hover .glass-button-shadow {
+  opacity: 1;
+  box-shadow: 0 0 28px rgba(255, 255, 255, 0.25);
+}
+/* Glass button selected (e.g. category chip – solid golden-brown with glow) */
+.glass-button-wrap.glass-button-selected .glass-button {
+  background: #C68E3C;
+  border-color: rgba(198, 142, 60, 0.7);
+  color: #fff;
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.2) inset,
+    0 4px 20px rgba(198, 142, 60, 0.35),
+    0 0 20px rgba(198, 142, 60, 0.2);
+}
+.glass-button-wrap.glass-button-selected .glass-button:hover {
+  background: #b87d2e;
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.25) inset,
+    0 4px 24px rgba(198, 142, 60, 0.4),
+    0 0 24px rgba(198, 142, 60, 0.25);
+}
+/* Glass button primary (dark fill, e.g. Clear search) */
+.glass-button-wrap.glass-button-primary .glass-button {
+  background: #2A2A2A;
+  border-color: rgba(42, 42, 42, 0.8);
+  color: #fff;
+}
+.glass-button-wrap.glass-button-primary .glass-button:hover {
+  background: #C68E3C;
+  border-color: rgba(198, 142, 60, 0.8);
+}
+/* Glass button on dark hero (white text) */
+.glass-button-wrap.glass-button-on-dark .glass-button {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.2);
+  color: #fff;
+}
+.glass-button-wrap.glass-button-on-dark .glass-button:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+/* Glass input (search field) */
+.glass-input {
+  background: rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: 1rem;
+  transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.glass-input:focus {
+  outline: none;
+  background: rgba(255, 255, 255, 0.35);
+  border-color: rgba(199, 142, 60, 0.5);
+  box-shadow: 0 0 0 2px rgba(199, 142, 60, 0.2);
+}
+
 /* ============================================
    MOTION & TRANSITIONS
    ============================================ */
