@@ -58,6 +58,7 @@ module.exports = {
           muted: 'var(--color-text-muted)',
           disabled: 'var(--color-text-disabled)',
         },
+        'muted-foreground': 'var(--color-text-muted)',
         border: {
           DEFAULT: 'var(--color-border)',
         },
@@ -96,6 +97,20 @@ module.exports = {
         'card-dark': 'var(--surface-card)',
         'chip-light': 'var(--color-primary-container)',
         'chip-dark': 'var(--color-primary-container)',
+      },
+      keyframes: {
+        'accordion-down': {
+          from: { height: '0' },
+          to: { height: 'var(--radix-accordion-content-height)' }
+        },
+        'accordion-up': {
+          from: { height: 'var(--radix-accordion-content-height)' },
+          to: { height: '0' }
+        }
+      },
+      animation: {
+        'accordion-down': 'accordion-down 0.2s ease-out',
+        'accordion-up': 'accordion-up 0.2s ease-out'
       }
     },
   },
