@@ -119,15 +119,15 @@ const SuperadminApp = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      <div className="min-h-screen bg-[var(--surface-page)]">
         <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
-          <div className="h-8 w-64 bg-gray-200 dark:bg-gray-700 rounded animate-pulse mb-4"></div>
-          <div className="h-4 w-96 bg-gray-200 dark:bg-gray-700 rounded animate-pulse mb-8"></div>
+          <div className="h-8 w-64 bg-[var(--surface-table)] rounded animate-pulse mb-4"></div>
+          <div className="h-4 w-96 bg-[var(--surface-table)] rounded animate-pulse mb-8"></div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {[1, 2, 3].map((i) => (
               <div key={i} className="card">
-                <div className="h-6 w-32 bg-gray-200 dark:bg-gray-700 rounded animate-pulse mb-4"></div>
-                <div className="h-8 w-24 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+                <div className="h-6 w-32 bg-[var(--surface-table)] rounded animate-pulse mb-4"></div>
+                <div className="h-8 w-24 bg-[var(--surface-table)] rounded animate-pulse"></div>
               </div>
             ))}
           </div>
@@ -142,21 +142,21 @@ const SuperadminApp = () => {
 
 
   return (
-    <div className={`min-h-screen bg-gray-50 dark:bg-gray-900 ${impersonation?.isImpersonating ? 'pt-16' : ''}`}>
+    <div className={`min-h-screen bg-[var(--surface-page)] ${impersonation?.isImpersonating ? 'pt-16' : ''}`}>
       <ImpersonationBanner />
     
       {/* Header */}
-      <header className={`bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700 ${user?.role === 'superadmin' && !user?.cafe_id ? '' : ''}`}>
+      <header className={`bg-[var(--surface-nav)] shadow-sm border-b border-[var(--color-outline)] ${user?.role === 'superadmin' && !user?.cafe_id ? '' : ''}`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center">
               <div className="flex items-center space-x-3">
                 <Crown className="h-8 w-8 text-yellow-500" />
                 <div>
-                  <h1 className="text-xl font-bold text-secondary-700 dark:text-gray-100">
+                  <h1 className="text-xl font-bold text-on-surface">
                     Super Admin Dashboard
                   </h1>
-                  <p className="text-xs text-secondary-500 dark:text-gray-400">
+                  <p className="text-xs text-on-surface-variant">
                     System-wide management and monitoring
                   </p>
                 </div>
@@ -165,7 +165,7 @@ const SuperadminApp = () => {
             
             <div className="flex items-center space-x-2">
               {/* User info */}
-              <div className="hidden sm:flex items-center space-x-2 text-sm text-secondary-600 dark:text-gray-400">
+              <div className="hidden sm:flex items-center space-x-2 text-sm text-on-surface-variant">
                 <Crown className="h-4 w-4" />
                 <span>{user?.username} (Superadmin)</span>
               </div>
@@ -177,7 +177,7 @@ const SuperadminApp = () => {
               {/* Logout button */}
               <button
                 onClick={handleLogout}
-                className="p-2 rounded-md text-secondary-600 hover:text-secondary-700 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-gray-300 dark:hover:bg-gray-700"
+                className="p-2 rounded-md text-on-surface-variant hover:text-on-surface hover:bg-[var(--surface-table)]"
                 title="Logout"
               >
                 <LogOut className="h-5 w-5" />
@@ -186,7 +186,7 @@ const SuperadminApp = () => {
               {/* Mobile menu button */}
               <button
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="lg:hidden p-2 rounded-md text-secondary-600 hover:text-secondary-700 hover:bg-gray-100 min-h-[44px] min-w-[44px] flex items-center justify-center"
+                className="lg:hidden p-2 rounded-md text-on-surface-variant hover:text-on-surface hover:bg-[var(--surface-table)] min-h-[44px] min-w-[44px] flex items-center justify-center"
                 aria-label="Toggle menu"
               >
                 {mobileMenuOpen ? (
@@ -202,7 +202,7 @@ const SuperadminApp = () => {
 
       {/* Mobile Navigation Menu */}
       {mobileMenuOpen && (
-        <div className="lg:hidden bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 shadow-sm">
+        <div className="lg:hidden bg-[var(--surface-nav)] border-b border-[var(--color-outline)] shadow-sm">
           <div className="px-4 py-2 space-y-1">
             {navigationItems.map((item) => {
               const Icon = item.icon;
@@ -213,7 +213,7 @@ const SuperadminApp = () => {
                   className={`w-full flex items-center px-3 py-3 text-sm font-medium rounded-lg transition-all duration-200 ${
                     currentPage === item.id
                       ? 'bg-secondary-600 text-white font-semibold shadow-sm'
-                      : 'text-secondary-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
+                      : 'text-on-surface hover:bg-[var(--surface-table)]'
                   }`}
                 >
                   <Icon className="h-4 w-4 mr-3" />
@@ -226,7 +226,7 @@ const SuperadminApp = () => {
       )}
 
       {/* Desktop Navigation */}
-      <nav className="hidden lg:block bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700">
+      <nav className="hidden lg:block bg-[var(--surface-nav)] shadow-sm border-b border-[var(--color-outline)]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex space-x-8">
             {navigationItems.map((item) => {

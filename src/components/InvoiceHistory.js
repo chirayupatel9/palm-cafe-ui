@@ -289,8 +289,8 @@ const InvoiceHistory = ({ cart, setCart, setCurrentPage }) => {
           )}
           <div>
             <h2 className="text-xl sm:text-2xl font-bold text-secondary-700 dark:text-secondary-300">Reports & Invoices</h2>
-            <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">View order history, download invoices, and access operational reports</p>
-                         <div className="text-sm text-gray-500 dark:text-gray-400 mt-2">
+            <p className="text-sm text-on-surface-variant mt-1">View order history, download invoices, and access operational reports</p>
+                         <div className="text-sm text-on-surface-variant mt-2">
                {activeTab === 'invoices' ? (
                  searchQuery ? 
                    `Total Invoices: ${invoices.length} | Filtered: ${displayedInvoices.length} of ${invoices.filter(invoice => {
@@ -319,7 +319,7 @@ const InvoiceHistory = ({ cart, setCart, setCurrentPage }) => {
              className={`py-2 px-1 border-b-2 font-medium text-sm ${
                activeTab === 'reports'
                  ? 'border-secondary-500 text-secondary-600 dark:text-secondary-400'
-                 : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'
+                 : 'border-transparent text-on-surface-variant hover:text-on-surface hover:border-[var(--color-outline)]'
              }`}
            >
              <div className="flex items-center">
@@ -335,7 +335,7 @@ const InvoiceHistory = ({ cart, setCart, setCurrentPage }) => {
              className={`py-2 px-1 border-b-2 font-medium text-sm ${
                activeTab === 'invoices'
                  ? 'border-secondary-500 text-secondary-600 dark:text-secondary-400'
-                 : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'
+                 : 'border-transparent text-on-surface-variant hover:text-on-surface hover:border-[var(--color-outline)]'
              }`}
            >
              <div className="flex items-center">
@@ -357,7 +357,7 @@ const InvoiceHistory = ({ cart, setCart, setCurrentPage }) => {
                  <div className="flex-1 relative">
                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none z-10">
                      <svg
-                       className="h-5 w-5 text-gray-400"
+                       className="h-5 w-5 text-on-surface-variant"
                        fill="none"
                        stroke="currentColor"
                        viewBox="0 0 24 24"
@@ -389,7 +389,7 @@ const InvoiceHistory = ({ cart, setCart, setCurrentPage }) => {
                  )}
                </div>
                {searchQuery && (
-                 <div className="mt-3 text-sm text-gray-500 dark:text-gray-400">
+                 <div className="mt-3 text-sm text-on-surface-variant">
                    Searching for: <span className="font-medium text-secondary-600 dark:text-secondary-400">"{searchQuery}"</span>
                  </div>
                )}
@@ -469,7 +469,7 @@ const InvoiceHistory = ({ cart, setCart, setCurrentPage }) => {
            {/* Invoices List */}
            <div className="card">
             {invoices.length === 0 ? (
-              <div className="text-center py-8 sm:py-12 text-gray-500 dark:text-gray-400">
+              <div className="text-center py-8 sm:py-12 text-on-surface-variant">
                 {cafeSettings.logo_url && (
                   <img 
                     src={getImageUrl(cafeSettings.logo_url)} 
@@ -478,7 +478,7 @@ const InvoiceHistory = ({ cart, setCart, setCurrentPage }) => {
                   />
                 )}
                 <h3 className="text-lg font-medium text-secondary-700 dark:text-secondary-300 mb-2">No invoices yet</h3>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Invoices are automatically created when orders are completed. Completed orders will appear here with their invoice details.</p>
+                <p className="text-sm text-on-surface-variant">Invoices are automatically created when orders are completed. Completed orders will appear here with their invoice details.</p>
               </div>
             ) : (
               <>
@@ -534,7 +534,7 @@ const InvoiceHistory = ({ cart, setCart, setCurrentPage }) => {
                                   {invoice.customer_name}
                                 </div>
                                 {invoice.customer_phone && (
-                                  <div className="text-sm text-gray-500 dark:text-gray-400">
+                                  <div className="text-sm text-on-surface-variant">
                                     {invoice.customer_phone}
                                   </div>
                                 )}
@@ -629,7 +629,7 @@ const InvoiceHistory = ({ cart, setCart, setCurrentPage }) => {
                           <div className="font-medium text-secondary-700 dark:text-secondary-300">
                             #{getInvoiceNumber(invoice)}
                           </div>
-                          <div className="text-sm text-gray-500 dark:text-gray-400">
+                          <div className="text-sm text-on-surface-variant">
                             {invoice.order_number ? `Order #${invoice.order_number}` : 'No order number'}
                           </div>
                         </div>
@@ -669,7 +669,7 @@ const InvoiceHistory = ({ cart, setCart, setCurrentPage }) => {
                             {invoice.customer_name}
                           </span>
                           {invoice.customer_phone && (
-                            <span className="text-gray-500 dark:text-gray-400 ml-2">
+                            <span className="text-on-surface-variant ml-2">
                               ({invoice.customer_phone})
                             </span>
                           )}
@@ -683,7 +683,7 @@ const InvoiceHistory = ({ cart, setCart, setCurrentPage }) => {
                         </div>
                         
                         <div className="flex justify-between items-center text-sm">
-                          <span className="text-gray-500 dark:text-gray-400">
+                          <span className="text-on-surface-variant">
                             {invoice.items ? invoice.items.length : 0} items • {invoice.payment_method || 'Cash'}
                           </span>
                           <span className="font-medium text-secondary-700 dark:text-secondary-300">
@@ -730,28 +730,28 @@ const InvoiceHistory = ({ cart, setCart, setCurrentPage }) => {
       >
         {showInvoiceDetails && selectedInvoice && (
             <>
-              <p className="text-sm text-[#6F6A63] mb-4">Order #{selectedInvoice.order_number}</p>
+              <p className="text-sm text-on-surface-variant mb-4">Order #{selectedInvoice.order_number}</p>
               <div className="space-y-4">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
                   <div>
-                    <span className="font-medium text-gray-700 dark:text-gray-300">Customer:</span>
-                    <p className="text-gray-600 dark:text-gray-400">{selectedInvoice.customer_name}</p>
+                    <span className="font-medium text-on-surface">Customer:</span>
+                    <p className="text-on-surface-variant">{selectedInvoice.customer_name}</p>
                   </div>
                   <div>
-                    <span className="font-medium text-gray-700 dark:text-gray-300">Date:</span>
-                    <p className="text-gray-600 dark:text-gray-400">{formatDate(selectedInvoice.invoice_date)}</p>
+                    <span className="font-medium text-on-surface">Date:</span>
+                    <p className="text-on-surface-variant">{formatDate(selectedInvoice.invoice_date)}</p>
                   </div>
                 </div>
 
                 {selectedInvoice.orderDetails && (
                   <div>
-                    <h4 className="font-medium text-gray-700 dark:text-gray-300 mb-2">Order Items:</h4>
+                    <h4 className="font-medium text-on-surface mb-2">Order Items:</h4>
                     <div className="space-y-2">
                       {selectedInvoice.orderDetails.items.map((item, index) => (
-                        <div key={index} className="flex justify-between items-center py-2 border-b border-gray-200 dark:border-gray-700">
+                        <div key={index} className="flex justify-between items-center py-2 border-b border-[var(--color-outline)]">
                           <div>
-                            <p className="font-medium text-gray-700 dark:text-gray-300">{item.name}</p>
-                            <p className="text-sm text-gray-500 dark:text-gray-400">
+                            <p className="font-medium text-on-surface">{item.name}</p>
+                            <p className="text-sm text-on-surface-variant">
                               Qty: {item.quantity} × {formatCurrency(item.price)}
                             </p>
                           </div>
@@ -767,7 +767,7 @@ const InvoiceHistory = ({ cart, setCart, setCurrentPage }) => {
                 <div className="flex flex-col sm:flex-row justify-end gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
                   <button
                     onClick={() => setShowInvoiceDetails(false)}
-                    className="px-4 py-2 min-h-[44px] text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 dark:text-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 rounded-lg transition-colors"
+                    className="px-4 py-2 min-h-[44px] text-sm font-medium text-on-surface bg-[var(--surface-table)] hover:bg-[var(--color-surface-variant)] rounded-lg transition-colors"
                   >
                     Close
                   </button>

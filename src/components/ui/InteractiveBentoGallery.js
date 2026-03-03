@@ -186,7 +186,7 @@ const GalleryModal = ({ selectedItem, isOpen, onClose, setSelectedItem, mediaIte
 
         <motion.button
           className="absolute top-2 sm:top-2.5 md:top-3 right-2 sm:right-2.5 md:right-3
-                              p-2 rounded-full bg-gray-200/80 text-gray-700 hover:bg-gray-300/80
+                              p-2 rounded-full bg-[var(--surface-table)] text-on-surface hover:opacity-90
                               text-xs sm:text-sm backdrop-blur-sm"
           onClick={onClose}
           whileHover={{ scale: 1.1 }}
@@ -297,7 +297,7 @@ const InteractiveBentoGallery = ({ mediaItems, title, description }) => {
         </motion.h1>
         {description && (
           <motion.p
-            className="mt-2 text-sm sm:text-base text-gray-600 dark:text-gray-400"
+            className="mt-2 text-sm sm:text-base text-on-surface-variant"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.1 }}
