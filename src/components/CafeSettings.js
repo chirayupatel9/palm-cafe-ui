@@ -578,6 +578,8 @@ const CafeSettings = () => {
       const formData = {
         cafe_name: cafeName,
         logo_url: cafeSettings?.logo_url,
+        hero_image_url: cafeSettings?.hero_image_url,
+        promo_banner_image_url: cafeSettings?.promo_banner_image_url,
         address,
         phone,
         email,

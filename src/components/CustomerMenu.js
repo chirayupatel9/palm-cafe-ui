@@ -423,6 +423,12 @@ const CustomerMenu = ({
 
   const promoBanners = useMemo(() => normalizeBannersFromBranding(cafeBranding), [cafeBranding]);
 
+  // Use a friendly display name when API returns placeholder "Default Cafe" so it looks consistent with other cafes
+  const cafeDisplayName = useMemo(() => {
+    const name = (cafeBranding.cafe_name || '').trim();
+    return name;
+  }, [cafeBranding.cafe_name]);
+
   // Calculate subtotal
   const getSubtotal = () => {
     return cart.reduce((total, item) => total + (ensureNumber(item.price) * item.quantity), 0);
@@ -821,7 +827,7 @@ const CustomerMenu = ({
                 contentClassName={'font-bold text-base sm:text-xl lg:text-2xl tracking-tight truncate max-w-full ' + (isScrolled ? 'text-[#2A2A2A]' : 'text-white')}
                 className={'min-w-0 max-w-full pointer-events-auto ' + (!isScrolled ? 'glass-button-on-dark [&_.glass-button]:!bg-transparent [&_.glass-button]:!border-transparent [&_.glass-button]:!shadow-none' : '')}
               >
-                <span className="truncate block">{cafeBranding.cafe_name || 'Brew & Bloom'}</span>
+                <span className="truncate block">{cafeDisplayName}</span>
               </GlassButton>
             </div>
             <div className="flex items-center flex-1 min-w-0 justify-end gap-1.5 sm:gap-3">
@@ -883,7 +889,7 @@ const CustomerMenu = ({
                   mediaType="image"
                   mediaSrc={getImageUrl(primaryImageUrl)}
                   bgImageSrc={getImageUrl(secondaryImageUrl || primaryImageUrl)}
-                  title={cafeBranding.cafe_name || 'Welcome to our cafe'}
+                  title={cafeDisplayName ? `${cafeDisplayName}` : 'Cafe'}
                   date={cafeBranding.address || ''}
                   scrollToExpand="Scroll to expand menu"
                 >
@@ -1123,7 +1129,7 @@ const CustomerMenu = ({
                   {cafeBranding.logo_url && (
                     <img
                       src={getImageUrl(cafeBranding.logo_url)}
-                      alt={`${cafeBranding.cafe_name || 'Cafe'} Logo`}
+                      alt={`${cafeDisplayName} Logo`}
                       className="h-24 w-24 mx-auto mb-6 opacity-50"
                     />
                   )}
@@ -1454,7 +1460,7 @@ const CustomerMenu = ({
                         <div className="scroll-animate-in space-y-5">
                           <div className="mb-6">
                             <h3 className="text-2xl sm:text-3xl font-bold text-[#2A2A2A] mb-1">
-                              {cafeBranding.cafe_name || 'Café'}
+                              {cafeDisplayName}
                             </h3>
                             <p className="font-serif italic text-[#6F6A63] text-lg">Café</p>
                           </div>
@@ -1530,7 +1536,7 @@ const CustomerMenu = ({
 
                       <div className="mt-16 pt-8 border-t border-[#2A2A2A]/10 flex flex-col sm:flex-row items-center justify-between gap-4">
                         <p className="text-sm text-[#6F6A63]">
-                          © {new Date().getFullYear()} {cafeBranding.cafe_name || 'Café'}. Crafted with care.
+                          © {new Date().getFullYear()} {cafeDisplayName}. Crafted with care.
                         </p>
                         <FlowButton
                           text="Back to top"
