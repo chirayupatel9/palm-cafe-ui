@@ -789,8 +789,14 @@ const CustomerMenu = ({
   const scrollToCategory = (categoryName) => {
     setSelectedCategory(categoryName);
     const slug = getCategorySlug(categoryName);
-    const el = document.getElementById(slug ? `category-${slug}` : 'menu-items-section');
-    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    const targetId = slug ? `category-${slug}` : 'menu-items-section';
+    // Defer scroll until after React re-renders (filtered list → single category section)
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        const el = document.getElementById(targetId);
+        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+    });
   };
 
   const scrollCarousel = (direction) => {
