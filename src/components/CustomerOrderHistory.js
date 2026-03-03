@@ -99,11 +99,11 @@ const CustomerOrderHistory = ({ customerPhone, cafeSlug, setActiveTab, cart, set
       case 'ready':
         return <CheckCircle className="h-4 w-4 text-green-500" />;
       case 'completed':
-        return <CheckCircle className="h-4 w-4 text-gray-500" />;
+        return <CheckCircle className="h-4 w-4 text-on-surface-variant" />;
       case 'cancelled':
         return <XCircle className="h-4 w-4 text-red-500" />;
       default:
-        return <Clock className="h-4 w-4 text-gray-500" />;
+        return <Clock className="h-4 w-4 text-on-surface-variant" />;
     }
   };
 
@@ -116,11 +116,11 @@ const CustomerOrderHistory = ({ customerPhone, cafeSlug, setActiveTab, cart, set
       case 'ready':
         return 'bg-green-100 text-green-800';
       case 'completed':
-        return 'bg-gray-100 text-gray-800';
+        return 'bg-[var(--surface-table)] text-on-surface';
       case 'cancelled':
         return 'bg-red-100 text-red-800';
       default:
-        return 'bg-gray-100 text-gray-800';
+        return 'bg-[var(--surface-table)] text-on-surface';
     }
   };
 
@@ -289,7 +289,7 @@ const CustomerOrderHistory = ({ customerPhone, cafeSlug, setActiveTab, cart, set
     return (
       <div className="flex items-center justify-center py-8">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-secondary-500"></div>
-        <span className="ml-2 text-gray-600">Loading order history...</span>
+        <span className="ml-2 text-on-surface-variant">Loading order history...</span>
       </div>
     );
   }
@@ -297,11 +297,11 @@ const CustomerOrderHistory = ({ customerPhone, cafeSlug, setActiveTab, cart, set
   if (orders.length === 0) {
     return (
       <div className="text-center py-8">
-        <Receipt className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-        <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">
+        <Receipt className="h-12 w-12 text-on-surface-variant mx-auto mb-4" />
+        <h3 className="text-lg font-medium text-on-surface mb-2">
           No Orders Yet
         </h3>
-        <p className="text-gray-600 dark:text-gray-400">
+        <p className="text-on-surface-variant">
           Start ordering to see your order history here.
         </p>
       </div>

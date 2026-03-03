@@ -357,7 +357,7 @@ const KitchenOrders = ({ cart, setCart }) => {
       case 'cancelled':
         return <XCircle className="h-5 w-5 text-red-500" />;
       default:
-        return <AlertTriangle className="h-5 w-5 text-gray-500" />;
+        return <AlertTriangle className="h-5 w-5 text-on-surface-variant" />;
     }
   };
 
@@ -375,7 +375,7 @@ const KitchenOrders = ({ cart, setCart }) => {
         case 'cancelled':
           return 'bg-red-900 text-red-300 border-red-700';
         default:
-          return 'bg-gray-700 text-gray-300 border-gray-600';
+          return 'bg-[var(--color-surface-variant)] text-on-surface-variant border-[var(--color-outline)]';
       }
     } else {
       switch (status) {
@@ -390,7 +390,7 @@ const KitchenOrders = ({ cart, setCart }) => {
         case 'cancelled':
           return 'bg-red-100 text-red-800 border-red-200';
         default:
-          return 'bg-gray-100 text-gray-800 border-gray-200';
+          return 'bg-[var(--surface-table)] text-on-surface border-[var(--color-outline)]';
       }
     }
   };
@@ -553,7 +553,7 @@ const KitchenOrders = ({ cart, setCart }) => {
     return (
       <div className="flex flex-col items-center justify-center py-12">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600 mb-4"></div>
-        <p className="text-gray-600 dark:text-gray-400">Loading kitchen orders...</p>
+        <p className="text-on-surface-variant">Loading kitchen orders...</p>
       </div>
     );
   }
@@ -567,7 +567,7 @@ const KitchenOrders = ({ cart, setCart }) => {
           className="h-16 w-16 mb-4 opacity-50"
         />
         <h2 className="text-xl font-semibold text-secondary-700 dark:text-secondary-300 mb-2">Authentication Required</h2>
-        <p className="text-gray-600 dark:text-gray-400 text-center mb-4">
+        <p className="text-on-surface-variant text-center mb-4">
           You need to be logged in to access the kitchen orders.
         </p>
         <button
@@ -598,14 +598,14 @@ const KitchenOrders = ({ cart, setCart }) => {
           )}
           <div>
             <h1 className="text-2xl font-bold text-secondary-700 dark:text-secondary-300">Kitchen Orders</h1>
-            <p className="text-gray-600 dark:text-gray-400">Manage and track order preparation</p>
+            <p className="text-on-surface-variant">Manage and track order preparation</p>
           </div>
         </div>
         <div className="flex items-center space-x-2">
           {/* WebSocket Status Indicator */}
           <div className="flex items-center space-x-2">
             <div className={`w-2 h-2 rounded-full ${isConnected ? 'bg-green-500' : 'bg-red-500'}`}></div>
-            <span className="text-sm text-gray-600 dark:text-gray-400">
+            <span className="text-sm text-on-surface-variant">
               {isConnected ? 'Live Updates' : 'Offline'}
             </span>
           </div>
@@ -642,7 +642,7 @@ const KitchenOrders = ({ cart, setCart }) => {
               onChange={(e) => setAutoRefresh(e.target.checked)}
               className="rounded"
             />
-            <span className="text-sm text-gray-600 dark:text-gray-400">Auto-refresh</span>
+            <span className="text-sm text-on-surface-variant">Auto-refresh</span>
           </label>
         </div>
       </div>
@@ -718,7 +718,7 @@ const KitchenOrders = ({ cart, setCart }) => {
       </div>
 
       {/* Tabs */}
-      <div className="border-b border-gray-200 dark:border-gray-700">
+      <div className="border-b border-[var(--color-outline)]">
         <nav className="-mb-px flex space-x-8">
           <button
             onClick={() => {
@@ -731,7 +731,7 @@ const KitchenOrders = ({ cart, setCart }) => {
             className={`py-2 px-1 border-b-2 font-medium text-sm ${
               activeTab === 'today'
                 ? 'border-secondary-500 text-secondary-600 dark:text-secondary-400'
-                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'
+                : 'border-transparent text-on-surface-variant hover:text-on-surface hover:border-[var(--color-outline)]'
             }`}
           >
             Today's Orders ({todayOrders.length})
@@ -746,7 +746,7 @@ const KitchenOrders = ({ cart, setCart }) => {
             className={`py-2 px-1 border-b-2 font-medium text-sm ${
               activeTab === 'history'
                 ? 'border-secondary-500 text-secondary-600 dark:text-secondary-400'
-                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'
+                : 'border-transparent text-on-surface-variant hover:text-on-surface hover:border-[var(--color-outline)]'
             }`}
           >
             History ({historyOrders.length})
@@ -756,7 +756,7 @@ const KitchenOrders = ({ cart, setCart }) => {
 
       {/* Today's Orders Sub-tabs */}
       {activeTab === 'today' && (
-        <div className="border-b border-gray-200 dark:border-gray-700">
+        <div className="border-b border-[var(--color-outline)]">
           <nav className="-mb-px flex space-x-8">
             <button
               onClick={() => {
@@ -768,7 +768,7 @@ const KitchenOrders = ({ cart, setCart }) => {
               className={`py-2 px-1 border-b-2 font-medium text-sm ${
                 todaySubTab === 'active'
                   ? 'border-secondary-500 text-secondary-600 dark:text-secondary-400'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'
+                  : 'border-transparent text-on-surface-variant hover:text-on-surface hover:border-[var(--color-outline)]'
               }`}
             >
               Pending & Preparing ({todayOrders.filter(o => ['pending', 'preparing'].includes(o.status)).length})
@@ -783,7 +783,7 @@ const KitchenOrders = ({ cart, setCart }) => {
               className={`py-2 px-1 border-b-2 font-medium text-sm ${
                 todaySubTab === 'ready'
                   ? 'border-secondary-500 text-secondary-600 dark:text-secondary-400'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'
+                  : 'border-transparent text-on-surface-variant hover:text-on-surface hover:border-[var(--color-outline)]'
               }`}
             >
               Ready ({todayOrders.filter(o => o.status === 'ready').length})
@@ -798,7 +798,7 @@ const KitchenOrders = ({ cart, setCart }) => {
               className={`py-2 px-1 border-b-2 font-medium text-sm ${
                 todaySubTab === 'completed'
                   ? 'border-secondary-500 text-secondary-600 dark:text-secondary-400'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'
+                  : 'border-transparent text-on-surface-variant hover:text-on-surface hover:border-[var(--color-outline)]'
               }`}
             >
               Completed ({todayOrders.filter(o => o.status === 'completed').length})
@@ -813,7 +813,7 @@ const KitchenOrders = ({ cart, setCart }) => {
               className={`py-2 px-1 border-b-2 font-medium text-sm ${
                 todaySubTab === 'cancelled'
                   ? 'border-secondary-500 text-secondary-600 dark:text-secondary-400'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'
+                  : 'border-transparent text-on-surface-variant hover:text-on-surface hover:border-[var(--color-outline)]'
               }`}
             >
               Cancelled ({todayOrders.filter(o => o.status === 'cancelled').length})
@@ -872,7 +872,7 @@ const KitchenOrders = ({ cart, setCart }) => {
               className="input-field pl-12 pr-10 w-64"
             />
             <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-              <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="h-5 w-5 text-on-surface-variant" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
               </svg>
             </div>
@@ -882,16 +882,16 @@ const KitchenOrders = ({ cart, setCart }) => {
                   setSearchQuery('');
                   setCurrentPage(1);
                 }}
-                className="absolute inset-y-0 right-0 pr-3 flex items-center hover:text-gray-600 dark:hover:text-gray-300"
+                className="absolute inset-y-0 right-0 pr-3 flex items-center hover:text-on-surface"
               >
-                <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="h-5 w-5 text-on-surface-variant" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 </svg>
               </button>
             )}
           </div>
         </div>
-        <div className="text-sm text-gray-600 dark:text-gray-400">
+        <div className="text-sm text-on-surface-variant">
           {activeTab === 'today' && todaySubTab === 'active' && (
             <span>Showing pending & preparing orders ({displayedOrders.length} of {getFilteredOrders().length})</span>
           )}
@@ -917,9 +917,9 @@ const KitchenOrders = ({ cart, setCart }) => {
         </div>
       ) : displayedOrders.length === 0 ? (
         <div className="text-center py-12">
-          <Coffee className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-          <p className="text-lg font-medium text-gray-700 dark:text-gray-300 mb-2">No orders found</p>
-          <p className="text-sm text-gray-500 dark:text-gray-400">Orders will appear here as they come in. New orders will show up automatically.</p>
+          <Coffee className="h-12 w-12 text-on-surface-variant mx-auto mb-4" />
+          <p className="text-lg font-medium text-on-surface mb-2">No orders found</p>
+          <p className="text-sm text-on-surface-variant">Orders will appear here as they come in. New orders will show up automatically.</p>
         </div>
       ) : (
         <div>
@@ -937,10 +937,10 @@ const KitchenOrders = ({ cart, setCart }) => {
                 {/* Order Header */}
                 <div className="flex items-center justify-between mb-4">
                   <div>
-                    <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                    <h3 className="text-lg font-semibold text-on-surface">
                       Order #{order.order_number}
                     </h3>
-                    <p className="text-sm text-gray-500">
+                    <p className="text-sm text-on-surface-variant">
                       {activeTab === 'history' ? formatDateOnly(order.created_at) : formatDate(order.created_at)}
                     </p>
                   </div>
@@ -952,12 +952,12 @@ const KitchenOrders = ({ cart, setCart }) => {
                     {(isHistoryCard || isCancelledCard) && (
                       <button
                         onClick={() => toggleHistoryCard(order.id)}
-                        className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
+                        className="p-1 hover:bg-[var(--surface-table)] rounded"
                       >
                         {isExpanded ? (
-                          <ChevronUp className="h-4 w-4 text-gray-500" />
+                          <ChevronUp className="h-4 w-4 text-on-surface-variant" />
                         ) : (
-                          <ChevronDown className="h-4 w-4 text-gray-500" />
+                          <ChevronDown className="h-4 w-4 text-on-surface-variant" />
                         )}
                       </button>
                     )}
@@ -969,9 +969,9 @@ const KitchenOrders = ({ cart, setCart }) => {
                   <>
                                     {/* Customer Info */}
                 {editingOrder === order.id ? (
-                  <div className="mb-4 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg space-y-3">
+                  <div className="mb-4 p-3 bg-[var(--surface-table)] rounded-lg space-y-3">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                      <label className="block text-sm font-medium text-on-surface mb-1">
                         Customer Name
                       </label>
                       <input
@@ -983,7 +983,7 @@ const KitchenOrders = ({ cart, setCart }) => {
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                      <label className="block text-sm font-medium text-on-surface mb-1">
                         Phone Number
                       </label>
                       <input
@@ -995,7 +995,7 @@ const KitchenOrders = ({ cart, setCart }) => {
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                      <label className="block text-sm font-medium text-on-surface mb-1">
                         Email
                       </label>
                       <input
@@ -1007,7 +1007,7 @@ const KitchenOrders = ({ cart, setCart }) => {
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                      <label className="block text-sm font-medium text-on-surface mb-1">
                         Table Number
                       </label>
                       <input
@@ -1019,7 +1019,7 @@ const KitchenOrders = ({ cart, setCart }) => {
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                      <label className="block text-sm font-medium text-on-surface mb-1">
                         Payment Method
                       </label>
                       <Select
@@ -1043,14 +1043,14 @@ const KitchenOrders = ({ cart, setCart }) => {
                         onChange={(e) => updateEditFormData('split_payment', e.target.checked)}
                         className="rounded"
                       />
-                      <label className="text-sm text-gray-700 dark:text-gray-300">
+                      <label className="text-sm text-on-surface">
                         Split Payment
                       </label>
                     </div>
                     {editFormData.split_payment && (
                       <>
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                          <label className="block text-sm font-medium text-on-surface mb-1">
                             Split Payment Method
                           </label>
                           <Select
@@ -1068,7 +1068,7 @@ const KitchenOrders = ({ cart, setCart }) => {
                           />
                         </div>
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                          <label className="block text-sm font-medium text-on-surface mb-1">
                             Split Amount
                           </label>
                           <input
@@ -1083,7 +1083,7 @@ const KitchenOrders = ({ cart, setCart }) => {
                       </>
                     )}
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                      <label className="block text-sm font-medium text-on-surface mb-1">
                         Extra Charge
                       </label>
                       <input
@@ -1097,7 +1097,7 @@ const KitchenOrders = ({ cart, setCart }) => {
                     </div>
                     {editFormData.extra_charge > 0 && (
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                        <label className="block text-sm font-medium text-on-surface mb-1">
                           Extra Charge Note
                         </label>
                         <input
@@ -1110,7 +1110,7 @@ const KitchenOrders = ({ cart, setCart }) => {
                       </div>
                     )}
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                      <label className="block text-sm font-medium text-on-surface mb-1">
                         Notes
                       </label>
                       <textarea
@@ -1123,22 +1123,22 @@ const KitchenOrders = ({ cart, setCart }) => {
                     </div>
                   </div>
                 ) : (
-                  <div className="mb-4 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                    <p className="font-medium text-gray-900 dark:text-gray-100">
+                  <div className="mb-4 p-3 bg-[var(--surface-table)] rounded-lg">
+                    <p className="font-medium text-on-surface">
                       {order.customer_name || 'Walk-in Customer'}
                     </p>
                     {(user?.role === 'admin' || (user?.role === 'chef' && cafeSettings?.chef_can_view_customers) || (user?.role === 'reception' && cafeSettings?.reception_can_view_customers)) && order.customer_phone && order.customer_phone.trim() !== '' && (
-                      <p className="text-sm text-gray-600 dark:text-gray-400">
+                      <p className="text-sm text-on-surface-variant">
                         📞 {order.customer_phone}
                       </p>
                     )}
                     {order.table_number && (
-                      <p className="text-sm text-gray-600 dark:text-gray-400">
+                      <p className="text-sm text-on-surface-variant">
                         🍽️ Table: {order.table_number}
                       </p>
                     )}
                     {(user?.role === 'admin' || (user?.role === 'chef' && cafeSettings?.chef_can_view_payments) || (user?.role === 'reception' && cafeSettings?.reception_can_view_payments)) && order.payment_method && (
-                      <p className="text-sm text-gray-600 dark:text-gray-400">
+                      <p className="text-sm text-on-surface-variant">
                         💳 {order.payment_method.toUpperCase()}
                       </p>
                     )}
@@ -1173,7 +1173,7 @@ const KitchenOrders = ({ cart, setCart }) => {
                     {/* Order Items */}
                     <div className="mb-4">
                       <div className="flex items-center justify-between mb-2">
-                        <h4 className="font-medium text-gray-900 dark:text-gray-100">Items:</h4>
+                        <h4 className="font-medium text-on-surface">Items:</h4>
                         {editingOrder === order.id && (
                           <button
                             onClick={addItemToOrder}
@@ -1188,9 +1188,9 @@ const KitchenOrders = ({ cart, setCart }) => {
                         <div className="space-y-3">
                           {editFormData.items && editFormData.items.length > 0 ? (
                             editFormData.items.map((item, index) => (
-                              <div key={index} className="p-3 bg-gray-50 dark:bg-gray-700 rounded-lg space-y-2">
+                              <div key={index} className="p-3 bg-[var(--surface-table)] rounded-lg space-y-2">
                                 <div className="flex items-center justify-between">
-                                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                                  <span className="text-sm font-medium text-on-surface">
                                     Item {index + 1}
                                   </span>
                                   <button
@@ -1202,7 +1202,7 @@ const KitchenOrders = ({ cart, setCart }) => {
                                 </div>
                                 <div className="grid grid-cols-2 gap-2">
                                   <div>
-                                    <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">
+                                    <label className="block text-xs text-on-surface-variant mb-1">
                                       Menu Item
                                     </label>
                                     <Select
@@ -1217,7 +1217,7 @@ const KitchenOrders = ({ cart, setCart }) => {
                                     />
                                   </div>
                                   <div>
-                                    <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">
+                                    <label className="block text-xs text-on-surface-variant mb-1">
                                       Quantity
                                     </label>
                                     <input
@@ -1231,7 +1231,7 @@ const KitchenOrders = ({ cart, setCart }) => {
                                 </div>
                                 <div className="grid grid-cols-2 gap-2">
                                   <div>
-                                    <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">
+                                    <label className="block text-xs text-on-surface-variant mb-1">
                                       Unit Price
                                     </label>
                                     <input
@@ -1243,7 +1243,7 @@ const KitchenOrders = ({ cart, setCart }) => {
                                     />
                                   </div>
                                   <div>
-                                    <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">
+                                    <label className="block text-xs text-on-surface-variant mb-1">
                                       Total
                                     </label>
                                     <input
@@ -1251,14 +1251,14 @@ const KitchenOrders = ({ cart, setCart }) => {
                                       step="0.01"
                                       value={item.total || 0}
                                       readOnly
-                                      className="input-field text-sm bg-gray-100 dark:bg-gray-600"
+                                      className="input-field text-sm bg-[var(--surface-table)]"
                                     />
                                   </div>
                                 </div>
                               </div>
                             ))
                           ) : (
-                            <p className="text-sm text-gray-500 dark:text-gray-400 italic">
+                            <p className="text-sm text-on-surface-variant italic">
                               No items added
                             </p>
                           )}
@@ -1269,21 +1269,21 @@ const KitchenOrders = ({ cart, setCart }) => {
                             {order.items.map((item, index) => (
                               <div key={index} className="flex justify-between items-center">
                                 <div className="flex items-center space-x-2">
-                                  <span className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                                  <span className="text-sm font-medium text-on-surface">
                                     {item.quantity}x
                                   </span>
-                                  <span className="text-sm text-gray-700 dark:text-gray-300">
+                                  <span className="text-sm text-on-surface">
                                     {item.name || 'Unknown Item'}
                                   </span>
                                 </div>
-                                <span className="text-sm text-gray-600 dark:text-gray-400">
+                                <span className="text-sm text-on-surface-variant">
                                   {formatCurrency(item.price || 0)}
                                 </span>
                               </div>
                             ))}
                           </div>
                         ) : (
-                          <p className="text-sm text-gray-500 dark:text-gray-400 italic">
+                          <p className="text-sm text-on-surface-variant italic">
                             No items found
                           </p>
                         )
@@ -1295,36 +1295,36 @@ const KitchenOrders = ({ cart, setCart }) => {
                       {editingOrder === order.id ? (
                         <div className="space-y-2">
                           <div className="flex justify-between items-center">
-                            <span className="text-sm text-gray-600 dark:text-gray-400">Subtotal:</span>
-                            <span className="text-sm text-gray-900 dark:text-gray-100">
+                            <span className="text-sm text-on-surface-variant">Subtotal:</span>
+                            <span className="text-sm text-on-surface">
                               ₹{editFormData.items ? editFormData.items.reduce((sum, item) => sum + (item.total || 0), 0).toFixed(2) : '0.00'}
                             </span>
                           </div>
                           <div className="flex justify-between items-center">
-                            <span className="text-sm text-gray-600 dark:text-gray-400">Tax (8.5%):</span>
-                            <span className="text-sm text-gray-900 dark:text-gray-100">
+                            <span className="text-sm text-on-surface-variant">Tax (8.5%):</span>
+                            <span className="text-sm text-on-surface">
                               ₹{((editFormData.items ? editFormData.items.reduce((sum, item) => sum + (item.total || 0), 0) : 0) * 0.085).toFixed(2)}
                             </span>
                           </div>
                           {editFormData.extra_charge > 0 && (
                             <div className="flex justify-between items-center">
-                              <span className="text-sm text-gray-600 dark:text-gray-400">Extra Charge:</span>
-                              <span className="text-sm text-gray-900 dark:text-gray-100">
+                              <span className="text-sm text-on-surface-variant">Extra Charge:</span>
+                              <span className="text-sm text-on-surface">
                                 ₹{editFormData.extra_charge.toFixed(2)}
                               </span>
                             </div>
                           )}
                           <div className="flex justify-between items-center border-t pt-2">
-                            <span className="font-medium text-gray-900 dark:text-gray-100">Final Total:</span>
-                            <span className="font-bold text-lg text-gray-900 dark:text-gray-100">
+                            <span className="font-medium text-on-surface">Final Total:</span>
+                            <span className="font-bold text-lg text-on-surface">
                               ₹{((editFormData.items ? editFormData.items.reduce((sum, item) => sum + (item.total || 0), 0) : 0) * 1.085 + (editFormData.extra_charge || 0)).toFixed(2)}
                             </span>
                           </div>
                         </div>
                       ) : (
                         <div className="flex justify-between items-center">
-                          <span className="font-medium text-gray-900 dark:text-gray-100">Total:</span>
-                          <span className="font-bold text-lg text-gray-900 dark:text-gray-100">
+                          <span className="font-medium text-on-surface">Total:</span>
+                          <span className="font-bold text-lg text-on-surface">
                             ₹{order.final_amount}
                           </span>
                         </div>
@@ -1372,7 +1372,7 @@ const KitchenOrders = ({ cart, setCart }) => {
                         </button>
                         <button
                           onClick={cancelEditing}
-                          className="text-sm px-3 py-1 bg-gray-600 text-white rounded hover:bg-gray-700 flex items-center"
+                          className="text-sm px-3 py-1 bg-[var(--color-primary)] text-on-primary rounded hover:opacity-90 flex items-center"
                         >
                           <X className="h-3 w-3 mr-1" />
                           Cancel

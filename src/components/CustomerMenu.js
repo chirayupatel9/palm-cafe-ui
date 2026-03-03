@@ -15,6 +15,7 @@ import ScrollExpandMedia from './ui/ScrollExpandMedia';
 import { GlassButton } from './ui/GlassButton';
 import { FlowButton } from './ui/FlowButton';
 import InteractiveBentoGallery from './ui/InteractiveBentoGallery';
+import LocationMap from './ui/LocationMap';
 
 const CustomerMenu = ({
   cafeSlug,
@@ -892,8 +893,6 @@ const CustomerMenu = ({
                   mediaSrc={getImageUrl(primaryImageUrl)}
                   bgImageSrc={getImageUrl(secondaryImageUrl || primaryImageUrl)}
                   title={cafeDisplayName ? `${cafeDisplayName}` : 'Cafe'}
-                  date={cafeBranding.address || ''}
-                  scrollToExpand="Scroll to expand menu"
                 >
                   <div className="max-w-3xl mx-auto text-center space-y-4 mb-10">
                     {/* {cafeBranding.cafe_name && (
@@ -1507,35 +1506,53 @@ const CustomerMenu = ({
                               )}
                             </div>
                           )}
+
+                          {/* Map under cafe details */}
+                          <div className="mt-8 scroll-animate-in">
+                            <div className="flex items-center gap-2 mb-4">
+                              <div className="w-8 h-8 rounded-full bg-[#C68E3C]/10 flex items-center justify-center">
+                                <MapPin className="h-4 w-4 text-[#C68E3C]" />
+                              </div>
+                              <h4 className="font-mono text-xs uppercase tracking-[0.2em] text-[#6F6A63]">Find us</h4>
+                            </div>
+                            <div className="rounded-xl overflow-hidden border border-[#2A2A2A]/10 shadow-sm h-[280px] bg-[#E9E4DA]">
+                              <LocationMap
+                                address={cafeSettings?.address || cafeBranding?.address || ''}
+                                latitude={cafeBranding?.latitude}
+                                longitude={cafeBranding?.longitude}
+                                locationName={cafeDisplayName || 'Café'}
+                              />
+                            </div>
+                          </div>
                         </div>
 
+                        {/* Right column: gallery */}
                         {bentoGalleryMediaItems.length > 0 && (
                           <div>
-                            <div className="flex items-center gap-2 mb-6">
-                              <div className="w-8 h-8 rounded-full bg-[#C68E3C]/10 flex items-center justify-center">
-                                <Star className="h-4 w-4 text-[#C68E3C]" />
+                              <div className="flex items-center gap-2 mb-6">
+                                <div className="w-8 h-8 rounded-full bg-[#C68E3C]/10 flex items-center justify-center">
+                                  <Star className="h-4 w-4 text-[#C68E3C]" />
+                                </div>
+                                <h4 className="font-mono text-xs uppercase tracking-[0.2em] text-[#6F6A63]">Gallery</h4>
                               </div>
-                              <h4 className="font-mono text-xs uppercase tracking-[0.2em] text-[#6F6A63]">Gallery</h4>
+                              <InteractiveBentoGallery
+                                mediaItems={bentoGalleryFirst6}
+                                title="Menu gallery"
+                              />
+                              {bentoGalleryMediaItems.length > 6 && (
+                                <div className="mt-6 text-center">
+                                  <GlassButton
+                                    size="sm"
+                                    onClick={() => setShowGalleryModal(true)}
+                                    className="[&_.glass-button]:bg-[#E9E4DA] [&_.glass-button]:border-[#2A2A2A]/10"
+                                    contentClassName="font-medium text-[#2A2A2A]"
+                                  >
+                                    Show more ({bentoGalleryMediaItems.length} photos)
+                                  </GlassButton>
+                                </div>
+                              )}
                             </div>
-                            <InteractiveBentoGallery
-                              mediaItems={bentoGalleryFirst6}
-                              title="Menu gallery"
-                              description="Drag to reorder, click to view full size"
-                            />
-                            {bentoGalleryMediaItems.length > 6 && (
-                              <div className="mt-6 text-center">
-                                <GlassButton
-                                  size="sm"
-                                  onClick={() => setShowGalleryModal(true)}
-                                  className="[&_.glass-button]:bg-[#E9E4DA] [&_.glass-button]:border-[#2A2A2A]/10"
-                                  contentClassName="font-medium text-[#2A2A2A]"
-                                >
-                                  Show more ({bentoGalleryMediaItems.length} photos)
-                                </GlassButton>
-                              </div>
-                            )}
-                          </div>
-                        )}
+                          )}
                       </div>
 
                       <div className="mt-16 pt-8 border-t border-[#2A2A2A]/10 flex flex-col sm:flex-row items-center justify-between gap-4">
@@ -2100,7 +2117,6 @@ const CustomerMenu = ({
           <InteractiveBentoGallery
             mediaItems={bentoGalleryMediaItems}
             title="Menu gallery"
-            description="Drag to reorder, click to view full size"
           />
         )}
       </Dialog>
