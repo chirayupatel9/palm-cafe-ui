@@ -1931,6 +1931,7 @@ const CustomerMenu = ({
                       <GlassButton
                         size="sm"
                         onClick={clearCart}
+                        className="glass-button-light w-full"
                         contentClassName="w-full flex items-center justify-center"
                       >
                         Clear Cart
