@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate, useLocation, useParams } from 'react-router-dom';
-import { Toaster } from 'react-hot-toast';
 import toast from 'react-hot-toast';
 import { 
   X, LogOut, Building, Shield, Crown, BarChart3, Menu
@@ -144,7 +143,6 @@ const SuperadminApp = () => {
 
   return (
     <div className={`min-h-screen bg-gray-50 dark:bg-gray-900 ${impersonation?.isImpersonating ? 'pt-16' : ''}`}>
-      <Toaster position="top-right" />
       <ImpersonationBanner />
     
       {/* Header */}
