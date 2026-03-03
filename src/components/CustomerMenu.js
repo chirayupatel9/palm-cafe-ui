@@ -702,14 +702,16 @@ const CustomerMenu = ({
 
     setProfileLoading(true);
     try {
-      const response = await axios.put('/customer/profile', {
+      const payload = {
         id: customer.id,
         ...editProfileData
-      });
+      };
+      if (cafeSlug) payload.cafeSlug = cafeSlug;
+      const response = await axios.put('/customer/profile', payload);
 
-      // Update customer data in parent component
+      // Update customer data in parent (merge so phone is preserved; API does not return phone)
       if (onCustomerUpdate) {
-        onCustomerUpdate(response.data);
+        onCustomerUpdate({ ...customer, ...response.data });
       }
 
       toast.success('Profile updated successfully!');
@@ -2074,6 +2076,7 @@ const CustomerMenu = ({
         {showProfile && customer && (
           <CustomerProfile
             customer={customer}
+            cafeSlug={cafeSlug}
             onCustomerUpdate={onCustomerUpdate}
             onLogout={() => {
               setShowProfile(false);
