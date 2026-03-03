@@ -453,13 +453,11 @@ const CustomerMenu = ({
         }
       });
     }
-    toast.success(`${item.name} added to cart`);
   };
 
   // Remove item from cart
   const removeFromCart = (itemId) => {
     setCart(prevCart => prevCart.filter(item => item.id !== itemId));
-    toast.success('Item removed from cart');
   };
 
   // Update item quantity
@@ -843,7 +841,7 @@ const CustomerMenu = ({
               >
                 <User className="h-4 w-4 sm:h-5 sm:w-5" />
               </GlassButton>
-              <div className="relative">
+              <div className="relative inline-flex">
                 <GlassButton
                   size="icon"
                   onClick={() => { setCategoryMenuOpen(false); setShowCart(true); }}
@@ -853,7 +851,10 @@ const CustomerMenu = ({
                   <ShoppingBag className="h-4 w-4 sm:h-5 sm:w-5" />
                 </GlassButton>
                 {cart.length > 0 && (
-                  <span className={`absolute -top-0.5 -right-0.5 min-w-[18px] h-4.5 sm:min-w-[20px] sm:h-5 flex items-center justify-center px-1 sm:px-1.5 text-[10px] sm:text-xs font-bold text-white bg-[#C68E3C] rounded-full shadow-md ${isScrolled ? 'border-2 border-white' : 'border-2 border-[#2A2A2A]'}`}>
+                  <span
+                    className="absolute top-0 right-0 min-w-[16px] h-4 px-1 flex items-center justify-center text-[10px] font-bold text-white bg-[#C68E3C] rounded-full shadow-sm translate-x-1/2 -translate-y-1/2"
+                    aria-label={`${cart.reduce((t, i) => t + i.quantity, 0)} items in cart`}
+                  >
                     {cart.reduce((t, i) => t + i.quantity, 0)}
                   </span>
                 )}
@@ -1283,6 +1284,8 @@ const CustomerMenu = ({
                                             type="button"
                                             onClick={() => updateQuantity(item.id, quantity - 1)}
                                             aria-label="Decrease quantity"
+                                            contentClassName="text-[#2A2A2A]"
+                                            className="[&_.glass-button]:!bg-white/80 [&_.glass-button]:!border-[#E0DED8] [&_.glass-button]:text-[#2A2A2A]"
                                           >
                                             <Minus className="h-4 w-4" />
                                           </GlassButton>
@@ -1292,6 +1295,8 @@ const CustomerMenu = ({
                                             type="button"
                                             onClick={() => updateQuantity(item.id, quantity + 1)}
                                             aria-label="Increase quantity"
+                                            contentClassName="text-[#2A2A2A]"
+                                            className="[&_.glass-button]:!bg-white/80 [&_.glass-button]:!border-[#E0DED8] [&_.glass-button]:text-[#2A2A2A]"
                                           >
                                             <Plus className="h-4 w-4" />
                                           </GlassButton>
@@ -1403,6 +1408,8 @@ const CustomerMenu = ({
                                         type="button"
                                         onClick={() => updateQuantity(item.id, quantity - 1)}
                                         aria-label="Decrease quantity"
+                                        contentClassName="text-[#2A2A2A]"
+                                        className="[&_.glass-button]:!bg-white/80 [&_.glass-button]:!border-[#E0DED8] [&_.glass-button]:text-[#2A2A2A]"
                                       >
                                         <Minus className="h-4 w-4" />
                                       </GlassButton>
@@ -1412,6 +1419,8 @@ const CustomerMenu = ({
                                         type="button"
                                         onClick={() => updateQuantity(item.id, quantity + 1)}
                                         aria-label="Increase quantity"
+                                        contentClassName="text-[#2A2A2A]"
+                                        className="[&_.glass-button]:!bg-white/80 [&_.glass-button]:!border-[#E0DED8] [&_.glass-button]:text-[#2A2A2A]"
                                       >
                                         <Plus className="h-4 w-4" />
                                       </GlassButton>
@@ -1611,7 +1620,8 @@ const CustomerMenu = ({
                               <GlassButton
                                 size="icon"
                                 onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                                className="!min-w-[36px] !min-h-[36px] [&_.glass-button]:!h-9 [&_.glass-button]:!w-9 [&_.glass-button-text]:!h-9 [&_.glass-button-text]:!w-9"
+                                className="!min-w-[36px] !min-h-[36px] [&_.glass-button]:!h-9 [&_.glass-button]:!w-9 [&_.glass-button-text]:!h-9 [&_.glass-button-text]:!w-9 [&_.glass-button]:!bg-white/80 [&_.glass-button]:!border-[#E0DED8] [&_.glass-button]:!text-[#2A2A2A]"
+                                contentClassName="text-[#2A2A2A]"
                                 aria-label="Decrease quantity"
                               >
                                 <Minus className="h-4 w-4" />
@@ -1620,7 +1630,8 @@ const CustomerMenu = ({
                               <GlassButton
                                 size="icon"
                                 onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                                className="!min-w-[36px] !min-h-[36px] [&_.glass-button]:!h-9 [&_.glass-button]:!w-9 [&_.glass-button-text]:!h-9 [&_.glass-button-text]:!w-9"
+                                className="!min-w-[36px] !min-h-[36px] [&_.glass-button]:!h-9 [&_.glass-button]:!w-9 [&_.glass-button-text]:!h-9 [&_.glass-button-text]:!w-9 [&_.glass-button]:!bg-white/80 [&_.glass-button]:!border-[#E0DED8] [&_.glass-button]:!text-[#2A2A2A]"
+                                contentClassName="text-[#2A2A2A]"
                                 aria-label="Increase quantity"
                               >
                                 <Plus className="h-4 w-4" />
