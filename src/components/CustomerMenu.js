@@ -14,6 +14,7 @@ import Dialog from './ui/Dialog';
 import ScrollExpandMedia from './ui/ScrollExpandMedia';
 import { GlassButton } from './ui/GlassButton';
 import { FlowButton } from './ui/FlowButton';
+import InteractiveBentoGallery from './ui/InteractiveBentoGallery';
 
 const CustomerMenu = ({
   cafeSlug,
@@ -69,7 +70,6 @@ const CustomerMenu = ({
   const [selectedSuggestionIndex, setSelectedSuggestionIndex] = useState(-1);
   const [categoryCarouselIndex, setCategoryCarouselIndex] = useState(0);
   const [itemsPerView, setItemsPerView] = useState(3); // Responsive items per view (default to 3 for mobile)
-  const [galleryExpanded, setGalleryExpanded] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const categoryScrollRef = useRef(null);
   const searchInputRef = useRef(null);
@@ -731,32 +731,28 @@ const CustomerMenu = ({
     return allItemsWithImages;
   }, [groupedMenuItems]);
 
-  // Gallery items to display (6 initially, all when expanded)
-  const galleryItems = useMemo(() => {
-    if (galleryExpanded) {
-      return allGalleryItems;
-    }
+  // Map menu gallery items to bento gallery format (id, type, title, desc, url, span)
+  const bentoGalleryMediaItems = useMemo(() => {
+    const spans = [
+      'md:col-span-1 md:row-span-3 sm:col-span-1 sm:row-span-2',
+      'md:col-span-2 md:row-span-2 col-span-1 sm:col-span-2 sm:row-span-2',
+      'md:col-span-1 md:row-span-3 sm:col-span-2 sm:row-span-2',
+      'md:col-span-2 md:row-span-2 sm:col-span-1 sm:row-span-2',
+      'md:col-span-1 md:row-span-3 sm:col-span-1 sm:row-span-2',
+      'md:col-span-2 md:row-span-2 sm:col-span-2 sm:row-span-2'
+    ];
+    return allGalleryItems.map((item, index) => ({
+      id: item.id,
+      type: 'image',
+      title: item.name || 'Menu item',
+      desc: item.description || item.category_name || '',
+      url: getImageUrl(item.image_url),
+      span: spans[index % spans.length]
+    }));
+  }, [allGalleryItems]);
 
-    // Shuffle and take up to 6 random items
-    const shuffled = [...allGalleryItems].sort(() => Math.random() - 0.5);
-    const items = shuffled.slice(0, 6);
-
-    // If we don't have 6 items with images, fill with placeholders
-    while (items.length < 6 && allGalleryItems.length < 6) {
-      const categories = Object.keys(groupedMenuItems);
-      if (categories.length === 0) break;
-      const randomCategory = categories[
-        Math.floor(Math.random() * categories.length)
-      ];
-      items.push({
-        image_url: null,
-        category_name: randomCategory,
-        name: 'Menu Item'
-      });
-    }
-
-    return items;
-  }, [allGalleryItems, galleryExpanded, groupedMenuItems]);
+  const bentoGalleryFirst6 = useMemo(() => bentoGalleryMediaItems.slice(0, 6), [bentoGalleryMediaItems]);
+  const [showGalleryModal, setShowGalleryModal] = useState(false);
 
   if (loading) {
     return (
@@ -816,17 +812,6 @@ const CustomerMenu = ({
                   className={!isScrolled ? 'glass-button-on-dark' : ''}
                 >
                   Menu
-                </GlassButton>
-                <GlassButton
-                  size="sm"
-                  onClick={() => {
-                    setCategoryMenuOpen(false);
-                    if (customer) { setShowProfile(true); setProfileOpenSection('orders'); } else onOpenLoginForOrders?.();
-                  }}
-                  contentClassName="font-mono text-xs uppercase tracking-[0.15em]"
-                  className={!isScrolled ? 'glass-button-on-dark' : ''}
-                >
-                  Order History
                 </GlassButton>
               </nav>
             </div>
@@ -932,7 +917,7 @@ const CustomerMenu = ({
                               setTimeout(() => setShowAutocomplete(false), 200);
                             }
                           }}
-                          className="glass-input w-full pl-14 pr-12 py-4 text-base rounded-2xl text-[#2A2A2A] placeholder:text-[#B0AAA0] transition-all duration-300"
+                          className="glass-input w-full pl-14 pr-12 py-4 text-base text-[#2A2A2A] transition-all duration-300"
                         />
                         {searchQuery && (
                           <div className="search-clear-btn absolute right-4 top-1/2 -translate-y-1/2">
@@ -1505,32 +1490,33 @@ const CustomerMenu = ({
                           )}
                         </div>
 
-                        <div>
-                          <div className="flex items-center gap-2 mb-6">
-                            <div className="w-8 h-8 rounded-full bg-[#C68E3C]/10 flex items-center justify-center">
-                              <Star className="h-4 w-4 text-[#C68E3C]" />
+                        {bentoGalleryMediaItems.length > 0 && (
+                          <div>
+                            <div className="flex items-center gap-2 mb-6">
+                              <div className="w-8 h-8 rounded-full bg-[#C68E3C]/10 flex items-center justify-center">
+                                <Star className="h-4 w-4 text-[#C68E3C]" />
+                              </div>
+                              <h4 className="font-mono text-xs uppercase tracking-[0.2em] text-[#6F6A63]">Gallery</h4>
                             </div>
-                            <h4 className="font-mono text-xs uppercase tracking-[0.2em] text-[#6F6A63]">Gallery</h4>
+                            <InteractiveBentoGallery
+                              mediaItems={bentoGalleryFirst6}
+                              title="Menu gallery"
+                              description="Drag to reorder, click to view full size"
+                            />
+                            {bentoGalleryMediaItems.length > 6 && (
+                              <div className="mt-6 text-center">
+                                <GlassButton
+                                  size="sm"
+                                  onClick={() => setShowGalleryModal(true)}
+                                  className="[&_.glass-button]:bg-[#E9E4DA] [&_.glass-button]:border-[#2A2A2A]/10"
+                                  contentClassName="font-medium text-[#2A2A2A]"
+                                >
+                                  Show more ({bentoGalleryMediaItems.length} photos)
+                                </GlassButton>
+                              </div>
+                            )}
                           </div>
-                          <div className="grid grid-cols-3 gap-3">
-                            {galleryItems.map((item, idx) => {
-                              const imageUrl = item.image_url ? getImageUrl(item.image_url) : getPlaceholderImage(item.category_name, item.name);
-                              return (
-                                <div key={`gallery-${idx}-${item.id || idx}`} className="aspect-square rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-shadow duration-300 group">
-                                  <img src={imageUrl} alt={item.name || `Gallery ${idx + 1}`} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
-                                </div>
-                              );
-                            })}
-                          </div>
-                          {allGalleryItems.length > 6 && (
-                            <button
-                              onClick={() => setGalleryExpanded(!galleryExpanded)}
-                              className="mt-5 text-sm text-[#C68E3C] hover:text-[#2A2A2A] transition-colors font-medium min-h-[44px]"
-                            >
-                              {galleryExpanded ? 'Show Less' : `View All ${allGalleryItems.length} Photos`}
-                            </button>
-                          )}
-                        </div>
+                        )}
                       </div>
 
                       <div className="mt-16 pt-8 border-t border-[#2A2A2A]/10 flex flex-col sm:flex-row items-center justify-between gap-4">
@@ -2075,6 +2061,22 @@ const CustomerMenu = ({
             cart={cart}
             setCart={setCart}
             embedded
+          />
+        )}
+      </Dialog>
+
+      {/* Full gallery modal (same bento implementation, all photos) */}
+      <Dialog
+        open={showGalleryModal}
+        onClose={() => setShowGalleryModal(false)}
+        title="Gallery"
+        size="4xl"
+      >
+        {showGalleryModal && (
+          <InteractiveBentoGallery
+            mediaItems={bentoGalleryMediaItems}
+            title="Menu gallery"
+            description="Drag to reorder, click to view full size"
           />
         )}
       </Dialog>

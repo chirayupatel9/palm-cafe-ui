@@ -811,7 +811,7 @@ img {
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-/* Glass button – glassmorphic pills (translucent, frosted, soft glow) */
+/* Glass button – glassmorphic pills (border animation in GlassButton.css) */
 .glass-button-wrap {
   position: relative;
   display: inline-block;
@@ -833,23 +833,26 @@ img {
   cursor: pointer;
   border-radius: 9999px;
   transition: background 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease, transform 0.15s ease;
-  background: rgba(255, 255, 255, 0.2);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.35);
+  background: rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.4);
   color: #fff;
   font-weight: 500;
   box-shadow:
-    0 0 0 1px rgba(255, 255, 255, 0.15) inset,
-    0 4px 20px rgba(0, 0, 0, 0.08);
+    0 0 0 1px rgba(255, 255, 255, 0.2) inset,
+    2px 2px 8px -2px rgba(255, 255, 255, 0.35) inset,
+    0 6px 24px rgba(0, 0, 0, 0.1),
+    0 2px 8px rgba(0, 0, 0, 0.06);
 }
 .glass-button:hover {
-  background: rgba(255, 255, 255, 0.28);
-  border-color: rgba(255, 255, 255, 0.45);
+  background: rgba(255, 255, 255, 0.32);
+  border-color: rgba(255, 255, 255, 0.5);
   box-shadow:
-    0 0 0 1px rgba(255, 255, 255, 0.2) inset,
-    0 4px 24px rgba(0, 0, 0, 0.1),
-    0 0 20px rgba(255, 255, 255, 0.15);
+    0 0 0 1px rgba(255, 255, 255, 0.25) inset,
+    2px 2px 10px -2px rgba(255, 255, 255, 0.4) inset,
+    0 8px 28px rgba(0, 0, 0, 0.12),
+    0 2px 10px rgba(0, 0, 0, 0.08);
 }
 .glass-button:active {
   transform: scale(0.98);
@@ -864,30 +867,32 @@ img {
   border-radius: 9999px;
   pointer-events: none;
   z-index: -1;
-  box-shadow: 0 0 24px rgba(255, 255, 255, 0.2);
-  opacity: 0.8;
-  transition: opacity 0.2s ease;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12), 0 2px 12px rgba(0, 0, 0, 0.08);
+  opacity: 0.7;
+  transition: opacity 0.2s ease, box-shadow 0.2s ease;
 }
 .glass-button-wrap:hover .glass-button-shadow {
-  opacity: 1;
-  box-shadow: 0 0 28px rgba(255, 255, 255, 0.25);
+  opacity: 0.85;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.14), 0 4px 16px rgba(0, 0, 0, 0.1);
 }
-/* Glass button selected (e.g. category chip – solid golden-brown with glow) */
+/* Glass button selected (e.g. category chip – solid golden-brown) */
 .glass-button-wrap.glass-button-selected .glass-button {
   background: #C68E3C;
   border-color: rgba(198, 142, 60, 0.7);
   color: #fff;
   box-shadow:
     0 0 0 1px rgba(255, 255, 255, 0.2) inset,
-    0 4px 20px rgba(198, 142, 60, 0.35),
-    0 0 20px rgba(198, 142, 60, 0.2);
+    2px 2px 8px -2px rgba(255, 255, 255, 0.2) inset,
+    0 6px 24px rgba(198, 142, 60, 0.3),
+    0 2px 8px rgba(0, 0, 0, 0.08);
 }
 .glass-button-wrap.glass-button-selected .glass-button:hover {
   background: #b87d2e;
   box-shadow:
     0 0 0 1px rgba(255, 255, 255, 0.25) inset,
-    0 4px 24px rgba(198, 142, 60, 0.4),
-    0 0 24px rgba(198, 142, 60, 0.25);
+    2px 2px 10px -2px rgba(255, 255, 255, 0.25) inset,
+    0 8px 28px rgba(198, 142, 60, 0.35),
+    0 2px 10px rgba(0, 0, 0, 0.1);
 }
 /* Glass button primary (dark fill, e.g. Clear search) */
 .glass-button-wrap.glass-button-primary .glass-button {
@@ -915,32 +920,52 @@ img {
   color: #2A2A2A;
   box-shadow:
     0 0 0 1px rgba(255, 255, 255, 0.25) inset,
-    0 4px 16px rgba(198, 142, 60, 0.2);
+    2px 2px 8px -2px rgba(255, 255, 255, 0.3) inset,
+    0 6px 24px rgba(198, 142, 60, 0.25),
+    0 2px 8px rgba(0, 0, 0, 0.06);
 }
 .glass-button-wrap.glass-button-carousel-arrow .glass-button:hover {
   background: linear-gradient(135deg, rgba(198, 142, 60, 0.5) 0%, rgba(139, 105, 20, 0.4) 100%);
   border-color: rgba(198, 142, 60, 0.65);
   box-shadow:
     0 0 0 1px rgba(255, 255, 255, 0.3) inset,
-    0 4px 20px rgba(198, 142, 60, 0.3);
+    2px 2px 10px -2px rgba(255, 255, 255, 0.35) inset,
+    0 8px 28px rgba(198, 142, 60, 0.3),
+    0 2px 10px rgba(0, 0, 0, 0.08);
 }
 .glass-button-wrap.glass-button-carousel-arrow .glass-button-shadow {
-  box-shadow: 0 0 20px rgba(198, 142, 60, 0.15);
+  box-shadow: 0 0 12px rgba(198, 142, 60, 0.1);
 }
-/* Glass input (search field) */
+/* Glass input (search field) – bubble glass to match glass buttons */
 .glass-input {
-  background: rgba(255, 255, 255, 0.25);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.35);
-  border-radius: 1rem;
-  transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+  background: rgba(255, 255, 255, 0.28);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: 9999px;
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.15) inset,
+    2px 2px 8px -2px rgba(255, 255, 255, 0.25) inset,
+    0 4px 20px rgba(0, 0, 0, 0.08),
+    0 2px 8px rgba(0, 0, 0, 0.05);
+  transition: background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.glass-input::placeholder {
+  color: rgba(42, 42, 42, 0.5);
 }
 .glass-input:focus {
   outline: none;
   background: rgba(255, 255, 255, 0.35);
-  border-color: rgba(199, 142, 60, 0.5);
-  box-shadow: 0 0 0 2px rgba(199, 142, 60, 0.2);
+  border-color: rgba(198, 142, 60, 0.55);
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.2) inset,
+    2px 2px 10px -2px rgba(255, 255, 255, 0.3) inset,
+    0 0 0 2px rgba(198, 142, 60, 0.2),
+    0 4px 24px rgba(0, 0, 0, 0.1),
+    0 2px 10px rgba(0, 0, 0, 0.06);
+}
+.glass-input:focus::placeholder {
+  color: rgba(42, 42, 42, 0.45);
 }
 
 /* ============================================

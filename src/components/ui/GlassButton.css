@@ -1,0 +1,41 @@
+/* Glass button border animation: upper L→R, lower R→L (starts when top at center), both finish together */
+
+.glass-button-wrap::before,
+.glass-button-wrap::after {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: 9999px;
+  border: 2px solid rgba(255, 255, 255, 0.55);
+  background: transparent;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.glass-button-wrap::before {
+  clip-path: inset(50% 100% 0 0);
+  transition: clip-path 0.35s ease;
+}
+
+.glass-button-wrap:hover::before {
+  clip-path: inset(50% 0 0 0);
+}
+
+.glass-button-wrap::after {
+  clip-path: inset(0 0 50% 100%);
+  transition: clip-path 0.175s ease 0.175s;
+}
+
+.glass-button-wrap:hover::after {
+  clip-path: inset(0 0 50% 0);
+}
+
+.glass-button-wrap.glass-button-selected::before,
+.glass-button-wrap.glass-button-selected::after {
+  border-color: rgba(255, 255, 255, 0.7);
+}
+
+.glass-button-wrap.glass-button-carousel-arrow::before,
+.glass-button-wrap.glass-button-carousel-arrow::after {
+  border-color: rgba(198, 142, 60, 0.8);
+}
