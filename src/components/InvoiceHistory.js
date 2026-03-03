@@ -141,22 +141,23 @@ const InvoiceHistory = ({ cart, setCart, setCurrentPage }) => {
           return;
         }
 
+        const MAX_ITEM_QUANTITY = 10;
         // Add all items from the order to cart
         order.items.forEach(item => {
           const cartItem = {
             id: item.menu_item_id,
             name: item.name,
             price: item.price,
-            quantity: item.quantity
+            quantity: Math.min(MAX_ITEM_QUANTITY, item.quantity)
           };
           
           // Check if item already exists in cart
-          const existingItemIndex = cart.findIndex(cartItem => cartItem.id === item.menu_item_id);
+          const existingItemIndex = cart.findIndex(c => c.id === item.menu_item_id);
           
           if (existingItemIndex !== -1) {
-            // Update quantity of existing item
+            // Update quantity of existing item (cap at max)
             const updatedCart = [...cart];
-            updatedCart[existingItemIndex].quantity += item.quantity;
+            updatedCart[existingItemIndex].quantity = Math.min(MAX_ITEM_QUANTITY, updatedCart[existingItemIndex].quantity + item.quantity);
             setCart(updatedCart);
           } else {
             // Add new item to cart

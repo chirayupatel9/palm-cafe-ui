@@ -441,17 +441,24 @@ const CustomerMenu = ({
     return subtotal + taxAmount + tipAmount - pointsDiscount;
   };
 
+  const MAX_ITEM_QUANTITY = 10;
+
   // Add item to cart
   const addToCart = (item) => {
     if (onAddToCart) {
       onAddToCart(item);
     } else {
+      const currentQty = getCartQuantity(item.id);
+      if (currentQty >= MAX_ITEM_QUANTITY) {
+        toast.error(`Maximum ${MAX_ITEM_QUANTITY} of the same item allowed`);
+        return;
+      }
       setCart(prevCart => {
         const existingItem = prevCart.find(cartItem => cartItem.id === item.id);
         if (existingItem) {
           return prevCart.map(cartItem =>
             cartItem.id === item.id
-              ? { ...cartItem, quantity: cartItem.quantity + 1 }
+              ? { ...cartItem, quantity: Math.min(MAX_ITEM_QUANTITY, cartItem.quantity + 1) }
               : cartItem
           );
         } else {
@@ -472,9 +479,10 @@ const CustomerMenu = ({
       removeFromCart(itemId);
       return;
     }
+    const capped = Math.min(newQuantity, MAX_ITEM_QUANTITY);
     setCart(prevCart =>
       prevCart.map(item =>
-        item.id === itemId ? { ...item, quantity: newQuantity } : item
+        item.id === itemId ? { ...item, quantity: capped } : item
       )
     );
   };
@@ -694,14 +702,16 @@ const CustomerMenu = ({
 
     setProfileLoading(true);
     try {
-      const response = await axios.put('/customer/profile', {
+      const payload = {
         id: customer.id,
         ...editProfileData
-      });
+      };
+      if (cafeSlug) payload.cafeSlug = cafeSlug;
+      const response = await axios.put('/customer/profile', payload);
 
-      // Update customer data in parent component
+      // Update customer data in parent (merge so phone is preserved; API does not return phone)
       if (onCustomerUpdate) {
-        onCustomerUpdate(response.data);
+        onCustomerUpdate({ ...customer, ...response.data });
       }
 
       toast.success('Profile updated successfully!');
@@ -779,8 +789,14 @@ const CustomerMenu = ({
   const scrollToCategory = (categoryName) => {
     setSelectedCategory(categoryName);
     const slug = getCategorySlug(categoryName);
-    const el = document.getElementById(slug ? `category-${slug}` : 'menu-items-section');
-    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    const targetId = slug ? `category-${slug}` : 'menu-items-section';
+    // Defer scroll until after React re-renders (filtered list → single category section)
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        const el = document.getElementById(targetId);
+        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+    });
   };
 
   const scrollCarousel = (direction) => {
@@ -804,21 +820,7 @@ const CustomerMenu = ({
           }`}
         >
           <div className="relative flex items-center justify-between gap-2 px-3 sm:px-6 lg:px-8 h-14 sm:h-20 min-h-0">
-            <div className="flex items-center relative category-menu-container flex-1 min-w-0 justify-start">
-              <nav className="hidden lg:flex items-center gap-1">
-                <GlassButton
-                  size="sm"
-                  onClick={() => {
-                    const el = document.getElementById('categories-section') || document.getElementById('menu-items-section') || document.getElementById('menu-section');
-                    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                  }}
-                  contentClassName="font-mono text-xs uppercase tracking-[0.15em]"
-                  className={!isScrolled ? 'glass-button-on-dark' : ''}
-                >
-                  Menu
-                </GlassButton>
-              </nav>
-            </div>
+            <div className="flex items-center relative category-menu-container flex-1 min-w-0 justify-start" aria-hidden="true" />
             <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center justify-center w-full max-w-[60%] pointer-events-none">
               <GlassButton
                 size="sm"
@@ -1299,10 +1301,11 @@ const CustomerMenu = ({
                                           <GlassButton
                                             size="icon"
                                             type="button"
-                                            onClick={() => updateQuantity(item.id, quantity + 1)}
+                                            disabled={quantity >= MAX_ITEM_QUANTITY}
+                                            onClick={() => quantity < MAX_ITEM_QUANTITY && updateQuantity(item.id, quantity + 1)}
                                             aria-label="Increase quantity"
                                             contentClassName="text-[#2A2A2A]"
-                                            className="[&_.glass-button]:!bg-white/80 [&_.glass-button]:!border-[#E0DED8] [&_.glass-button]:text-[#2A2A2A]"
+                                            className="[&_.glass-button]:!bg-white/80 [&_.glass-button]:!border-[#E0DED8] [&_.glass-button]:text-[#2A2A2A] disabled:opacity-50 disabled:pointer-events-none"
                                           >
                                             <Plus className="h-4 w-4" />
                                           </GlassButton>
@@ -1423,10 +1426,11 @@ const CustomerMenu = ({
                                       <GlassButton
                                         size="icon"
                                         type="button"
-                                        onClick={() => updateQuantity(item.id, quantity + 1)}
+                                        disabled={quantity >= MAX_ITEM_QUANTITY}
+                                        onClick={() => quantity < MAX_ITEM_QUANTITY && updateQuantity(item.id, quantity + 1)}
                                         aria-label="Increase quantity"
                                         contentClassName="text-[#2A2A2A]"
-                                        className="[&_.glass-button]:!bg-white/80 [&_.glass-button]:!border-[#E0DED8] [&_.glass-button]:text-[#2A2A2A]"
+                                        className="[&_.glass-button]:!bg-white/80 [&_.glass-button]:!border-[#E0DED8] [&_.glass-button]:text-[#2A2A2A] disabled:opacity-50 disabled:pointer-events-none"
                                       >
                                         <Plus className="h-4 w-4" />
                                       </GlassButton>
@@ -1635,8 +1639,9 @@ const CustomerMenu = ({
                               <span className="w-8 text-center text-sm font-medium text-secondary-700">{item.quantity}</span>
                               <GlassButton
                                 size="icon"
-                                onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                                className="!min-w-[36px] !min-h-[36px] [&_.glass-button]:!h-9 [&_.glass-button]:!w-9 [&_.glass-button-text]:!h-9 [&_.glass-button-text]:!w-9 [&_.glass-button]:!bg-white/80 [&_.glass-button]:!border-[#E0DED8] [&_.glass-button]:!text-[#2A2A2A]"
+                                disabled={item.quantity >= MAX_ITEM_QUANTITY}
+                                onClick={() => item.quantity < MAX_ITEM_QUANTITY && updateQuantity(item.id, item.quantity + 1)}
+                                className="!min-w-[36px] !min-h-[36px] [&_.glass-button]:!h-9 [&_.glass-button]:!w-9 [&_.glass-button-text]:!h-9 [&_.glass-button-text]:!w-9 [&_.glass-button]:!bg-white/80 [&_.glass-button]:!border-[#E0DED8] [&_.glass-button]:!text-[#2A2A2A] disabled:opacity-50 disabled:pointer-events-none"
                                 contentClassName="text-[#2A2A2A]"
                                 aria-label="Increase quantity"
                               >
@@ -1920,6 +1925,7 @@ const CustomerMenu = ({
                       <GlassButton
                         size="sm"
                         onClick={clearCart}
+                        className="glass-button-light w-full"
                         contentClassName="w-full flex items-center justify-center"
                       >
                         Clear Cart
@@ -2062,6 +2068,7 @@ const CustomerMenu = ({
         {showProfile && customer && (
           <CustomerProfile
             customer={customer}
+            cafeSlug={cafeSlug}
             onCustomerUpdate={onCustomerUpdate}
             onLogout={() => {
               setShowProfile(false);

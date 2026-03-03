@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster, toast } from 'react-hot-toast';
+import SwipeableToast from './components/ui/SwipeableToast';
 import { Receipt, Settings, Plus, Menu, X, LogOut, User, Package, Utensils, Users, CreditCard, ShoppingCart, Building, BarChart3, TrendingUp, FileText } from 'lucide-react';
 import axios from 'axios';
 import { CurrencyProvider } from './contexts/CurrencyContext';
@@ -252,8 +253,6 @@ function MainApp() {
 
   return (
     <div className={`min-h-screen surface-page ${impersonation?.isImpersonating ? 'pt-16' : ''}`}>
-      <Toaster position="top-right" />
-    
     {/* Header - Distinct navigation surface */}
     <header className="surface-nav">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -432,6 +431,37 @@ function App() {
               <ThemeProvider>
                 <SubscriptionProvider>
                   <FeatureProvider>
+                    <Toaster
+                      position="bottom-center"
+                      reverseOrder={false}
+                      gutter={12}
+                      containerClassName="palm-toast-container"
+                      children={(t) => <SwipeableToast toast={t} position="bottom-center" />}
+                      toastOptions={{
+                        className: 'palm-toast',
+                        duration: 3200,
+                        style: {
+                          padding: 0,
+                          margin: 0,
+                          background: 'transparent',
+                          boxShadow: 'none',
+                          border: 'none',
+                          maxWidth: 380
+                        },
+                        success: {
+                          className: 'palm-toast palm-toast-success',
+                          iconTheme: { primary: 'var(--color-success)', secondary: 'var(--color-on-success)' }
+                        },
+                        error: {
+                          className: 'palm-toast palm-toast-error',
+                          iconTheme: { primary: 'var(--color-error)', secondary: 'var(--color-on-error)' }
+                        },
+                        loading: {
+                          className: 'palm-toast palm-toast-loading',
+                          iconTheme: { primary: 'var(--color-primary-container)', secondary: 'var(--color-primary)' }
+                        }
+                      }}
+                    />
                     <ImpersonationBanner />
                 <Routes>
                   <Route path="/" element={<LandingPage />} />

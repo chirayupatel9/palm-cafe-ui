@@ -4,7 +4,7 @@ import axios from 'axios';
 import toast from 'react-hot-toast';
 import CustomerOrderHistory from './CustomerOrderHistory';
 
-const CustomerProfile = ({ customer, onCustomerUpdate, onLogout, onClose, initialSection, setActiveTab, cart, setCart, embedded }) => {
+const CustomerProfile = ({ customer, onCustomerUpdate, onLogout, onClose, initialSection, setActiveTab, cart, setCart, embedded, cafeSlug }) => {
   const hasTabAndCart = typeof setActiveTab === 'function' && typeof setCart === 'function';
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -40,15 +40,17 @@ const CustomerProfile = ({ customer, onCustomerUpdate, onLogout, onClose, initia
     setLoading(true);
 
     try {
-      const response = await axios.put('/customer/profile', {
+      const payload = {
         id: customer.id,
         name: formData.name.trim(),
         email: formData.email?.trim() || null,
         address: formData.address?.trim() || null,
         date_of_birth: formData.date_of_birth || null
-      });
+      };
+      if (cafeSlug) payload.cafeSlug = cafeSlug;
+      const response = await axios.put('/customer/profile', payload);
       toast.success('Profile updated successfully!');
-      onCustomerUpdate(response.data);
+      onCustomerUpdate({ ...customer, ...response.data });
       setIsEditing(false);
     } catch (error) {
       console.error('Error updating profile:', error);

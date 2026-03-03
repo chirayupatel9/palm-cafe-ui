@@ -224,13 +224,20 @@ const OrderPage = ({ menuItems, cart: externalCart, setCart: setExternalCart }) 
     }
   };
 
+  const MAX_ITEM_QUANTITY = 10;
+
   const addToCart = (item) => {
+    const currentQty = getCartQuantity(item.id);
+    if (currentQty >= MAX_ITEM_QUANTITY) {
+      toast.error(`Maximum ${MAX_ITEM_QUANTITY} of the same item allowed`);
+      return;
+    }
     setCurrentCart(prevCart => {
       const existingItem = prevCart.find(cartItem => cartItem.id === item.id);
       if (existingItem) {
         return prevCart.map(cartItem =>
           cartItem.id === item.id
-            ? { ...cartItem, quantity: cartItem.quantity + 1 }
+            ? { ...cartItem, quantity: Math.min(MAX_ITEM_QUANTITY, cartItem.quantity + 1) }
             : cartItem
         );
       } else {
@@ -255,9 +262,10 @@ const OrderPage = ({ menuItems, cart: externalCart, setCart: setExternalCart }) 
       removeFromCart(itemId);
       return;
     }
+    const capped = Math.min(newQuantity, MAX_ITEM_QUANTITY);
     setCurrentCart(prevCart =>
       prevCart.map(item =>
-        item.id === itemId ? { ...item, quantity: newQuantity } : item
+        item.id === itemId ? { ...item, quantity: capped } : item
       )
     );
   };
@@ -502,8 +510,9 @@ const OrderPage = ({ menuItems, cart: externalCart, setCart: setExternalCart }) 
                                 <span className="font-mono text-lg font-medium text-on-surface">{quantity}</span>
                                 <button
                                   type="button"
-                                  onClick={(e) => { e.stopPropagation(); updateQuantity(item.id, quantity + 1); }}
-                                  className="h-10 w-10 rounded-full shadow-sm flex items-center justify-center transition-all hover:scale-105 bg-[var(--surface-card)] hover:bg-[var(--surface-elevated)] border border-[var(--color-outline)]"
+                                  onClick={(e) => { e.stopPropagation(); quantity < MAX_ITEM_QUANTITY && updateQuantity(item.id, quantity + 1); }}
+                                  disabled={quantity >= MAX_ITEM_QUANTITY}
+                                  className="h-10 w-10 rounded-full shadow-sm flex items-center justify-center transition-all hover:scale-105 bg-[var(--surface-card)] hover:bg-[var(--surface-elevated)] border border-[var(--color-outline)] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
                                   aria-label="Increase quantity"
                                 >
                                   <Plus className="h-4 w-4 text-on-surface" />
@@ -851,8 +860,9 @@ const OrderPage = ({ menuItems, cart: externalCart, setCart: setExternalCart }) 
                         </button>
                         <span className="w-8 text-center font-medium text-sm" style={{ color: 'var(--color-on-surface)' }}>{item.quantity}</span>
                         <button
-                          onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                          className="p-2 rounded-full border transition-interactive btn-press"
+                          onClick={() => item.quantity < MAX_ITEM_QUANTITY && updateQuantity(item.id, item.quantity + 1)}
+                          disabled={item.quantity >= MAX_ITEM_QUANTITY}
+                          className="p-2 rounded-full border transition-interactive btn-press disabled:opacity-50 disabled:cursor-not-allowed"
                           style={{ 
                             backgroundColor: 'var(--surface-card)',
                             borderColor: 'var(--color-outline)',
