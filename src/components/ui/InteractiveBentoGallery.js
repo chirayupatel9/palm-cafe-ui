@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
+import ReactDOM from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X } from 'lucide-react';
 
@@ -130,7 +131,7 @@ const GalleryModal = ({ selectedItem, isOpen, onClose, setSelectedItem, mediaIte
 
   if (!isOpen) return null;
 
-  return (
+  const modalContent = (
     <>
       <motion.div
         initial={{ scale: 0.98 }}
@@ -141,8 +142,7 @@ const GalleryModal = ({ selectedItem, isOpen, onClose, setSelectedItem, mediaIte
           stiffness: 400,
           damping: 30
         }}
-        className="fixed inset-0 w-full min-h-screen sm:h-[90vh] md:h-[600px] backdrop-blur-lg
-                          rounded-none sm:rounded-lg md:rounded-xl overflow-hidden z-10"
+        className="fixed inset-0 w-full min-h-screen backdrop-blur-lg overflow-hidden z-[10000]"
       >
         <div className="h-full flex flex-col">
           <div className="flex-1 p-2 sm:p-3 md:p-4 flex items-center justify-center bg-gray-50/50">
@@ -208,14 +208,14 @@ const GalleryModal = ({ selectedItem, isOpen, onClose, setSelectedItem, mediaIte
             y: prev.y + info.offset.y
           }));
         }}
-        className="fixed z-50 left-1/2 bottom-4 -translate-x-1/2 touch-none"
+        className="fixed z-[10001] left-1/2 bottom-4 -translate-x-1/2 touch-none max-w-[calc(100vw-2rem)]"
       >
         <motion.div
           className="relative rounded-xl bg-sky-400/20 backdrop-blur-xl
                              border border-blue-400/30 shadow-lg
                              cursor-grab active:cursor-grabbing"
         >
-          <div className="flex items-center -space-x-2 px-3 py-2">
+          <div className="flex items-center -space-x-2 px-3 py-2 overflow-x-auto max-w-full min-w-0">
             {mediaItems.map((item, index) => (
               <motion.div
                 key={item.id}
@@ -266,6 +266,8 @@ const GalleryModal = ({ selectedItem, isOpen, onClose, setSelectedItem, mediaIte
       </motion.div>
     </>
   );
+
+  return ReactDOM.createPortal(modalContent, document.body);
 };
 
 /**
