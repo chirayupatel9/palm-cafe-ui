@@ -295,14 +295,16 @@ const InteractiveBentoGallery = ({ mediaItems, title, description }) => {
         >
           {title}
         </motion.h1>
-        <motion.p
-          className="mt-2 text-sm sm:text-base text-gray-600 dark:text-gray-400"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.1 }}
-        >
-          {description}
-        </motion.p>
+        {description && (
+          <motion.p
+            className="mt-2 text-sm sm:text-base text-gray-600 dark:text-gray-400"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.1 }}
+          >
+            {description}
+          </motion.p>
+        )}
       </div>
       <AnimatePresence mode="wait">
         {selectedItem ? (
