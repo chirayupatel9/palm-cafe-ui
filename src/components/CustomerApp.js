@@ -170,14 +170,20 @@ const CustomerApp = () => {
     setCustomer(updatedCustomer);
   };
 
+  const MAX_ITEM_QUANTITY = 10;
+
   const handleAddToCart = (item) => {
-    // Allow adding to cart without login
+    const currentQty = cart.find(cartItem => cartItem.id === item.id)?.quantity ?? 0;
+    if (currentQty >= MAX_ITEM_QUANTITY) {
+      toast.error(`Maximum ${MAX_ITEM_QUANTITY} of the same item allowed`);
+      return;
+    }
     setCart(prevCart => {
       const existingItem = prevCart.find(cartItem => cartItem.id === item.id);
       if (existingItem) {
         return prevCart.map(cartItem =>
           cartItem.id === item.id
-            ? { ...cartItem, quantity: cartItem.quantity + 1 }
+            ? { ...cartItem, quantity: Math.min(MAX_ITEM_QUANTITY, cartItem.quantity + 1) }
             : cartItem
         );
       } else {

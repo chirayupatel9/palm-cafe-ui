@@ -441,17 +441,24 @@ const CustomerMenu = ({
     return subtotal + taxAmount + tipAmount - pointsDiscount;
   };
 
+  const MAX_ITEM_QUANTITY = 10;
+
   // Add item to cart
   const addToCart = (item) => {
     if (onAddToCart) {
       onAddToCart(item);
     } else {
+      const currentQty = getCartQuantity(item.id);
+      if (currentQty >= MAX_ITEM_QUANTITY) {
+        toast.error(`Maximum ${MAX_ITEM_QUANTITY} of the same item allowed`);
+        return;
+      }
       setCart(prevCart => {
         const existingItem = prevCart.find(cartItem => cartItem.id === item.id);
         if (existingItem) {
           return prevCart.map(cartItem =>
             cartItem.id === item.id
-              ? { ...cartItem, quantity: cartItem.quantity + 1 }
+              ? { ...cartItem, quantity: Math.min(MAX_ITEM_QUANTITY, cartItem.quantity + 1) }
               : cartItem
           );
         } else {
@@ -472,9 +479,10 @@ const CustomerMenu = ({
       removeFromCart(itemId);
       return;
     }
+    const capped = Math.min(newQuantity, MAX_ITEM_QUANTITY);
     setCart(prevCart =>
       prevCart.map(item =>
-        item.id === itemId ? { ...item, quantity: newQuantity } : item
+        item.id === itemId ? { ...item, quantity: capped } : item
       )
     );
   };
@@ -1299,10 +1307,11 @@ const CustomerMenu = ({
                                           <GlassButton
                                             size="icon"
                                             type="button"
-                                            onClick={() => updateQuantity(item.id, quantity + 1)}
+                                            disabled={quantity >= MAX_ITEM_QUANTITY}
+                                            onClick={() => quantity < MAX_ITEM_QUANTITY && updateQuantity(item.id, quantity + 1)}
                                             aria-label="Increase quantity"
                                             contentClassName="text-[#2A2A2A]"
-                                            className="[&_.glass-button]:!bg-white/80 [&_.glass-button]:!border-[#E0DED8] [&_.glass-button]:text-[#2A2A2A]"
+                                            className="[&_.glass-button]:!bg-white/80 [&_.glass-button]:!border-[#E0DED8] [&_.glass-button]:text-[#2A2A2A] disabled:opacity-50 disabled:pointer-events-none"
                                           >
                                             <Plus className="h-4 w-4" />
                                           </GlassButton>
@@ -1423,10 +1432,11 @@ const CustomerMenu = ({
                                       <GlassButton
                                         size="icon"
                                         type="button"
-                                        onClick={() => updateQuantity(item.id, quantity + 1)}
+                                        disabled={quantity >= MAX_ITEM_QUANTITY}
+                                        onClick={() => quantity < MAX_ITEM_QUANTITY && updateQuantity(item.id, quantity + 1)}
                                         aria-label="Increase quantity"
                                         contentClassName="text-[#2A2A2A]"
-                                        className="[&_.glass-button]:!bg-white/80 [&_.glass-button]:!border-[#E0DED8] [&_.glass-button]:text-[#2A2A2A]"
+                                        className="[&_.glass-button]:!bg-white/80 [&_.glass-button]:!border-[#E0DED8] [&_.glass-button]:text-[#2A2A2A] disabled:opacity-50 disabled:pointer-events-none"
                                       >
                                         <Plus className="h-4 w-4" />
                                       </GlassButton>
@@ -1635,8 +1645,9 @@ const CustomerMenu = ({
                               <span className="w-8 text-center text-sm font-medium text-secondary-700">{item.quantity}</span>
                               <GlassButton
                                 size="icon"
-                                onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                                className="!min-w-[36px] !min-h-[36px] [&_.glass-button]:!h-9 [&_.glass-button]:!w-9 [&_.glass-button-text]:!h-9 [&_.glass-button-text]:!w-9 [&_.glass-button]:!bg-white/80 [&_.glass-button]:!border-[#E0DED8] [&_.glass-button]:!text-[#2A2A2A]"
+                                disabled={item.quantity >= MAX_ITEM_QUANTITY}
+                                onClick={() => item.quantity < MAX_ITEM_QUANTITY && updateQuantity(item.id, item.quantity + 1)}
+                                className="!min-w-[36px] !min-h-[36px] [&_.glass-button]:!h-9 [&_.glass-button]:!w-9 [&_.glass-button-text]:!h-9 [&_.glass-button-text]:!w-9 [&_.glass-button]:!bg-white/80 [&_.glass-button]:!border-[#E0DED8] [&_.glass-button]:!text-[#2A2A2A] disabled:opacity-50 disabled:pointer-events-none"
                                 contentClassName="text-[#2A2A2A]"
                                 aria-label="Increase quantity"
                               >
