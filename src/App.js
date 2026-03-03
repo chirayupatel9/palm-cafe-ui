@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster, toast } from 'react-hot-toast';
+import SwipeableToast from './components/ui/SwipeableToast';
 import { Receipt, Settings, Plus, Menu, X, LogOut, User, Package, Utensils, Users, CreditCard, ShoppingCart, Building, BarChart3, TrendingUp, FileText } from 'lucide-react';
 import axios from 'axios';
 import { CurrencyProvider } from './contexts/CurrencyContext';
@@ -257,6 +258,7 @@ function MainApp() {
         reverseOrder={false}
         gutter={12}
         containerClassName="palm-toast-container"
+        children={(t) => <SwipeableToast toast={t} position="bottom-center" />}
         toastOptions={{
           className: 'palm-toast',
           duration: 3200,

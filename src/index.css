@@ -1009,6 +1009,12 @@ img {
   flex-shrink: 0;
 }
 
+/* Swipeable toast wrapper - no extra layout */
+.palm-toast-swipe-wrap {
+  display: inline-block;
+  user-select: none;
+}
+
 /* ============================================
    MOTION & TRANSITIONS
    ============================================ */
