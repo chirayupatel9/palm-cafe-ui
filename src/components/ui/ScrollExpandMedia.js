@@ -237,7 +237,7 @@ const ScrollExpandMedia = ({
                   </div>
                 )}
 
-                {/* Readable title overlay: dark gradient + white text with shadow */}
+                {/* Readable title overlay: dark gradient + white text */}
                 <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center text-center z-20 transition-none">
                   <div
                     className="absolute inset-0 rounded-xl bg-gradient-to-b from-black/50 via-black/40 to-black/50"
@@ -245,19 +245,19 @@ const ScrollExpandMedia = ({
                   />
                   <div className="relative z-10 flex flex-col items-center justify-center">
                     <motion.h2
-                      className="text-4xl md:text-5xl lg:text-6xl font-bold text-white transition-none drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]"
+                      className="text-5xl md:text-6xl lg:text-7xl font-bold text-white transition-none"
                       style={{
-                        transform: `translateX(-${textTranslateX}vw)`,
-                        textShadow: '0 2px 4px rgba(0,0,0,0.9), 0 0 20px rgba(0,0,0,0.5)'
+                        fontFamily: "'Fuggles', cursive",
+                        transform: `translateX(-${textTranslateX}vw)`
                       }}
                     >
                       {firstWord}
                     </motion.h2>
                     <motion.h2
-                      className="text-4xl md:text-5xl lg:text-6xl font-bold text-center text-white transition-none drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]"
+                      className="text-5xl md:text-6xl lg:text-7xl font-bold text-center text-white transition-none"
                       style={{
-                        transform: `translateX(${textTranslateX}vw)`,
-                        textShadow: '0 2px 4px rgba(0,0,0,0.9), 0 0 20px rgba(0,0,0,0.5)'
+                        fontFamily: "'Fuggles', cursive",
+                        transform: `translateX(${textTranslateX}vw)`
                       }}
                     >
                       {restOfTitle}
@@ -269,10 +269,7 @@ const ScrollExpandMedia = ({
                   {date && (
                     <p
                       className="text-2xl text-white font-medium"
-                      style={{
-                        transform: `translateX(-${textTranslateX}vw)`,
-                        textShadow: '0 2px 4px rgba(0,0,0,0.9), 0 0 12px rgba(0,0,0,0.6)'
-                      }}
+                      style={{ transform: `translateX(-${textTranslateX}vw)` }}
                     >
                       {date}
                     </p>
@@ -280,10 +277,7 @@ const ScrollExpandMedia = ({
                   {scrollToExpand && (
                     <p
                       className="text-white font-medium text-center"
-                      style={{
-                        transform: `translateX(${textTranslateX}vw)`,
-                        textShadow: '0 2px 4px rgba(0,0,0,0.9), 0 0 12px rgba(0,0,0,0.6)'
-                      }}
+                      style={{ transform: `translateX(${textTranslateX}vw)` }}
                     >
                       {scrollToExpand}
                     </p>

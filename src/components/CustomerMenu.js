@@ -14,6 +14,7 @@ import Dialog from './ui/Dialog';
 import ScrollExpandMedia from './ui/ScrollExpandMedia';
 import { GlassButton } from './ui/GlassButton';
 import { FlowButton } from './ui/FlowButton';
+import InteractiveBentoGallery from './ui/InteractiveBentoGallery';
 
 const CustomerMenu = ({
   cafeSlug,
@@ -60,6 +61,7 @@ const CustomerMenu = ({
   const [categoryMenuOpen, setCategoryMenuOpen] = useState(false); // Hamburger menu state
   const [categoriesExpanded, setCategoriesExpanded] = useState(false);
   const INITIAL_CATEGORIES_VISIBLE = 6;
+  const [openCategoryMobile, setOpenCategoryMobile] = useState(null);
   const [searchExpanded, setSearchExpanded] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
   const [profileOpenSection, setProfileOpenSection] = useState(null); // 'orders' = open profile on My Orders section
@@ -68,7 +70,6 @@ const CustomerMenu = ({
   const [selectedSuggestionIndex, setSelectedSuggestionIndex] = useState(-1);
   const [categoryCarouselIndex, setCategoryCarouselIndex] = useState(0);
   const [itemsPerView, setItemsPerView] = useState(3); // Responsive items per view (default to 3 for mobile)
-  const [galleryExpanded, setGalleryExpanded] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const categoryScrollRef = useRef(null);
   const searchInputRef = useRef(null);
@@ -422,6 +423,12 @@ const CustomerMenu = ({
 
   const promoBanners = useMemo(() => normalizeBannersFromBranding(cafeBranding), [cafeBranding]);
 
+  // Use a friendly display name when API returns placeholder "Default Cafe" so it looks consistent with other cafes
+  const cafeDisplayName = useMemo(() => {
+    const name = (cafeBranding.cafe_name || '').trim();
+    return name;
+  }, [cafeBranding.cafe_name]);
+
   // Calculate subtotal
   const getSubtotal = () => {
     return cart.reduce((total, item) => total + (ensureNumber(item.price) * item.quantity), 0);
@@ -452,13 +459,11 @@ const CustomerMenu = ({
         }
       });
     }
-    toast.success(`${item.name} added to cart`);
   };
 
   // Remove item from cart
   const removeFromCart = (itemId) => {
     setCart(prevCart => prevCart.filter(item => item.id !== itemId));
-    toast.success('Item removed from cart');
   };
 
   // Update item quantity
@@ -730,32 +735,28 @@ const CustomerMenu = ({
     return allItemsWithImages;
   }, [groupedMenuItems]);
 
-  // Gallery items to display (6 initially, all when expanded)
-  const galleryItems = useMemo(() => {
-    if (galleryExpanded) {
-      return allGalleryItems;
-    }
+  // Map menu gallery items to bento gallery format (id, type, title, desc, url, span)
+  const bentoGalleryMediaItems = useMemo(() => {
+    const spans = [
+      'md:col-span-1 md:row-span-3 sm:col-span-1 sm:row-span-2',
+      'md:col-span-2 md:row-span-2 col-span-1 sm:col-span-2 sm:row-span-2',
+      'md:col-span-1 md:row-span-3 sm:col-span-2 sm:row-span-2',
+      'md:col-span-2 md:row-span-2 sm:col-span-1 sm:row-span-2',
+      'md:col-span-1 md:row-span-3 sm:col-span-1 sm:row-span-2',
+      'md:col-span-2 md:row-span-2 sm:col-span-2 sm:row-span-2'
+    ];
+    return allGalleryItems.map((item, index) => ({
+      id: item.id,
+      type: 'image',
+      title: item.name || 'Menu item',
+      desc: item.description || item.category_name || '',
+      url: getImageUrl(item.image_url),
+      span: spans[index % spans.length]
+    }));
+  }, [allGalleryItems]);
 
-    // Shuffle and take up to 6 random items
-    const shuffled = [...allGalleryItems].sort(() => Math.random() - 0.5);
-    const items = shuffled.slice(0, 6);
-
-    // If we don't have 6 items with images, fill with placeholders
-    while (items.length < 6 && allGalleryItems.length < 6) {
-      const categories = Object.keys(groupedMenuItems);
-      if (categories.length === 0) break;
-      const randomCategory = categories[
-        Math.floor(Math.random() * categories.length)
-      ];
-      items.push({
-        image_url: null,
-        category_name: randomCategory,
-        name: 'Menu Item'
-      });
-    }
-
-    return items;
-  }, [allGalleryItems, galleryExpanded, groupedMenuItems]);
+  const bentoGalleryFirst6 = useMemo(() => bentoGalleryMediaItems.slice(0, 6), [bentoGalleryMediaItems]);
+  const [showGalleryModal, setShowGalleryModal] = useState(false);
 
   if (loading) {
     return (
@@ -816,17 +817,6 @@ const CustomerMenu = ({
                 >
                   Menu
                 </GlassButton>
-                <GlassButton
-                  size="sm"
-                  onClick={() => {
-                    setCategoryMenuOpen(false);
-                    if (customer) { setShowProfile(true); setProfileOpenSection('orders'); } else onOpenLoginForOrders?.();
-                  }}
-                  contentClassName="font-mono text-xs uppercase tracking-[0.15em]"
-                  className={!isScrolled ? 'glass-button-on-dark' : ''}
-                >
-                  Order History
-                </GlassButton>
               </nav>
             </div>
             <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center justify-center w-full max-w-[60%] pointer-events-none">
@@ -837,7 +827,7 @@ const CustomerMenu = ({
                 contentClassName={'font-bold text-base sm:text-xl lg:text-2xl tracking-tight truncate max-w-full ' + (isScrolled ? 'text-[#2A2A2A]' : 'text-white')}
                 className={'min-w-0 max-w-full pointer-events-auto ' + (!isScrolled ? 'glass-button-on-dark [&_.glass-button]:!bg-transparent [&_.glass-button]:!border-transparent [&_.glass-button]:!shadow-none' : '')}
               >
-                <span className="truncate block">{cafeBranding.cafe_name || 'Brew & Bloom'}</span>
+                <span className="truncate block">{cafeDisplayName}</span>
               </GlassButton>
             </div>
             <div className="flex items-center flex-1 min-w-0 justify-end gap-1.5 sm:gap-3">
@@ -857,7 +847,7 @@ const CustomerMenu = ({
               >
                 <User className="h-4 w-4 sm:h-5 sm:w-5" />
               </GlassButton>
-              <div className="relative">
+              <div className="relative inline-flex">
                 <GlassButton
                   size="icon"
                   onClick={() => { setCategoryMenuOpen(false); setShowCart(true); }}
@@ -867,7 +857,10 @@ const CustomerMenu = ({
                   <ShoppingBag className="h-4 w-4 sm:h-5 sm:w-5" />
                 </GlassButton>
                 {cart.length > 0 && (
-                  <span className={`absolute -top-0.5 -right-0.5 min-w-[18px] h-4.5 sm:min-w-[20px] sm:h-5 flex items-center justify-center px-1 sm:px-1.5 text-[10px] sm:text-xs font-bold text-white bg-[#C68E3C] rounded-full shadow-md ${isScrolled ? 'border-2 border-white' : 'border-2 border-[#2A2A2A]'}`}>
+                  <span
+                    className="absolute top-0 right-0 min-w-[16px] h-4 px-1 flex items-center justify-center text-[10px] font-bold text-white bg-[#C68E3C] rounded-full shadow-sm translate-x-1/2 -translate-y-1/2"
+                    aria-label={`${cart.reduce((t, i) => t + i.quantity, 0)} items in cart`}
+                  >
                     {cart.reduce((t, i) => t + i.quantity, 0)}
                   </span>
                 )}
@@ -896,7 +889,7 @@ const CustomerMenu = ({
                   mediaType="image"
                   mediaSrc={getImageUrl(primaryImageUrl)}
                   bgImageSrc={getImageUrl(secondaryImageUrl || primaryImageUrl)}
-                  title={cafeBranding.cafe_name || 'Welcome to our cafe'}
+                  title={cafeDisplayName ? `${cafeDisplayName}` : 'Cafe'}
                   date={cafeBranding.address || ''}
                   scrollToExpand="Scroll to expand menu"
                 >
@@ -931,7 +924,7 @@ const CustomerMenu = ({
                               setTimeout(() => setShowAutocomplete(false), 200);
                             }
                           }}
-                          className="glass-input w-full pl-14 pr-12 py-4 text-base rounded-2xl text-[#2A2A2A] placeholder:text-[#B0AAA0] transition-all duration-300"
+                          className="glass-input w-full pl-14 pr-12 py-4 text-base text-[#2A2A2A] transition-all duration-300"
                         />
                         {searchQuery && (
                           <div className="search-clear-btn absolute right-4 top-1/2 -translate-y-1/2">
@@ -1136,7 +1129,7 @@ const CustomerMenu = ({
                   {cafeBranding.logo_url && (
                     <img
                       src={getImageUrl(cafeBranding.logo_url)}
-                      alt={`${cafeBranding.cafe_name || 'Cafe'} Logo`}
+                      alt={`${cafeDisplayName} Logo`}
                       className="h-24 w-24 mx-auto mb-6 opacity-50"
                     />
                   )}
@@ -1215,22 +1208,38 @@ const CustomerMenu = ({
                           key={categoryName}
                           id={slug ? `category-${slug}` : undefined}
                           data-scroll-animate
-                          className="py-16 sm:py-24 bg-[#F6F4F0] relative scroll-mt-24"
+                          className="py-6 sm:py-24 bg-[#F6F4F0] relative scroll-mt-24"
                         >
                           <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#C68E3C]/[0.02] to-transparent pointer-events-none" />
                           <div className="px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto relative z-10">
-                            <div className="mb-12 sm:mb-16">
-                              <div className="scroll-animate-left flex items-baseline gap-4 mb-4">
-                                <span className="font-mono text-sm text-[#C68E3C] bg-[#C68E3C]/10 px-3 py-1 rounded-full">
-                                  {categoryNumber}
+                            <button
+                              type="button"
+                              onClick={() => setOpenCategoryMobile(openCategoryMobile === categoryName ? null : categoryName)}
+                              className="sm:pointer-events-none sm:static w-full text-left mb-4 sm:mb-16"
+                              aria-expanded={openCategoryMobile === categoryName}
+                              aria-controls={slug ? `category-content-${slug}` : undefined}
+                              id={slug ? `category-heading-${slug}` : undefined}
+                            >
+                              <div className="scroll-animate-left flex items-center justify-between gap-4">
+                                <div className="flex items-baseline gap-4">
+                                  <span className="font-mono text-sm text-[#C68E3C] bg-[#C68E3C]/10 px-3 py-1 rounded-full">
+                                    {categoryNumber}
+                                  </span>
+                                  <h2 className="text-2xl sm:text-4xl lg:text-5xl font-bold text-[#2A2A2A] tracking-tight">
+                                    {categoryName}
+                                  </h2>
+                                </div>
+                                <span className="sm:hidden flex-shrink-0 transition-transform duration-200" aria-hidden>
+                                  <ChevronDown className={`h-6 w-6 text-[#2A2A2A] ${openCategoryMobile === categoryName ? 'rotate-180' : ''}`} />
                                 </span>
-                                <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-[#2A2A2A] tracking-tight">
-                                  {categoryName}
-                                </h2>
                               </div>
-                            </div>
+                            </button>
 
-                            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+                            <div
+                              id={slug ? `category-content-${slug}` : undefined}
+                              aria-labelledby={slug ? `category-heading-${slug}` : undefined}
+                              className={`grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 ${openCategoryMobile !== categoryName ? 'max-sm:hidden' : ''}`}
+                            >
                               {items.map((item, itemIndex) => {
                                 const itemImage = item.image_url
                                   ? getImageUrl(item.image_url)
@@ -1281,6 +1290,8 @@ const CustomerMenu = ({
                                             type="button"
                                             onClick={() => updateQuantity(item.id, quantity - 1)}
                                             aria-label="Decrease quantity"
+                                            contentClassName="text-[#2A2A2A]"
+                                            className="[&_.glass-button]:!bg-white/80 [&_.glass-button]:!border-[#E0DED8] [&_.glass-button]:text-[#2A2A2A]"
                                           >
                                             <Minus className="h-4 w-4" />
                                           </GlassButton>
@@ -1290,6 +1301,8 @@ const CustomerMenu = ({
                                             type="button"
                                             onClick={() => updateQuantity(item.id, quantity + 1)}
                                             aria-label="Increase quantity"
+                                            contentClassName="text-[#2A2A2A]"
+                                            className="[&_.glass-button]:!bg-white/80 [&_.glass-button]:!border-[#E0DED8] [&_.glass-button]:text-[#2A2A2A]"
                                           >
                                             <Plus className="h-4 w-4" />
                                           </GlassButton>
@@ -1401,6 +1414,8 @@ const CustomerMenu = ({
                                         type="button"
                                         onClick={() => updateQuantity(item.id, quantity - 1)}
                                         aria-label="Decrease quantity"
+                                        contentClassName="text-[#2A2A2A]"
+                                        className="[&_.glass-button]:!bg-white/80 [&_.glass-button]:!border-[#E0DED8] [&_.glass-button]:text-[#2A2A2A]"
                                       >
                                         <Minus className="h-4 w-4" />
                                       </GlassButton>
@@ -1410,6 +1425,8 @@ const CustomerMenu = ({
                                         type="button"
                                         onClick={() => updateQuantity(item.id, quantity + 1)}
                                         aria-label="Increase quantity"
+                                        contentClassName="text-[#2A2A2A]"
+                                        className="[&_.glass-button]:!bg-white/80 [&_.glass-button]:!border-[#E0DED8] [&_.glass-button]:text-[#2A2A2A]"
                                       >
                                         <Plus className="h-4 w-4" />
                                       </GlassButton>
@@ -1443,7 +1460,7 @@ const CustomerMenu = ({
                         <div className="scroll-animate-in space-y-5">
                           <div className="mb-6">
                             <h3 className="text-2xl sm:text-3xl font-bold text-[#2A2A2A] mb-1">
-                              {cafeBranding.cafe_name || 'Café'}
+                              {cafeDisplayName}
                             </h3>
                             <p className="font-serif italic text-[#6F6A63] text-lg">Café</p>
                           </div>
@@ -1488,37 +1505,38 @@ const CustomerMenu = ({
                           )}
                         </div>
 
-                        <div>
-                          <div className="flex items-center gap-2 mb-6">
-                            <div className="w-8 h-8 rounded-full bg-[#C68E3C]/10 flex items-center justify-center">
-                              <Star className="h-4 w-4 text-[#C68E3C]" />
+                        {bentoGalleryMediaItems.length > 0 && (
+                          <div>
+                            <div className="flex items-center gap-2 mb-6">
+                              <div className="w-8 h-8 rounded-full bg-[#C68E3C]/10 flex items-center justify-center">
+                                <Star className="h-4 w-4 text-[#C68E3C]" />
+                              </div>
+                              <h4 className="font-mono text-xs uppercase tracking-[0.2em] text-[#6F6A63]">Gallery</h4>
                             </div>
-                            <h4 className="font-mono text-xs uppercase tracking-[0.2em] text-[#6F6A63]">Gallery</h4>
+                            <InteractiveBentoGallery
+                              mediaItems={bentoGalleryFirst6}
+                              title="Menu gallery"
+                              description="Drag to reorder, click to view full size"
+                            />
+                            {bentoGalleryMediaItems.length > 6 && (
+                              <div className="mt-6 text-center">
+                                <GlassButton
+                                  size="sm"
+                                  onClick={() => setShowGalleryModal(true)}
+                                  className="[&_.glass-button]:bg-[#E9E4DA] [&_.glass-button]:border-[#2A2A2A]/10"
+                                  contentClassName="font-medium text-[#2A2A2A]"
+                                >
+                                  Show more ({bentoGalleryMediaItems.length} photos)
+                                </GlassButton>
+                              </div>
+                            )}
                           </div>
-                          <div className="grid grid-cols-3 gap-3">
-                            {galleryItems.map((item, idx) => {
-                              const imageUrl = item.image_url ? getImageUrl(item.image_url) : getPlaceholderImage(item.category_name, item.name);
-                              return (
-                                <div key={`gallery-${idx}-${item.id || idx}`} className="aspect-square rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-shadow duration-300 group">
-                                  <img src={imageUrl} alt={item.name || `Gallery ${idx + 1}`} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
-                                </div>
-                              );
-                            })}
-                          </div>
-                          {allGalleryItems.length > 6 && (
-                            <button
-                              onClick={() => setGalleryExpanded(!galleryExpanded)}
-                              className="mt-5 text-sm text-[#C68E3C] hover:text-[#2A2A2A] transition-colors font-medium min-h-[44px]"
-                            >
-                              {galleryExpanded ? 'Show Less' : `View All ${allGalleryItems.length} Photos`}
-                            </button>
-                          )}
-                        </div>
+                        )}
                       </div>
 
                       <div className="mt-16 pt-8 border-t border-[#2A2A2A]/10 flex flex-col sm:flex-row items-center justify-between gap-4">
                         <p className="text-sm text-[#6F6A63]">
-                          © {new Date().getFullYear()} {cafeBranding.cafe_name || 'Café'}. Crafted with care.
+                          © {new Date().getFullYear()} {cafeDisplayName}. Crafted with care.
                         </p>
                         <FlowButton
                           text="Back to top"
@@ -1608,7 +1626,8 @@ const CustomerMenu = ({
                               <GlassButton
                                 size="icon"
                                 onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                                className="!min-w-[36px] !min-h-[36px] [&_.glass-button]:!h-9 [&_.glass-button]:!w-9 [&_.glass-button-text]:!h-9 [&_.glass-button-text]:!w-9"
+                                className="!min-w-[36px] !min-h-[36px] [&_.glass-button]:!h-9 [&_.glass-button]:!w-9 [&_.glass-button-text]:!h-9 [&_.glass-button-text]:!w-9 [&_.glass-button]:!bg-white/80 [&_.glass-button]:!border-[#E0DED8] [&_.glass-button]:!text-[#2A2A2A]"
+                                contentClassName="text-[#2A2A2A]"
                                 aria-label="Decrease quantity"
                               >
                                 <Minus className="h-4 w-4" />
@@ -1617,7 +1636,8 @@ const CustomerMenu = ({
                               <GlassButton
                                 size="icon"
                                 onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                                className="!min-w-[36px] !min-h-[36px] [&_.glass-button]:!h-9 [&_.glass-button]:!w-9 [&_.glass-button-text]:!h-9 [&_.glass-button-text]:!w-9"
+                                className="!min-w-[36px] !min-h-[36px] [&_.glass-button]:!h-9 [&_.glass-button]:!w-9 [&_.glass-button-text]:!h-9 [&_.glass-button-text]:!w-9 [&_.glass-button]:!bg-white/80 [&_.glass-button]:!border-[#E0DED8] [&_.glass-button]:!text-[#2A2A2A]"
+                                contentClassName="text-[#2A2A2A]"
                                 aria-label="Increase quantity"
                               >
                                 <Plus className="h-4 w-4" />
@@ -2058,6 +2078,22 @@ const CustomerMenu = ({
             cart={cart}
             setCart={setCart}
             embedded
+          />
+        )}
+      </Dialog>
+
+      {/* Full gallery modal (same bento implementation, all photos) */}
+      <Dialog
+        open={showGalleryModal}
+        onClose={() => setShowGalleryModal(false)}
+        title="Gallery"
+        size="4xl"
+      >
+        {showGalleryModal && (
+          <InteractiveBentoGallery
+            mediaItems={bentoGalleryMediaItems}
+            title="Menu gallery"
+            description="Drag to reorder, click to view full size"
           />
         )}
       </Dialog>

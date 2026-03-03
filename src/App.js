@@ -39,6 +39,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 import RoleBasedRedirect from './components/RoleBasedRedirect';
 import DashboardRedirect from './components/DashboardRedirect';
 import OnboardingGuard from './components/OnboardingGuard';
+import StockCategoryListDemo from './components/StockCategoryListDemo';
 
 // Configure axios base URL - use environment variable or fallback to localhost.
 // API_PATH is centralised here so migrating to /api/v1 is a one-line change (#18).
@@ -434,6 +435,7 @@ function App() {
                     <ImpersonationBanner />
                 <Routes>
                   <Route path="/" element={<LandingPage />} />
+                  <Route path="/demo/stock-categories" element={<StockCategoryListDemo />} />
                   <Route path="/login" element={<Login />} />
                   <Route path="/admin/register" element={
                     <ProtectedRoute>
