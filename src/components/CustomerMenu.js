@@ -814,21 +814,7 @@ const CustomerMenu = ({
           }`}
         >
           <div className="relative flex items-center justify-between gap-2 px-3 sm:px-6 lg:px-8 h-14 sm:h-20 min-h-0">
-            <div className="flex items-center relative category-menu-container flex-1 min-w-0 justify-start">
-              <nav className="hidden lg:flex items-center gap-1">
-                <GlassButton
-                  size="sm"
-                  onClick={() => {
-                    const el = document.getElementById('categories-section') || document.getElementById('menu-items-section') || document.getElementById('menu-section');
-                    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                  }}
-                  contentClassName="font-mono text-xs uppercase tracking-[0.15em]"
-                  className={!isScrolled ? 'glass-button-on-dark' : ''}
-                >
-                  Menu
-                </GlassButton>
-              </nav>
-            </div>
+            <div className="flex items-center relative category-menu-container flex-1 min-w-0 justify-start" aria-hidden="true" />
             <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center justify-center w-full max-w-[60%] pointer-events-none">
               <GlassButton
                 size="sm"
