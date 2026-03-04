@@ -1,0 +1,91 @@
+import React from 'react';
+
+export interface TableColumn {
+  key?: string;
+  label: string;
+  align?: 'left' | 'right';
+}
+
+export interface TableProps<T extends { id?: string | number }> {
+  columns: TableColumn[];
+  data: T[];
+  renderRow: (row: T, rowIndex: number) => React.ReactNode;
+  emptyMessage?: string;
+  className?: string;
+}
+
+function Table<T extends { id?: string | number }>({
+  columns,
+  data,
+  renderRow,
+  emptyMessage = 'No data available',
+  className = ''
+}: TableProps<T>): React.ReactElement {
+  return (
+    <div
+      className={`overflow-x-auto ${className}`}
+      style={{
+        backgroundColor: 'var(--surface-card)',
+        borderRadius: 'var(--radius-lg)',
+        border: '1px solid var(--color-outline)',
+        boxShadow: 'var(--elevation-1)'
+      }}
+    >
+      <table
+        className="min-w-full"
+        style={{ borderCollapse: 'separate', borderSpacing: 0 }}
+      >
+        <thead style={{ backgroundColor: 'var(--surface-table)' }}>
+          <tr>
+            {columns.map((column, index) => (
+              <th
+                key={column.key ?? String(index)}
+                className={`px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-semibold uppercase tracking-wider ${
+                  column.align === 'right' ? 'text-right' : ''
+                }`}
+                style={{
+                  color: 'var(--color-on-surface-variant)',
+                  borderBottom: '2px solid var(--color-outline)'
+                }}
+              >
+                {column.label}
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody style={{ backgroundColor: 'var(--surface-card)' }}>
+          {data.length === 0 ? (
+            <tr>
+              <td colSpan={columns.length} className="px-6 py-12 text-center">
+                <p
+                  className="text-sm"
+                  style={{ color: 'var(--color-on-surface-variant)' }}
+                >
+                  {emptyMessage}
+                </p>
+              </td>
+            </tr>
+          ) : (
+            data.map((row, rowIndex) => (
+              <tr
+                key={(row.id != null ? String(row.id) : undefined) ?? rowIndex}
+                className="transition-colors h-14"
+                style={{ borderBottom: '1px solid var(--color-outline-variant)' }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = 'var(--surface-table)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = 'var(--surface-card)';
+                }}
+              >
+                {renderRow(row, rowIndex)}
+              </tr>
+            ))
+          )}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+export default Table;
