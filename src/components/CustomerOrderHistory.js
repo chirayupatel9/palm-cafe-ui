@@ -57,7 +57,7 @@ const CustomerOrderHistory = ({ customerPhone, cafeSlug, setActiveTab, cart, set
     try {
       const payload = { phone: customerPhone };
       if (cafeSlug) payload.cafeSlug = cafeSlug;
-      const response = await axios.post('/customer/login', payload);
+      const response = await axios.post('/customer/lookup', payload);
       if (response.data) {
         setCustomerInfo(response.data);
       }
