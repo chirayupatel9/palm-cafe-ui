@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
-import { Phone, ArrowRight, UserPlus, User, Mail, MapPin } from 'lucide-react';
+import { Phone, ArrowRight, User, Mail, MapPin } from 'lucide-react';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 
 const CustomerLogin = ({ cafeSlug, onLogin, onRegister }) => {
-  const [phone, setPhone] = useState('');
+  const [email, setEmail] = useState('');
+  const [otp, setOtp] = useState('');
+  const [step, setStep] = useState('email'); // 'email' | 'otp'
   const [loading, setLoading] = useState(false);
   const [showRegister, setShowRegister] = useState(false);
   const [registerData, setRegisterData] = useState({
@@ -14,36 +16,56 @@ const CustomerLogin = ({ cafeSlug, onLogin, onRegister }) => {
     address: ''
   });
 
-  const handleLogin = async (e) => {
+  const handleSendOtp = async (e) => {
     e.preventDefault();
-    
-    if (!phone.trim()) {
-      toast.error('Please enter your phone number');
+    const trimmed = email.trim();
+    if (!trimmed) {
+      toast.error('Please enter your email address');
       return;
     }
 
     setLoading(true);
-
     try {
-      const payload = { phone };
+      const payload = { email: trimmed };
+      if (cafeSlug) payload.cafeSlug = cafeSlug;
+      await axios.post('/customer/send-otp', payload);
+      toast.success('Verification code sent to your email');
+      setStep('otp');
+    } catch (error) {
+      const msg = error.response?.data?.error || 'Failed to send verification code';
+      toast.error(msg);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    const trimmed = email.trim();
+    if (!trimmed || !otp.trim()) {
+      toast.error('Please enter your email and verification code');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const payload = { email: trimmed, otp: otp.trim() };
       if (cafeSlug) payload.cafeSlug = cafeSlug;
       const response = await axios.post('/customer/login', payload);
-      
-      if (response.data) {
-        const customer = response.data;
-        toast.success(`Welcome back, ${customer.name}!`);
-        onLogin(customer);
-      } else {
-        toast.error('Phone number not found. Please register first.');
-        setShowRegister(true);
-      }
+      const customer = response.data;
+      toast.success(`Welcome back, ${customer.name}!`);
+      setStep('email');
+      setEmail('');
+      setOtp('');
+      onLogin(customer);
     } catch (error) {
-      console.error('Error searching customer:', error);
       if (error.response?.status === 404) {
-        toast.error('Phone number not found. Please register first.');
+        toast.error('Account not found. Please register first.');
+        setRegisterData((prev) => ({ ...prev, email: trimmed }));
         setShowRegister(true);
+        setStep('email');
       } else {
-        toast.error('Failed to verify phone number');
+        toast.error(error.response?.data?.error || 'Login failed');
       }
     } finally {
       setLoading(false);
@@ -52,14 +74,21 @@ const CustomerLogin = ({ cafeSlug, onLogin, onRegister }) => {
 
   const handleRegister = async (e) => {
     e.preventDefault();
-    
-    if (!registerData.name.trim() || !registerData.phone.trim()) {
-      toast.error('Name and phone number are required');
+
+    if (!registerData.name.trim()) {
+      toast.error('Name is required');
+      return;
+    }
+    if (!registerData.email.trim()) {
+      toast.error('Email is required');
+      return;
+    }
+    if (!registerData.phone.trim()) {
+      toast.error('Phone number is required');
       return;
     }
 
     setLoading(true);
-
     try {
       const dataToSend = { ...registerData };
       if (cafeSlug) dataToSend.cafeSlug = cafeSlug;
@@ -67,90 +96,135 @@ const CustomerLogin = ({ cafeSlug, onLogin, onRegister }) => {
       toast.success(`Welcome, ${customer.data.name}! You've been registered successfully.`);
       onLogin(customer.data);
     } catch (error) {
-      console.error('Error registering customer:', error);
       toast.error(error.response?.data?.error || 'Failed to register');
     } finally {
       setLoading(false);
     }
   };
 
+  const handleCloseOtp = () => {
+    setStep('email');
+    setOtp('');
+  };
+
   return (
     <div className="relative w-full max-w-md bg-white dark:bg-[#221a10] rounded-xl shadow-lg p-8 sm:p-10">
       <div className="flex flex-col w-full">
         {!showRegister ? (
-          // Login Form
-          <>
-            <div className="text-center mb-6">
-              <h1 className="text-text-light dark:text-[#F7F4EF] tracking-tight text-3xl font-bold leading-tight">
-                Welcome Back!
-              </h1>
-              <p className="text-text-light/70 dark:text-[#F7F4EF]/70 text-base font-normal leading-normal pt-2">
-                Login to your account to continue
-              </p>
-            </div>
-            <form onSubmit={handleLogin} className="flex flex-col gap-4">
-              <div className="flex flex-col">
-                <label
-                  className="text-text-light dark:text-[#F7F4EF] text-base font-medium leading-normal pb-2"
-                  htmlFor="phone"
-                >
-                  Phone Number
-                </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                    <Phone className="h-5 w-5 text-[#9a794c] dark:text-[#8a6d4c]" />
+          step === 'email' ? (
+            <>
+              <div className="text-center mb-6">
+                <h1 className="text-text-light dark:text-[#F7F4EF] tracking-tight text-3xl font-bold leading-tight">
+                  Welcome Back!
+                </h1>
+                <p className="text-text-light/70 dark:text-[#F7F4EF]/70 text-base font-normal leading-normal pt-2">
+                  Enter your email to receive a login code
+                </p>
+              </div>
+              <form onSubmit={handleSendOtp} className="flex flex-col gap-4">
+                <div className="flex flex-col">
+                  <label
+                    className="text-text-light dark:text-[#F7F4EF] text-base font-medium leading-normal pb-2"
+                    htmlFor="email"
+                  >
+                    Email Address
+                  </label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                      <Mail className="h-5 w-5 text-[#9a794c] dark:text-[#8a6d4c]" />
+                    </div>
+                    <input
+                      className="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-text-light dark:text-[#F7F4EF] focus:outline-0 focus:ring-2 focus:ring-[#6F4E37]/50 border border-[#e7ddcf] dark:border-[#443d34] bg-transparent dark:bg-[#221a10] h-14 placeholder:text-[#9a794c] dark:placeholder:text-[#8a6d4c] pl-12 pr-4 text-base font-normal leading-normal"
+                      id="email"
+                      placeholder="Enter your email address"
+                      type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      required
+                    />
                   </div>
+                </div>
+                <button
+                  className="flex items-center justify-center text-center w-full h-14 px-6 py-2 mt-4 text-base font-bold leading-normal rounded-lg hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors disabled:opacity-50"
+                  style={{
+                    backgroundColor: 'var(--color-primary)',
+                    color: 'var(--color-on-primary)',
+                    '--tw-ring-color': 'var(--color-primary)'
+                  }}
+                  type="submit"
+                  disabled={loading}
+                >
+                  {loading ? (
+                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                  ) : (
+                    <>
+                      Send verification code
+                      <ArrowRight className="ml-2 h-4 w-4" />
+                    </>
+                  )}
+                </button>
+              </form>
+            </>
+          ) : (
+            <>
+              <div className="text-center mb-6">
+                <h1 className="text-text-light dark:text-[#F7F4EF] tracking-tight text-3xl font-bold leading-tight">
+                  Enter code
+                </h1>
+                <p className="text-text-light/70 dark:text-[#F7F4EF]/70 text-base font-normal leading-normal pt-2">
+                  We sent a 6-digit code to
+                </p>
+                <p className="font-medium text-text-light dark:text-[#F7F4EF] pt-1">{email}</p>
+              </div>
+              <form onSubmit={handleLogin} className="flex flex-col gap-4">
+                <div className="flex flex-col">
+                  <label
+                    className="text-text-light dark:text-[#F7F4EF] text-base font-medium leading-normal pb-2"
+                    htmlFor="otp"
+                  >
+                    Verification code
+                  </label>
                   <input
-                    className="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-text-light dark:text-[#F7F4EF] focus:outline-0 focus:ring-2 focus:ring-[#6F4E37]/50 border border-[#e7ddcf] dark:border-[#443d34] bg-transparent dark:bg-[#221a10] h-14 placeholder:text-[#9a794c] dark:placeholder:text-[#8a6d4c] pl-12 pr-4 text-base font-normal leading-normal"
-                    id="phone"
-                    placeholder="Enter your phone number"
-                    type="tel"
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
-                    required
+                    className="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-text-light dark:text-[#F7F4EF] focus:outline-0 focus:ring-2 focus:ring-[#6F4E37]/50 border border-[#e7ddcf] dark:border-[#443d34] bg-transparent dark:bg-[#221a10] h-14 placeholder:text-[#9a794c] dark:placeholder:text-[#8a6d4c] px-4 text-center text-2xl tracking-widest text-base font-normal leading-normal"
+                    id="otp"
+                    placeholder="123456"
+                    type="text"
+                    inputMode="numeric"
+                    maxLength={6}
+                    value={otp}
+                    onChange={(e) => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
                   />
                 </div>
-              </div>
-              <button
-                className="flex items-center justify-center text-center w-full h-14 px-6 py-2 mt-4 text-base font-bold leading-normal rounded-lg hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors disabled:opacity-50"
-                style={{ 
-                  backgroundColor: 'var(--color-primary)', 
-                  color: 'var(--color-on-primary)',
-                  '--tw-ring-color': 'var(--color-primary)'
-                }}
-                type="submit"
-                disabled={loading}
-              >
-                {loading ? (
-                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-                ) : (
-                  <>
-                    Login
-                    <ArrowRight className="ml-2 h-4 w-4" />
-                  </>
-                )}
-              </button>
-            </form>
-            <div className="flex items-center my-8">
-              <hr className="flex-grow border-t border-[#e7ddcf] dark:border-[#443d34]" />
-              <span className="px-4 text-sm text-text-light/60 dark:text-[#F7F4EF]/60">Or</span>
-              <hr className="flex-grow border-t border-[#e7ddcf] dark:border-[#443d34]" />
-            </div>
-            <div className="text-center">
-              <p className="text-text-light dark:text-[#F7F4EF] text-base font-normal leading-normal">
-                Don't have an account?{' '}
+                <button
+                  className="flex items-center justify-center text-center w-full h-14 px-6 py-2 mt-4 text-base font-bold leading-normal rounded-lg hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors disabled:opacity-50"
+                  style={{
+                    backgroundColor: 'var(--color-primary)',
+                    color: 'var(--color-on-primary)',
+                    '--tw-ring-color': 'var(--color-primary)'
+                  }}
+                  type="submit"
+                  disabled={loading || otp.length < 6}
+                >
+                  {loading ? (
+                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                  ) : (
+                    <>
+                      Verify & Login
+                      <ArrowRight className="ml-2 h-4 w-4" />
+                    </>
+                  )}
+                </button>
                 <button
                   type="button"
-                  onClick={() => setShowRegister(true)}
-                  className="font-bold text-[#C8A165] hover:underline"
+                  onClick={handleCloseOtp}
+                  className="w-full text-center text-sm text-[#C8A165] hover:underline"
                 >
-                  Sign Up
+                  Use a different email
                 </button>
-              </p>
-            </div>
-          </>
+              </form>
+            </>
+          )
         ) : (
-          // Register Form
           <>
             <div className="text-center mb-6">
               <h1 className="text-text-light dark:text-[#F7F4EF] tracking-tight text-3xl font-bold leading-tight">
@@ -178,10 +252,35 @@ const CustomerLogin = ({ cafeSlug, onLogin, onRegister }) => {
                     placeholder="Enter your full name"
                     type="text"
                     value={registerData.name}
-                    onChange={(e) => setRegisterData({...registerData, name: e.target.value})}
+                    onChange={(e) => setRegisterData({ ...registerData, name: e.target.value })}
                     required
                   />
                 </div>
+              </div>
+              <div className="flex flex-col">
+                <label
+                  className="text-text-light dark:text-[#F7F4EF] text-base font-medium leading-normal pb-2"
+                  htmlFor="registerEmail"
+                >
+                  Email Address *
+                </label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                    <Mail className="h-5 w-5 text-[#9a794c] dark:text-[#8a6d4c]" />
+                  </div>
+                  <input
+                    className="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-text-light dark:text-[#F7F4EF] focus:outline-0 focus:ring-2 focus:ring-[#6F4E37]/50 border border-[#e7ddcf] dark:border-[#443d34] bg-transparent dark:bg-[#221a10] h-14 placeholder:text-[#9a794c] dark:placeholder:text-[#8a6d4c] pl-12 pr-4 text-base font-normal leading-normal read-only:opacity-90 read-only:cursor-not-allowed read-only:bg-[#e7ddcf]/20 dark:read-only:bg-[#443d34]/30"
+                    id="registerEmail"
+                    placeholder="Enter your email address"
+                    type="email"
+                    value={registerData.email}
+                    readOnly
+                    required
+                  />
+                </div>
+                <p className="text-xs text-text-light/60 dark:text-[#F7F4EF]/60 mt-1">
+                  This is the email you used to receive the verification code.
+                </p>
               </div>
               <div className="flex flex-col">
                 <label
@@ -200,29 +299,8 @@ const CustomerLogin = ({ cafeSlug, onLogin, onRegister }) => {
                     placeholder="Enter your phone number"
                     type="tel"
                     value={registerData.phone}
-                    onChange={(e) => setRegisterData({...registerData, phone: e.target.value})}
+                    onChange={(e) => setRegisterData({ ...registerData, phone: e.target.value })}
                     required
-                  />
-                </div>
-              </div>
-              <div className="flex flex-col">
-                <label
-                  className="text-text-light dark:text-[#F7F4EF] text-base font-medium leading-normal pb-2"
-                  htmlFor="email"
-                >
-                  Email Address
-                </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                    <Mail className="h-5 w-5 text-[#9a794c] dark:text-[#8a6d4c]" />
-                  </div>
-                  <input
-                    className="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-text-light dark:text-[#F7F4EF] focus:outline-0 focus:ring-2 focus:ring-[#6F4E37]/50 border border-[#e7ddcf] dark:border-[#443d34] bg-transparent dark:bg-[#221a10] h-14 placeholder:text-[#9a794c] dark:placeholder:text-[#8a6d4c] pl-12 pr-4 text-base font-normal leading-normal"
-                    id="email"
-                    placeholder="Enter your email address"
-                    type="email"
-                    value={registerData.email}
-                    onChange={(e) => setRegisterData({...registerData, email: e.target.value})}
                   />
                 </div>
               </div>
@@ -243,14 +321,14 @@ const CustomerLogin = ({ cafeSlug, onLogin, onRegister }) => {
                     placeholder="Enter your address"
                     rows="3"
                     value={registerData.address}
-                    onChange={(e) => setRegisterData({...registerData, address: e.target.value})}
+                    onChange={(e) => setRegisterData({ ...registerData, address: e.target.value })}
                   />
                 </div>
               </div>
               <button
                 className="flex items-center justify-center text-center w-full h-14 px-6 py-2 mt-4 text-base font-bold leading-normal rounded-lg hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors disabled:opacity-50"
-                style={{ 
-                  backgroundColor: 'var(--color-primary)', 
+                style={{
+                  backgroundColor: 'var(--color-primary)',
                   color: 'var(--color-on-primary)',
                   '--tw-ring-color': 'var(--color-primary)'
                 }}
@@ -267,6 +345,10 @@ const CustomerLogin = ({ cafeSlug, onLogin, onRegister }) => {
                 )}
               </button>
             </form>
+          </>
+        )}
+        {(!showRegister && step === 'email') || showRegister ? (
+          <>
             <div className="flex items-center my-8">
               <hr className="flex-grow border-t border-[#e7ddcf] dark:border-[#443d34]" />
               <span className="px-4 text-sm text-text-light/60 dark:text-[#F7F4EF]/60">Or</span>
@@ -274,21 +356,42 @@ const CustomerLogin = ({ cafeSlug, onLogin, onRegister }) => {
             </div>
             <div className="text-center">
               <p className="text-text-light dark:text-[#F7F4EF] text-base font-normal leading-normal">
-                Already have an account?{' '}
+                {showRegister ? (
+                  <>
+                    Already have an account?{' '}
+                    <button
+                      type="button"
+                      onClick={() => setShowRegister(false)}
+                      className="font-bold text-[#C8A165] hover:underline"
+                    >
+                      Login
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    Don't have an account?{' '}
                 <button
                   type="button"
-                  onClick={() => setShowRegister(false)}
+                  onClick={() => {
+                    setRegisterData((prev) => ({ ...prev, email: email.trim() }));
+                    setShowRegister(true);
+                    setStep('email');
+                    setEmail('');
+                    setOtp('');
+                  }}
                   className="font-bold text-[#C8A165] hover:underline"
                 >
-                  Login
+                  Sign Up
                 </button>
+                  </>
+                )}
               </p>
             </div>
           </>
-        )}
+        ) : null}
       </div>
     </div>
   );
 };
 
-export default CustomerLogin; 
+export default CustomerLogin;

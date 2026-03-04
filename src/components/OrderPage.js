@@ -206,7 +206,9 @@ const OrderPage = ({ menuItems, cart: externalCart, setCart: setExternalCart }) 
     }
 
     try {
-      const response = await axios.post('/customer/login', { phone });
+      const cafeSlug = user?.cafe_slug || 'default';
+      const payload = { phone, cafeSlug };
+      const response = await axios.post('/customer/lookup', payload);
       if (response.data) {
         const customer = response.data;
         setCustomerInfo(customer);

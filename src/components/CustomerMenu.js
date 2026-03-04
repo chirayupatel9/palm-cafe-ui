@@ -575,18 +575,15 @@ const CustomerMenu = ({
       setOrderStatus('pending');
 
       // Update customer points after successful order
-      if (customer.phone) {
+      if (customer.id && cafeSlug) {
         try {
-          const loginPayload = { phone: customer.phone };
-          if (cafeSlug) loginPayload.cafeSlug = cafeSlug;
-          const customerResponse = await axios.post('/customer/login', loginPayload);
+          const refreshUrl = `/customer/refresh?customerId=${customer.id}&cafeSlug=${encodeURIComponent(cafeSlug)}`;
+          const customerResponse = await axios.get(refreshUrl);
           if (customerResponse.data) {
-            // Update the customer data with new points
             const updatedCustomer = {
               ...customer,
               loyalty_points: customerResponse.data.loyalty_points
             };
-            // Update customer data in parent component
             if (onCustomerUpdate) {
               onCustomerUpdate(updatedCustomer);
             }
