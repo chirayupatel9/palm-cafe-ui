@@ -61,6 +61,7 @@ const CustomerLogin = ({ cafeSlug, onLogin, onRegister }) => {
     } catch (error) {
       if (error.response?.status === 404) {
         toast.error('Account not found. Please register first.');
+        setRegisterData((prev) => ({ ...prev, email: trimmed }));
         setShowRegister(true);
         setStep('email');
       } else {
@@ -268,15 +269,18 @@ const CustomerLogin = ({ cafeSlug, onLogin, onRegister }) => {
                     <Mail className="h-5 w-5 text-[#9a794c] dark:text-[#8a6d4c]" />
                   </div>
                   <input
-                    className="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-text-light dark:text-[#F7F4EF] focus:outline-0 focus:ring-2 focus:ring-[#6F4E37]/50 border border-[#e7ddcf] dark:border-[#443d34] bg-transparent dark:bg-[#221a10] h-14 placeholder:text-[#9a794c] dark:placeholder:text-[#8a6d4c] pl-12 pr-4 text-base font-normal leading-normal"
+                    className="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-text-light dark:text-[#F7F4EF] focus:outline-0 focus:ring-2 focus:ring-[#6F4E37]/50 border border-[#e7ddcf] dark:border-[#443d34] bg-transparent dark:bg-[#221a10] h-14 placeholder:text-[#9a794c] dark:placeholder:text-[#8a6d4c] pl-12 pr-4 text-base font-normal leading-normal read-only:opacity-90 read-only:cursor-not-allowed read-only:bg-[#e7ddcf]/20 dark:read-only:bg-[#443d34]/30"
                     id="registerEmail"
                     placeholder="Enter your email address"
                     type="email"
                     value={registerData.email}
-                    onChange={(e) => setRegisterData({ ...registerData, email: e.target.value })}
+                    readOnly
                     required
                   />
                 </div>
+                <p className="text-xs text-text-light/60 dark:text-[#F7F4EF]/60 mt-1">
+                  This is the email you used to receive the verification code.
+                </p>
               </div>
               <div className="flex flex-col">
                 <label
@@ -366,13 +370,19 @@ const CustomerLogin = ({ cafeSlug, onLogin, onRegister }) => {
                 ) : (
                   <>
                     Don't have an account?{' '}
-                    <button
-                      type="button"
-                      onClick={() => { setShowRegister(true); setStep('email'); setEmail(''); setOtp(''); }}
-                      className="font-bold text-[#C8A165] hover:underline"
-                    >
-                      Sign Up
-                    </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setRegisterData((prev) => ({ ...prev, email: email.trim() }));
+                    setShowRegister(true);
+                    setStep('email');
+                    setEmail('');
+                    setOtp('');
+                  }}
+                  className="font-bold text-[#C8A165] hover:underline"
+                >
+                  Sign Up
+                </button>
                   </>
                 )}
               </p>
