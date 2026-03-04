@@ -743,29 +743,29 @@ const OrderPage: React.FC<OrderPageProps> = ({ menuItems, cart: externalCart, se
                   <label className="block text-sm font-medium text-on-surface mb-2">
                     Pickup Option
                   </label>
-                  <div className="grid grid-cols-2 gap-2">
+                  <div className="grid grid-cols-2 gap-2 items-stretch">
                     <button
                       type="button"
                       onClick={() => setPickupOption('pickup')}
-                      className={`h-10 flex items-center justify-center rounded-lg border transition-colors text-sm font-medium ${
+                      className={`w-full min-h-10 h-10 flex items-center justify-center gap-2 rounded-lg border transition-colors text-sm font-medium ${
                         pickupOption === 'pickup'
                           ? 'bg-secondary-600 text-white border-secondary-600'
                           : 'btn-secondary'
                       }`}
                     >
-                      <span className="mr-2">🏪</span>
+                      <span>🏪</span>
                       <span>Pickup</span>
                     </button>
                     <button
                       type="button"
                       onClick={() => setPickupOption('dine-in')}
-                      className={`h-10 flex items-center justify-center rounded-lg border transition-colors text-sm font-medium ${
+                      className={`w-full min-h-10 h-10 flex items-center justify-center gap-2 rounded-lg border transition-colors text-sm font-medium ${
                         pickupOption === 'dine-in'
                           ? 'bg-secondary-600 text-white border-secondary-600'
                           : 'btn-secondary'
                       }`}
                     >
-                      <span className="mr-2">🍽️</span>
+                      <span>🍽️</span>
                       <span>Dine-in</span>
                     </button>
                   </div>
