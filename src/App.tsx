@@ -225,7 +225,7 @@ function MainApp() {
 
   return (
     <div className={`min-h-screen surface-page ${impersonation?.isImpersonating ? 'pt-16' : ''}`}>
-      <header className="surface-nav">
+      <header className="surface-nav" style={{ boxShadow: 'none', backgroundColor: 'var(--surface-page)' }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center">
@@ -256,7 +256,7 @@ function MainApp() {
         </div>
       </header>
       {mobileMenuOpen && (
-        <div className="lg:hidden surface-nav" style={{ borderTop: '1px solid var(--color-outline)' }}>
+        <div className="lg:hidden surface-nav" style={{ borderTop: '1px solid var(--color-outline)', boxShadow: 'none', backgroundColor: 'var(--surface-page)' }}>
           <div className="px-4 py-2 space-y-1">
             {navigationItems.map((item) => {
               const Icon = item.icon;
@@ -270,7 +270,7 @@ function MainApp() {
           </div>
         </div>
       )}
-      <nav className="hidden lg:block surface-nav p-2">
+      <nav className="hidden lg:block surface-nav p-2" style={{ boxShadow: 'none', backgroundColor: 'var(--surface-page)' }}>
         <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-center items-center">
           <PillBase
             items={pillNavItems}

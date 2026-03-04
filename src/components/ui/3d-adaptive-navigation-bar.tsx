@@ -107,24 +107,12 @@ export const PillBase: React.FC<PillBaseProps> = ({
       style={{
         height: '56px',
         minWidth: isExpanded ? undefined : 140,
-        background: `linear-gradient(135deg, var(--surface-card) 0%, var(--surface-table) 50%, var(--surface-card) 100%)`,
-        boxShadow: isExpanded
-          ? 'var(--elevation-2), inset 0 1px 0 var(--color-outline-variant)'
-          : isTransitioning
-          ? 'var(--elevation-1), inset 0 1px 0 var(--color-outline-variant)'
-          : 'var(--elevation-1), inset 0 1px 0 var(--color-outline-variant)',
+        background: 'transparent',
+        boxShadow: 'none',
         x: pillShift,
-        overflow: 'hidden',
-        transition: 'box-shadow 0.3s ease-out'
+        overflow: 'hidden'
       }}
     >
-      <div
-        className="absolute inset-0 rounded-full pointer-events-none"
-        style={{
-          boxShadow: 'inset 0 0 0 1px var(--color-outline-variant)'
-        }}
-      />
-
       <div
         ref={containerRef}
         className="relative z-10 h-full flex items-center justify-center px-6 sm:px-8"
@@ -186,6 +174,14 @@ export const PillBase: React.FC<PillBaseProps> = ({
                     <motion.span
                       layoutId="pill-active-glass"
                       className="absolute inset-0 rounded-full pointer-events-none"
+                      animate={{
+                        y: [0, -0.5, 0],
+                        scale: [1, 1.008, 1]
+                      }}
+                      transition={{
+                        y: { duration: 3, repeat: Infinity, ease: 'easeInOut' },
+                        scale: { duration: 3, repeat: Infinity, ease: 'easeInOut' }
+                      }}
                       style={{
                         background: 'var(--color-primary-container)',
                         boxShadow: 'var(--elevation-1), inset 0 0 0 1px var(--color-outline-variant)',
@@ -194,8 +190,23 @@ export const PillBase: React.FC<PillBaseProps> = ({
                         backdropFilter: 'blur(8px)',
                         WebkitBackdropFilter: 'blur(8px)'
                       }}
-                      transition={{ type: 'spring', stiffness: 380, damping: 30 }}
-                    />
+                    >
+                      {/* Bubble highlight on active pill */}
+                      <span
+                        className="absolute inset-x-0 top-0 rounded-t-full pointer-events-none"
+                        style={{
+                          height: '55%',
+                          background: 'linear-gradient(180deg, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0.1) 40%, transparent 100%)',
+                          borderRadius: '9999px 9999px 0 0'
+                        }}
+                      />
+                      <span
+                        className="absolute inset-0 rounded-full pointer-events-none"
+                        style={{
+                          boxShadow: 'inset 0 0 20px rgba(255,255,255,0.15), inset 0 -4px 12px rgba(0,0,0,0.06)'
+                        }}
+                      />
+                    </motion.span>
                   )}
                   <motion.button
                     type="button"
