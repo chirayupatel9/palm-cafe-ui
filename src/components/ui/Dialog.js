@@ -14,21 +14,37 @@ function Dialog({ open, onClose, children, title = '', className = '', maxHeight
     if (!open) return;
     const handleEscape = (e) => { if (e.key === 'Escape') onClose(); };
     document.addEventListener('keydown', handleEscape);
+    const scrollY = window.scrollY;
     document.body.style.overflow = 'hidden';
+    document.body.style.position = 'fixed';
+    document.body.style.top = `-${scrollY}px`;
+    document.body.style.left = '0';
+    document.body.style.right = '0';
+    document.body.style.pointerEvents = 'none';
+    const rootEl = document.getElementById('root');
+    if (rootEl) rootEl.style.pointerEvents = 'none';
     return () => {
       document.removeEventListener('keydown', handleEscape);
       document.body.style.overflow = '';
+      document.body.style.position = '';
+      document.body.style.top = '';
+      document.body.style.left = '';
+      document.body.style.right = '';
+      document.body.style.pointerEvents = '';
+      if (rootEl) rootEl.style.pointerEvents = '';
+      window.scrollTo(0, scrollY);
     };
   }, [open, onClose]);
 
   if (!open) return null;
 
   const content = (
-    <div className="fixed inset-0 z-[9999]" role="dialog" aria-modal="true" aria-labelledby={title ? 'dialog-title' : undefined} data-dialog="template">
-      {/* Overlay - template: bg-black/50 */}
+    <div className="fixed inset-0 z-[9999] pointer-events-auto" role="dialog" aria-modal="true" aria-labelledby={title ? 'dialog-title' : undefined} data-dialog="template">
+      {/* Overlay - blocks all background interaction */}
       <div
-        className="absolute inset-0 bg-black/50 transition-opacity"
+        className="absolute inset-0 w-full h-full min-w-full min-h-full bg-black/50 transition-opacity cursor-default"
         onClick={onClose}
+        onMouseDown={(e) => e.preventDefault()}
         aria-hidden="true"
       />
       {/* Content - template: centered, sm:max-w-md, rounded-2xl */}

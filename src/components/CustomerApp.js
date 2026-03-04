@@ -218,6 +218,7 @@ const CustomerApp = () => {
       <LoginDialog
         open={showLoginModal}
         onClose={() => { setShowLoginModal(false); setLoginIntent(null); }}
+        size="lg"
         title={(() => {
           const name = (cafeBranding.cafe_name || '').trim();
           const isPlaceholder = !name || /^default\s*cafe$/i.test(name);

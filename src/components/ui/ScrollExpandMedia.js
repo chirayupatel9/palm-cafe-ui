@@ -139,8 +139,8 @@ const ScrollExpandMedia = ({
     return () => window.removeEventListener('resize', checkIfMobile);
   }, []);
 
-  const cardW = isMobileState ? 950 : 1550;
-  const cardH = isMobileState ? 600 : 800;
+  const cardW = isMobileState ? 1150 : 1900;
+  const cardH = isMobileState ? 720 : 1000;
   const textVw = isMobileState ? 180 : 150;
 
   const firstWord = title ? title.split(' ')[0] : '';
