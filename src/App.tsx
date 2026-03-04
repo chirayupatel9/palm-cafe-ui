@@ -38,6 +38,7 @@ import RoleBasedRedirect from './components/RoleBasedRedirect';
 import DashboardRedirect from './components/DashboardRedirect';
 import OnboardingGuard from './components/OnboardingGuard';
 import StockCategoryListDemo from './components/StockCategoryListDemo';
+import { PillBase, type NavItem } from './components/ui/3d-adaptive-navigation-bar';
 
 const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
 const API_PATH = '/api';
@@ -208,6 +209,10 @@ function MainApp() {
     { id: 'cafe-settings', label: 'Settings', icon: Settings, module: 'settings' }
   ];
 
+  const pillNavItems: NavItem[] = navigationItems
+    .filter((item) => checkFeatureAccess(item.module))
+    .map((item) => ({ id: item.id, label: item.label }));
+
   if (loading || cafeSettingsLoading || subscriptionLoading || featuresLoading) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center surface-page">
@@ -266,18 +271,13 @@ function MainApp() {
         </div>
       )}
       <nav className="hidden lg:block surface-nav p-2">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-wrap gap-2">
-            {navigationItems.map((item) => {
-              const Icon = item.icon;
-              return (
-                <button key={item.id} onClick={() => handlePageChange(item.id)} className={`flex items-center px-4 py-2 text-sm font-medium ${currentPage === item.id ? 'nav-active' : 'nav-inactive'}`} aria-current={currentPage === item.id ? 'page' : undefined}>
-                  <Icon className="h-4 w-4 mr-2" />
-                  {item.label}
-                </button>
-              );
-            })}
-          </div>
+        <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-center items-center">
+          <PillBase
+            items={pillNavItems}
+            activeId={currentPage}
+            onSelect={handlePageChange}
+            alwaysExpanded
+          />
         </div>
       </nav>
       <main className="surface-container max-w-7xl mx-auto my-8 sm:my-12 px-4 sm:px-6 lg:px-8">

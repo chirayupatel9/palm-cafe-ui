@@ -494,6 +494,16 @@ body {
   }
 }
 
+/* 3D pill nav: prevent theme borders/outlines so liquid-glass look is not overridden */
+.pill-nav-btn,
+.pill-nav-btn:focus,
+.pill-nav-btn:focus-visible {
+  outline: none !important;
+  border: none !important;
+  box-shadow: none !important;
+  background: transparent !important;
+}
+
 /* ============================================
    UTILITY CLASSES
    ============================================ */
