@@ -77,7 +77,7 @@ const Select: React.FC<SelectProps> = ({
       {open && (
         <ul
           role="listbox"
-          className="select-dropdown-glass absolute left-0 right-0 top-full mt-1.5 z-50 rounded-2xl overflow-hidden min-w-[160px] max-h-60 overflow-y-auto py-2 transition-all duration-200"
+          className="select-dropdown-glass absolute left-0 right-0 top-full mt-1.5 z-[100] rounded-2xl overflow-hidden min-w-[160px] max-h-60 overflow-y-auto py-2 transition-all duration-200"
         >
           {options.map((opt) => {
             const isSelected = opt.value === value;
@@ -97,11 +97,7 @@ const Select: React.FC<SelectProps> = ({
                     setOpen(false);
                   }
                 }}
-                className={`select-option-glass-hover px-4 py-3 cursor-pointer transition-all duration-150 text-sm font-medium rounded-lg mx-1.5 ${isSelected ? 'select-option-selected' : ''}`}
-                style={{
-                  color: 'var(--color-on-surface)',
-                  backgroundColor: isSelected ? 'var(--color-primary-container)' : 'transparent'
-                }}
+                className={`select-option px-4 py-3 cursor-pointer transition-colors duration-150 text-sm font-medium rounded-lg mx-1.5 ${isSelected ? 'select-option-selected' : ''}`}
               >
                 {opt.label}
               </li>

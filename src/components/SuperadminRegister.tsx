@@ -3,7 +3,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { useCafeSettings } from '../contexts/CafeSettingsContext';
 import { Eye, EyeOff, Crown, ArrowLeft } from 'lucide-react';
 import toast from 'react-hot-toast';
-import { FlowButton } from './ui/FlowButton';
+import { GlassButton } from './ui/GlassButton';
 import { getImageUrl } from '../utils/imageUtils';
 
 interface SuperadminRegisterProps {
@@ -208,7 +208,10 @@ const SuperadminRegister: React.FC<SuperadminRegisterProps> = ({ onBack }) => {
             </button>
             
             {onBack && (
-              <FlowButton text="Back to User Management" direction="back" onClick={onBack} />
+              <GlassButton size="default" className="glass-button-secondary" contentClassName="flex items-center gap-2" onClick={onBack}>
+                <ArrowLeft className="h-4 w-4" />
+                Back to User Management
+              </GlassButton>
             )}
           </div>
 

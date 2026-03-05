@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
-import { Plus, Minus, Trash2, ShoppingCart, X, Search, User, Phone, Mail, MapPin, CheckCircle, ChevronLeft, ChevronRight, ChevronDown, Utensils, Star, LogOut, Edit3, Save, ShoppingBag } from 'lucide-react';
+import { Plus, Minus, Trash2, ShoppingCart, X, Search, User, Phone, Mail, MapPin, CheckCircle, ChevronLeft, ChevronRight, ChevronDown, Utensils, Star, LogOut, Edit3, Save, ShoppingBag, ArrowLeft, ArrowUp } from 'lucide-react';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 import { useCurrency } from '../contexts/CurrencyContext';
@@ -13,7 +13,6 @@ import Sheet from './ui/Sheet';
 import Dialog from './ui/Dialog';
 import ScrollExpandMedia from './ui/ScrollExpandMedia';
 import { GlassButton } from './ui/GlassButton';
-import { FlowButton } from './ui/FlowButton';
 import InteractiveBentoGallery from './ui/InteractiveBentoGallery';
 import LocationMap from './ui/LocationMap';
 
@@ -1178,9 +1177,10 @@ const CustomerMenu: React.FC<CustomerMenuProps> = ({
                   {/* Back to categories - when viewing a single category */}
                   {!searchQuery.trim() && selectedCategory !== 'All' && (
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 mb-6">
-                      <FlowButton
-                        text="Back to categories"
-                        direction="back"
+                      <GlassButton
+                        size="default"
+                        className="glass-button-light"
+                        contentClassName="flex items-center gap-2"
                         onClick={() => {
                           setSelectedCategory('All');
                           requestAnimationFrame(() => {
@@ -1190,7 +1190,10 @@ const CustomerMenu: React.FC<CustomerMenuProps> = ({
                           });
                         }}
                         aria-label="Back to all categories"
-                      />
+                      >
+                        <ArrowLeft className="h-4 w-4" />
+                        Back to categories
+                      </GlassButton>
                     </div>
                   )}
 
@@ -1576,12 +1579,16 @@ const CustomerMenu: React.FC<CustomerMenuProps> = ({
                         <p className="text-sm text-[#b3af9b]">
                           © {new Date().getFullYear()} {cafeDisplayName}. Crafted with care.
                         </p>
-                        <FlowButton
-                          text="Back to top"
-                          direction="back"
+                        <GlassButton
+                          size="default"
+                          className="glass-button-light"
+                          contentClassName="flex items-center gap-2"
                           onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
                           aria-label="Back to top"
-                        />
+                        >
+                          <ArrowUp className="h-4 w-4" />
+                          Back to top
+                        </GlassButton>
                       </div>
                     </div>
                   </footer>

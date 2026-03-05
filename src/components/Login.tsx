@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useCafeSettings } from '../contexts/CafeSettingsContext';
 import { Link, useNavigate } from 'react-router-dom';
-import { Eye, EyeOff, Coffee } from 'lucide-react';
-import { FlowButton } from './ui/FlowButton';
+import { Eye, EyeOff, Coffee, ArrowLeft } from 'lucide-react';
+import { GlassButton } from './ui/GlassButton';
 import toast from 'react-hot-toast';
 import { getImageUrl } from '../utils/imageUtils';
 
@@ -112,21 +112,23 @@ const Login: React.FC = () => {
             </div>
           </div>
 
-          <div>
-            <button
+          <div className="w-full">
+            <GlassButton
               type="submit"
               disabled={loading}
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-secondary-600 hover:bg-secondary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-secondary-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              size="default"
+              className="w-full glass-button-primary"
+              contentClassName="flex items-center justify-center gap-2"
             >
               {loading ? (
-                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white" />
               ) : (
                 <>
-                  <Coffee className="h-5 w-5 mr-2" />
+                  <Coffee className="h-5 w-5" />
                   Sign in
                 </>
               )}
-            </button>
+            </GlassButton>
           </div>
 
           <div className="text-center space-y-2">
@@ -140,7 +142,10 @@ const Login: React.FC = () => {
               </Link>
             </p>
             <p className="text-sm text-secondary-600 dark:text-gray-400">
-              <FlowButton text="Back to Home" direction="back" onClick={() => navigate('/')} />
+              <GlassButton size="default" className="glass-button-secondary" contentClassName="flex items-center gap-2" onClick={() => navigate('/')}>
+                <ArrowLeft className="h-4 w-4" />
+                Back to Home
+              </GlassButton>
             </p>
           </div>
         </form>

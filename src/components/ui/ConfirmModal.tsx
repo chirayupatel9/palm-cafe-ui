@@ -1,6 +1,7 @@
 import React from 'react';
 import { AlertTriangle } from 'lucide-react';
 import Dialog from './Dialog';
+import { GlassButton } from './GlassButton';
 
 export interface ConfirmModalProps {
   isOpen: boolean;
@@ -16,21 +17,21 @@ export interface ConfirmModalProps {
 
 const variantStyles: Record<
   string,
-  { icon: string; button: string; titleColor: string }
+  { icon: string; buttonClass: string; titleColor: string }
 > = {
   danger: {
     icon: 'bg-red-100 dark:bg-red-900/20 text-red-600 dark:text-red-400',
-    button: 'btn-destructive',
+    buttonClass: 'glass-button-destructive',
     titleColor: 'text-red-600 dark:text-red-400'
   },
   warning: {
     icon: 'bg-yellow-100 dark:bg-yellow-900/20 text-yellow-600 dark:text-yellow-400',
-    button: 'bg-yellow-600 hover:bg-yellow-700 text-white',
+    buttonClass: 'glass-button-primary',
     titleColor: 'text-yellow-600 dark:text-yellow-400'
   },
   info: {
     icon: 'bg-blue-100 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400',
-    button: 'btn-primary',
+    buttonClass: 'glass-button-primary',
     titleColor: 'text-blue-600 dark:text-blue-400'
   }
 };
@@ -57,27 +58,30 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({
         <p className="text-sm text-gray-600 dark:text-gray-400 flex-1 pt-0.5">{message}</p>
       </div>
       <div className="flex flex-col sm:flex-row justify-end gap-3 mt-6">
-        <button
+        <GlassButton
           onClick={onClose}
           disabled={isLoading}
-          className="btn-secondary min-h-[44px]"
+          size="default"
+          className="glass-button-secondary min-h-[44px]"
         >
           {cancelLabel}
-        </button>
-        <button
+        </GlassButton>
+        <GlassButton
           onClick={onConfirm}
           disabled={isLoading}
-          className={`${styles.button} flex items-center justify-center min-h-[44px]`}
+          size="default"
+          className={`${styles.buttonClass} flex items-center justify-center min-h-[44px]`}
+          contentClassName="flex items-center justify-center gap-2"
         >
           {isLoading ? (
             <>
-              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
+              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white" />
               Processing...
             </>
           ) : (
             confirmLabel
           )}
-        </button>
+        </GlassButton>
       </div>
     </Dialog>
   );

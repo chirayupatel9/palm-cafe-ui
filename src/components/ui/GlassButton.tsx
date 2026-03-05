@@ -1,5 +1,5 @@
-import React from 'react';
-import { cva } from 'class-variance-authority';
+import * as React from 'react';
+import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '../../lib/utils';
 import './GlassButton.css';
 
@@ -20,7 +20,6 @@ const glassButtonVariants = cva(
   }
 );
 
-
 const glassButtonTextVariants = cva(
   'glass-button-text relative block select-none tracking-tighter',
   {
@@ -38,23 +37,32 @@ const glassButtonTextVariants = cva(
   }
 );
 
-export interface GlassButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  className?: string;
-  size?: 'default' | 'sm' | 'lg' | 'icon';
+export interface GlassButtonProps
+  extends React.ButtonHTMLAttributes<HTMLButtonElement>,
+    VariantProps<typeof glassButtonVariants> {
   contentClassName?: string;
-  children?: React.ReactNode;
 }
 
 const GlassButton = React.forwardRef<HTMLButtonElement, GlassButtonProps>(
-  ({ className, children, size = 'default', contentClassName, ...props }, ref) => {
+  ({ className, children, size, contentClassName, ...props }, ref) => {
     return (
-      <div className={cn('glass-button-wrap cursor-pointer rounded-full', className)}>
+      <div
+        className={cn(
+          'glass-button-wrap cursor-pointer rounded-full',
+          className
+        )}
+      >
         <button
           className={cn('glass-button', glassButtonVariants({ size }))}
           ref={ref}
           {...props}
         >
-          <span className={cn(glassButtonTextVariants({ size }), contentClassName)}>
+          <span
+            className={cn(
+              glassButtonTextVariants({ size }),
+              contentClassName
+            )}
+          >
             {children}
           </span>
         </button>

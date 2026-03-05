@@ -36,82 +36,67 @@ const DailyReports: React.FC = () => {
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center py-12">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-secondary-500"></div>
-        <p className="mt-3 text-sm text-secondary-600">Loading reports...</p>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[var(--color-primary)]"></div>
+        <p className="mt-3 text-sm text-[var(--color-on-surface-variant)]">Loading reports...</p>
       </div>
     );
   }
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center">
-        <FileText className="h-8 w-8 text-secondary-600 mr-3" />
-        <div>
-          <h2 className="text-xl sm:text-2xl font-bold text-secondary-700 dark:text-secondary-300">
-            Operational Reports
-          </h2>
-          <p className="text-sm text-gray-500 dark:text-gray-400">
-            Detailed item-level data and operational insights
-          </p>
+      <div className="flex items-center gap-3 min-w-0">
+        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[var(--color-primary-container)]">
+          <FileText className="h-6 w-6 text-[var(--color-primary)]" />
+        </div>
+        <div className="min-w-0">
+          <h1 className="text-xl sm:text-2xl font-bold text-[var(--color-on-surface)] truncate">Operational Reports</h1>
+          <p className="text-sm text-[var(--color-on-surface-variant)] mt-1">Detailed item-level data and operational insights</p>
         </div>
       </div>
 
-      <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+      <div className="glass-card p-4 rounded-2xl border border-[var(--color-outline)]/20">
         <div className="flex items-start">
-          <TrendingUp className="h-5 w-5 text-blue-600 dark:text-blue-400 mt-0.5 mr-3 flex-shrink-0" />
+          <TrendingUp className="h-5 w-5 text-[var(--color-primary)] mt-0.5 mr-3 flex-shrink-0" />
           <div className="flex-1">
-            <p className="text-sm text-blue-800 dark:text-blue-200">
-              <strong>Tip:</strong> For high-level business insights, revenue trends, and performance metrics, visit the <strong>Analytics</strong> dashboard.
+            <p className="text-sm text-[var(--color-on-surface)]">
+              <strong>Tip:</strong> For high-level business insights, revenue trends, and performance metrics, visit the <a href="/analytics" className="font-semibold text-[var(--color-primary)] hover:underline">Analytics</a> dashboard.
             </p>
           </div>
         </div>
       </div>
 
-      <div className="card">
-        <div className="card-header">
-          <h3 className="card-title">
-            Top 5 Most Ordered Items
-          </h3>
-          <p className="card-description">
-            Item-level performance data for operational planning
-          </p>
+      <div className="glass-card overflow-hidden rounded-2xl shadow-sm">
+        <div className="bg-[var(--surface-table)]/60 backdrop-blur-sm px-5 py-4 border-b border-[var(--color-outline)]/20">
+          <h3 className="text-[var(--color-on-surface)] font-semibold">Top 5 Most Ordered Items</h3>
+          <p className="text-sm text-[var(--color-on-surface-variant)] mt-0.5">Item-level performance data for operational planning</p>
         </div>
         {topItems.length > 0 ? (
-          <div className="space-y-3">
+          <div className="divide-y divide-[var(--color-outline)]/30">
             {topItems.slice(0, 5).map((item, index) => (
               <div
                 key={item.id ?? index}
-                className="flex items-center justify-between p-3 rounded-lg transition-surface"
-                style={{ backgroundColor: 'var(--surface-table)' }}
+                className="flex items-center justify-between px-5 py-4 hover:bg-[var(--surface-table)]/50 transition-colors"
               >
                 <div className="flex items-center">
-                  <div className="w-8 h-8 bg-secondary-100 dark:bg-secondary-900 rounded-full flex items-center justify-center mr-3">
-                    <span className="text-sm font-bold text-secondary-600 dark:text-secondary-400">
+                  <div className="w-8 h-8 rounded-full flex items-center justify-center mr-3 bg-[var(--color-primary-container)]">
+                    <span className="text-sm font-bold text-[var(--color-on-primary-container)]">
                       #{index + 1}
                     </span>
                   </div>
                   <div>
-                    <p className="font-medium text-gray-900 dark:text-gray-100">
-                      {item.name}
-                    </p>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">
-                      {item.category || 'Uncategorized'}
-                    </p>
+                    <p className="font-medium text-[var(--color-on-surface)]">{item.name}</p>
+                    <p className="text-sm text-[var(--color-on-surface-variant)]">{item.category || 'Uncategorized'}</p>
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className="font-semibold text-gray-900 dark:text-gray-100">
-                    {item.total_orders} orders
-                  </p>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">
-                    {formatCurrency(item.total_revenue)}
-                  </p>
+                  <p className="font-semibold text-[var(--color-on-surface)]">{item.total_orders} orders</p>
+                  <p className="text-sm text-[var(--color-on-surface-variant)]">{formatCurrency(item.total_revenue)}</p>
                 </div>
               </div>
             ))}
           </div>
         ) : (
-          <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+          <div className="text-center py-8 text-[var(--color-on-surface-variant)]">
             <ShoppingBag className="h-12 w-12 mx-auto mb-2 opacity-50" />
             <p>No order data available</p>
           </div>

@@ -4,7 +4,7 @@ import { useCafeSettings } from '../contexts/CafeSettingsContext';
 import { getImageUrl } from '../utils/imageUtils';
 import { Link, useNavigate } from 'react-router-dom';
 import { Eye, EyeOff, UserPlus, Shield, ArrowLeft } from 'lucide-react';
-import { FlowButton } from './ui/FlowButton';
+import { GlassButton } from './ui/GlassButton';
 import toast from 'react-hot-toast';
 
 const AdminRegister: React.FC = () => {
@@ -241,7 +241,10 @@ const AdminRegister: React.FC = () => {
           </div>
 
           <div className="text-center">
-            <FlowButton text="Back to Admin Panel" direction="back" onClick={() => navigate('/admin')} />
+            <GlassButton size="default" className="glass-button-secondary" contentClassName="flex items-center gap-2" onClick={() => navigate('/admin')}>
+              <ArrowLeft className="h-4 w-4" />
+              Back to Admin Panel
+            </GlassButton>
           </div>
         </form>
       </div>

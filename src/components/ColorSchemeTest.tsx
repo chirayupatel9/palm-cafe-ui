@@ -1,4 +1,5 @@
 import React from 'react';
+import { GlassButton } from './ui/GlassButton';
 import { useTheme } from '../contexts/ThemeContext';
 import { useCafeSettings } from '../contexts/CafeSettingsContext';
 import { useDarkMode } from '../contexts/DarkModeContext';
@@ -258,10 +259,10 @@ const ColorSchemeTest: React.FC = () => {
         <div className="space-y-4">
           <div>
             <h5 className="font-medium mb-2">Button Tests:</h5>
-            <div className="space-x-2">
-              <button className="btn-primary">Primary Button</button>
-              <button className="btn-secondary">Secondary Button</button>
-              <button className="btn-materialize">Materialize Button</button>
+            <div className="flex flex-wrap gap-2">
+              <GlassButton size="sm" className="glass-button-primary">Primary Button</GlassButton>
+              <GlassButton size="sm" className="glass-button-secondary">Secondary Button</GlassButton>
+              <GlassButton size="sm" className="glass-button-primary">Materialize Button</GlassButton>
             </div>
           </div>
           <div>

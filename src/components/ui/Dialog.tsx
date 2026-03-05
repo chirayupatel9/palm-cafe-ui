@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import ReactDOM from 'react-dom';
 import { X } from 'lucide-react';
+import { GlassButton } from './GlassButton';
 
 const sizeClasses: Record<string, string> = {
   md: 'sm:max-w-md',
@@ -86,14 +87,15 @@ const Dialog: React.FC<DialogProps> = ({
           ) : (
             <span />
           )}
-          <button
+          <GlassButton
             type="button"
             onClick={onClose}
-            className="ml-auto p-2 rounded-full text-[#b3af9b] hover:bg-[#e1e5df] hover:text-[#0b0f05] transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center"
+            size="icon"
+            className="glass-button-secondary ml-auto [&_.glass-button]:!bg-transparent [&_.glass-button]:!border-transparent [&_.glass-button]:text-[#b3af9b] [&_.glass-button:hover]:bg-[#e1e5df] [&_.glass-button:hover]:text-[#0b0f05]"
             aria-label="Close"
           >
             <X className="h-5 w-5" />
-          </button>
+          </GlassButton>
         </div>
         <div
           className={`flex-1 overflow-y-auto px-6 pb-6 pt-1 ${maxHeight ? 'max-h-[calc(90vh-80px)]' : ''}`}

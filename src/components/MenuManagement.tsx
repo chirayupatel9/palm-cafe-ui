@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Plus, Edit, Trash2, Save, X, Download, Upload, FolderOpen, RefreshCw, Sparkles } from 'lucide-react';
 import toast from 'react-hot-toast';
 import axios from 'axios';
@@ -11,6 +11,7 @@ import { EmptyMenu } from './ui/EmptyState';
 import ConfirmModal from './ui/ConfirmModal';
 import Dialog from './ui/Dialog';
 import Select from './ui/Select';
+import { GlassButton } from './ui/GlassButton';
 
 interface MenuManagementProps {
   menuItems: any[];
@@ -55,6 +56,9 @@ const MenuManagement: React.FC<MenuManagementProps> = ({ menuItems, onUpdate, on
   });
   const [categoryLoading, setCategoryLoading] = useState(true);
   const [autoGenerating, setAutoGenerating] = useState(false);
+
+  const importExcelInputRef = useRef<HTMLInputElement>(null);
+  const importZipInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     fetchCategories();
@@ -570,58 +574,43 @@ const MenuManagement: React.FC<MenuManagementProps> = ({ menuItems, onUpdate, on
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-6">
-        <div>
-          <h2 className={`text-2xl font-bold ${isDarkMode ? 'text-secondary-300' : 'text-secondary-700'}`}>
-            Menu
-          </h2>
-          <p className={`text-sm mt-1 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-            Manage menu items and categories
-          </p>
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+        <div className="flex items-center gap-3 min-w-0">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[var(--color-primary-container)]">
+            <FolderOpen className="h-6 w-6 text-[var(--color-primary)]" />
+          </div>
+          <div className="min-w-0">
+            <h1 className="text-2xl font-bold text-[var(--color-on-surface)] truncate">Menu</h1>
+            <p className="text-sm text-[var(--color-on-surface-variant)] mt-1">Manage menu items and categories</p>
+          </div>
         </div>
       </div>
 
-      {/* Tab Navigation - light pill style (same as main app nav: Dashboard / Orders / Customers / Menu / Analytics) */}
-      <div className="flex items-center gap-1 rounded-full p-1">
+      {/* Tab Navigation – same as Reports & Invoices */}
+      <div className="flex gap-2 p-1 rounded-2xl glass-card w-fit">
         <button
+          type="button"
           onClick={() => setActiveTab('menu-items')}
-          className={`relative flex items-center rounded-full py-2.5 px-4 text-sm transition-colors ${
+          className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-colors ${
             activeTab === 'menu-items'
-              ? 'font-semibold text-[var(--color-on-primary-container)]'
-              : 'font-medium text-[var(--color-on-surface-variant)] hover:text-[var(--color-on-surface)]'
+              ? 'bg-[var(--color-primary)] text-[var(--color-on-primary)]'
+              : 'text-[var(--color-on-surface-variant)] hover:bg-[var(--surface-table)]/50 hover:text-[var(--color-on-surface)]'
           }`}
         >
-          {activeTab === 'menu-items' && (
-            <span
-              className="absolute inset-0 rounded-full pointer-events-none"
-              style={{
-                background: 'var(--color-primary-container)',
-                boxShadow: 'var(--elevation-1), inset 0 0 0 1px var(--color-outline-variant)'
-              }}
-            />
-          )}
-          <FolderOpen className="h-4 w-4 mr-2 shrink-0 relative z-10" />
-          <span className="relative z-10">Menu Items</span>
+          <FolderOpen className="h-4 w-4 shrink-0" />
+          Menu Items
         </button>
         <button
+          type="button"
           onClick={() => setActiveTab('categories')}
-          className={`relative flex items-center rounded-full py-2.5 px-4 text-sm transition-colors ${
+          className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-colors ${
             activeTab === 'categories'
-              ? 'font-semibold text-[var(--color-on-primary-container)]'
-              : 'font-medium text-[var(--color-on-surface-variant)] hover:text-[var(--color-on-surface)]'
+              ? 'bg-[var(--color-primary)] text-[var(--color-on-primary)]'
+              : 'text-[var(--color-on-surface-variant)] hover:bg-[var(--surface-table)]/50 hover:text-[var(--color-on-surface)]'
           }`}
         >
-          {activeTab === 'categories' && (
-            <span
-              className="absolute inset-0 rounded-full pointer-events-none"
-              style={{
-                background: 'var(--color-primary-container)',
-                boxShadow: 'var(--elevation-1), inset 0 0 0 1px var(--color-outline-variant)'
-              }}
-            />
-          )}
-          <FolderOpen className="h-4 w-4 mr-2 shrink-0 relative z-10" />
-          <span className="relative z-10">Categories</span>
+          <FolderOpen className="h-4 w-4 shrink-0" />
+          Categories
         </button>
       </div>
 
@@ -630,69 +619,83 @@ const MenuManagement: React.FC<MenuManagementProps> = ({ menuItems, onUpdate, on
         <div className="space-y-4 sm:space-y-6">
           {/* Header */}
           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center space-y-4 sm:space-y-0">
-            <div className="flex items-center">
-              {cafeSettings.logo_url ? (
-                <img 
-                  src={getImageUrl(cafeSettings.logo_url)} 
-                  alt={`${cafeSettings.cafe_name || 'Cafe'} Logo`} 
-                  className="h-10 w-10 mr-3"
-                />
-              ) : (
-                <div className="h-10 w-10 mr-3 bg-primary rounded flex items-center justify-center text-on-primary font-bold">
-                  {cafeSettings.cafe_name ? cafeSettings.cafe_name.charAt(0).toUpperCase() : 'C'}
-                </div>
-              )}
-              <div>
-                <h3 className={`text-xl sm:text-2xl font-bold ${isDarkMode ? 'text-secondary-300' : 'text-secondary-700'}`}>Menu Items</h3>
-                <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Manage your cafe's menu items</p>
+            <div className="flex items-center gap-3 min-w-0">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[var(--color-primary-container)]">
+                <FolderOpen className="h-6 w-6 text-[var(--color-primary)]" />
+              </div>
+              <div className="min-w-0">
+                <h2 className="text-xl sm:text-2xl font-bold text-[var(--color-on-surface)] truncate">Menu Items</h2>
+                <p className="text-sm text-[var(--color-on-surface-variant)] mt-1">Manage your cafe's menu items</p>
               </div>
             </div>
             <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3">
-              <label className="btn-secondary flex items-center justify-center cursor-pointer text-sm" title="Import Excel file (without images)">
-                <Upload className="h-4 w-4 mr-2" />
+              <input
+                ref={importExcelInputRef}
+                type="file"
+                accept=".xlsx,.xls"
+                onChange={handleImport}
+                className="hidden"
+                disabled={loading}
+              />
+              <input
+                ref={importZipInputRef}
+                type="file"
+                accept=".zip"
+                onChange={handleZipImport}
+                className="hidden"
+                disabled={loading}
+              />
+              <GlassButton
+                type="button"
+                onClick={() => importExcelInputRef.current?.click()}
+                disabled={loading}
+                size="sm"
+                className="glass-button-secondary"
+                contentClassName="flex items-center gap-2"
+                title="Import Excel file (without images)"
+              >
+                <Upload className="h-4 w-4" />
                 Import Excel
-                <input
-                  type="file"
-                  accept=".xlsx,.xls"
-                  onChange={handleImport}
-                  className="hidden"
-                  disabled={loading}
-                />
-              </label>
-              <label className="btn-secondary flex items-center justify-center cursor-pointer text-sm" title="Import ZIP file with Excel and images folder">
-                <FolderOpen className="h-4 w-4 mr-2" />
+              </GlassButton>
+              <GlassButton
+                type="button"
+                onClick={() => importZipInputRef.current?.click()}
+                disabled={loading}
+                size="sm"
+                className="glass-button-secondary"
+                contentClassName="flex items-center gap-2"
+                title="Import ZIP file with Excel and images folder"
+              >
+                <FolderOpen className="h-4 w-4" />
                 Import ZIP
-                <input
-                  type="file"
-                  accept=".zip"
-                  onChange={handleZipImport}
-                  className="hidden"
-                  disabled={loading}
-                />
-              </label>
-              <button
+              </GlassButton>
+              <GlassButton
                 onClick={handleExport}
                 disabled={loading}
-                className="btn-secondary flex items-center justify-center text-sm"
+                size="sm"
+                className="glass-button-secondary"
+                contentClassName="flex items-center gap-2"
                 title="Export menu to Excel (includes image filenames)"
               >
-                <Download className="h-4 w-4 mr-2" />
+                <Download className="h-4 w-4" />
                 Export Excel
-              </button>
-              <button
+              </GlassButton>
+              <GlassButton
                 onClick={() => setShowAddForm(true)}
-                className="btn-primary flex items-center justify-center text-sm"
+                size="sm"
+                className="glass-button-primary"
+                contentClassName="flex items-center gap-2"
               >
-                <Plus className="h-4 w-4 mr-2" />
+                <Plus className="h-4 w-4" />
                 Add New Item
-              </button>
+              </GlassButton>
             </div>
           </div>
 
-          {/* Category Filter */}
-          <div className="card">
+          {/* Category Filter – glass card (relative z-10 so dropdown opens above category cards) */}
+          <div className="glass-card p-4 relative z-10">
             <div className="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-4">
-              <label className={`text-sm font-medium ${isDarkMode ? 'text-secondary-300' : 'text-secondary-700'}`}>Filter by Category:</label>
+              <label className="text-sm font-medium text-[var(--color-on-surface)]">Filter by Category:</label>
               <Select
                 options={[
                   { value: 'all', label: 'All Categories' },
@@ -700,7 +703,7 @@ const MenuManagement: React.FC<MenuManagementProps> = ({ menuItems, onUpdate, on
                 ]}
                 value={String(selectedCategory)}
                 onChange={setSelectedCategory}
-                className="sm:max-w-xs"
+                className="sm:max-w-xs select-trigger-glass select-trigger-glass-hover rounded-full"
                 placeholder="All Categories"
               />
             </div>
@@ -709,7 +712,7 @@ const MenuManagement: React.FC<MenuManagementProps> = ({ menuItems, onUpdate, on
           {/* Add New Item Form */}
           {showAddForm && (
             <div className="card">
-              <h3 className={`text-lg font-semibold mb-4 ${isDarkMode ? 'text-secondary-300' : 'text-secondary-700'}`}>Add New Menu Item</h3>
+              <h3 className="text-lg font-semibold mb-4 text-[var(--color-on-surface)]">Add New Menu Item</h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4">
                 <Select
                   options={[
@@ -763,10 +766,10 @@ const MenuManagement: React.FC<MenuManagementProps> = ({ menuItems, onUpdate, on
               </div>
               {/* Image Upload Section */}
               <div className="mt-4">
-                <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-secondary-300' : 'text-secondary-700'}`}>
+                <label className="block text-sm font-medium mb-2 text-[var(--color-on-surface)]">
                   Item Image
                 </label>
-                <p className={`text-xs mb-3 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                <p className="text-xs mb-3 text-[var(--color-on-surface-variant)]">
                   Upload an image for this menu item (max 5MB)
                 </p>
                 <div className="flex items-start space-x-4">
@@ -837,7 +840,7 @@ const MenuManagement: React.FC<MenuManagementProps> = ({ menuItems, onUpdate, on
                       )}
                     </div>
                     {selectedImageFile && (
-                      <p className="text-xs text-gray-500">
+                      <p className="text-xs text-[var(--color-on-surface-variant)]">
                         Selected: {selectedImageFile.name} ({(selectedImageFile.size / 1024 / 1024).toFixed(2)} MB)
                       </p>
                     )}
@@ -845,27 +848,29 @@ const MenuManagement: React.FC<MenuManagementProps> = ({ menuItems, onUpdate, on
                 </div>
               </div>
               <div className="flex flex-col sm:flex-row justify-end space-y-2 sm:space-y-0 sm:space-x-3 mt-4">
-                <button onClick={handleCancel} className="btn-secondary flex items-center justify-center">
-                  <X className="h-4 w-4 mr-2" />
+                <GlassButton onClick={handleCancel} size="default" className="glass-button-secondary" contentClassName="flex items-center gap-2">
+                  <X className="h-4 w-4" />
                   Cancel
-                </button>
-                <button 
-                  onClick={handleSave} 
-                  className="btn-primary flex items-center justify-center"
+                </GlassButton>
+                <GlassButton
+                  onClick={handleSave}
+                  size="default"
+                  className="glass-button-primary"
+                  contentClassName="flex items-center justify-center gap-2"
                   disabled={isSaving}
                 >
                   {isSaving ? (
                     <>
-                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white" />
                       Saving...
                     </>
                   ) : (
                     <>
-                      <Save className="h-4 w-4 mr-2" />
+                      <Save className="h-4 w-4" />
                       Save
                     </>
                   )}
-                </button>
+                </GlassButton>
               </div>
             </div>
           )}
@@ -876,12 +881,12 @@ const MenuManagement: React.FC<MenuManagementProps> = ({ menuItems, onUpdate, on
           ) : (
             Object.entries(groupedMenuItems).map(([categoryName, items], index) => {
               return (
-                <div key={categoryName} className="card overflow-hidden">
-                  <div className="card-header !mb-4">
-                    <h3 className="card-title flex items-center">
-                      <FolderOpen className="h-5 w-5 mr-2.5 opacity-80" />
+                <div key={categoryName} className="glass-card overflow-hidden rounded-2xl shadow-sm">
+                  <div className="px-5 py-4 border-b border-white/20 bg-black/[0.04] dark:bg-white/[0.06] backdrop-blur-sm">
+                    <h3 className="flex items-center text-base font-semibold text-[var(--color-on-surface)]">
+                      <FolderOpen className="h-5 w-5 mr-2.5 text-[var(--color-primary)] opacity-90" />
                       {categoryName}
-                      <span className="card-description ml-2 !mt-0">
+                      <span className="ml-2 text-sm font-normal text-[var(--color-on-surface-variant)]">
                         {items.length} item{items.length !== 1 ? 's' : ''}
                       </span>
                     </h3>
@@ -889,7 +894,7 @@ const MenuManagement: React.FC<MenuManagementProps> = ({ menuItems, onUpdate, on
 
                 {/* Desktop Table */}
                 <div className="hidden lg:block overflow-x-auto scrollbar-hide">
-                  <table className={`w-full table-fixed ${isDarkMode ? 'divide-gray-700' : 'divide-gray-100'}`} style={{ tableLayout: 'fixed' }}>
+                  <table className="w-full table-fixed" style={{ tableLayout: 'fixed' }}>
                     <colgroup>
                       <col style={{ width: '72px' }} />
                       <col style={{ width: '110px' }} />
@@ -901,78 +906,76 @@ const MenuManagement: React.FC<MenuManagementProps> = ({ menuItems, onUpdate, on
                       <col style={{ width: '96px' }} />
                     </colgroup>
                     <thead>
-                      <tr className={`text-left text-xs font-medium uppercase tracking-wider ${isDarkMode ? 'text-gray-400 bg-gray-800/60' : 'text-gray-500 bg-gray-50/90'}`}>
-                        <th className="px-4 py-3.5">Image</th>
+                      <tr className="text-left text-xs font-semibold uppercase tracking-wider bg-[var(--surface-table)]/60 text-[var(--color-on-surface)]">
+                        <th className="px-4 py-3.5 rounded-tl-lg">Image</th>
                         <th className="px-4 py-3.5">Category</th>
                         <th className="px-4 py-3.5">Item</th>
                         <th className="px-4 py-3.5 min-w-0">Description</th>
                         <th className="px-4 py-3.5">Price</th>
                         <th className="px-4 py-3.5">Sort</th>
                         <th className="px-4 py-3.5">Priority</th>
-                        <th className="px-4 py-3.5 text-right">Actions</th>
+                        <th className="px-4 py-3.5 text-right rounded-tr-lg">Actions</th>
                       </tr>
                     </thead>
-                    <tbody className={`divide-y ${isDarkMode ? 'divide-gray-700/80' : 'divide-gray-100'}`}>
+                    <tbody className={`divide-y divide-[var(--color-outline)]/30`}>
                       {items.map((item) => (
                         <tr
                           key={item.id}
                           className={`transition-colors ${editingId === item.id
-                            ? isDarkMode
-                              ? 'bg-gray-700/50'
-                              : 'bg-gray-50'
-                            : isDarkMode
-                              ? 'hover:bg-gray-700/40'
-                              : 'hover:bg-gray-50'
+                            ? 'bg-[var(--color-primary-container)]/40'
+                            : 'hover:bg-[var(--surface-table)]/50'
                           }`}
                         >
                           <td className="px-4 py-3 align-middle">
                             <img
                               src={item.image_url ? getImageUrl(item.image_url) : getPlaceholderImage(item.category_name, item.name)}
                               alt={item.name}
-                              className="w-12 h-12 object-cover rounded-lg border border-gray-200 dark:border-gray-600"
+                              className="w-12 h-12 object-cover rounded-xl border border-[var(--color-outline)]/40 shadow-sm"
                             />
                           </td>
                           <td className="px-4 py-3 align-middle">
-                            <div className={`text-sm truncate ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                            <div className="text-sm truncate text-[var(--color-on-surface-variant)]">
                               {categories.find(cat => cat.id === item.category_id)?.name || 'Unknown'}
                             </div>
                           </td>
                           <td className="px-4 py-3 align-middle">
-                            <div className={`text-sm font-medium truncate ${isDarkMode ? 'text-gray-200' : 'text-gray-900'}`}>{item.name}</div>
+                            <div className="text-sm font-medium truncate text-[var(--color-on-surface)]">{item.name}</div>
                           </td>
                           <td className="px-4 py-3 align-middle min-w-0">
-                            <div className={`text-sm truncate ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`} title={item.description}>{item.description}</div>
+                            <div className="text-sm truncate text-[var(--color-on-surface-variant)]" title={item.description}>{item.description}</div>
                           </td>
                           <td className="px-4 py-3 align-middle">
-                            <div className={`text-sm font-semibold tabular-nums ${isDarkMode ? 'text-gray-300' : 'text-gray-800'}`}>
+                            <div className="text-sm font-semibold tabular-nums text-[var(--color-on-surface)]">
                               {formatCurrency(ensureNumber(item.price))}
                             </div>
                           </td>
                           <td className="px-4 py-3 align-middle">
-                            <div className={`text-sm tabular-nums ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>{item.sort_order ?? 0}</div>
+                            <div className="text-sm tabular-nums text-[var(--color-on-surface-variant)]">{item.sort_order ?? 0}</div>
                           </td>
                           <td className="px-4 py-3 align-middle">
-                            <div className={`text-sm tabular-nums ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                            <div className="text-sm tabular-nums text-[var(--color-on-surface-variant)]">
                               {item.featured_priority !== null && item.featured_priority !== undefined ? item.featured_priority : '–'}
                             </div>
                           </td>
                           <td className="px-4 py-3 align-middle text-right">
-                            <div className="flex justify-end space-x-2">
-                              <button
+                            <div className="flex justify-end gap-1.5">
+                              <GlassButton
                                 onClick={() => handleEdit(item)}
-                                className={`${isDarkMode ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-900'}`}
+                                size="icon"
+                                className="glass-button-secondary [&_.glass-button]:!min-w-[36px] [&_.glass-button]:!h-9 [&_.glass-button-text]:!min-w-[36px] [&_.glass-button-text]:!h-9 [&_.glass-button]:!border-blue-200 [&_.glass-button]:text-blue-600 [&_.glass-button:hover]:!bg-blue-50 [&_.glass-button:hover]:!border-blue-300"
                                 aria-label="Edit"
                               >
                                 <Edit className="h-4 w-4" />
-                              </button>
-                              <button
+                              </GlassButton>
+                              <GlassButton
                                 onClick={() => setDeleteConfirm({ id: item.id, name: item.name })}
-                                className={`${isDarkMode ? 'text-red-400 hover:text-red-300' : 'text-red-600 hover:text-red-900'}`}
                                 disabled={isDeleting}
+                                size="icon"
+                                className="glass-button-destructive [&_.glass-button]:!min-w-[36px] [&_.glass-button]:!h-9 [&_.glass-button-text]:!min-w-[36px] [&_.glass-button-text]:!h-9"
                                 aria-label="Delete"
                               >
                                 <Trash2 className="h-4 w-4" />
-                              </button>
+                              </GlassButton>
                             </div>
                           </td>
                         </tr>
@@ -986,40 +989,44 @@ const MenuManagement: React.FC<MenuManagementProps> = ({ menuItems, onUpdate, on
                   {items.map((item) => (
                     <div
                       key={item.id}
-                      className={`card card-sm ${editingId === item.id ? (isDarkMode ? '!bg-gray-700/50' : '!bg-gray-50') : ''}`}
+                      className={`glass-card p-4 rounded-xl ${editingId === item.id ? 'ring-2 ring-[var(--color-primary)]/30' : ''}`}
                     >
                       <div>
                           <div className="flex items-start space-x-3 mb-3">
                             <img
                               src={item.image_url ? getImageUrl(item.image_url) : getPlaceholderImage(item.category_name, item.name)}
                               alt={item.name}
-                              className="w-16 h-16 object-cover rounded-lg border flex-shrink-0"
+                              className="w-16 h-16 object-cover rounded-xl border border-[var(--color-outline)]/40 shadow-sm flex-shrink-0"
                             />
                             <div className="flex-1">
                               <div className="flex justify-between items-start mb-2">
-                                <h4 className={`font-medium ${isDarkMode ? 'text-secondary-300' : 'text-secondary-700'}`}>{item.name}</h4>
-                                <div className="flex space-x-2">
-                                  <button
+                                <h4 className="font-medium text-[var(--color-on-surface)]">{item.name}</h4>
+                                <div className="flex gap-1.5">
+                                  <GlassButton
                                     onClick={() => handleEdit(item)}
-                                    className={`p-2 rounded-full ${isDarkMode ? 'text-blue-400 hover:text-blue-300 bg-blue-900/30' : 'text-blue-600 hover:text-blue-900 bg-blue-50'}`}
+                                    size="icon"
+                                    className="glass-button-secondary [&_.glass-button]:!min-w-[36px] [&_.glass-button]:!h-9 [&_.glass-button-text]:!min-w-[36px] [&_.glass-button-text]:!h-9 [&_.glass-button]:!border-blue-200 [&_.glass-button]:text-blue-600 [&_.glass-button:hover]:!bg-blue-50"
+                                    aria-label="Edit"
                                   >
                                     <Edit className="h-4 w-4" />
-                                  </button>
-                                  <button
+                                  </GlassButton>
+                                  <GlassButton
                                     onClick={() => setDeleteConfirm({ id: item.id, name: item.name })}
-                                    className={`p-2 rounded-full ${isDarkMode ? 'text-red-400 hover:text-red-300 bg-red-900/30' : 'text-red-600 hover:text-red-900 bg-red-50'}`}
                                     disabled={isDeleting}
+                                    size="icon"
+                                    className="glass-button-destructive [&_.glass-button]:!min-w-[36px] [&_.glass-button]:!h-9 [&_.glass-button-text]:!min-w-[36px] [&_.glass-button-text]:!h-9"
+                                    aria-label="Delete"
                                   >
                                     <Trash2 className="h-4 w-4" />
-                                  </button>
+                                  </GlassButton>
                                 </div>
                               </div>
-                              <p className={`text-sm mb-2 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>{item.description}</p>
+                              <p className="text-sm mb-2 text-[var(--color-on-surface-variant)]">{item.description}</p>
                               <div className="flex justify-between items-center text-sm">
-                                <span className={`font-semibold ${isDarkMode ? 'text-secondary-400' : 'text-secondary-600'}`}>
+                                <span className="font-semibold text-[var(--color-primary)]">
                                   {formatCurrency(ensureNumber(item.price))}
                                 </span>
-                                <span className={`${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>Sort: {item.sort_order || 0}</span>
+                                <span className="text-[var(--color-on-surface-variant)]">Sort: {item.sort_order || 0}</span>
                               </div>
                             </div>
                           </div>
@@ -1039,53 +1046,46 @@ const MenuManagement: React.FC<MenuManagementProps> = ({ menuItems, onUpdate, on
         <div className="space-y-4 sm:space-y-6">
           {/* Header */}
           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center space-y-4 sm:space-y-0">
-            <div className="flex items-center">
-              {cafeSettings.logo_url ? (
-                <img 
-                  src={getImageUrl(cafeSettings.logo_url)} 
-                  alt={`${cafeSettings.cafe_name || 'Cafe'} Logo`} 
-                  className="h-10 w-10 mr-3"
-                />
-              ) : (
-                <div className="h-10 w-10 mr-3 bg-primary rounded flex items-center justify-center text-on-primary font-bold">
-                  {cafeSettings.cafe_name ? cafeSettings.cafe_name.charAt(0).toUpperCase() : 'C'}
-                </div>
-              )}
-              <div>
-                <h3 className={`text-xl sm:text-2xl font-bold flex items-center ${isDarkMode ? 'text-secondary-300' : 'text-secondary-700'}`}>
-                  <FolderOpen className="h-6 w-6 mr-2" />
-                  Category Management
-                </h3>
-                <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Organize your menu with categories</p>
+            <div className="flex items-center gap-3 min-w-0">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[var(--color-primary-container)]">
+                <FolderOpen className="h-6 w-6 text-[var(--color-primary)]" />
+              </div>
+              <div className="min-w-0">
+                <h2 className="text-xl sm:text-2xl font-bold text-[var(--color-on-surface)] truncate">Category Management</h2>
+                <p className="text-sm text-[var(--color-on-surface-variant)] mt-1">Organize your menu with categories</p>
               </div>
             </div>
             <div className="flex space-x-2">
-              <button
+              <GlassButton
                 onClick={generateCategoriesFromMenu}
                 disabled={autoGenerating}
-                className="btn-secondary flex items-center justify-center text-sm"
+                size="sm"
+                className="glass-button-secondary"
+                contentClassName="flex items-center gap-2"
               >
                 {autoGenerating ? (
-                  <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                  <RefreshCw className="h-4 w-4 animate-spin" />
                 ) : (
-                  <Sparkles className="h-4 w-4 mr-2" />
+                  <Sparkles className="h-4 w-4" />
                 )}
                 {autoGenerating ? 'Generating...' : 'Auto-Generate'}
-              </button>
-              <button
+              </GlassButton>
+              <GlassButton
                 onClick={() => setShowCategoryForm(true)}
-                className="btn-primary flex items-center justify-center text-sm"
+                size="sm"
+                className="glass-button-primary"
+                contentClassName="flex items-center gap-2"
               >
-                <Plus className="h-4 w-4 mr-2" />
+                <Plus className="h-4 w-4" />
                 Add New Category
-              </button>
+              </GlassButton>
             </div>
           </div>
 
           {/* Add New Category Form */}
           {showCategoryForm && (
-            <div className="card">
-              <h3 className={`text-lg font-semibold mb-4 ${isDarkMode ? 'text-secondary-300' : 'text-secondary-700'}`}>Add New Category</h3>
+            <div className="glass-card p-5 rounded-2xl">
+              <h3 className="text-lg font-semibold mb-4 text-[var(--color-on-surface)]">Add New Category</h3>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <input
                   type="text"
@@ -1111,23 +1111,25 @@ const MenuManagement: React.FC<MenuManagementProps> = ({ menuItems, onUpdate, on
                 />
               </div>
               <div className="flex flex-col sm:flex-row justify-end space-y-2 sm:space-y-0 sm:space-x-3 mt-4">
-                <button onClick={handleCategoryCancel} className="btn-secondary flex items-center justify-center">
-                  <X className="h-4 w-4 mr-2" />
+                <GlassButton onClick={handleCategoryCancel} size="default" className="glass-button-secondary" contentClassName="flex items-center gap-2">
+                  <X className="h-4 w-4" />
                   Cancel
-                </button>
-                <button onClick={handleCategorySave} className="btn-primary flex items-center justify-center">
-                  <Save className="h-4 w-4 mr-2" />
+                </GlassButton>
+                <GlassButton onClick={handleCategorySave} size="default" className="glass-button-primary" contentClassName="flex items-center gap-2">
+                  <Save className="h-4 w-4" />
                   Save
-                </button>
+                </GlassButton>
               </div>
             </div>
           )}
 
-          {/* Categories List */}
-          <div className="card">
-            <h3 className={`text-lg font-semibold mb-4 ${isDarkMode ? 'text-secondary-300' : 'text-secondary-700'}`}>Current Categories</h3>
+          {/* Categories List – same glass as Menu Items */}
+          <div className="glass-card overflow-hidden rounded-2xl shadow-sm">
+            <div className="px-5 py-4 border-b border-white/20 bg-black/[0.04] dark:bg-white/[0.06] backdrop-blur-sm">
+              <h3 className="text-base font-semibold text-[var(--color-on-surface)]">Current Categories</h3>
+            </div>
             {categories.length === 0 ? (
-              <div className={`text-center py-8 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+              <div className="text-center py-8 px-4 text-[var(--color-on-surface-variant)]">
                 {cafeSettings.logo_url ? (
                   <img 
                     src={getImageUrl(cafeSettings.logo_url)} 
@@ -1146,30 +1148,20 @@ const MenuManagement: React.FC<MenuManagementProps> = ({ menuItems, onUpdate, on
               <>
                 {/* Desktop Table */}
                 <div className="hidden lg:block overflow-x-auto scrollbar-hide">
-                  <table className={`min-w-full divide-y ${isDarkMode ? 'divide-gray-700' : 'divide-accent-200'}`}>
-                    <thead style={{ backgroundColor: 'var(--surface-table)' }}>
-                      <tr>
-                        <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${isDarkMode ? 'text-gray-300' : 'text-secondary-600'}`}>
-                          Category
-                        </th>
-                        <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${isDarkMode ? 'text-gray-300' : 'text-secondary-600'}`}>
-                          Description
-                        </th>
-                        <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${isDarkMode ? 'text-gray-300' : 'text-secondary-600'}`}>
-                          Items
-                        </th>
-                        <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${isDarkMode ? 'text-gray-300' : 'text-secondary-600'}`}>
-                          Sort Order
-                        </th>
-                        <th className={`px-6 py-3 text-right text-xs font-medium uppercase tracking-wider ${isDarkMode ? 'text-gray-300' : 'text-secondary-600'}`}>
-                          Actions
-                        </th>
+                  <table className="min-w-full">
+                    <thead>
+                      <tr className="text-left text-xs font-semibold uppercase tracking-wider bg-[var(--surface-table)]/60 text-[var(--color-on-surface)]">
+                        <th className="px-6 py-3.5 rounded-tl-lg">Category</th>
+                        <th className="px-6 py-3.5">Description</th>
+                        <th className="px-6 py-3.5">Items</th>
+                        <th className="px-6 py-3.5">Sort Order</th>
+                        <th className="px-6 py-3.5 text-right rounded-tr-lg">Actions</th>
                       </tr>
                     </thead>
-                    <tbody className={`${isDarkMode ? 'bg-gray-800 divide-gray-700' : 'bg-white divide-accent-200'}`}>
+                    <tbody className="divide-y divide-[var(--color-outline)]/30">
                       {categories.map((category, index) => {
                         return (
-                        <tr key={category.id} className={isDarkMode ? 'hover:bg-gray-700' : 'hover:bg-accent-50'}>
+                        <tr key={category.id} className={`transition-colors ${categoryEditingId === category.id ? 'bg-[var(--color-primary-container)]/40' : 'hover:bg-[var(--surface-table)]/50'}`}>
                           {categoryEditingId === category.id ? (
                             // Edit Mode
                             <>
@@ -1190,7 +1182,7 @@ const MenuManagement: React.FC<MenuManagementProps> = ({ menuItems, onUpdate, on
                                 />
                               </td>
                               <td className="px-6 py-4 whitespace-nowrap">
-                                <span className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>{category.item_count} items</span>
+                                <span className="text-sm text-[var(--color-on-surface-variant)]">{category.item_count} items</span>
                               </td>
                               <td className="px-6 py-4 whitespace-nowrap">
                                 <input
@@ -1202,13 +1194,13 @@ const MenuManagement: React.FC<MenuManagementProps> = ({ menuItems, onUpdate, on
                                 />
                               </td>
                               <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                <div className="flex justify-end space-x-2">
-                                  <button onClick={handleCategorySave} className="text-green-600 hover:text-green-900">
+                                <div className="flex justify-end gap-1.5">
+                                  <GlassButton onClick={handleCategorySave} size="icon" className="glass-button-primary [&_.glass-button]:!min-w-[36px] [&_.glass-button]:!h-9 [&_.glass-button-text]:!min-w-[36px] [&_.glass-button-text]:!h-9" aria-label="Save">
                                     <Save className="h-4 w-4" />
-                                  </button>
-                                  <button onClick={handleCategoryCancel} className={`${isDarkMode ? 'text-gray-400 hover:text-gray-200' : 'text-gray-600 hover:text-gray-900'}`}>
+                                  </GlassButton>
+                                  <GlassButton onClick={handleCategoryCancel} size="icon" className="glass-button-secondary [&_.glass-button]:!min-w-[36px] [&_.glass-button]:!h-9 [&_.glass-button-text]:!min-w-[36px] [&_.glass-button-text]:!h-9" aria-label="Cancel">
                                     <X className="h-4 w-4" />
-                                  </button>
+                                  </GlassButton>
                                 </div>
                               </td>
                             </>
@@ -1217,12 +1209,12 @@ const MenuManagement: React.FC<MenuManagementProps> = ({ menuItems, onUpdate, on
                             <>
                               <td className="px-6 py-4 whitespace-nowrap">
                                 <div className="flex items-center">
-                                  <FolderOpen className="h-5 w-5 text-secondary-500 mr-3" />
-                                  <div className={`text-sm font-medium ${isDarkMode ? 'text-secondary-300' : 'text-secondary-700'}`}>{category.name}</div>
+                                  <FolderOpen className="h-5 w-5 text-[var(--color-primary)] opacity-90 mr-3" />
+                                  <div className="text-sm font-medium text-[var(--color-on-surface)]">{category.name}</div>
                                 </div>
                               </td>
                               <td className="px-6 py-4 whitespace-nowrap">
-                                <div className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>{category.description}</div>
+                                <div className="text-sm text-[var(--color-on-surface-variant)]">{category.description}</div>
                               </td>
                               <td className="px-6 py-4 whitespace-nowrap">
                                 <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
@@ -1234,22 +1226,26 @@ const MenuManagement: React.FC<MenuManagementProps> = ({ menuItems, onUpdate, on
                                 </span>
                               </td>
                               <td className="px-6 py-4 whitespace-nowrap">
-                                <div className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>{category.sort_order}</div>
+                                <div className="text-sm text-[var(--color-on-surface-variant)] tabular-nums">{category.sort_order}</div>
                               </td>
                               <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                <div className="flex justify-end space-x-2">
-                                  <button
+                                <div className="flex justify-end gap-1.5">
+                                  <GlassButton
                                     onClick={() => handleCategoryEdit(category)}
-                                    className={`${isDarkMode ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-900'}`}
+                                    size="icon"
+                                    className="glass-button-secondary [&_.glass-button]:!min-w-[36px] [&_.glass-button]:!h-9 [&_.glass-button-text]:!min-w-[36px] [&_.glass-button-text]:!h-9"
+                                    aria-label="Edit category"
                                   >
                                     <Edit className="h-4 w-4" />
-                                  </button>
-                                  <button
+                                  </GlassButton>
+                                  <GlassButton
                                     onClick={() => handleCategoryDelete(category.id, category.name, category.item_count)}
-                                    className={`${isDarkMode ? 'text-red-400 hover:text-red-300' : 'text-red-600 hover:text-red-900'}`}
+                                    size="icon"
+                                    className="glass-button-destructive [&_.glass-button]:!min-w-[36px] [&_.glass-button]:!h-9 [&_.glass-button-text]:!min-w-[36px] [&_.glass-button-text]:!h-9"
+                                    aria-label="Delete category"
                                   >
                                     <Trash2 className="h-4 w-4" />
-                                  </button>
+                                  </GlassButton>
                                 </div>
                               </td>
                             </>
@@ -1262,9 +1258,9 @@ const MenuManagement: React.FC<MenuManagementProps> = ({ menuItems, onUpdate, on
                 </div>
 
                 {/* Mobile Cards */}
-                <div className="lg:hidden space-y-3">
+                <div className="lg:hidden p-4 space-y-3">
                   {categories.map((category) => (
-                    <div key={category.id} className="card card-sm">
+                    <div key={category.id} className={`glass-card p-4 rounded-xl ${categoryEditingId === category.id ? 'ring-2 ring-[var(--color-primary)]/30' : ''}`}>
                       {categoryEditingId === category.id ? (
                         // Edit Mode Mobile
                         <div className="space-y-3">
@@ -1291,14 +1287,14 @@ const MenuManagement: React.FC<MenuManagementProps> = ({ menuItems, onUpdate, on
                             className="input-field"
                           />
                           <div className="flex space-x-2">
-                            <button onClick={handleCategorySave} className="flex-1 btn-primary flex items-center justify-center">
-                              <Save className="h-4 w-4 mr-2" />
+                            <GlassButton onClick={handleCategorySave} size="default" className="flex-1 glass-button-primary" contentClassName="flex items-center justify-center gap-2">
+                              <Save className="h-4 w-4" />
                               Save
-                            </button>
-                            <button onClick={handleCategoryCancel} className="flex-1 btn-secondary flex items-center justify-center">
-                              <X className="h-4 w-4 mr-2" />
+                            </GlassButton>
+                            <GlassButton onClick={handleCategoryCancel} size="default" className="flex-1 glass-button-secondary" contentClassName="flex items-center justify-center gap-2">
+                              <X className="h-4 w-4" />
                               Cancel
-                            </button>
+                            </GlassButton>
                           </div>
                         </div>
                       ) : (
@@ -1306,25 +1302,29 @@ const MenuManagement: React.FC<MenuManagementProps> = ({ menuItems, onUpdate, on
                         <div>
                           <div className="flex justify-between items-start mb-3">
                             <div className="flex items-center">
-                              <FolderOpen className="h-5 w-5 text-secondary-500 mr-3" />
+                              <FolderOpen className="h-5 w-5 text-[var(--color-primary)] opacity-90 mr-3" />
                               <div>
-                                <h4 className={`font-medium ${isDarkMode ? 'text-secondary-300' : 'text-secondary-700'}`}>{category.name}</h4>
-                                <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>{category.description}</p>
+                                <h4 className="font-medium text-[var(--color-on-surface)]">{category.name}</h4>
+                                <p className="text-sm text-[var(--color-on-surface-variant)]">{category.description}</p>
                               </div>
                             </div>
-                            <div className="flex space-x-2">
-                              <button
+                            <div className="flex gap-1.5">
+                              <GlassButton
                                 onClick={() => handleCategoryEdit(category)}
-                                className={`p-2 rounded-full transition-colors ${isDarkMode ? 'text-blue-400 hover:text-blue-300 bg-blue-900/30' : 'text-blue-600 hover:text-blue-900 bg-blue-50'}`}
+                                size="icon"
+                                className="glass-button-secondary [&_.glass-button]:!min-w-[36px] [&_.glass-button]:!h-9 [&_.glass-button-text]:!min-w-[36px] [&_.glass-button-text]:!h-9"
+                                aria-label="Edit category"
                               >
                                 <Edit className="h-4 w-4" />
-                              </button>
-                              <button
+                              </GlassButton>
+                              <GlassButton
                                 onClick={() => handleCategoryDelete(category.id, category.name, category.item_count)}
-                                className={`p-2 rounded-full transition-colors ${isDarkMode ? 'text-red-400 hover:text-red-300 bg-red-900/30' : 'text-red-600 hover:text-red-900 bg-red-50'}`}
+                                size="icon"
+                                className="glass-button-destructive [&_.glass-button]:!min-w-[36px] [&_.glass-button]:!h-9 [&_.glass-button-text]:!min-w-[36px] [&_.glass-button-text]:!h-9"
+                                aria-label="Delete category"
                               >
                                 <Trash2 className="h-4 w-4" />
-                              </button>
+                              </GlassButton>
                             </div>
                           </div>
                           <div className="flex justify-between items-center text-sm">
@@ -1335,7 +1335,7 @@ const MenuManagement: React.FC<MenuManagementProps> = ({ menuItems, onUpdate, on
                             }`}>
                               {category.item_count} items
                             </span>
-                            <span className={`${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>Sort: {category.sort_order}</span>
+                            <span className="text-[var(--color-on-surface-variant)]">Sort: {category.sort_order}</span>
                           </div>
                         </div>
                       )}
@@ -1359,7 +1359,7 @@ const MenuManagement: React.FC<MenuManagementProps> = ({ menuItems, onUpdate, on
           <div className="space-y-4">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className={`block text-sm font-medium mb-1 ${isDarkMode ? 'text-gray-300' : 'text-secondary-700'}`}>Category *</label>
+                <label className="block text-sm font-medium mb-1 text-[var(--color-on-surface)]">Category *</label>
                 <Select
                   options={categories.map(c => ({ value: String(c.id), label: c.name }))}
                   value={formData.category_id === '' || formData.category_id == null ? '' : String(formData.category_id)}
@@ -1369,7 +1369,7 @@ const MenuManagement: React.FC<MenuManagementProps> = ({ menuItems, onUpdate, on
                 />
               </div>
               <div>
-                <label className={`block text-sm font-medium mb-1 ${isDarkMode ? 'text-gray-300' : 'text-secondary-700'}`}>Item Name *</label>
+                <label className="block text-sm font-medium mb-1 text-[var(--color-on-surface)]">Item Name *</label>
                 <input
                   type="text"
                   value={formData.name}
@@ -1380,7 +1380,7 @@ const MenuManagement: React.FC<MenuManagementProps> = ({ menuItems, onUpdate, on
               </div>
             </div>
             <div>
-              <label className={`block text-sm font-medium mb-1 ${isDarkMode ? 'text-gray-300' : 'text-secondary-700'}`}>Description</label>
+              <label className="block text-sm font-medium mb-1 text-[var(--color-on-surface)]">Description</label>
               <input
                 type="text"
                 value={formData.description}
@@ -1391,7 +1391,7 @@ const MenuManagement: React.FC<MenuManagementProps> = ({ menuItems, onUpdate, on
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div>
-                <label className={`block text-sm font-medium mb-1 ${isDarkMode ? 'text-gray-300' : 'text-secondary-700'}`}>Price *</label>
+                <label className="block text-sm font-medium mb-1 text-[var(--color-on-surface)]">Price *</label>
                 <input
                   type="number"
                   step="0.01"
@@ -1402,7 +1402,7 @@ const MenuManagement: React.FC<MenuManagementProps> = ({ menuItems, onUpdate, on
                 />
               </div>
               <div>
-                <label className={`block text-sm font-medium mb-1 ${isDarkMode ? 'text-gray-300' : 'text-secondary-700'}`}>Sort Order</label>
+                <label className="block text-sm font-medium mb-1 text-[var(--color-on-surface)]">Sort Order</label>
                 <input
                   type="number"
                   min="0"
@@ -1412,7 +1412,7 @@ const MenuManagement: React.FC<MenuManagementProps> = ({ menuItems, onUpdate, on
                 />
               </div>
               <div>
-                <label className={`block text-sm font-medium mb-1 ${isDarkMode ? 'text-gray-300' : 'text-secondary-700'}`}>Featured Priority</label>
+                <label className="block text-sm font-medium mb-1 text-[var(--color-on-surface)]">Featured Priority</label>
                 <input
                   type="number"
                   min="0"
@@ -1425,8 +1425,8 @@ const MenuManagement: React.FC<MenuManagementProps> = ({ menuItems, onUpdate, on
               </div>
             </div>
             <div>
-              <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-300' : 'text-secondary-700'}`}>Item Image</label>
-              <p className={`text-xs mb-2 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>Upload an image for this menu item (max 5MB)</p>
+              <label className="block text-sm font-medium mb-2 text-[var(--color-on-surface)]">Item Image</label>
+              <p className="text-xs mb-2 text-[var(--color-on-surface-variant)]">Upload an image for this menu item (max 5MB)</p>
               <div className="flex items-start space-x-4 flex-wrap gap-2">
                 {(formData.image_url || selectedImageFile) && (
                   <div className="relative">
@@ -1480,22 +1480,24 @@ const MenuManagement: React.FC<MenuManagementProps> = ({ menuItems, onUpdate, on
               </div>
             </div>
             <div className="flex justify-end gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
-              <button type="button" onClick={handleCancel} className="btn-secondary flex items-center justify-center">
-                <X className="h-4 w-4 mr-2" />
+              <GlassButton type="button" onClick={handleCancel} size="default" className="glass-button-secondary" contentClassName="flex items-center gap-2">
+                <X className="h-4 w-4" />
                 Cancel
-              </button>
-              <button
+              </GlassButton>
+              <GlassButton
                 type="button"
                 onClick={handleSave}
-                className="btn-primary flex items-center justify-center"
+                size="default"
+                className="glass-button-primary"
+                contentClassName="flex items-center justify-center gap-2"
                 disabled={isSaving}
               >
                 {isSaving ? (
-                  <><div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" /> Saving...</>
+                  <><div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white" /> Saving...</>
                 ) : (
-                  <><Save className="h-4 w-4 mr-2" /> Save</>
+                  <><Save className="h-4 w-4" /> Save</>
                 )}
-              </button>
+              </GlassButton>
             </div>
           </div>
         )}

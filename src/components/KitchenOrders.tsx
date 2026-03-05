@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Clock, CheckCircle, XCircle, Printer, RefreshCw, AlertTriangle, Coffee, Utensils, ChevronDown, ChevronUp, ShoppingCart, Plus, Edit, Save, X, Trash2, FileText } from 'lucide-react';
+import { Clock, CheckCircle, XCircle, Printer, RefreshCw, AlertTriangle, Coffee, Utensils, ChevronDown, ChevronUp, ShoppingCart, Plus, Edit, Save, X, Trash2, FileText, Search, ClipboardList } from 'lucide-react';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 import { useAuth } from '../contexts/AuthContext';
@@ -10,6 +10,7 @@ import { getImageUrl } from '../utils/imageUtils';
 import useOrders from '../hooks/useOrders';
 import PrintModal from './PrintModal';
 import Select from './ui/Select';
+import { GlassButton } from './ui/GlassButton';
 
 interface KitchenOrdersProps {
   cart: any[];
@@ -571,16 +572,17 @@ const KitchenOrders: React.FC<KitchenOrdersProps> = ({ cart, setCart }) => {
           alt={`${cafeSettings.cafe_name || 'Cafe'} Logo`} 
           className="h-16 w-16 mb-4 opacity-50"
         />
-        <h2 className="text-xl font-semibold text-secondary-700 dark:text-secondary-300 mb-2">Authentication Required</h2>
+        <h2 className="text-xl font-semibold text-[var(--color-on-surface)] mb-2">Authentication Required</h2>
         <p className="text-on-surface-variant text-center mb-4">
           You need to be logged in to access the kitchen orders.
         </p>
-        <button
+        <GlassButton
           onClick={() => window.location.href = '/login'}
-          className="btn-primary"
+          size="default"
+          className="glass-button-primary"
         >
           Go to Login
-        </button>
+        </GlassButton>
       </div>
     );
   }
@@ -588,22 +590,14 @@ const KitchenOrders: React.FC<KitchenOrdersProps> = ({ cart, setCart }) => {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center">
-          {cafeSettings.logo_url ? (
-            <img 
-              src={getImageUrl(cafeSettings.logo_url)} 
-              alt={`${cafeSettings.cafe_name || 'Cafe'} Logo`} 
-              className="h-12 w-12 mr-4"
-            />
-          ) : (
-            <div className="h-12 w-12 mr-4 bg-primary rounded flex items-center justify-center text-on-primary font-bold">
-              {cafeSettings.cafe_name ? cafeSettings.cafe_name.charAt(0).toUpperCase() : 'C'}
-            </div>
-          )}
-          <div>
-            <h1 className="text-2xl font-bold text-secondary-700 dark:text-secondary-300">Kitchen Orders</h1>
-            <p className="text-on-surface-variant">Manage and track order preparation</p>
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div className="flex items-center gap-3 min-w-0">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[var(--color-primary-container)]">
+            <ClipboardList className="h-6 w-6 text-[var(--color-primary)]" />
+          </div>
+          <div className="min-w-0">
+            <h1 className="text-2xl font-bold text-[var(--color-on-surface)] truncate">Kitchen Orders</h1>
+            <p className="text-sm text-[var(--color-on-surface-variant)] mt-1">Manage and track order preparation</p>
           </div>
         </div>
         <div className="flex items-center space-x-2">
@@ -615,31 +609,33 @@ const KitchenOrders: React.FC<KitchenOrdersProps> = ({ cart, setCart }) => {
             </span>
           </div>
           
-          <button
+          <GlassButton
             onClick={fetchOrders}
-            className="btn-secondary flex items-center"
+            size="sm"
+            className="glass-button-secondary"
+            contentClassName="flex items-center gap-2"
             title="Refresh Orders"
           >
-            <RefreshCw className="h-4 w-4 mr-2" />
+            <RefreshCw className="h-4 w-4" />
             Refresh
-          </button>
-                     <button
-             onClick={async () => {
-               try {
-                 const response = await axios.post('/orders/test');
-                 toast.success('Test order created!');
-                 // Add new order to cache
-                 addOrderToCache(response.data);
-               } catch (error) {
-                 console.error('Error creating test order:', error);
-                 toast.error('Failed to create test order');
-               }
-             }}
-             className="btn-primary flex items-center"
-             title="Create Test Order"
-           >
-             Test Order
-           </button>
+          </GlassButton>
+          <GlassButton
+            onClick={async () => {
+              try {
+                const response = await axios.post('/orders/test');
+                toast.success('Test order created!');
+                addOrderToCache(response.data);
+              } catch (error) {
+                console.error('Error creating test order:', error);
+                toast.error('Failed to create test order');
+              }
+            }}
+            size="sm"
+            className="glass-button-primary"
+            title="Create Test Order"
+          >
+            Test Order
+          </GlassButton>
           <label className="flex items-center space-x-2 cursor-pointer">
             <input
               type="checkbox"
@@ -652,9 +648,9 @@ const KitchenOrders: React.FC<KitchenOrdersProps> = ({ cart, setCart }) => {
         </div>
       </div>
 
-      {/* Statistics */}
+      {/* Statistics – glass cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div className="card">
+        <div className="glass-card p-5">
           <div className="flex items-center">
             <div className="p-2 rounded-lg bg-[var(--color-primary-container)]">
               <Clock className="h-6 w-6" style={{ color: 'var(--color-warning)' }} />
@@ -667,7 +663,7 @@ const KitchenOrders: React.FC<KitchenOrdersProps> = ({ cart, setCart }) => {
             </div>
           </div>
         </div>
-        <div className="card">
+        <div className="glass-card p-5">
           <div className="flex items-center">
             <div className="p-2 rounded-lg bg-[var(--color-primary-container)]">
               <Utensils className="h-6 w-6" style={{ color: 'var(--color-info)' }} />
@@ -680,7 +676,7 @@ const KitchenOrders: React.FC<KitchenOrdersProps> = ({ cart, setCart }) => {
             </div>
           </div>
         </div>
-        <div className="card">
+        <div className="glass-card p-5">
           <div className="flex items-center">
             <div className="p-2 rounded-lg bg-[var(--color-primary-container)]">
               <CheckCircle className="h-6 w-6" style={{ color: 'var(--color-success)' }} />
@@ -693,7 +689,7 @@ const KitchenOrders: React.FC<KitchenOrdersProps> = ({ cart, setCart }) => {
             </div>
           </div>
         </div>
-        <div className="card">
+        <div className="glass-card p-5">
           <div className="flex items-center">
             <div className="p-2 rounded-lg bg-[var(--surface-table)]">
               <Coffee className="h-6 w-6" style={{ color: 'var(--color-on-surface-variant)' }} />
@@ -722,108 +718,90 @@ const KitchenOrders: React.FC<KitchenOrdersProps> = ({ cart, setCart }) => {
         </div>
       </div>
 
-      {/* Tabs */}
-      <div className="border-b border-[var(--color-outline)]">
-        <nav className="-mb-px flex space-x-8">
-          <button
-            onClick={() => {
-              setActiveTab('today');
-              setTodaySubTab('active'); // Reset to active sub-tab
-              setFilterStatus('all'); // Reset filter
-              setSearchQuery(''); // Clear search
-              setCurrentPage(1); // Reset pagination when tab changes
-            }}
-            className={`py-2 px-1 border-b-2 font-medium text-sm ${
-              activeTab === 'today'
-                ? 'border-secondary-500 text-secondary-600 dark:text-secondary-400'
-                : 'border-transparent text-on-surface-variant hover:text-on-surface hover:border-[var(--color-outline)]'
-            }`}
-          >
-            Today's Orders ({todayOrders.length})
-          </button>
-          <button
-            onClick={() => {
-              setActiveTab('history');
-              setFilterStatus('all'); // Reset filter
-              setSearchQuery(''); // Clear search
-              setCurrentPage(1); // Reset pagination when tab changes
-            }}
-            className={`py-2 px-1 border-b-2 font-medium text-sm ${
-              activeTab === 'history'
-                ? 'border-secondary-500 text-secondary-600 dark:text-secondary-400'
-                : 'border-transparent text-on-surface-variant hover:text-on-surface hover:border-[var(--color-outline)]'
-            }`}
-          >
-            History ({historyOrders.length})
-          </button>
-        </nav>
+      {/* Tabs – same as Reports & Invoices */}
+      <div className="flex gap-2 p-1 rounded-2xl glass-card w-fit">
+        <button
+          type="button"
+          onClick={() => {
+            setActiveTab('today');
+            setTodaySubTab('active');
+            setFilterStatus('all');
+            setSearchQuery('');
+            setCurrentPage(1);
+          }}
+          className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-colors ${
+            activeTab === 'today'
+              ? 'bg-[var(--color-primary)] text-[var(--color-on-primary)]'
+              : 'text-[var(--color-on-surface-variant)] hover:bg-[var(--surface-table)]/50 hover:text-[var(--color-on-surface)]'
+          }`}
+        >
+          Today&apos;s Orders ({todayOrders.length})
+        </button>
+        <button
+          type="button"
+          onClick={() => {
+            setActiveTab('history');
+            setFilterStatus('all');
+            setSearchQuery('');
+            setCurrentPage(1);
+          }}
+          className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-colors ${
+            activeTab === 'history'
+              ? 'bg-[var(--color-primary)] text-[var(--color-on-primary)]'
+              : 'text-[var(--color-on-surface-variant)] hover:bg-[var(--surface-table)]/50 hover:text-[var(--color-on-surface)]'
+          }`}
+        >
+          History ({historyOrders.length})
+        </button>
       </div>
 
-      {/* Today's Orders Sub-tabs */}
+      {/* Today's Orders Sub-tabs – same style */}
       {activeTab === 'today' && (
-        <div className="border-b border-[var(--color-outline)]">
-          <nav className="-mb-px flex space-x-8">
-            <button
-              onClick={() => {
-                setTodaySubTab('active');
-                setFilterStatus('all');
-                setSearchQuery('');
-                setCurrentPage(1);
-              }}
-              className={`py-2 px-1 border-b-2 font-medium text-sm ${
-                todaySubTab === 'active'
-                  ? 'border-secondary-500 text-secondary-600 dark:text-secondary-400'
-                  : 'border-transparent text-on-surface-variant hover:text-on-surface hover:border-[var(--color-outline)]'
-              }`}
-            >
-              Pending & Preparing ({todayOrders.filter(o => ['pending', 'preparing'].includes(o.status)).length})
-            </button>
-            <button
-              onClick={() => {
-                setTodaySubTab('ready');
-                setFilterStatus('all');
-                setSearchQuery('');
-                setCurrentPage(1);
-              }}
-              className={`py-2 px-1 border-b-2 font-medium text-sm ${
-                todaySubTab === 'ready'
-                  ? 'border-secondary-500 text-secondary-600 dark:text-secondary-400'
-                  : 'border-transparent text-on-surface-variant hover:text-on-surface hover:border-[var(--color-outline)]'
-              }`}
-            >
-              Ready ({todayOrders.filter(o => o.status === 'ready').length})
-            </button>
-            <button
-              onClick={() => {
-                setTodaySubTab('completed');
-                setFilterStatus('all');
-                setSearchQuery('');
-                setCurrentPage(1);
-              }}
-              className={`py-2 px-1 border-b-2 font-medium text-sm ${
-                todaySubTab === 'completed'
-                  ? 'border-secondary-500 text-secondary-600 dark:text-secondary-400'
-                  : 'border-transparent text-on-surface-variant hover:text-on-surface hover:border-[var(--color-outline)]'
-              }`}
-            >
-              Completed ({todayOrders.filter(o => o.status === 'completed').length})
-            </button>
-            <button
-              onClick={() => {
-                setTodaySubTab('cancelled');
-                setFilterStatus('all');
-                setSearchQuery('');
-                setCurrentPage(1);
-              }}
-              className={`py-2 px-1 border-b-2 font-medium text-sm ${
-                todaySubTab === 'cancelled'
-                  ? 'border-secondary-500 text-secondary-600 dark:text-secondary-400'
-                  : 'border-transparent text-on-surface-variant hover:text-on-surface hover:border-[var(--color-outline)]'
-              }`}
-            >
-              Cancelled ({todayOrders.filter(o => o.status === 'cancelled').length})
-            </button>
-          </nav>
+        <div className="flex gap-2 p-1 rounded-2xl glass-card w-fit flex-wrap">
+          <button
+            type="button"
+            onClick={() => { setTodaySubTab('active'); setFilterStatus('all'); setSearchQuery(''); setCurrentPage(1); }}
+            className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-colors ${
+              todaySubTab === 'active'
+                ? 'bg-[var(--color-primary)] text-[var(--color-on-primary)]'
+                : 'text-[var(--color-on-surface-variant)] hover:bg-[var(--surface-table)]/50 hover:text-[var(--color-on-surface)]'
+            }`}
+          >
+            Pending & Preparing ({todayOrders.filter(o => ['pending', 'preparing'].includes(o.status)).length})
+          </button>
+          <button
+            type="button"
+            onClick={() => { setTodaySubTab('ready'); setFilterStatus('all'); setSearchQuery(''); setCurrentPage(1); }}
+            className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-colors ${
+              todaySubTab === 'ready'
+                ? 'bg-[var(--color-primary)] text-[var(--color-on-primary)]'
+                : 'text-[var(--color-on-surface-variant)] hover:bg-[var(--surface-table)]/50 hover:text-[var(--color-on-surface)]'
+            }`}
+          >
+            Ready ({todayOrders.filter(o => o.status === 'ready').length})
+          </button>
+          <button
+            type="button"
+            onClick={() => { setTodaySubTab('completed'); setFilterStatus('all'); setSearchQuery(''); setCurrentPage(1); }}
+            className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-colors ${
+              todaySubTab === 'completed'
+                ? 'bg-[var(--color-primary)] text-[var(--color-on-primary)]'
+                : 'text-[var(--color-on-surface-variant)] hover:bg-[var(--surface-table)]/50 hover:text-[var(--color-on-surface)]'
+            }`}
+          >
+            Completed ({todayOrders.filter(o => o.status === 'completed').length})
+          </button>
+          <button
+            type="button"
+            onClick={() => { setTodaySubTab('cancelled'); setFilterStatus('all'); setSearchQuery(''); setCurrentPage(1); }}
+            className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-colors ${
+              todaySubTab === 'cancelled'
+                ? 'bg-[var(--color-primary)] text-[var(--color-on-primary)]'
+                : 'text-[var(--color-on-surface-variant)] hover:bg-[var(--surface-table)]/50 hover:text-[var(--color-on-surface)]'
+            }`}
+          >
+            Cancelled ({todayOrders.filter(o => o.status === 'cancelled').length})
+          </button>
         </div>
       )}
 
@@ -859,12 +837,13 @@ const KitchenOrders: React.FC<KitchenOrdersProps> = ({ cart, setCart }) => {
                     setCurrentPage(1);
                   }}
                   placeholder="All Orders"
+                  className="select-trigger-glass select-trigger-glass-hover rounded-full"
                 />
               </div>
             );
           })()}
           
-          {/* Search Bar */}
+          {/* Search Bar – glass input */}
           <div className="relative">
             <input
               type="text"
@@ -872,14 +851,12 @@ const KitchenOrders: React.FC<KitchenOrdersProps> = ({ cart, setCart }) => {
               value={searchQuery}
               onChange={(e) => {
                 setSearchQuery(e.target.value);
-                setCurrentPage(1); // Reset pagination when search changes
+                setCurrentPage(1);
               }}
-              className="input-field pl-12 pr-10 w-64"
+              className="glass-input input-field pl-12 pr-10 w-64 min-h-[40px] rounded-full"
             />
             <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-              <svg className="h-5 w-5 text-on-surface-variant" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
+              <Search className="h-5 w-5 text-on-surface-variant" />
             </div>
             {searchQuery && (
               <button
@@ -1419,59 +1396,55 @@ const KitchenOrders: React.FC<KitchenOrdersProps> = ({ cart, setCart }) => {
                     {editingOrder !== order.id && (
                       <>
                         {(user?.role === 'admin' || (user?.role === 'chef' && cafeSettings?.chef_can_edit_orders) || (user?.role === 'reception' && cafeSettings?.reception_can_edit_orders)) && (
-                          <button
+                          <GlassButton
                             onClick={() => startEditing(order)}
-                            className={`inline-flex items-center justify-center h-8 min-w-[5.5rem] text-sm px-3 rounded border ${
-                              isDarkMode 
-                                ? 'text-blue-400 border-blue-600 hover:bg-blue-900' 
-                                : 'text-blue-600 border-blue-300 hover:bg-blue-50'
-                            }`}
+                            size="sm"
+                            className="glass-button-secondary"
+                            contentClassName="flex items-center gap-1.5"
                             title="Edit Order"
                           >
-                            <Edit className="h-4 w-4 mr-1 shrink-0" />
+                            <Edit className="h-4 w-4 shrink-0" />
                             Edit
-                          </button>
+                          </GlassButton>
                         )}
-                        <button
+                        <GlassButton
                           onClick={() => addOrderToCart(order)}
-                          className={`inline-flex items-center justify-center h-8 min-w-[5.5rem] text-sm px-3 rounded border ${
-                            isDarkMode 
-                              ? 'text-green-400 border-green-600 hover:bg-green-900' 
-                              : 'text-green-600 border-green-300 hover:bg-green-50'
-                          }`}
+                          size="sm"
+                          className="glass-button-primary"
+                          contentClassName="flex items-center gap-1.5"
                           title="Add to Cart"
                         >
-                          <ShoppingCart className="h-4 w-4 mr-1 shrink-0" />
+                          <ShoppingCart className="h-4 w-4 shrink-0" />
                           Add to Cart
-                        </button>
-                        <button
+                        </GlassButton>
+                        <GlassButton
                           onClick={() => printOrder(order)}
-                          className="btn-secondary inline-flex items-center justify-center h-8 min-w-[5.5rem] text-sm px-3 rounded border"
+                          size="sm"
+                          className="glass-button-secondary"
+                          contentClassName="flex items-center gap-1.5"
                           title="Print Order"
                         >
                           <Printer className="h-4 w-4 shrink-0" />
                           Print
-                        </button>
+                        </GlassButton>
                         {user?.role === 'admin' && (
-                          <button
+                          <GlassButton
                             onClick={() => handleGenerateInvoice(order)}
                             disabled={generatingInvoiceId === order.id}
-                            className={`inline-flex items-center justify-center h-8 min-w-[5.5rem] text-sm px-3 rounded border ${
-                              isDarkMode
-                                ? 'text-purple-400 border-purple-600 hover:bg-purple-900 disabled:opacity-50'
-                                : 'text-purple-600 border-purple-300 hover:bg-purple-50 disabled:opacity-50'
-                            }`}
+                            size="sm"
+                            className="glass-button-secondary [&_.glass-button]:!border-purple-300 [&_.glass-button]:text-purple-600 [&_.glass-button:hover]:!bg-purple-50"
+                            contentClassName="flex items-center gap-1.5"
                             title="Generate Invoice"
                           >
                             {generatingInvoiceId === order.id ? (
                               <RefreshCw className="h-4 w-4 shrink-0 animate-spin" />
                             ) : (
                               <>
-                                <FileText className="h-4 w-4 mr-1 shrink-0" />
+                                <FileText className="h-4 w-4 shrink-0" />
                                 Invoice
                               </>
                             )}
-                          </button>
+                          </GlassButton>
                         )}
                       </>
                     )}
@@ -1485,13 +1458,15 @@ const KitchenOrders: React.FC<KitchenOrdersProps> = ({ cart, setCart }) => {
           {/* Show More Button */}
           {hasMore && displayedOrders.length > 0 && (
             <div className="mt-6 text-center">
-              <button
+              <GlassButton
                 onClick={handleShowMore}
-                className="btn-secondary flex items-center mx-auto"
+                size="default"
+                className="glass-button-secondary mx-auto"
+                contentClassName="flex items-center gap-2"
               >
-                <Plus className="h-4 w-4 mr-2" />
+                <Plus className="h-4 w-4" />
                 Show More ({currentPage * itemsPerPage} of {getFilteredOrders().length})
-              </button>
+              </GlassButton>
             </div>
           )}
         </div>

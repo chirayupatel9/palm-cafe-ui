@@ -39,6 +39,7 @@ import DashboardRedirect from './components/DashboardRedirect';
 import OnboardingGuard from './components/OnboardingGuard';
 import StockCategoryListDemo from './components/StockCategoryListDemo';
 import { PillBase, type NavItem } from './components/ui/3d-adaptive-navigation-bar';
+import { GlassButton } from './components/ui/GlassButton';
 
 const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
 const API_PATH = '/api';
@@ -224,8 +225,8 @@ function MainApp() {
   }
 
   return (
-    <div className={`min-h-screen surface-page ${impersonation?.isImpersonating ? 'pt-16' : ''}`}>
-      <header className="surface-nav" style={{ boxShadow: 'none', backgroundColor: 'var(--surface-page)' }}>
+    <div className={`min-h-screen flex flex-col surface-page ${impersonation?.isImpersonating ? 'pt-16' : ''}`}>
+      <header className="surface-nav shrink-0" style={{ boxShadow: 'none', backgroundColor: 'var(--surface-page)' }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center">
@@ -245,12 +246,12 @@ function MainApp() {
                 <span>{user?.username}</span>
               </div>
               <DarkModeToggle />
-              <button onClick={handleLogout} className="p-2 rounded-md transition-colors" style={{ color: 'var(--color-on-surface-variant)' }} onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = 'var(--color-primary-container)'; e.currentTarget.style.color = 'var(--color-primary)'; }} onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; e.currentTarget.style.color = 'var(--color-on-surface-variant)'; }} title="Logout">
+              <GlassButton onClick={handleLogout} size="icon" className="glass-button-secondary [&_.glass-button]:!bg-transparent [&_.glass-button]:!border-transparent [&_.glass-button]:text-[var(--color-on-surface-variant)] [&_.glass-button:hover]:!bg-[var(--color-primary-container)] [&_.glass-button:hover]:!text-[var(--color-primary)]" title="Logout">
                 <LogOut className="h-5 w-5" />
-              </button>
-              <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)} className="lg:hidden p-2 rounded-md transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center" style={{ color: 'var(--color-on-surface-variant)' }} aria-label="Toggle menu">
+              </GlassButton>
+              <GlassButton onClick={() => setMobileMenuOpen(!mobileMenuOpen)} size="icon" className="lg:hidden glass-button-secondary [&_.glass-button]:!bg-transparent [&_.glass-button]:!border-transparent [&_.glass-button]:text-[var(--color-on-surface-variant)]" aria-label="Toggle menu">
                 {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-              </button>
+              </GlassButton>
             </div>
           </div>
         </div>
@@ -260,17 +261,24 @@ function MainApp() {
           <div className="px-4 py-2 space-y-1">
             {navigationItems.map((item) => {
               const Icon = item.icon;
+              const isActive = currentPage === item.id;
               return (
-                <button key={item.id} onClick={() => handlePageChange(item.id)} className="w-full flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all" style={currentPage === item.id ? { backgroundColor: 'var(--color-primary)', color: 'var(--color-on-primary)', boxShadow: 'var(--elevation-1)' } : { color: 'var(--color-on-surface-variant)' }}>
-                  <Icon className="h-4 w-4 mr-3" />
+                <GlassButton
+                  key={item.id}
+                  onClick={() => handlePageChange(item.id)}
+                  size="default"
+                  className={`w-full ${isActive ? 'glass-button-primary' : 'glass-button-secondary'}`}
+                  contentClassName="flex items-center justify-center gap-3"
+                >
+                  <Icon className="h-4 w-4" />
                   {item.label}
-                </button>
+                </GlassButton>
               );
             })}
           </div>
         </div>
       )}
-      <nav className="hidden lg:block surface-nav p-2" style={{ boxShadow: 'none', backgroundColor: 'var(--surface-page)' }}>
+      <nav className="hidden lg:block surface-nav p-2 shrink-0" style={{ boxShadow: 'none', backgroundColor: 'var(--surface-page)' }}>
         <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-center items-center">
           <PillBase
             items={pillNavItems}
@@ -280,7 +288,7 @@ function MainApp() {
           />
         </div>
       </nav>
-      <main className="surface-container max-w-7xl mx-auto my-8 sm:my-12 px-4 sm:px-6 lg:px-8">
+      <main className="surface-container flex-1 max-w-7xl mx-auto my-8 sm:my-12 px-4 sm:px-6 lg:px-8 w-full">
         {renderPage()}
       </main>
     </div>

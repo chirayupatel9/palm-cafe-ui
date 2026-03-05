@@ -26,6 +26,7 @@ import { TableSkeleton } from './ui/Skeleton';
 import Select from './ui/Select';
 import { EmptyCustomers } from './ui/EmptyState';
 import Dialog from './ui/Dialog';
+import { GlassButton } from './ui/GlassButton';
 
 const CustomerManagement: React.FC = () => {
   const { isAuthenticated, user, loading: authLoading } = useAuth();
@@ -244,12 +245,13 @@ const CustomerManagement: React.FC = () => {
         <p className="text-gray-600 dark:text-gray-400 text-center mb-4">
           You need to be logged in to access customer management.
         </p>
-        <button
+        <GlassButton
           onClick={() => window.location.href = '/login'}
-          className="btn-primary"
+          size="default"
+          className="glass-button-primary"
         >
           Go to Login
-        </button>
+        </GlassButton>
       </div>
     );
   }
@@ -261,18 +263,18 @@ const CustomerManagement: React.FC = () => {
           title="Users"
           description="Loading customers..."
         />
-        <div className="card">
+        <div className="glass-card overflow-hidden rounded-2xl">
           <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-              <thead className="bg-gray-50 dark:bg-gray-700">
-                <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-300">Customer</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-300">Contact</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-300">Loyalty</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-300">Visits</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-300">Total Spent</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-300">Status</th>
-                  <th className="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-300">Actions</th>
+            <table className="min-w-full divide-y divide-[var(--color-outline)]/30">
+              <thead>
+                <tr className="text-left text-xs font-semibold uppercase tracking-wider bg-[var(--surface-table)]/60 text-[var(--color-on-surface)]">
+                  <th className="px-6 py-3.5">Customer</th>
+                  <th className="px-6 py-3.5">Contact</th>
+                  <th className="px-6 py-3.5">Loyalty</th>
+                  <th className="px-6 py-3.5">Visits</th>
+                  <th className="px-6 py-3.5">Total Spent</th>
+                  <th className="px-6 py-3.5">Status</th>
+                  <th className="px-6 py-3.5 text-right">Actions</th>
                 </tr>
               </thead>
               <TableSkeleton rows={5} columns={7} />
@@ -289,6 +291,7 @@ const CustomerManagement: React.FC = () => {
       <PageHeader
         title="Users"
         description={`Manage customers and loyalty program. Total: ${customers.length}`}
+        icon={Users}
         primaryAction={() => setShowAddModal(true)}
         primaryActionLabel="Add Customer"
         primaryActionIcon={Plus}
@@ -297,7 +300,7 @@ const CustomerManagement: React.FC = () => {
       {/* Statistics Cards */}
       {statistics && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <div className="card">
+          <div className="glass-card p-5">
             <div className="flex items-center">
               <div className="p-2 rounded-lg bg-[var(--color-primary-container)]">
                 <Users className="h-6 w-6" style={{ color: 'var(--color-primary)' }} />
@@ -308,7 +311,7 @@ const CustomerManagement: React.FC = () => {
               </div>
             </div>
           </div>
-          <div className="card">
+          <div className="glass-card p-5">
             <div className="flex items-center">
               <div className="p-2 rounded-lg bg-[var(--color-primary-container)]">
                 <UserCheck className="h-6 w-6" style={{ color: 'var(--color-success)' }} />
@@ -319,7 +322,7 @@ const CustomerManagement: React.FC = () => {
               </div>
             </div>
           </div>
-          <div className="card">
+          <div className="glass-card p-5">
             <div className="flex items-center">
               <div className="p-2 rounded-lg bg-[var(--color-primary-container)]">
                 <Star className="h-6 w-6" style={{ color: 'var(--color-warning)' }} />
@@ -330,7 +333,7 @@ const CustomerManagement: React.FC = () => {
               </div>
             </div>
           </div>
-          <div className="card">
+          <div className="glass-card p-5">
             <div className="flex items-center">
               <div className="p-2 rounded-lg bg-[var(--color-primary-container)]">
                 <TrendingUp className="h-6 w-6" style={{ color: 'var(--color-primary)' }} />
@@ -345,109 +348,69 @@ const CustomerManagement: React.FC = () => {
       )}
 
       {/* Search and Filters */}
-      <div className="card">
-        <div className="flex flex-col sm:flex-row gap-4">
-          <div className="flex-1 relative">
-            <Search className={`absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 pointer-events-none ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`} />
+      <div className="glass-card p-4 rounded-2xl w-full relative z-10">
+        <div className="flex flex-col sm:flex-row sm:items-center gap-4 w-full">
+          <div className="flex-1 min-w-0 relative flex items-center">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 pointer-events-none text-[var(--color-on-surface-variant)]" aria-hidden />
             <input
               type="text"
               placeholder="Search customers by name, email, or phone..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               onKeyPress={(e) => e.key === 'Enter' && searchCustomers(searchQuery)}
-              className="input-field pl-12"
+              className="glass-input input-field pl-12 h-11 rounded-xl w-full border border-[var(--color-outline-variant)] bg-[var(--surface-card)] text-[var(--color-on-surface)] placeholder-[var(--color-on-surface-variant)]"
             />
           </div>
-          
-          <div className="max-w-[180px]">
-            <Select
-              options={[
-                { value: 'all', label: 'All Customers' },
-                { value: 'active', label: 'Active Only' },
-                { value: 'inactive', label: 'Inactive Only' }
-              ]}
-              value={filterActive}
-              onChange={setFilterActive}
-              placeholder="All Customers"
-            />
+          <div className="flex flex-col sm:flex-row sm:items-center gap-3 shrink-0">
+            <div className="w-full sm:w-[180px] [&_.select-trigger-glass-hover]:h-11 [&_.select-trigger-glass-hover]:rounded-xl">
+              <Select
+                options={[
+                  { value: 'all', label: 'All Customers' },
+                  { value: 'active', label: 'Active Only' },
+                  { value: 'inactive', label: 'Inactive Only' }
+                ]}
+                value={filterActive}
+                onChange={setFilterActive}
+                placeholder="All Customers"
+                className="select-trigger-glass select-trigger-glass-hover w-full"
+              />
+            </div>
+            <button
+              type="button"
+              onClick={() => searchCustomers(searchQuery)}
+              className="h-11 px-5 rounded-xl shrink-0 font-medium text-[var(--color-on-surface)] border border-[var(--color-outline-variant)] bg-[var(--surface-card)] hover:bg-[var(--color-outline-variant)]/20 transition-colors select-trigger-glass select-trigger-glass-hover"
+            >
+              Search
+            </button>
           </div>
-          
-          <button
-            onClick={() => searchCustomers(searchQuery)}
-            className="btn-secondary"
-          >
-            Search
-          </button>
         </div>
       </div>
 
-      {/* Customers List */}
-      <div className="card">
+      {/* Customers List – same glass as Menu/Categories */}
+      <div className="glass-card overflow-hidden rounded-2xl shadow-sm">
         {filteredCustomers.length === 0 ? (
-          <EmptyCustomers />
+          <div className="p-6">
+            <EmptyCustomers />
+          </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="min-w-full" style={{ borderCollapse: 'separate', borderSpacing: 0 }}>
-              <thead style={{ backgroundColor: 'var(--surface-table)' }}>
-                <tr>
-                  <th className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-semibold uppercase tracking-wider whitespace-nowrap" style={{ 
-                    color: 'var(--color-on-surface-variant)',
-                    borderBottom: '2px solid var(--color-outline)'
-                  }}>
-                    Customer
-                  </th>
-                  <th className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-semibold uppercase tracking-wider whitespace-nowrap" style={{ 
-                    color: 'var(--color-on-surface-variant)',
-                    borderBottom: '2px solid var(--color-outline)'
-                  }}>
-                    Contact
-                  </th>
-                  <th className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-semibold uppercase tracking-wider whitespace-nowrap" style={{ 
-                    color: 'var(--color-on-surface-variant)',
-                    borderBottom: '2px solid var(--color-outline)'
-                  }}>
-                    Loyalty
-                  </th>
-                  <th className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-semibold uppercase tracking-wider whitespace-nowrap" style={{ 
-                    color: 'var(--color-on-surface-variant)',
-                    borderBottom: '2px solid var(--color-outline)'
-                  }}>
-                    Visits
-                  </th>
-                  <th className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-semibold uppercase tracking-wider whitespace-nowrap" style={{ 
-                    color: 'var(--color-on-surface-variant)',
-                    borderBottom: '2px solid var(--color-outline)'
-                  }}>
-                    Total Spent
-                  </th>
-                  <th className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-semibold uppercase tracking-wider whitespace-nowrap" style={{ 
-                    color: 'var(--color-on-surface-variant)',
-                    borderBottom: '2px solid var(--color-outline)'
-                  }}>
-                    Status
-                  </th>
-                  <th className="px-6 py-4 text-right text-xs font-semibold uppercase tracking-wider" style={{ 
-                    color: 'var(--color-on-surface-variant)',
-                    borderBottom: '2px solid var(--color-outline)'
-                  }}>
-                    Actions
-                  </th>
+            <table className="min-w-full">
+              <thead>
+                <tr className="text-left text-xs font-semibold uppercase tracking-wider bg-[var(--surface-table)]/60 text-[var(--color-on-surface)]">
+                  <th className="px-3 sm:px-6 py-3.5 rounded-tl-lg whitespace-nowrap">Customer</th>
+                  <th className="px-3 sm:px-6 py-3.5 whitespace-nowrap">Contact</th>
+                  <th className="px-3 sm:px-6 py-3.5 whitespace-nowrap">Loyalty</th>
+                  <th className="px-3 sm:px-6 py-3.5 whitespace-nowrap">Visits</th>
+                  <th className="px-3 sm:px-6 py-3.5 whitespace-nowrap">Total Spent</th>
+                  <th className="px-3 sm:px-6 py-3.5 whitespace-nowrap">Status</th>
+                  <th className="px-6 py-3.5 text-right rounded-tr-lg">Actions</th>
                 </tr>
               </thead>
-              <tbody style={{ backgroundColor: 'var(--surface-card)' }}>
+              <tbody className="divide-y divide-[var(--color-outline)]/30">
                 {filteredCustomers.map((customer) => (
-                  <tr 
-                    key={customer.id} 
-                    className="h-14 transition-surface"
-                    style={{ 
-                      borderBottom: '1px solid var(--color-outline-variant)'
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.backgroundColor = 'var(--surface-table)';
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.backgroundColor = 'var(--surface-card)';
-                    }}
+                  <tr
+                    key={customer.id}
+                    className="h-14 transition-colors hover:bg-[var(--surface-table)]/50"
                   >
                     <td className="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap">
                       <div className="flex items-center">
@@ -463,24 +426,24 @@ const CustomerManagement: React.FC = () => {
                           </div>
                         </div>
                         <div className="ml-4">
-                          <div className={`text-sm font-medium ${isDarkMode ? 'text-gray-100' : 'text-gray-900'}`}>{customer.name}</div>
-                          <div className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                          <div className="text-sm font-medium text-[var(--color-on-surface)]">{customer.name}</div>
+                          <div className="text-sm text-[var(--color-on-surface-variant)]">
                             Member since {formatDate(customer.first_visit_date)}
                           </div>
                         </div>
                       </div>
                     </td>
                     <td className="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap">
-                      <div className={`text-sm ${isDarkMode ? 'text-gray-100' : 'text-gray-900'}`}>
+                      <div className="text-sm text-[var(--color-on-surface)]">
                         {customer.phone && (
                           <div className="flex items-center mb-1">
-                            <Phone className={`h-3 w-3 mr-1 ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`} />
+                            <Phone className="h-3 w-3 mr-1 text-[var(--color-on-surface-variant)]" />
                             {customer.phone}
                           </div>
                         )}
                         {customer.email && (
                           <div className="flex items-center">
-                            <Mail className={`h-3 w-3 mr-1 ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`} />
+                            <Mail className="h-3 w-3 mr-1 text-[var(--color-on-surface-variant)]" />
                             {customer.email}
                           </div>
                         )}
@@ -489,44 +452,47 @@ const CustomerManagement: React.FC = () => {
                     <td className="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap">
                       <div className="flex items-center">
                         <Star className="h-4 w-4 text-yellow-500 mr-1" />
-                        <span className={`text-sm font-medium ${isDarkMode ? 'text-gray-100' : 'text-gray-900'}`}>
+                        <span className="text-sm font-medium text-[var(--color-on-surface)]">
                           {customer.loyalty_points} pts
                         </span>
                       </div>
                       {customer.loyalty_points >= 100 && (
-                        <button
+                        <GlassButton
                           onClick={() => handleRedeemPoints(customer.id, 100)}
-                          className={`text-xs ${isDarkMode ? 'text-secondary-400 hover:text-secondary-300' : 'text-secondary-600 hover:text-secondary-800'}`}
+                          size="sm"
+                          className="glass-button-secondary mt-1"
                         >
                           Redeem 100 pts
-                        </button>
+                        </GlassButton>
                       )}
                     </td>
-                    <td className={`px-6 py-4 whitespace-nowrap text-sm ${isDarkMode ? 'text-gray-100' : 'text-gray-900'}`}>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-[var(--color-on-surface)]">
                       {customer.visit_count} visits
                     </td>
-                    <td className={`px-6 py-4 whitespace-nowrap text-sm ${isDarkMode ? 'text-gray-100' : 'text-gray-900'}`}>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-[var(--color-on-surface)]">
                       {formatCurrency(customer.total_spent)}
                     </td>
                     <td className="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap">
                       {getStatusIcon(customer.is_active)}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                      <div className="flex items-center justify-end space-x-2">
-                        <button
+                      <div className="flex items-center justify-end gap-1.5">
+                        <GlassButton
                           onClick={() => handleViewOrders(customer)}
-                          className={`${isDarkMode ? 'text-secondary-400 hover:text-secondary-300' : 'text-secondary-600 hover:text-secondary-900'}`}
+                          size="icon"
+                          className="glass-button-secondary [&_.glass-button]:!min-w-[36px] [&_.glass-button]:!h-9 [&_.glass-button-text]:!min-w-[36px] [&_.glass-button-text]:!h-9"
                           title="View Orders"
                         >
                           <Calendar className="h-4 w-4" />
-                        </button>
-                        <button
+                        </GlassButton>
+                        <GlassButton
                           onClick={() => handleEdit(customer)}
-                          className={`${isDarkMode ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-900'}`}
+                          size="icon"
+                          className="glass-button-secondary [&_.glass-button]:!min-w-[36px] [&_.glass-button]:!h-9 [&_.glass-button-text]:!min-w-[36px] [&_.glass-button-text]:!h-9"
                           title="Edit Customer"
                         >
                           <Edit className="h-4 w-4" />
-                        </button>
+                        </GlassButton>
                       </div>
                     </td>
                   </tr>
@@ -604,16 +570,17 @@ const CustomerManagement: React.FC = () => {
               </div>
               
               <div className="flex justify-end space-x-3 mt-6">
-                <button
+                <GlassButton
                   type="button"
                   onClick={() => setShowAddModal(false)}
-                  className="btn-secondary"
+                  size="default"
+                  className="glass-button-secondary"
                 >
                   Cancel
-                </button>
-                <button type="submit" className="btn-primary">
+                </GlassButton>
+                <GlassButton type="submit" size="default" className="glass-button-primary">
                   Add Customer
-                </button>
+                </GlassButton>
               </div>
             </form>
       </Dialog>
@@ -702,16 +669,17 @@ const CustomerManagement: React.FC = () => {
               </div>
               
               <div className="flex justify-end space-x-3 mt-6">
-                <button
+                <GlassButton
                   type="button"
                   onClick={() => setShowEditModal(false)}
-                  className="btn-secondary"
+                  size="default"
+                  className="glass-button-secondary"
                 >
                   Cancel
-                </button>
-                <button type="submit" className="btn-primary">
+                </GlassButton>
+                <GlassButton type="submit" size="default" className="glass-button-primary">
                   Update Customer
-                </button>
+                </GlassButton>
               </div>
             </form>
         )}
@@ -733,7 +701,7 @@ const CustomerManagement: React.FC = () => {
                 {orderHistory.map((order) => (
                   <div
                     key={order.id}
-                    className="card card-sm cursor-pointer"
+                    className="glass-card p-4 rounded-xl cursor-pointer"
                     onClick={() => viewOrderDetails(order)}
                   >
                     <div className="flex justify-between items-start mb-2">
@@ -816,16 +784,13 @@ const CustomerManagement: React.FC = () => {
                       {formatCurrency(selectedOrder.final_amount)}
                     </p>
                   </div>
-                  <button
+                  <GlassButton
                     onClick={() => setShowOrderDetailsModal(false)}
-                    className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
-                      isDarkMode 
-                        ? 'text-gray-300 bg-gray-700 hover:bg-gray-600' 
-                        : 'text-gray-700 bg-gray-100 hover:bg-gray-200'
-                    }`}
+                    size="default"
+                    className="glass-button-secondary"
                   >
                     Close
-                  </button>
+                  </GlassButton>
                 </div>
               </div>
             </>

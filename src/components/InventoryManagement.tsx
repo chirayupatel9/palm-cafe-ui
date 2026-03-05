@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Plus, Edit, Trash2, Package, AlertTriangle, TrendingUp, TrendingDown, Search, Filter, Download, Upload, FileSpreadsheet } from 'lucide-react';
 import axios from 'axios';
 import toast from 'react-hot-toast';
@@ -11,6 +11,7 @@ import { getImageUrl } from '../utils/imageUtils';
 import LockedFeature from './ui/LockedFeature';
 import Select from './ui/Select';
 import Dialog from './ui/Dialog';
+import { GlassButton } from './ui/GlassButton';
 
 const InventoryManagement: React.FC = () => {
   const { formatCurrency } = useCurrency();
@@ -27,6 +28,7 @@ const InventoryManagement: React.FC = () => {
   const [categories, setCategories] = useState([]);
   const [importing, setImporting] = useState(false);
   const [importResults, setImportResults] = useState(null);
+  const importInputRef = useRef(null);
 
   const [formData, setFormData] = useState({
     name: '',
@@ -337,12 +339,13 @@ const InventoryManagement: React.FC = () => {
         <p className={`${isDarkMode ? 'text-gray-400' : 'text-gray-600'} text-center mb-4`}>
           You need to be logged in to access the inventory management system.
         </p>
-        <button
+        <GlassButton
           onClick={() => window.location.href = '/login'}
-          className="btn-primary"
+          size="default"
+          className="glass-button-primary"
         >
           Go to Login
-        </button>
+        </GlassButton>
       </div>
     );
   }
@@ -350,116 +353,122 @@ const InventoryManagement: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center">
-          {cafeSettings.logo_url ? (
-            <img 
-              src={getImageUrl(cafeSettings.logo_url)} 
-              alt={`${cafeSettings.cafe_name || 'Cafe'} Logo`} 
-              className="h-12 w-12 mr-4"
-            />
-          ) : (
-            <div className="h-12 w-12 mr-4 bg-primary rounded flex items-center justify-center text-on-primary font-bold">
-              {cafeSettings.cafe_name ? cafeSettings.cafe_name.charAt(0).toUpperCase() : 'C'}
-            </div>
-          )}
-          <div>
-            <h1 className={`text-2xl font-bold ${isDarkMode ? 'text-gray-100' : 'text-secondary-700'}`}>Inventory Management</h1>
-            <p className={isDarkMode ? 'text-gray-400' : 'text-gray-600'}>Track stock levels, set reorder points, and manage suppliers</p>
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div className="flex items-center gap-3 min-w-0">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[var(--color-primary-container)]">
+            <Package className="h-6 w-6 text-[var(--color-primary)]" />
+          </div>
+          <div className="min-w-0">
+            <h1 className="text-2xl font-bold text-[var(--color-on-surface)] truncate">Inventory Management</h1>
+            <p className="text-sm text-[var(--color-on-surface-variant)] mt-1">Track stock levels, set reorder points, and manage suppliers</p>
           </div>
         </div>
         <div className="flex items-center space-x-2">
-          <button
+          <GlassButton
             onClick={handleDownloadTemplate}
-            className="btn-secondary flex items-center"
+            size="sm"
+            className="glass-button-secondary"
+            contentClassName="flex items-center gap-2"
             title="Download Import Template"
           >
-            <FileSpreadsheet className="h-4 w-4 mr-2" />
+            <FileSpreadsheet className="h-4 w-4" />
             Template
-          </button>
+          </GlassButton>
           
-          <label className={`btn-secondary flex items-center cursor-pointer ${importing ? 'opacity-50 cursor-not-allowed' : ''}`}>
+          <input
+            ref={importInputRef}
+            type="file"
+            accept=".xlsx,.xls"
+            onChange={handleImport}
+            className="hidden"
+            disabled={importing}
+          />
+          <GlassButton
+            onClick={() => importInputRef.current?.click()}
+            size="sm"
+            className="glass-button-secondary"
+            contentClassName="flex items-center gap-2"
+            title="Import from Excel"
+            disabled={importing}
+          >
             {importing ? (
-              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current" />
             ) : (
-              <Upload className="h-4 w-4 mr-2" />
+              <Upload className="h-4 w-4" />
             )}
             {importing ? 'Importing...' : 'Import'}
-            <input
-              type="file"
-              accept=".xlsx,.xls"
-              onChange={handleImport}
-              className="hidden"
-              disabled={importing}
-            />
-          </label>
+          </GlassButton>
           
-          <button
+          <GlassButton
             onClick={handleExport}
-            className="btn-secondary flex items-center"
+            size="sm"
+            className="glass-button-secondary"
+            contentClassName="flex items-center gap-2"
             title="Export to Excel"
           >
-            <Download className="h-4 w-4 mr-2" />
+            <Download className="h-4 w-4" />
             Export
-          </button>
+          </GlassButton>
           
-          <button
+          <GlassButton
             onClick={() => {
               setShowAddForm(true);
               setEditingItem(null);
               resetForm();
             }}
-            className="btn-primary flex items-center"
+            size="sm"
+            className="glass-button-primary"
+            contentClassName="flex items-center gap-2"
           >
-            <Plus className="h-4 w-4 mr-2" />
+            <Plus className="h-4 w-4" />
             Add Item
-          </button>
+          </GlassButton>
         </div>
       </div>
 
       {/* Statistics Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="card">
+        <div className="glass-card p-5 rounded-2xl">
           <div className="flex items-center">
             <div className="p-2 rounded-lg bg-[var(--color-primary-container)]">
               <Package className="h-6 w-6" style={{ color: 'var(--color-primary)' }} />
             </div>
             <div className="ml-4">
-              <p className="text-sm font-medium text-body-muted">Total Items</p>
-              <p className="text-2xl font-bold text-on-surface">{stats.totalItems}</p>
+              <p className="text-sm font-medium text-[var(--color-on-surface-variant)]">Total Items</p>
+              <p className="text-2xl font-bold text-[var(--color-on-surface)]">{stats.totalItems}</p>
             </div>
           </div>
         </div>
-        <div className="card">
+        <div className="glass-card p-5 rounded-2xl">
           <div className="flex items-center">
             <div className="p-2 rounded-lg bg-[var(--color-primary-container)]">
               <AlertTriangle className="h-6 w-6" style={{ color: 'var(--color-warning)' }} />
             </div>
             <div className="ml-4">
-              <p className="text-sm font-medium text-body-muted">Low Stock</p>
-              <p className="text-2xl font-bold text-on-surface">{stats.lowStockItems}</p>
+              <p className="text-sm font-medium text-[var(--color-on-surface-variant)]">Low Stock</p>
+              <p className="text-2xl font-bold text-[var(--color-on-surface)]">{stats.lowStockItems}</p>
             </div>
           </div>
         </div>
-        <div className="card">
+        <div className="glass-card p-5 rounded-2xl">
           <div className="flex items-center">
             <div className="p-2 rounded-lg bg-[var(--color-primary-container)]">
               <AlertTriangle className="h-6 w-6" style={{ color: 'var(--color-error)' }} />
             </div>
             <div className="ml-4">
-              <p className="text-sm font-medium text-body-muted">Out of Stock</p>
-              <p className="text-2xl font-bold text-on-surface">{stats.outOfStockItems}</p>
+              <p className="text-sm font-medium text-[var(--color-on-surface-variant)]">Out of Stock</p>
+              <p className="text-2xl font-bold text-[var(--color-on-surface)]">{stats.outOfStockItems}</p>
             </div>
           </div>
         </div>
-        <div className="card">
+        <div className="glass-card p-5 rounded-2xl">
           <div className="flex items-center">
             <div className="p-2 rounded-lg bg-[var(--color-primary-container)]">
               <TrendingUp className="h-6 w-6" style={{ color: 'var(--color-success)' }} />
             </div>
             <div className="ml-4">
-              <p className="text-sm font-medium text-body-muted">Total Value</p>
-              <p className="text-2xl font-bold text-on-surface">{formatCurrency(stats.totalValue)}</p>
+              <p className="text-sm font-medium text-[var(--color-on-surface-variant)]">Total Value</p>
+              <p className="text-2xl font-bold text-[var(--color-on-surface)]">{formatCurrency(stats.totalValue)}</p>
             </div>
           </div>
         </div>
@@ -467,26 +476,26 @@ const InventoryManagement: React.FC = () => {
 
       {/* Import Results */}
       {importResults && (
-        <div className="card">
-          <h3 className="text-lg font-semibold mb-3 text-on-surface">Import Results</h3>
+        <div className="glass-card p-5 rounded-2xl">
+          <h3 className="text-lg font-semibold mb-3 text-[var(--color-on-surface)]">Import Results</h3>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
             <div className="text-center">
               <div className="text-2xl font-bold text-blue-600">{importResults.total}</div>
-              <div className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Total Rows</div>
+              <div className="text-sm text-[var(--color-on-surface-variant)]">Total Rows</div>
             </div>
             <div className="text-center">
               <div className="text-2xl font-bold text-green-600">{importResults.successful}</div>
-              <div className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Successful</div>
+              <div className="text-sm text-[var(--color-on-surface-variant)]">Successful</div>
             </div>
             <div className="text-center">
               <div className="text-2xl font-bold text-red-600">{importResults.failed}</div>
-              <div className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Failed</div>
+              <div className="text-sm text-[var(--color-on-surface-variant)]">Failed</div>
             </div>
             <div className="text-center">
-              <div className={`text-2xl font-bold ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+              <div className="text-2xl font-bold text-[var(--color-on-surface)]">
                 {importResults.total > 0 ? Math.round((importResults.successful / importResults.total) * 100) : 0}%
               </div>
-              <div className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Success Rate</div>
+              <div className="text-sm text-[var(--color-on-surface-variant)]">Success Rate</div>
             </div>
           </div>
           
@@ -503,31 +512,32 @@ const InventoryManagement: React.FC = () => {
             </div>
           )}
           
-          <button
+          <GlassButton
             onClick={() => setImportResults(null)}
-            className="mt-3 btn-secondary"
+            size="default"
+            className="mt-3 glass-button-secondary"
           >
             Close
-          </button>
+          </GlassButton>
         </div>
       )}
 
       {/* Search and Filter */}
-      <div className="card">
-        <div className="flex flex-col sm:flex-row gap-4">
-          <div className="flex-1">
-            <div className="relative">
-              <Search className={`absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 pointer-events-none ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`} />
+      <div className="glass-card p-4 rounded-2xl w-full relative z-10">
+        <div className="flex flex-col sm:flex-row sm:items-center gap-4 w-full">
+          <div className="flex-1 min-w-0">
+            <div className="relative flex items-center">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 pointer-events-none text-[var(--color-on-surface-variant)]" aria-hidden />
               <input
                 type="text"
                 placeholder="Search inventory items..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="input-field pl-12"
+                className="glass-input w-full pl-12 h-11 rounded-xl border border-[var(--color-outline-variant)] bg-[var(--surface-card)] text-[var(--color-on-surface)] placeholder-[var(--color-on-surface-variant)]"
               />
             </div>
           </div>
-          <div className="sm:w-48">
+          <div className="w-full sm:w-48 shrink-0 [&_.select-trigger-glass-hover]:h-11 [&_.select-trigger-glass-hover]:rounded-xl">
             <Select
               options={[
                 { value: 'all', label: 'All Categories' },
@@ -536,6 +546,7 @@ const InventoryManagement: React.FC = () => {
               value={filterCategory}
               onChange={setFilterCategory}
               placeholder="All Categories"
+              className="select-trigger-glass select-trigger-glass-hover w-full rounded-xl"
             />
           </div>
         </div>
@@ -543,8 +554,8 @@ const InventoryManagement: React.FC = () => {
 
       {/* Add Form - only when adding, not when editing (edit uses modal) */}
       {showAddForm && !editingItem && (
-        <div className="card">
-          <h2 className={`text-lg font-semibold mb-4 ${isDarkMode ? 'text-gray-100' : 'text-gray-900'}`}>
+        <div className="glass-card p-5 rounded-2xl">
+          <h2 className="text-lg font-semibold mb-4 text-[var(--color-on-surface)]">
             {editingItem ? 'Edit Inventory Item' : 'Add New Inventory Item'}
           </h2>
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -659,86 +670,60 @@ const InventoryManagement: React.FC = () => {
               />
             </div>
             <div className="flex justify-end space-x-3">
-              <button
+              <GlassButton
                 type="button"
                 onClick={() => {
                   setShowAddForm(false);
                   setEditingItem(null);
                   resetForm();
                 }}
-                className="btn-secondary"
+                size="default"
+                className="glass-button-secondary"
               >
                 Cancel
-              </button>
-              <button type="submit" className="btn-primary">
+              </GlassButton>
+              <GlassButton type="submit" size="default" className="glass-button-primary">
                 {editingItem ? 'Update Item' : 'Add Item'}
-              </button>
+              </GlassButton>
             </div>
           </form>
         </div>
       )}
 
       {/* Inventory Table */}
-      <div className="card">
+      <div className="glass-card overflow-hidden rounded-2xl shadow-sm">
         <div className="overflow-x-auto">
-          <table className={`min-w-full divide-y ${isDarkMode ? 'divide-gray-700' : 'divide-gray-200'}`}>
-            <thead style={{ backgroundColor: 'var(--surface-table)' }}>
-              <tr>
-                <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider" style={{ 
-                  color: 'var(--color-on-surface-variant)',
-                  borderBottom: '2px solid var(--color-outline)'
-                }}>Item</th>
-                <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider" style={{ 
-                  color: 'var(--color-on-surface-variant)',
-                  borderBottom: '2px solid var(--color-outline)'
-                }}>Category</th>
-                <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider" style={{ 
-                  color: 'var(--color-on-surface-variant)',
-                  borderBottom: '2px solid var(--color-outline)'
-                }}>Stock</th>
-                <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider" style={{ 
-                  color: 'var(--color-on-surface-variant)',
-                  borderBottom: '2px solid var(--color-outline)'
-                }}>Cost</th>
-                <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider" style={{ 
-                  color: 'var(--color-on-surface-variant)',
-                  borderBottom: '2px solid var(--color-outline)'
-                }}>Supplier</th>
-                <th className="px-6 py-4 text-right text-xs font-semibold uppercase tracking-wider" style={{ 
-                  color: 'var(--color-on-surface-variant)',
-                  borderBottom: '2px solid var(--color-outline)'
-                }}>Actions</th>
+          <table className="min-w-full">
+            <thead>
+              <tr className="bg-[var(--surface-table)]/60 text-[var(--color-on-surface)]">
+                <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider border-b border-[var(--color-outline)]/20">Item</th>
+                <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider border-b border-[var(--color-outline)]/20">Category</th>
+                <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider border-b border-[var(--color-outline)]/20">Stock</th>
+                <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider border-b border-[var(--color-outline)]/20">Cost</th>
+                <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider border-b border-[var(--color-outline)]/20">Supplier</th>
+                <th className="px-6 py-4 text-right text-xs font-semibold uppercase tracking-wider border-b border-[var(--color-outline)]/20">Actions</th>
               </tr>
             </thead>
-            <tbody style={{ backgroundColor: 'var(--surface-card)' }}>
+            <tbody className="divide-y divide-[var(--color-outline)]/30">
               {filteredInventory.map((item) => {
                 const stockStatus = getStockStatus(item.quantity, item.reorder_level);
                 const StatusIcon = stockStatus.icon;
                 
                 return (
-                  <tr 
-                    key={item.id} 
-                    className={`transition-surface ${editingItem?.id === item.id ? (isDarkMode ? '!bg-gray-700/50' : '!bg-gray-50') : ''}`}
-                    style={{ borderBottom: '1px solid var(--color-outline-variant)' }}
-                    onMouseEnter={(e) => {
-                      if (editingItem?.id !== item.id) e.currentTarget.style.backgroundColor = 'var(--surface-table)';
-                    }}
-                    onMouseLeave={(e) => {
-                      if (editingItem?.id !== item.id) e.currentTarget.style.backgroundColor = 'var(--surface-card)';
-                    }}
+                  <tr
+                    key={item.id}
+                    className={`hover:bg-[var(--surface-table)]/50 transition-colors ${editingItem?.id === item.id ? 'bg-[var(--surface-table)]/40' : ''}`}
                   >
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div>
-                        <div className={`text-sm font-medium ${isDarkMode ? 'text-gray-100' : 'text-gray-900'}`}>{item.name}</div>
+                        <div className="text-sm font-medium text-[var(--color-on-surface)]">{item.name}</div>
                         {item.description && (
-                          <div className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>{item.description}</div>
+                          <div className="text-sm text-[var(--color-on-surface-variant)]">{item.description}</div>
                         )}
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                        'transition-surface'
-                      }`}>
+                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium text-[var(--color-on-surface)]">
                         {item.category}
                       </span>
                     </td>
@@ -746,11 +731,11 @@ const InventoryManagement: React.FC = () => {
                       <div className="flex items-center">
                         <StatusIcon className={`h-4 w-4 mr-2 ${stockStatus.color}`} />
                         <div>
-                          <div className={`text-sm font-medium ${isDarkMode ? 'text-gray-100' : 'text-gray-900'}`}>
+                          <div className="text-sm font-medium text-[var(--color-on-surface)]">
                             {item.quantity} {item.unit}
                           </div>
                           {item.reorder_level && (
-                            <div className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                            <div className="text-xs text-[var(--color-on-surface-variant)]">
                               Reorder at: {item.reorder_level} {item.unit}
                             </div>
                           )}
@@ -758,29 +743,35 @@ const InventoryManagement: React.FC = () => {
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className={`text-sm ${isDarkMode ? 'text-gray-100' : 'text-gray-900'}`}>
+                      <div className="text-sm text-[var(--color-on-surface)]">
                         {item.cost_per_unit ? formatCurrency(item.cost_per_unit) : '-'}
                       </div>
-                      <div className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                      <div className="text-xs text-[var(--color-on-surface-variant)]">
                         Total: {formatCurrency(item.quantity * (item.cost_per_unit || 0))}
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className={`text-sm ${isDarkMode ? 'text-gray-100' : 'text-gray-900'}`}>{item.supplier || '-'}</div>
+                      <div className="text-sm text-[var(--color-on-surface)]">{item.supplier || '-'}</div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                      <button
-                        onClick={() => handleEdit(item)}
-                        className={`mr-3 ${isDarkMode ? 'text-blue-400 hover:text-blue-300' : 'text-secondary-600 hover:text-secondary-900'}`}
-                      >
-                        <Edit className="h-4 w-4" />
-                      </button>
-                      <button
-                        onClick={() => handleDelete(item.id)}
-                        className={`${isDarkMode ? 'text-red-400 hover:text-red-300' : 'text-red-600 hover:text-red-900'}`}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </button>
+                      <div className="flex items-center justify-end gap-1.5">
+                        <GlassButton
+                          onClick={() => handleEdit(item)}
+                          size="icon"
+                          className="glass-button-secondary [&_.glass-button]:!min-w-[36px] [&_.glass-button]:!h-9 [&_.glass-button-text]:!min-w-[36px] [&_.glass-button-text]:!h-9"
+                          title="Edit"
+                        >
+                          <Edit className="h-4 w-4" />
+                        </GlassButton>
+                        <GlassButton
+                          onClick={() => handleDelete(item.id)}
+                          size="icon"
+                          className="glass-button-destructive [&_.glass-button]:!min-w-[36px] [&_.glass-button]:!h-9 [&_.glass-button-text]:!min-w-[36px] [&_.glass-button-text]:!h-9"
+                          title="Delete"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </GlassButton>
+                      </div>
                     </td>
                   </tr>
                 );
@@ -790,10 +781,10 @@ const InventoryManagement: React.FC = () => {
         </div>
         
         {filteredInventory.length === 0 && (
-          <div className={`text-center py-8 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-            <Package className={`h-12 w-12 mx-auto mb-2 ${isDarkMode ? 'text-gray-600' : 'text-gray-300'}`} />
-            <p className="text-gray-600 dark:text-gray-400">Inventory items will appear here once you add them. Track stock levels, set reorder points, and manage suppliers for each item.</p>
-            <p className="text-sm">Add your first inventory item to get started</p>
+          <div className="text-center py-8 text-[var(--color-on-surface-variant)]">
+            <Package className="h-12 w-12 mx-auto mb-2 opacity-60" />
+            <p>Inventory items will appear here once you add them. Track stock levels, set reorder points, and manage suppliers for each item.</p>
+            <p className="text-sm mt-1">Add your first inventory item to get started</p>
           </div>
         )}
       </div>
@@ -918,12 +909,12 @@ const InventoryManagement: React.FC = () => {
               />
             </div>
             <div className="flex justify-end space-x-3 pt-4 border-t border-[var(--color-outline)]">
-              <button type="button" onClick={handleCloseEditModal} className="btn-secondary">
+              <GlassButton type="button" onClick={handleCloseEditModal} size="default" className="glass-button-secondary">
                 Cancel
-              </button>
-              <button type="submit" className="btn-primary">
+              </GlassButton>
+              <GlassButton type="submit" size="default" className="glass-button-primary">
                 Save
-              </button>
+              </GlassButton>
             </div>
           </form>
         )}

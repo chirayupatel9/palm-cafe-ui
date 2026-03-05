@@ -7,6 +7,7 @@ import { Users, Plus, Edit, Trash2, Search, Loader, AlertCircle } from 'lucide-r
 import LockedFeature from './ui/LockedFeature';
 import Dialog from './ui/Dialog';
 import Select from './ui/Select';
+import { GlassButton } from './ui/GlassButton';
 
 const CafeUserManagement: React.FC = () => {
   const { user: currentUser } = useAuth();
@@ -186,105 +187,95 @@ const CafeUserManagement: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-2xl font-bold text-secondary-700 dark:text-gray-100 flex items-center">
-            <Users className="h-6 w-6 mr-2" />
-            User Management
-          </h2>
-          <p className="text-sm text-secondary-500 dark:text-gray-400 mt-1">
-            Add team members, assign roles, and manage access permissions
-          </p>
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div className="flex items-center gap-3 min-w-0">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[var(--color-primary-container)]">
+            <Users className="h-6 w-6 text-[var(--color-primary)]" />
+          </div>
+          <div className="min-w-0">
+            <h1 className="text-2xl font-bold text-[var(--color-on-surface)] truncate">User Management</h1>
+            <p className="text-sm text-[var(--color-on-surface-variant)] mt-1">Add team members, assign roles, and manage access permissions</p>
+          </div>
         </div>
-        <button
+        <GlassButton
           onClick={() => setShowCreateModal(true)}
-          className="flex items-center space-x-2 bg-secondary-600 hover:bg-secondary-700 text-white px-4 py-2 rounded-lg transition-colors"
+          size="default"
+          className="glass-button-primary"
+          contentClassName="flex items-center gap-2"
         >
           <Plus className="h-4 w-4" />
-          <span>Add User</span>
-        </button>
+          Add User
+        </GlassButton>
       </div>
 
       {/* Search */}
-      <div className="card">
+      <div className="glass-card p-4 rounded-2xl">
         <div className="relative">
-          <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-secondary-400 pointer-events-none" />
+          <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-[var(--color-on-surface-variant)] pointer-events-none" />
           <input
             type="text"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             placeholder="Search users by username, email, or role..."
-            className="input-field pl-12"
+            className="glass-input w-full pl-12 rounded-xl border border-[var(--color-outline-variant)] bg-[var(--surface-card)] text-[var(--color-on-surface)] placeholder-[var(--color-on-surface-variant)] py-2.5"
           />
         </div>
       </div>
 
       {/* Users Table */}
-      <div className="card overflow-hidden p-0">
+      <div className="glass-card overflow-hidden rounded-2xl shadow-sm">
         <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-accent-200 dark:divide-gray-700">
-            <thead className="bg-accent-50 dark:bg-gray-700">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-secondary-500 dark:text-gray-300 uppercase tracking-wider">
-                  User
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-secondary-500 dark:text-gray-300 uppercase tracking-wider">
-                  Role
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-secondary-500 dark:text-gray-300 uppercase tracking-wider">
-                  Created
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-secondary-500 dark:text-gray-300 uppercase tracking-wider">
-                  Last Login
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-secondary-500 dark:text-gray-300 uppercase tracking-wider">
-                  Actions
-                </th>
+          <table className="min-w-full">
+            <thead>
+              <tr className="bg-[var(--surface-table)]/60 text-[var(--color-on-surface)]">
+                <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider border-b border-[var(--color-outline)]/20">User</th>
+                <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider border-b border-[var(--color-outline)]/20">Role</th>
+                <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider border-b border-[var(--color-outline)]/20">Created</th>
+                <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider border-b border-[var(--color-outline)]/20">Last Login</th>
+                <th className="px-6 py-4 text-right text-xs font-semibold uppercase tracking-wider border-b border-[var(--color-outline)]/20">Actions</th>
               </tr>
             </thead>
-            <tbody className="bg-white dark:bg-gray-800 divide-y divide-accent-200 dark:divide-gray-700">
+            <tbody className="divide-y divide-[var(--color-outline)]/30">
               {filteredUsers.map((user) => (
-                <tr key={user.id} className="hover:bg-accent-50 dark:hover:bg-gray-700">
+                <tr key={user.id} className="hover:bg-[var(--surface-table)]/50 transition-colors">
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div>
-                      <div className="text-sm font-medium text-secondary-900 dark:text-gray-100">
-                        {user.username}
-                      </div>
-                      <div className="text-sm text-secondary-500 dark:text-gray-400">
-                        {user.email}
-                      </div>
+                      <div className="text-sm font-medium text-[var(--color-on-surface)]">{user.username}</div>
+                      <div className="text-sm text-[var(--color-on-surface-variant)]">{user.email}</div>
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                      user.role === 'admin' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' :
+                      user.role === 'admin' ? 'bg-[var(--color-primary-container)] text-[var(--color-on-primary-container)]' :
                       user.role === 'chef' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' :
                       user.role === 'reception' ? 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200' :
-                      'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200'
+                      'bg-[var(--color-surface-variant)] text-[var(--color-on-surface-variant)]'
                     }`}>
                       {user.role}
                     </span>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-secondary-500 dark:text-gray-400">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-[var(--color-on-surface-variant)]">
                     {user.created_at ? new Date(user.created_at).toLocaleDateString() : '-'}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-secondary-500 dark:text-gray-400">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-[var(--color-on-surface-variant)]">
                     {user.last_login ? new Date(user.last_login).toLocaleDateString() : 'Never'}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                    <div className="flex items-center space-x-2">
-                      <button
+                    <div className="flex items-center justify-end gap-1.5">
+                      <GlassButton
                         onClick={() => handleEdit(user)}
-                        className="text-secondary-600 hover:text-secondary-900 dark:text-gray-400 dark:hover:text-gray-100"
+                        size="icon"
+                        className="glass-button-secondary [&_.glass-button]:!min-w-[36px] [&_.glass-button]:!h-9 [&_.glass-button-text]:!min-w-[36px] [&_.glass-button-text]:!h-9"
                         title="Edit user"
                       >
                         <Edit className="h-4 w-4" />
-                      </button>
+                      </GlassButton>
                       {user.id !== currentUser?.id && (
-                        <button
+                        <GlassButton
                           onClick={() => handleDelete(user.id)}
                           disabled={deletingUserId === user.id}
-                          className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 disabled:opacity-50"
+                          size="icon"
+                          className="glass-button-destructive [&_.glass-button]:!min-w-[36px] [&_.glass-button]:!h-9 [&_.glass-button-text]:!min-w-[36px] [&_.glass-button-text]:!h-9"
                           title="Disable user"
                         >
                           {deletingUserId === user.id ? (
@@ -292,7 +283,7 @@ const CafeUserManagement: React.FC = () => {
                           ) : (
                             <Trash2 className="h-4 w-4" />
                           )}
-                        </button>
+                        </GlassButton>
                       )}
                     </div>
                   </td>
@@ -303,7 +294,7 @@ const CafeUserManagement: React.FC = () => {
         </div>
 
         {filteredUsers.length === 0 && (
-          <div className="text-center py-12 text-secondary-500 dark:text-gray-400">
+          <div className="text-center py-12 text-[var(--color-on-surface-variant)]">
             <Users className="h-12 w-12 mx-auto mb-4 opacity-50" />
             <p>{searchTerm ? `No users found matching "${searchTerm}". Try a different search term.` : 'Team members will appear here once you add them. Add your first user to start managing access and permissions.'}</p>
           </div>
@@ -318,7 +309,7 @@ const CafeUserManagement: React.FC = () => {
       >
         <form onSubmit={handleCreate} className="space-y-4 pt-0">
               <div>
-                <label className="block text-sm font-medium text-secondary-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-[var(--color-on-surface)] mb-2">
                   Username <span className="text-red-500">*</span>
                 </label>
                 <input
@@ -332,7 +323,7 @@ const CafeUserManagement: React.FC = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-secondary-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-[var(--color-on-surface)] mb-2">
                   Email <span className="text-red-500">*</span>
                 </label>
                 <input
@@ -346,7 +337,7 @@ const CafeUserManagement: React.FC = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-secondary-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-[var(--color-on-surface)] mb-2">
                   Password <span className="text-red-500">*</span>
                 </label>
                 <input
@@ -364,7 +355,7 @@ const CafeUserManagement: React.FC = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-secondary-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-[var(--color-on-surface)] mb-2">
                   Role <span className="text-red-500">*</span>
                 </label>
                 <Select
@@ -376,26 +367,25 @@ const CafeUserManagement: React.FC = () => {
                   value={formData.role}
                   onChange={(v) => handleInputChange({ target: { name: 'role', value: v } })}
                   placeholder="Role"
+                  className="select-trigger-glass select-trigger-glass-hover"
                 />
               </div>
 
-              <div className="flex flex-col sm:flex-row justify-end gap-3 pt-4 border-t border-accent-200 dark:border-gray-700">
-                <button
+              <div className="flex flex-col sm:flex-row justify-end gap-3 pt-4 border-t border-[var(--color-outline)]/30">
+                <GlassButton
                   type="button"
                   onClick={() => {
                     setShowCreateModal(false);
                     setFormData({ username: '', email: '', password: '', role: 'admin' });
                   }}
-                  className="btn-secondary"
+                  size="default"
+                  className="glass-button-secondary"
                 >
                   Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="px-4 py-2 min-h-[44px] bg-secondary-600 hover:bg-secondary-700 text-white rounded-lg transition-colors"
-                >
+                </GlassButton>
+                <GlassButton type="submit" size="default" className="glass-button-primary">
                   Add User
-                </button>
+                </GlassButton>
               </div>
             </form>
       </Dialog>
@@ -409,7 +399,7 @@ const CafeUserManagement: React.FC = () => {
         {showEditModal && editingUser && (
             <form onSubmit={handleUpdate} className="space-y-4 pt-0">
               <div>
-                <label className="block text-sm font-medium text-secondary-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-[var(--color-on-surface)] mb-2">
                   Username <span className="text-red-500">*</span>
                 </label>
                 <input
@@ -423,7 +413,7 @@ const CafeUserManagement: React.FC = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-secondary-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-[var(--color-on-surface)] mb-2">
                   Email <span className="text-red-500">*</span>
                 </label>
                 <input
@@ -437,7 +427,7 @@ const CafeUserManagement: React.FC = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-secondary-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-[var(--color-on-surface)] mb-2">
                   Password (leave blank to keep current)
                 </label>
                 <input
@@ -448,13 +438,13 @@ const CafeUserManagement: React.FC = () => {
                   minLength={12}
                   className="input-field"
                 />
-                <p className="text-xs text-secondary-500 dark:text-gray-400 mt-1">
+                <p className="text-xs text-[var(--color-on-surface-variant)] mt-1">
                   Leave blank to keep current password
                 </p>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-secondary-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-[var(--color-on-surface)] mb-2">
                   Role <span className="text-red-500">*</span>
                 </label>
                 <Select
@@ -466,27 +456,26 @@ const CafeUserManagement: React.FC = () => {
                   value={formData.role}
                   onChange={(v) => handleInputChange({ target: { name: 'role', value: v } })}
                   placeholder="Role"
+                  className="select-trigger-glass select-trigger-glass-hover"
                 />
               </div>
 
-              <div className="flex flex-col sm:flex-row justify-end gap-3 pt-4 border-t border-accent-200 dark:border-gray-700">
-                <button
+              <div className="flex flex-col sm:flex-row justify-end gap-3 pt-4 border-t border-[var(--color-outline)]/30">
+                <GlassButton
                   type="button"
                   onClick={() => {
                     setShowEditModal(false);
                     setEditingUser(null);
                     setFormData({ username: '', email: '', password: '', role: 'admin' });
                   }}
-                  className="btn-secondary"
+                  size="default"
+                  className="glass-button-secondary"
                 >
                   Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="px-4 py-2 min-h-[44px] bg-secondary-600 hover:bg-secondary-700 text-white rounded-lg transition-colors"
-                >
+                </GlassButton>
+                <GlassButton type="submit" size="default" className="glass-button-primary">
                   Update User
-                </button>
+                </GlassButton>
               </div>
             </form>
         )}

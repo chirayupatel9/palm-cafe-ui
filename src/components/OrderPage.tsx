@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { Plus, Minus, Trash2, Receipt, ShoppingCart, FolderOpen, Star, ShoppingBag } from 'lucide-react';
+import { Plus, Minus, Trash2, Receipt, ShoppingCart, FolderOpen, Star, ShoppingBag, BarChart3 } from 'lucide-react';
 import Dialog from './ui/Dialog';
 import Sheet from './ui/Sheet';
 import axios from 'axios';
@@ -389,7 +389,7 @@ const OrderPage: React.FC<OrderPageProps> = ({ menuItems, cart: externalCart, se
   const total = getTotal();
 
   return (
-    <div className="min-h-screen pt-6 pb-6 sm:pt-8 sm:pb-8 px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto surface-page">
+    <>
       {/* Invoice prompt - Template Dialog */}
       <Dialog open={showInvoicePrompt} onClose={() => setShowInvoicePrompt(false)} title="Complete order" maxHeight={false}>
         <p className="text-sm text-body-muted mb-6">Do you want to see the invoice?</p>
@@ -422,26 +422,26 @@ const OrderPage: React.FC<OrderPageProps> = ({ menuItems, cart: externalCart, se
       </Dialog>
 
       {/* Menu Items - full width; cart opens in right-side sheet */}
-      <div className="mb-6">
-        <div className="mb-8 sm:mb-12">
-          <span className="font-mono text-xs uppercase tracking-[0.2em] mb-2 block text-primary">Dashboard</span>
-          <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-on-surface">Create new orders</h2>
-          <p className="max-w-xl text-base sm:text-lg mt-2 leading-relaxed text-body-muted">
-            Manage your cafe operations. Add items to the cart and complete the order.
-          </p>
+      <div className="space-y-6">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[var(--color-primary-container)]">
+              <BarChart3 className="h-6 w-6 text-[var(--color-primary)]" />
+            </div>
+            <div className="min-w-0">
+              <h1 className="text-2xl font-bold text-[var(--color-on-surface)] truncate">Create new orders</h1>
+              <p className="text-sm text-[var(--color-on-surface-variant)] mt-1">Manage your cafe operations. Add items to the cart and complete the order.</p>
+            </div>
+          </div>
         </div>
 
         {Object.keys(groupedMenuItems).length === 0 ? (
           <div className="text-center py-16">
-            {cafeSettings.logo_url && (
-              <img
-                src={getImageUrl(cafeSettings.logo_url)}
-                alt={`${cafeSettings.cafe_name || 'Cafe'} Logo`}
-                className="h-24 w-24 mx-auto mb-6 opacity-50"
-              />
-            )}
-            <h3 className="text-xl font-semibold mb-2 text-on-surface">No menu items available</h3>
-            <p className="text-body-muted">Add items in Menu Management to get started</p>
+            <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-[var(--color-primary-container)] mx-auto mb-4">
+              <FolderOpen className="h-8 w-8 text-[var(--color-primary)]" />
+            </div>
+            <h3 className="text-xl font-semibold mb-2 text-[var(--color-on-surface)]">No menu items available</h3>
+            <p className="text-[var(--color-on-surface-variant)]">Add items in Menu Management to get started</p>
           </div>
         ) : (
           <div className="space-y-12 sm:space-y-16">
@@ -1007,7 +1007,7 @@ const OrderPage: React.FC<OrderPageProps> = ({ menuItems, cart: externalCart, se
               </button>
           </Sheet>
       )}
-    </div>
+    </>
   );
 };
 

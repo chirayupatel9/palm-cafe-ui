@@ -1,5 +1,6 @@
 import React from 'react';
 import { Plus, Search, Package, Users, ShoppingCart, FileText, Settings, LucideIcon } from 'lucide-react';
+import { GlassButton } from './GlassButton';
 
 export interface EmptyStateProps {
   icon?: LucideIcon;
@@ -28,10 +29,10 @@ const EmptyState: React.FC<EmptyStateProps> = ({
         <p className="text-sm text-gray-500 dark:text-gray-400 max-w-md mb-6">{description}</p>
       )}
       {action && actionLabel && (
-        <button onClick={action} className="btn-primary flex items-center justify-center">
-          <Plus className="h-4 w-4 mr-2" />
+        <GlassButton onClick={action} size="default" className="glass-button-primary" contentClassName="flex items-center gap-2">
+          <Plus className="h-4 w-4" />
           {actionLabel}
-        </button>
+        </GlassButton>
       )}
     </div>
   );

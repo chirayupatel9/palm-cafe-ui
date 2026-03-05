@@ -10,8 +10,7 @@ import {
   TrendingUp, BarChart3, Users, DollarSign, 
   ShoppingCart, Calendar, Loader, AlertCircle 
 } from 'lucide-react';
-import Card from './ui/Card';
-import Skeleton, { CardSkeleton } from './ui/Skeleton';
+import Skeleton from './ui/Skeleton';
 import LockedFeature from './ui/LockedFeature';
 import Select from './ui/Select';
 
@@ -82,7 +81,7 @@ const HighchartsBarChart: React.FC<HighchartsBarChartProps> = ({ data, labelKey 
 
   if (!data || data.length === 0) {
     return (
-      <div className="flex items-center justify-center h-48 rounded-xl text-secondary-500 dark:text-gray-400" style={{ backgroundColor: 'var(--color-surface-variant)' }}>
+      <div className="flex items-center justify-center h-48 rounded-xl text-[var(--color-on-surface-variant)]" style={{ backgroundColor: 'var(--color-surface-variant)' }}>
         <p>No data available</p>
       </div>
     );
@@ -161,7 +160,7 @@ const HighchartsLineChart: React.FC<HighchartsLineChartProps> = ({ data, labelKe
 
   if (!data || data.length === 0) {
     return (
-      <div className="flex items-center justify-center h-48 rounded-xl text-secondary-500 dark:text-gray-400" style={{ backgroundColor: 'var(--color-surface-variant)' }}>
+      <div className="flex items-center justify-center h-48 rounded-xl text-[var(--color-on-surface-variant)]" style={{ backgroundColor: 'var(--color-surface-variant)' }}>
         <p>No data available</p>
       </div>
     );
@@ -185,7 +184,7 @@ interface MetricCardProps {
 
 const MetricCard: React.FC<MetricCardProps> = ({ title, value, subtitle, icon: Icon, trend, className = '' }) => {
   return (
-    <Card className={className}>
+    <div className={`glass-card p-5 rounded-2xl ${className}`}>
       <div className="flex items-start justify-between">
         <div className="flex-1">
           <p className="text-sm font-semibold mb-2" style={{ color: 'var(--color-on-surface-variant)' }}>
@@ -214,7 +213,7 @@ const MetricCard: React.FC<MetricCardProps> = ({ title, value, subtitle, icon: I
           </div>
         )}
       </div>
-    </Card>
+    </div>
   );
 };
 
@@ -266,7 +265,7 @@ const CafeAnalytics: React.FC = () => {
       <div className="flex items-center justify-center h-64">
         <div className="text-center">
           <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
-          <p className="text-secondary-600 dark:text-gray-400">Access denied. Admin or manager privileges required.</p>
+          <p className="text-[var(--color-on-surface-variant)]">Access denied. Admin or manager privileges required.</p>
         </div>
       </div>
     );
@@ -276,7 +275,7 @@ const CafeAnalytics: React.FC = () => {
   if (featuresLoading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <Loader className="h-8 w-8 animate-spin text-secondary-500" />
+        <Loader className="h-8 w-8 animate-spin text-[var(--color-primary)]" />
       </div>
     );
   }
@@ -291,30 +290,32 @@ const CafeAnalytics: React.FC = () => {
         previewContent={
           <div className="space-y-6">
             <div>
-              <h2 className="text-2xl font-bold text-secondary-700 dark:text-gray-100 flex items-center mb-2">
+              <h2 className="text-2xl font-bold text-[var(--color-on-surface)] flex items-center mb-2">
                 <BarChart3 className="h-6 w-6 mr-2" />
                 Analytics
               </h2>
-              <p className="text-sm text-secondary-500 dark:text-gray-400">
+              <p className="text-sm text-[var(--color-on-surface-variant)]">
                 Business insights and performance metrics
               </p>
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               {[1, 2, 3, 4].map(i => (
-                <Card key={i} className="opacity-50">
-                  <div className="h-20 rounded animate-pulse" style={{ backgroundColor: 'var(--surface-table)' }} />
-                </Card>
+                <div key={i} className="glass-card p-5 rounded-2xl opacity-50">
+                  <div className="h-20 rounded animate-pulse bg-[var(--surface-table)]/50" />
+                </div>
               ))}
             </div>
             
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <Card className="opacity-50">
-                <div className="h-64 rounded animate-pulse" style={{ backgroundColor: 'var(--surface-table)' }} />
-              </Card>
-              <Card className="opacity-50">
-                <div className="h-64 rounded animate-pulse" style={{ backgroundColor: 'var(--surface-table)' }} />
-              </Card>
+              <div className="glass-card overflow-hidden rounded-2xl opacity-50">
+                <div className="bg-[var(--surface-table)]/60 backdrop-blur-sm px-5 py-4 h-14" />
+                <div className="h-64 p-4 rounded animate-pulse bg-[var(--surface-table)]/30" />
+              </div>
+              <div className="glass-card overflow-hidden rounded-2xl opacity-50">
+                <div className="bg-[var(--surface-table)]/60 backdrop-blur-sm px-5 py-4 h-14" />
+                <div className="h-64 p-4 rounded animate-pulse bg-[var(--surface-table)]/30" />
+              </div>
             </div>
           </div>
         }
@@ -326,24 +327,39 @@ const CafeAnalytics: React.FC = () => {
     return (
       <div className="space-y-6">
         <div>
-          <h2 className="text-2xl font-bold text-secondary-700 dark:text-gray-100 flex items-center mb-2">
+          <h2 className="text-2xl font-bold text-[var(--color-on-surface)] flex items-center mb-2">
             <BarChart3 className="h-6 w-6 mr-2" />
             Analytics
           </h2>
-          <p className="text-sm text-secondary-500 dark:text-gray-400">
+          <p className="text-sm text-[var(--color-on-surface-variant)]">
             Business insights and performance metrics
           </p>
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {[1, 2, 3, 4].map(i => (
-            <CardSkeleton key={i} lines={2} />
+            <div key={i} className="glass-card p-5 rounded-2xl">
+              <div className="space-y-4">
+                <Skeleton variant="text" width="60%" height="24px" />
+                <Skeleton variant="text" lines={2} />
+              </div>
+            </div>
           ))}
         </div>
         
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <CardSkeleton lines={5} />
-          <CardSkeleton lines={5} />
+          <div className="glass-card overflow-hidden rounded-2xl">
+            <div className="bg-[var(--surface-table)]/60 backdrop-blur-sm px-5 py-4 border-b border-[var(--color-outline)]/20 h-20" />
+            <div className="p-4 space-y-4">
+              <Skeleton variant="text" lines={5} />
+            </div>
+          </div>
+          <div className="glass-card overflow-hidden rounded-2xl">
+            <div className="bg-[var(--surface-table)]/60 backdrop-blur-sm px-5 py-4 border-b border-[var(--color-outline)]/20 h-20" />
+            <div className="p-4 space-y-4">
+              <Skeleton variant="text" lines={5} />
+            </div>
+          </div>
         </div>
       </div>
     );
@@ -362,20 +378,20 @@ const CafeAnalytics: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-2xl font-bold text-secondary-700 dark:text-gray-100 flex items-center mb-2">
-            <BarChart3 className="h-6 w-6 mr-2" />
-            Analytics
-          </h2>
-          <p className="text-sm text-secondary-500 dark:text-gray-400">
-            Business insights and performance metrics
-          </p>
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div className="flex items-center gap-3 min-w-0">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[var(--color-primary-container)]">
+            <BarChart3 className="h-6 w-6 text-[var(--color-primary)]" />
+          </div>
+          <div className="min-w-0">
+            <h1 className="text-2xl font-bold text-[var(--color-on-surface)] truncate">Analytics</h1>
+            <p className="text-sm text-[var(--color-on-surface-variant)] mt-1">Business insights and performance metrics</p>
+          </div>
         </div>
         
         {/* Time Range Selector */}
         <div className="flex items-center space-x-2">
-          <label className="text-sm text-secondary-600 dark:text-gray-400">Time Range:</label>
+          <label className="text-sm text-[var(--color-on-surface-variant)]">Time Range:</label>
           <Select
             options={[
               { value: '7', label: 'Last 7 days' },
@@ -386,7 +402,7 @@ const CafeAnalytics: React.FC = () => {
             ]}
             value={String(timeRange)}
             onChange={(v) => setTimeRange(Math.min(parseInt(v, 10), 365))}
-            className="text-sm"
+            className="text-sm select-trigger-glass select-trigger-glass-hover"
             placeholder="Time range"
           />
         </div>
@@ -423,77 +439,86 @@ const CafeAnalytics: React.FC = () => {
       {/* Trends Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Orders Trend */}
-        <Card
-          title="Orders Over Time"
-          description={`Order volume for the last ${timeRange} days`}
-        >
-          {trends?.orders && trends.orders.length > 0 ? (
-            <HighchartsBarChart
-              data={trends.orders}
-              labelKey="date"
-              valueKey="count"
-              height={250}
-            />
-          ) : (
-            <div className="flex items-center justify-center h-64 text-secondary-500 dark:text-gray-400">
-              <p>No order data available for this period</p>
-            </div>
-          )}
-        </Card>
+        <div className="glass-card overflow-hidden rounded-2xl shadow-sm">
+          <div className="bg-[var(--surface-table)]/60 backdrop-blur-sm px-5 py-4 border-b border-[var(--color-outline)]/20">
+            <h3 className="text-[var(--color-on-surface)] font-semibold">Orders Over Time</h3>
+            <p className="text-sm text-[var(--color-on-surface-variant)] mt-0.5">Order volume for the last {timeRange} days</p>
+          </div>
+          <div className="p-4">
+            {trends?.orders && trends.orders.length > 0 ? (
+              <HighchartsBarChart
+                data={trends.orders}
+                labelKey="date"
+                valueKey="count"
+                height={250}
+              />
+            ) : (
+              <div className="flex items-center justify-center h-64 text-[var(--color-on-surface-variant)]">
+                <p>No order data available for this period</p>
+              </div>
+            )}
+          </div>
+        </div>
 
         {/* Revenue Trend */}
-        <Card
-          title="Revenue Over Time"
-          description={`Revenue for the last ${timeRange} days`}
-        >
-          {trends?.revenue && trends.revenue.length > 0 ? (
-            <HighchartsLineChart
-              data={trends.revenue}
-              labelKey="date"
-              valueKey="amount"
-              height={250}
-              valuePrefix={currencySettings?.currency_symbol ?? ''}
-            />
-          ) : (
-            <div className="flex items-center justify-center h-64 text-secondary-500 dark:text-gray-400">
-              <p>No revenue data available for this period</p>
-            </div>
-          )}
-        </Card>
+        <div className="glass-card overflow-hidden rounded-2xl shadow-sm">
+          <div className="bg-[var(--surface-table)]/60 backdrop-blur-sm px-5 py-4 border-b border-[var(--color-outline)]/20">
+            <h3 className="text-[var(--color-on-surface)] font-semibold">Revenue Over Time</h3>
+            <p className="text-sm text-[var(--color-on-surface-variant)] mt-0.5">Revenue for the last {timeRange} days</p>
+          </div>
+          <div className="p-4">
+            {trends?.revenue && trends.revenue.length > 0 ? (
+              <HighchartsLineChart
+                data={trends.revenue}
+                labelKey="date"
+                valueKey="amount"
+                height={250}
+                valuePrefix={currencySettings?.currency_symbol ?? ''}
+              />
+            ) : (
+              <div className="flex items-center justify-center h-64 text-[var(--color-on-surface-variant)]">
+                <p>No revenue data available for this period</p>
+              </div>
+            )}
+          </div>
+        </div>
       </div>
 
       {/* Customer Analytics */}
-      <Card
-        title="Customer Insights"
-        description="Customer metrics and engagement"
-      >
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="card text-center">
-            <p className="text-3xl font-bold" style={{ color: 'var(--color-primary)' }}>
-              {customers?.total || 0}
-            </p>
-            <p className="text-sm mt-1" style={{ color: 'var(--color-on-surface-variant)' }}>
-              Total Customers
-            </p>
-          </div>
-          <div className="card text-center">
-            <p className="text-3xl font-bold" style={{ color: 'var(--color-primary)' }}>
-              {customers?.new_this_month || 0}
-            </p>
-            <p className="text-sm mt-1" style={{ color: 'var(--color-on-surface-variant)' }}>
-              New This Month
-            </p>
-          </div>
-          <div className="card text-center">
-            <p className="text-3xl font-bold" style={{ color: 'var(--color-primary)' }}>
-              {customers?.returning || 0}
-            </p>
-            <p className="text-sm mt-1" style={{ color: 'var(--color-on-surface-variant)' }}>
-              Returning Customers
-            </p>
+      <div className="glass-card overflow-hidden rounded-2xl shadow-sm">
+        <div className="bg-[var(--surface-table)]/60 backdrop-blur-sm px-5 py-4 border-b border-[var(--color-outline)]/20">
+          <h3 className="text-[var(--color-on-surface)] font-semibold">Customer Insights</h3>
+          <p className="text-sm text-[var(--color-on-surface-variant)] mt-0.5">Customer metrics and engagement</p>
+        </div>
+        <div className="p-5">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="glass-card p-5 rounded-xl text-center">
+              <p className="text-3xl font-bold" style={{ color: 'var(--color-primary)' }}>
+                {customers?.total || 0}
+              </p>
+              <p className="text-sm mt-1" style={{ color: 'var(--color-on-surface-variant)' }}>
+                Total Customers
+              </p>
+            </div>
+            <div className="glass-card p-5 rounded-xl text-center">
+              <p className="text-3xl font-bold" style={{ color: 'var(--color-primary)' }}>
+                {customers?.new_this_month || 0}
+              </p>
+              <p className="text-sm mt-1" style={{ color: 'var(--color-on-surface-variant)' }}>
+                New This Month
+              </p>
+            </div>
+            <div className="glass-card p-5 rounded-xl text-center">
+              <p className="text-3xl font-bold" style={{ color: 'var(--color-primary)' }}>
+                {customers?.returning || 0}
+              </p>
+              <p className="text-sm mt-1" style={{ color: 'var(--color-on-surface-variant)' }}>
+                Returning Customers
+              </p>
+            </div>
           </div>
         </div>
-      </Card>
+      </div>
     </div>
   );
 };

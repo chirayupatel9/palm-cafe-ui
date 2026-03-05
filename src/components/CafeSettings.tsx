@@ -5,9 +5,10 @@ import { useAuth } from '../contexts/AuthContext';
 import ColorSchemePreview from './ColorSchemePreview';
 import ColorSchemeTest from './ColorSchemeTest';
 import { getImageUrl } from '../utils/imageUtils';
-import { Copy, ExternalLink, Check, Plus, Pencil, Trash2 } from 'lucide-react';
+import { Copy, ExternalLink, Check, Plus, Pencil, Trash2, Settings, Link2, Info, LayoutDashboard, Palette } from 'lucide-react';
 import toast from 'react-hot-toast';
 import FileInput from './ui/FileInput';
+import { GlassButton } from './ui/GlassButton';
 
 const CafeSettings: React.FC = () => {
   const { cafeSettings, loading: cafeSettingsLoading, error: cafeSettingsError, fetchCafeSettings, updateCafeSettings, updateLogo, updateHeroImage, updatePromoBannerImage, removeHeroImage, removePromoBannerImage, removeLogo } = useCafeSettings();
@@ -646,20 +647,24 @@ const CafeSettings: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="flex flex-nowrap justify-between items-start sm:items-center gap-4 mb-6">
-          <div className="min-w-0">
-            <h1 className="text-2xl font-bold text-on-surface truncate">Cafe Settings</h1>
-            <p className="text-sm text-body-muted mt-1">Manage your cafe configuration and appearance.</p>
+    <div className="space-y-6">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[var(--color-primary-container)]">
+              <Settings className="h-6 w-6 text-[var(--color-primary)]" />
+            </div>
+            <div className="min-w-0">
+              <h1 className="text-2xl font-bold text-[var(--color-on-surface)] truncate">Cafe Settings</h1>
+              <p className="text-sm text-[var(--color-on-surface-variant)] mt-1">Manage your cafe configuration and appearance.</p>
+            </div>
           </div>
-          <button type="button" onClick={handleSubmit} disabled={isSubmitting || cafeSettingsLoading} className="btn-primary px-5 py-2.5 text-sm font-medium shrink-0 disabled:opacity-50 disabled:cursor-not-allowed">
+          <GlassButton type="button" onClick={handleSubmit} disabled={isSubmitting || cafeSettingsLoading} size="default" className="glass-button-primary shrink-0 disabled:opacity-50 disabled:cursor-not-allowed min-w-[8rem]" contentClassName="flex items-center justify-center gap-2">
             {isSubmitting ? 'Saving...' : 'Save Changes'}
-          </button>
+          </GlassButton>
         </div>
 
         {showMessage && (
-          <div className="w-full max-w-4xl mx-auto mb-6">
+          <div className="mb-6">
             <div
               className="p-4 rounded-xl text-sm border"
               style={{
@@ -674,18 +679,18 @@ const CafeSettings: React.FC = () => {
         )}
 
         {cafeSettingsLoading ? (
-          <div className="flex flex-col items-center justify-center py-16">
+          <div className="flex flex-col items-center justify-center py-16 min-h-[12rem]">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 mb-4" style={{ borderColor: 'var(--color-primary)' }} />
-            <p className="text-body-muted">Loading cafe settings...</p>
+            <p className="text-[var(--color-on-surface-variant)]">Loading cafe settings...</p>
           </div>
         ) : cafeSettingsError ? (
-          <div className="w-full max-w-4xl mx-auto">
-            <div className="card border-2 bg-red-50 dark:bg-red-900/20" style={{ borderColor: 'var(--color-error)' }}>
+          <div className="w-full">
+            <div className="glass-card p-5 rounded-2xl border-2" style={{ borderColor: 'var(--color-error)' }}>
               <p className="font-medium mb-2" style={{ color: 'var(--color-error)' }}>Failed to load cafe settings</p>
               <p className="text-sm mb-4" style={{ color: 'var(--color-error)' }}>{cafeSettingsError}</p>
-              <button type="button" onClick={() => fetchCafeSettings()} className="btn-primary">
+              <GlassButton type="button" onClick={() => fetchCafeSettings()} size="default" className="glass-button-primary">
                 Retry
-              </button>
+              </GlassButton>
             </div>
           </div>
         ) : (
@@ -693,34 +698,37 @@ const CafeSettings: React.FC = () => {
           <div className="space-y-6">
             {/* Cafe Slug & Public URL Section (multi-cafe: show when admin/superadmin has a cafe slug) */}
             {(user?.role === 'admin' || user?.role === 'superadmin') && publicSlug && (
-              <div className="card">
-                <div className="card-header">
-                  <h2 className="card-title">Public Cafe URL</h2>
-                  <p className="card-description">
-                    Share this URL with your customers to access your cafe menu and place orders.
-                  </p>
+              <div className="glass-card overflow-hidden rounded-2xl shadow-sm">
+                <div className="bg-[var(--surface-table)]/60 backdrop-blur-sm px-5 py-4 border-b border-[var(--color-outline)]/20 flex items-start gap-3">
+                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[var(--color-primary-container)]">
+                    <Link2 className="h-5 w-5 text-[var(--color-primary)]" />
+                  </div>
+                  <div className="min-w-0">
+                    <h2 className="text-[var(--color-on-surface)] font-semibold">Public Cafe URL</h2>
+                    <p className="text-sm text-[var(--color-on-surface-variant)] mt-0.5">Share this URL with your customers to access your cafe menu and place orders.</p>
+                  </div>
                 </div>
-                <div className="space-y-5">
+                <div className="p-5 space-y-5">
                   <div>
-                    <label className="block text-sm font-medium text-on-surface mb-1.5">Cafe Slug</label>
+                    <label className="block text-sm font-medium text-[var(--color-on-surface)] mb-1.5">Cafe Slug</label>
                     <input
                       type="text"
                       value={String(publicSlug ?? '')}
                       readOnly
-                      className="input-field w-full bg-[var(--surface-table)] cursor-not-allowed font-mono text-sm truncate"
+                      className="w-full rounded-xl border border-[var(--color-outline-variant)] bg-[var(--surface-table)] text-[var(--color-on-surface)] font-mono text-sm truncate px-4 py-2.5 cursor-not-allowed"
                     />
-                    <p className="text-xs text-body-muted mt-1">Cannot be changed after creation.</p>
+                    <p className="text-xs text-[var(--color-on-surface-variant)] mt-1">Cannot be changed after creation.</p>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-on-surface mb-1.5">Public Customer URL</label>
+                    <label className="block text-sm font-medium text-[var(--color-on-surface)] mb-1.5">Public Customer URL</label>
                     <div className="flex flex-wrap gap-2 items-stretch">
                       <input
                         type="text"
                         value={`${window.location.origin}/cafe/${publicSlug ?? ''}`}
                         readOnly
-                        className="input-field flex-1 min-w-[200px] bg-[var(--surface-table)] cursor-not-allowed font-mono text-sm truncate"
+                        className="flex-1 min-w-[200px] rounded-xl border border-[var(--color-outline-variant)] bg-[var(--surface-table)] text-[var(--color-on-surface)] font-mono text-sm truncate px-4 py-2.5 cursor-not-allowed"
                       />
-                      <button
+                      <GlassButton
                         type="button"
                         onClick={() => {
                           const url = `${window.location.origin}/cafe/${publicSlug}`;
@@ -729,21 +737,24 @@ const CafeSettings: React.FC = () => {
                           toast.success('URL copied to clipboard!');
                           setTimeout(() => setCopied(false), 2000);
                         }}
-                        className="btn-primary inline-flex items-center gap-2 shrink-0"
+                        size="sm"
+                        className="glass-button-primary shrink-0"
+                        contentClassName="inline-flex items-center gap-2"
                         title="Copy URL"
                       >
                         {copied ? <><Check className="h-4 w-4" /> Copied!</> : <><Copy className="h-4 w-4" /> Copy</>}
-                      </button>
-                      <a
-                        href={`/cafe/${publicSlug}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="btn-secondary inline-flex items-center gap-2 shrink-0"
+                      </GlassButton>
+                      <GlassButton
+                        type="button"
+                        onClick={() => window.open(`/cafe/${publicSlug}`, '_blank')}
+                        size="sm"
+                        className="glass-button-secondary shrink-0"
+                        contentClassName="inline-flex items-center gap-2"
                         title="Open in new tab"
                       >
                         <ExternalLink className="h-4 w-4" />
                         Open
-                      </a>
+                      </GlassButton>
                     </div>
                   </div>
                 </div>
@@ -751,58 +762,68 @@ const CafeSettings: React.FC = () => {
             )}
 
             {/* Basic Information */}
-            <div className="card">
-              <div className="card-header">
-                <h2 className="card-title">Basic Information</h2>
-                <p className="card-description">Your cafe details shown to customers and used in invoices.</p>
+            <div className="glass-card overflow-hidden rounded-2xl shadow-sm">
+              <div className="bg-[var(--surface-table)]/60 backdrop-blur-sm px-5 py-4 border-b border-[var(--color-outline)]/20 flex items-start gap-3">
+                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[var(--color-primary-container)]">
+                  <Info className="h-5 w-5 text-[var(--color-primary)]" />
+                </div>
+                <div className="min-w-0">
+                  <h2 className="text-[var(--color-on-surface)] font-semibold">Basic Information</h2>
+                  <p className="text-sm text-[var(--color-on-surface-variant)] mt-0.5">Your cafe details shown to customers and used in invoices.</p>
+                </div>
               </div>
-              <form onSubmit={handleSubmit} className="space-y-4" id="cafe-settings-form">
+              <form onSubmit={handleSubmit} className="p-5 space-y-4" id="cafe-settings-form">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-on-surface mb-1.5">Cafe Name *</label>
-                    <input type="text" value={cafeName} onChange={(e) => setCafeName(e.target.value)} className="input-field" required />
+                    <label className="block text-sm font-medium text-[var(--color-on-surface)] mb-1.5">Cafe Name *</label>
+                    <input type="text" value={cafeName} onChange={(e) => setCafeName(e.target.value)} className="glass-input w-full rounded-xl border border-[var(--color-outline-variant)] bg-[var(--surface-card)] text-[var(--color-on-surface)] placeholder-[var(--color-on-surface-variant)] px-4 py-2.5" required />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-on-surface mb-1.5">Phone</label>
-                    <input type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} className="input-field" />
+                    <label className="block text-sm font-medium text-[var(--color-on-surface)] mb-1.5">Phone</label>
+                    <input type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} className="glass-input w-full rounded-xl border border-[var(--color-outline-variant)] bg-[var(--surface-card)] text-[var(--color-on-surface)] placeholder-[var(--color-on-surface-variant)] px-4 py-2.5" />
                   </div>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-on-surface mb-1.5">Address</label>
-                  <input type="text" value={address} onChange={(e) => setAddress(e.target.value)} className="input-field" />
+                  <label className="block text-sm font-medium text-[var(--color-on-surface)] mb-1.5">Address</label>
+                  <input type="text" value={address} onChange={(e) => setAddress(e.target.value)} className="glass-input w-full rounded-xl border border-[var(--color-outline-variant)] bg-[var(--surface-card)] text-[var(--color-on-surface)] placeholder-[var(--color-on-surface-variant)] px-4 py-2.5" />
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-on-surface mb-1.5">Email</label>
-                    <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} className="input-field" />
+                    <label className="block text-sm font-medium text-[var(--color-on-surface)] mb-1.5">Email</label>
+                    <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} className="glass-input w-full rounded-xl border border-[var(--color-outline-variant)] bg-[var(--surface-card)] text-[var(--color-on-surface)] placeholder-[var(--color-on-surface-variant)] px-4 py-2.5" />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-on-surface mb-1.5">Website</label>
-                    <input type="url" value={website} onChange={(e) => setWebsite(e.target.value)} className="input-field" />
+                    <label className="block text-sm font-medium text-[var(--color-on-surface)] mb-1.5">Website</label>
+                    <input type="url" value={website} onChange={(e) => setWebsite(e.target.value)} className="glass-input w-full rounded-xl border border-[var(--color-outline-variant)] bg-[var(--surface-card)] text-[var(--color-on-surface)] placeholder-[var(--color-on-surface-variant)] px-4 py-2.5" />
                   </div>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-on-surface mb-1.5">Opening Hours</label>
-                  <input type="text" value={openingHours} onChange={(e) => setOpeningHours(e.target.value)} className="input-field" placeholder="e.g., Mon-Fri 8AM-6PM, Sat-Sun 9AM-5PM" />
+                  <label className="block text-sm font-medium text-[var(--color-on-surface)] mb-1.5">Opening Hours</label>
+                  <input type="text" value={openingHours} onChange={(e) => setOpeningHours(e.target.value)} className="glass-input w-full rounded-xl border border-[var(--color-outline-variant)] bg-[var(--surface-card)] text-[var(--color-on-surface)] placeholder-[var(--color-on-surface-variant)] px-4 py-2.5" placeholder="e.g., Mon-Fri 8AM-6PM, Sat-Sun 9AM-5PM" />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-on-surface mb-1.5">Description</label>
-                  <textarea value={description} onChange={(e) => setDescription(e.target.value)} className="input-field" rows={3} placeholder="Brief description of your cafe..." />
+                  <label className="block text-sm font-medium text-[var(--color-on-surface)] mb-1.5">Description</label>
+                  <textarea value={description} onChange={(e) => setDescription(e.target.value)} className="glass-input w-full rounded-xl border border-[var(--color-outline-variant)] bg-[var(--surface-card)] text-[var(--color-on-surface)] placeholder-[var(--color-on-surface-variant)] px-4 py-2.5" rows={3} placeholder="Brief description of your cafe..." />
                 </div>
               </form>
             </div>
 
             {/* Tab & Role Visibility */}
-            <div className="card">
-              <div className="card-header">
-                <h2 className="card-title">Tab & Role Visibility</h2>
-                <p className="card-description">Control which tabs and features are visible to each role.</p>
+            <div className="glass-card overflow-hidden rounded-2xl shadow-sm">
+              <div className="bg-[var(--surface-table)]/60 backdrop-blur-sm px-5 py-4 border-b border-[var(--color-outline)]/20 flex items-start gap-3">
+                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[var(--color-primary-container)]">
+                  <LayoutDashboard className="h-5 w-5 text-[var(--color-primary)]" />
+                </div>
+                <div className="min-w-0">
+                  <h2 className="text-[var(--color-on-surface)] font-semibold">Tab & Role Visibility</h2>
+                  <p className="text-sm text-[var(--color-on-surface-variant)] mt-0.5">Control which tabs and features are visible to each role.</p>
+                </div>
               </div>
-              <form onSubmit={handleSubmit} className="space-y-0" id="cafe-visibility-form" noValidate>
+              <form onSubmit={handleSubmit} className="p-5 space-y-0" id="cafe-visibility-form" noValidate>
                 <div className="space-y-6">
                   {/* Owner */}
                   <div className="pb-6 border-b border-[var(--color-outline)]">
-                    <h3 className="text-sm font-semibold text-on-surface mb-3">Owner (your view)</h3>
+                    <h3 className="text-sm font-semibold text-[var(--color-on-surface)] mb-3">Owner (your view)</h3>
                     <div className="grid grid-cols-2 sm:grid-cols-3 gap-x-4 gap-y-2.5">
                       {([
                         [showKitchenTab, setShowKitchenTab, 'Orders'],
@@ -815,64 +836,64 @@ const CafeSettings: React.FC = () => {
                       ] as [boolean, React.Dispatch<React.SetStateAction<boolean>>, string][]).map(([checked, setter, label]) => (
                         <label key={label} className="flex items-center gap-2.5 cursor-pointer py-0.5">
                           <input type="checkbox" checked={checked} onChange={(e) => setter(e.target.checked)} className="rounded border-[var(--color-outline)] text-primary focus:ring-primary focus:ring-offset-0" />
-                          <span className="text-sm text-on-surface">{label}</span>
+                          <span className="text-sm text-[var(--color-on-surface)]">{label}</span>
                         </label>
                       ))}
                     </div>
                   </div>
                   {/* Chef */}
                   <div className="pb-6 border-b border-[var(--color-outline)]">
-                    <h3 className="text-sm font-semibold text-on-surface mb-3">Chef</h3>
-                    <p className="text-xs font-medium uppercase tracking-wider text-body-muted mb-2">Visible tabs</p>
+                    <h3 className="text-sm font-semibold text-[var(--color-on-surface)] mb-3">Chef</h3>
+                    <p className="text-xs font-medium uppercase tracking-wider text-[var(--color-on-surface-variant)] mb-2">Visible tabs</p>
                     <div className="grid grid-cols-2 sm:grid-cols-3 gap-x-4 gap-y-2.5 mb-4">
                       {([[chefShowKitchenTab, setChefShowKitchenTab, 'Orders'], [chefShowMenuTab, setChefShowMenuTab, 'Menu'], [chefShowInventoryTab, setChefShowInventoryTab, 'Inventory'], [chefShowHistoryTab, setChefShowHistoryTab, 'History']] as [boolean, React.Dispatch<React.SetStateAction<boolean>>, string][]).map(([c, s, l]) => (
                         <label key={l} className="flex items-center gap-2.5 cursor-pointer py-0.5">
                           <input type="checkbox" checked={c} onChange={(e) => s(e.target.checked)} className="rounded border-[var(--color-outline)] text-primary focus:ring-primary focus:ring-offset-0" />
-                          <span className="text-sm text-on-surface">{l}</span>
+                          <span className="text-sm text-[var(--color-on-surface)]">{l}</span>
                         </label>
                       ))}
                     </div>
-                    <p className="text-xs font-medium uppercase tracking-wider text-body-muted mb-2">Permissions</p>
+                    <p className="text-xs font-medium uppercase tracking-wider text-[var(--color-on-surface-variant)] mb-2">Permissions</p>
                     <div className="grid grid-cols-2 sm:grid-cols-3 gap-x-4 gap-y-2.5">
                       {([[chefCanEditOrders, setChefCanEditOrders, 'Can Edit Orders'], [chefCanViewCustomers, setChefCanViewCustomers, 'Can View Customers'], [chefCanViewPayments, setChefCanViewPayments, 'Can View Payments']] as [boolean, React.Dispatch<React.SetStateAction<boolean>>, string][]).map(([c, s, l]) => (
                         <label key={l} className="flex items-center gap-2.5 cursor-pointer py-0.5">
                           <input type="checkbox" checked={c} onChange={(e) => s(e.target.checked)} className="rounded border-[var(--color-outline)] text-primary focus:ring-primary focus:ring-offset-0" />
-                          <span className="text-sm text-on-surface">{l}</span>
+                          <span className="text-sm text-[var(--color-on-surface)]">{l}</span>
                         </label>
                       ))}
                     </div>
                   </div>
                   {/* Reception */}
                   <div className="pb-6 border-b border-[var(--color-outline)]">
-                    <h3 className="text-sm font-semibold text-on-surface mb-3">Reception</h3>
-                    <p className="text-xs font-medium uppercase tracking-wider text-body-muted mb-2">Visible tabs</p>
+                    <h3 className="text-sm font-semibold text-[var(--color-on-surface)] mb-3">Reception</h3>
+                    <p className="text-xs font-medium uppercase tracking-wider text-[var(--color-on-surface-variant)] mb-2">Visible tabs</p>
                     <div className="grid grid-cols-2 sm:grid-cols-3 gap-x-4 gap-y-2.5 mb-4">
                       {([[receptionShowKitchenTab, setReceptionShowKitchenTab, 'Orders'], [receptionShowMenuTab, setReceptionShowMenuTab, 'Menu'], [receptionShowInventoryTab, setReceptionShowInventoryTab, 'Inventory'], [receptionShowHistoryTab, setReceptionShowHistoryTab, 'History']] as [boolean, React.Dispatch<React.SetStateAction<boolean>>, string][]).map(([c, s, l]) => (
                         <label key={l} className="flex items-center gap-2.5 cursor-pointer py-0.5">
                           <input type="checkbox" checked={c} onChange={(e) => s(e.target.checked)} className="rounded border-[var(--color-outline)] text-primary focus:ring-primary focus:ring-offset-0" />
-                          <span className="text-sm text-on-surface">{l}</span>
+                          <span className="text-sm text-[var(--color-on-surface)]">{l}</span>
                         </label>
                       ))}
                     </div>
-                    <p className="text-xs font-medium uppercase tracking-wider text-body-muted mb-2">Permissions</p>
+                    <p className="text-xs font-medium uppercase tracking-wider text-[var(--color-on-surface-variant)] mb-2">Permissions</p>
                     <div className="grid grid-cols-2 sm:grid-cols-3 gap-x-4 gap-y-2.5">
                       {([[receptionCanEditOrders, setReceptionCanEditOrders, 'Can Edit Orders'], [receptionCanViewCustomers, setReceptionCanViewCustomers, 'Can View Customers'], [receptionCanViewPayments, setReceptionCanViewPayments, 'Can View Payments'], [receptionCanCreateOrders, setReceptionCanCreateOrders, 'Can Create Orders']] as [boolean, React.Dispatch<React.SetStateAction<boolean>>, string][]).map(([c, s, l]) => (
                         <label key={l} className="flex items-center gap-2.5 cursor-pointer py-0.5">
                           <input type="checkbox" checked={c} onChange={(e) => s(e.target.checked)} className="rounded border-[var(--color-outline)] text-primary focus:ring-primary focus:ring-offset-0" />
-                          <span className="text-sm text-on-surface">{l}</span>
+                          <span className="text-sm text-[var(--color-on-surface)]">{l}</span>
                         </label>
                       ))}
                     </div>
                   </div>
                   {/* Admin */}
                   <div>
-                    <h3 className="text-sm font-semibold text-on-surface mb-3">Admin</h3>
-                    <p className="text-xs font-medium uppercase tracking-wider text-body-muted mb-2">Permissions</p>
+                    <h3 className="text-sm font-semibold text-[var(--color-on-surface)] mb-3">Admin</h3>
+                    <p className="text-xs font-medium uppercase tracking-wider text-[var(--color-on-surface-variant)] mb-2">Permissions</p>
                     <div className="grid grid-cols-2 sm:grid-cols-3 gap-x-4 gap-y-2.5">
                       {([[adminCanAccessSettings, setAdminCanAccessSettings, 'Can Access Settings'], [adminCanManageUsers, setAdminCanManageUsers, 'Can Manage Users'], [adminCanViewReports, setAdminCanViewReports, 'Can View Reports'], [adminCanManageInventory, setAdminCanManageInventory, 'Can Manage Inventory'], [adminCanManageMenu, setAdminCanManageMenu, 'Can Manage Menu']] as [boolean, React.Dispatch<React.SetStateAction<boolean>>, string][]).map(([c, s, l]) => (
                         <label key={l} className="flex items-center gap-2.5 cursor-pointer py-0.5">
                           <input type="checkbox" checked={c} onChange={(e) => s(e.target.checked)} className="rounded border-[var(--color-outline)] text-primary focus:ring-primary focus:ring-offset-0" />
-                          <span className="text-sm text-on-surface">{l}</span>
+                          <span className="text-sm text-[var(--color-on-surface)]">{l}</span>
                         </label>
                       ))}
                     </div>
@@ -882,15 +903,20 @@ const CafeSettings: React.FC = () => {
             </div>
 
             {/* Branding Section */}
-            <div className="card">
-              <div className="card-header">
-                <h2 className="card-title">Branding</h2>
-                <p className="card-description">Images shown on the customer-facing menu page.</p>
+            <div className="glass-card overflow-hidden rounded-2xl shadow-sm">
+              <div className="bg-[var(--surface-table)]/60 backdrop-blur-sm px-5 py-4 border-b border-[var(--color-outline)]/20 flex items-start gap-3">
+                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[var(--color-primary-container)]">
+                  <Palette className="h-5 w-5 text-[var(--color-primary)]" />
+                </div>
+                <div className="min-w-0">
+                  <h2 className="text-[var(--color-on-surface)] font-semibold">Branding</h2>
+                  <p className="text-sm text-[var(--color-on-surface-variant)] mt-0.5">Images shown on the customer-facing menu page.</p>
+                </div>
               </div>
-              <div className="space-y-6">
+              <div className="p-5 space-y-6">
               <div>
-                <label className="block text-sm font-medium text-on-surface mb-1.5">Logo</label>
-                <p className="text-xs text-body-muted mb-2">
+                <label className="block text-sm font-medium text-[var(--color-on-surface)] mb-1.5">Logo</label>
+                <p className="text-xs text-[var(--color-on-surface-variant)] mb-2">
                   Headers, invoices, and customer-facing pages.
                 </p>
                 <div className="space-y-3">
@@ -901,14 +927,9 @@ const CafeSettings: React.FC = () => {
                         alt="Cafe Logo"
                         className="w-48 h-48 object-contain border rounded-lg"
                       />
-                      <button
-                        type="button"
-                        onClick={handleRemoveLogo}
-                        disabled={uploadingLogo}
-                        className="mt-2 px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg text-sm disabled:opacity-50"
-                      >
+                      <GlassButton type="button" onClick={handleRemoveLogo} disabled={uploadingLogo} size="sm" className="mt-2 glass-button-destructive disabled:opacity-50">
                         {uploadingLogo ? 'Removing...' : 'Remove'}
-                      </button>
+                      </GlassButton>
                     </div>
                   )}
                   <div className="flex items-center space-x-4">
@@ -921,20 +942,15 @@ const CafeSettings: React.FC = () => {
                         placeholder="No file chosen"
                       />
                     </div>
-                    <button
-                      type="button"
-                      onClick={handleLogoUpload}
-                      disabled={!selectedFile || uploadingLogo}
-                      className="btn-primary disabled:opacity-50"
-                    >
+                    <GlassButton type="button" onClick={handleLogoUpload} disabled={!selectedFile || uploadingLogo} size="default" className="glass-button-primary disabled:opacity-50">
                       {uploadingLogo ? 'Uploading...' : 'Upload'}
-                    </button>
+                    </GlassButton>
                   </div>
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-medium text-on-surface mb-1.5">Hero Image</label>
-                <p className="text-xs text-body-muted mb-2">
+                <label className="block text-sm font-medium text-[var(--color-on-surface)] mb-1.5">Hero Image</label>
+                <p className="text-xs text-[var(--color-on-surface-variant)] mb-2">
                   Main background on the customer menu.
                 </p>
                 <div className="space-y-3">
@@ -945,14 +961,9 @@ const CafeSettings: React.FC = () => {
                         alt="Hero Image"
                         className="w-full h-48 object-cover border rounded-lg"
                       />
-                      <button
-                        type="button"
-                        onClick={handleRemoveHeroImage}
-                        disabled={uploadingHero}
-                        className="mt-2 px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg text-sm disabled:opacity-50"
-                      >
+                      <GlassButton type="button" onClick={handleRemoveHeroImage} disabled={uploadingHero} size="sm" className="mt-2 glass-button-destructive disabled:opacity-50">
                         {uploadingHero ? 'Removing...' : 'Remove'}
-                      </button>
+                      </GlassButton>
                     </div>
                   )}
                   <div className="flex items-center space-x-4">
@@ -965,21 +976,16 @@ const CafeSettings: React.FC = () => {
                         placeholder="No file chosen"
                       />
                     </div>
-                    <button
-                      type="button"
-                      onClick={handleHeroImageUpload}
-                      disabled={!selectedHeroFile || uploadingHero}
-                      className="btn-primary disabled:opacity-50"
-                    >
+                    <GlassButton type="button" onClick={handleHeroImageUpload} disabled={!selectedHeroFile || uploadingHero} size="default" className="glass-button-primary disabled:opacity-50">
                       {uploadingHero ? 'Uploading...' : 'Upload'}
-                    </button>
+                    </GlassButton>
                   </div>
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-on-surface mb-1.5">Second menu image</label>
-                <p className="text-xs text-body-muted mb-2">
+                <label className="block text-sm font-medium text-[var(--color-on-surface)] mb-1.5">Second menu image</label>
+                <p className="text-xs text-[var(--color-on-surface-variant)] mb-2">
                   Background image on the customer menu (when scrolling). If empty, the hero image is used.
                 </p>
                 <div className="space-y-3">
@@ -990,14 +996,9 @@ const CafeSettings: React.FC = () => {
                         alt="Second menu image"
                         className="w-full h-48 object-cover border rounded-lg"
                       />
-                      <button
-                        type="button"
-                        onClick={handleRemovePromoMenuImage}
-                        disabled={uploadingPromoMenu}
-                        className="mt-2 px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg text-sm disabled:opacity-50"
-                      >
+                      <GlassButton type="button" onClick={handleRemovePromoMenuImage} disabled={uploadingPromoMenu} size="sm" className="mt-2 glass-button-destructive disabled:opacity-50">
                         {uploadingPromoMenu ? 'Removing...' : 'Remove'}
-                      </button>
+                      </GlassButton>
                     </div>
                   )}
                   <div className="flex items-center space-x-4">
@@ -1010,14 +1011,9 @@ const CafeSettings: React.FC = () => {
                         placeholder="No file chosen"
                       />
                     </div>
-                    <button
-                      type="button"
-                      onClick={handlePromoMenuImageUpload}
-                      disabled={!selectedPromoMenuFile || uploadingPromoMenu}
-                      className="btn-primary disabled:opacity-50"
-                    >
+                    <GlassButton type="button" onClick={handlePromoMenuImageUpload} disabled={!selectedPromoMenuFile || uploadingPromoMenu} size="default" className="glass-button-primary disabled:opacity-50">
                       {uploadingPromoMenu ? 'Uploading...' : 'Upload'}
-                    </button>
+                    </GlassButton>
                   </div>
                 </div>
               </div>
@@ -1025,28 +1021,24 @@ const CafeSettings: React.FC = () => {
               <div className="pt-5 border-t border-[var(--color-outline)]">
                 <div className="flex flex-wrap items-start justify-between gap-3 mb-3">
                   <div>
-                    <label className="block text-sm font-medium text-on-surface mb-1.5">Promotional Banners</label>
-                    <p className="text-xs text-body-muted">
+                    <label className="block text-sm font-medium text-[var(--color-on-surface)] mb-1.5">Promotional Banners</label>
+                    <p className="text-xs text-[var(--color-on-surface-variant)]">
                       Customer menu. Order by priority (lower first). Keep at least one.
                     </p>
                   </div>
                   {!loadingPromoBanners && !promoBannerForm.show && (
-                    <button
-                      type="button"
-                      onClick={() => setPromoBannerForm((f) => ({ ...f, show: true }))}
-                      className="inline-flex items-center gap-2 px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-lg text-sm font-medium shadow-sm"
-                    >
+                    <GlassButton type="button" onClick={() => setPromoBannerForm((f) => ({ ...f, show: true }))} size="sm" className="glass-button-primary" contentClassName="inline-flex items-center gap-2">
                       <Plus className="h-4 w-4" /> Add banner
-                    </button>
+                    </GlassButton>
                   )}
                 </div>
                 {loadingPromoBanners ? (
-                  <p className="text-sm text-gray-500">Loading banners...</p>
+                  <p className="text-sm text-[var(--color-on-surface-variant)]">Loading banners...</p>
                 ) : (
                   <div className="space-y-4">
                     <div className="flex flex-wrap gap-3">
                       {promoBanners.map((b) => (
-                        <div key={b.id} className="card overflow-hidden w-48 p-0">
+                        <div key={b.id} className="glass-card overflow-hidden w-48 p-0 rounded-xl">
                           <div className="h-28 bg-gray-100 dark:bg-gray-700">
                             <img src={getImageUrl(b.image_url)} alt="Banner" className="w-full h-full object-cover" />
                           </div>
@@ -1057,26 +1049,12 @@ const CafeSettings: React.FC = () => {
                               <span className={b.active ? 'text-green-600' : 'text-gray-400'}>{b.active ? 'On' : 'Off'}</span>
                             </div>
                             <div className="flex gap-1 mt-2">
-                              <button
-                                type="button"
-                                onClick={() => {
-                                  setEditingBannerId(b.id);
-                                  setEditingBannerForm({ link_url: b.link_url || '', priority: b.priority, active: b.active });
-                                  setEditingBannerReplaceFile(null);
-                                }}
-                                className="flex-1 flex items-center justify-center gap-1 px-2 py-1 bg-gray-200 dark:bg-gray-600 rounded text-xs hover:bg-gray-300"
-                              >
+                              <GlassButton type="button" onClick={() => { setEditingBannerId(b.id); setEditingBannerForm({ link_url: b.link_url || '', priority: b.priority, active: b.active }); setEditingBannerReplaceFile(null); }} size="sm" className="flex-1 glass-button-secondary !py-1 text-xs" contentClassName="flex items-center justify-center gap-1">
                                 <Pencil className="h-3 w-3" /> Edit
-                              </button>
-                              <button
-                                type="button"
-                                onClick={() => handleDeletePromoBanner(b.id)}
-                                disabled={promoBanners.length <= 1}
-                                title={promoBanners.length <= 1 ? 'Keep at least one banner' : 'Remove banner'}
-                                className="flex items-center justify-center px-2 py-1 bg-red-100 dark:bg-red-900/30 text-red-600 rounded text-xs hover:bg-red-200 disabled:opacity-50 disabled:cursor-not-allowed"
-                              >
+                              </GlassButton>
+                              <GlassButton type="button" onClick={() => handleDeletePromoBanner(b.id)} disabled={promoBanners.length <= 1} size="sm" className="glass-button-destructive !py-1 !px-2 text-xs disabled:opacity-50" title={promoBanners.length <= 1 ? 'Keep at least one banner' : 'Remove banner'}>
                                 <Trash2 className="h-3 w-3" />
-                              </button>
+                              </GlassButton>
                             </div>
                           </div>
                         </div>
@@ -1086,7 +1064,7 @@ const CafeSettings: React.FC = () => {
                       const b = promoBanners.find((x) => x.id === editingBannerId);
                       if (!b) return null;
                       return (
-                        <div className="card card-sm">
+                        <div className="glass-card p-4 rounded-xl">
                           <p className="text-sm font-medium mb-2">Edit banner</p>
                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                             <div className="sm:col-span-2">
@@ -1130,10 +1108,10 @@ const CafeSettings: React.FC = () => {
                             </div>
                           </div>
                           <div className="flex gap-2 mt-3">
-                            <button type="button" onClick={handleUpdatePromoBanner} disabled={updatingBanner} className="btn-primary text-sm disabled:opacity-50">
+                            <GlassButton type="button" onClick={handleUpdatePromoBanner} disabled={updatingBanner} size="sm" className="glass-button-primary disabled:opacity-50">
                               {updatingBanner ? 'Saving...' : 'Save'}
-                            </button>
-                            <button type="button" onClick={() => { setEditingBannerId(null); setEditingBannerReplaceFile(null); }} disabled={updatingBanner} className="px-3 py-1 border rounded text-sm disabled:opacity-50">Cancel</button>
+                            </GlassButton>
+                            <GlassButton type="button" onClick={() => { setEditingBannerId(null); setEditingBannerReplaceFile(null); }} disabled={updatingBanner} size="sm" className="glass-button-secondary disabled:opacity-50">Cancel</GlassButton>
                           </div>
                         </div>
                       );
@@ -1182,10 +1160,10 @@ const CafeSettings: React.FC = () => {
                           </div>
                         </div>
                         <div className="flex gap-2 mt-3">
-                          <button type="button" onClick={handleAddPromoBanner} disabled={!promoBannerForm.file || uploadingNewBanner} className="btn-primary text-sm disabled:opacity-50">
+                          <GlassButton type="button" onClick={handleAddPromoBanner} disabled={!promoBannerForm.file || uploadingNewBanner} size="sm" className="glass-button-primary disabled:opacity-50">
                             {uploadingNewBanner ? 'Uploading...' : 'Add'}
-                          </button>
-                          <button type="button" onClick={() => setPromoBannerForm({ show: false, file: null, link_url: '', priority: 0, active: true })} className="px-3 py-1 border rounded text-sm">Cancel</button>
+                          </GlassButton>
+                          <GlassButton type="button" onClick={() => setPromoBannerForm({ show: false, file: null, link_url: '', priority: 0, active: true })} size="sm" className="glass-button-secondary">Cancel</GlassButton>
                         </div>
                       </div>
                     )}
@@ -1448,7 +1426,6 @@ const CafeSettings: React.FC = () => {
           */}
         </div>
         )}
-      </div>
     </div>
   );
 };
