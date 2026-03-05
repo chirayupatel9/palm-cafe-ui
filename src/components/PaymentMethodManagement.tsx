@@ -435,7 +435,7 @@ const PaymentMethodManagement: React.FC = () => {
 
       {/* Form */}
       {showForm && (
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+        <div className="bg-surface-card rounded-lg shadow-md p-6">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-lg font-semibold text-secondary-700 dark:text-secondary-300">
               {editingId ? 'Edit Payment Method' : 'Add Payment Method'}
@@ -551,7 +551,7 @@ const PaymentMethodManagement: React.FC = () => {
       )}
 
       {/* Payment Methods List */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden">
+      <div className="bg-surface-card rounded-lg shadow-md overflow-hidden">
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
             <thead className="bg-gray-50 dark:bg-gray-700">
@@ -573,7 +573,7 @@ const PaymentMethodManagement: React.FC = () => {
                 </th>
               </tr>
             </thead>
-            <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+            <tbody className="bg-surface-card divide-y divide-gray-200 dark:divide-gray-700">
               {paymentMethods.map((method, index) => (
                 <tr key={method.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300">
@@ -676,7 +676,7 @@ const PaymentMethodManagement: React.FC = () => {
           </div>
 
           {/* Current Settings */}
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+          <div className="bg-surface-card rounded-lg shadow-md p-6">
             <div className="flex items-center justify-between mb-4">
               <h4 className="text-lg font-semibold text-secondary-700 dark:text-secondary-300">
                 Current Currency Settings
@@ -808,7 +808,7 @@ const PaymentMethodManagement: React.FC = () => {
           </div>
 
           {/* Currency History */}
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+          <div className="bg-surface-card rounded-lg shadow-md p-6">
             <h4 className="text-lg font-semibold text-secondary-700 dark:text-secondary-300 mb-4 flex items-center">
               <Calendar className="h-5 w-5 mr-2" />
               Currency History
@@ -838,7 +838,7 @@ const PaymentMethodManagement: React.FC = () => {
                       </th>
                     </tr>
                   </thead>
-                  <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                  <tbody className="bg-surface-card divide-y divide-gray-200 dark:divide-gray-700">
                     {currencyHistory.map((record, index) => (
                       <tr key={index} className="hover:bg-gray-50 dark:hover:bg-gray-700">
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300">
@@ -886,7 +886,7 @@ const PaymentMethodManagement: React.FC = () => {
           )}
 
           {/* Current Tax Settings */}
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+          <div className="bg-surface-card rounded-lg shadow-md p-6">
             <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-4 space-y-2 sm:space-y-0">
               <h3 className="text-lg font-semibold text-secondary-700 dark:text-secondary-300">Current Tax Settings</h3>
               {!isEditingTax && (
@@ -1033,7 +1033,7 @@ const PaymentMethodManagement: React.FC = () => {
           </div>
 
           {/* Tax History */}
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+          <div className="bg-surface-card rounded-lg shadow-md p-6">
             <h4 className="text-lg font-semibold text-secondary-700 dark:text-secondary-300 mb-4 flex items-center">
               <Calendar className="h-5 w-5 mr-2" />
               Tax History
@@ -1066,7 +1066,7 @@ const PaymentMethodManagement: React.FC = () => {
                       </th>
                     </tr>
                   </thead>
-                  <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                  <tbody className="bg-surface-card divide-y divide-gray-200 dark:divide-gray-700">
                     {taxHistory.map((setting) => (
                       <tr key={setting.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300">

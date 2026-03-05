@@ -75,12 +75,12 @@ const Dialog: React.FC<DialogProps> = ({
         aria-hidden="true"
       />
       <div
-        className={`absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-[calc(100%-2rem)] ${maxW} bg-white rounded-3xl shadow-xl flex flex-col ${maxHeight ? 'max-h-[90vh]' : ''} overflow-hidden ${className}`}
+        className={`absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-[calc(100%-2rem)] ${maxW} bg-surface-card rounded-3xl shadow-xl flex flex-col ${maxHeight ? 'max-h-[90vh]' : ''} overflow-hidden ${className}`}
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between flex-shrink-0 px-6 pt-6 pb-5">
           {title ? (
-            <h2 id="dialog-title" className="text-xl font-bold text-[#2A2A2A]">
+            <h2 id="dialog-title" className="text-xl font-bold text-[#0b0f05]">
               {title}
             </h2>
           ) : (
@@ -89,7 +89,7 @@ const Dialog: React.FC<DialogProps> = ({
           <button
             type="button"
             onClick={onClose}
-            className="ml-auto p-2 rounded-full text-[#6F6A63] hover:bg-[#F6F4F0] hover:text-[#2A2A2A] transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center"
+            className="ml-auto p-2 rounded-full text-[#b3af9b] hover:bg-[#e1e5df] hover:text-[#0b0f05] transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center"
             aria-label="Close"
           >
             <X className="h-5 w-5" />

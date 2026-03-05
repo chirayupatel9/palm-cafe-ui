@@ -38,8 +38,8 @@ export const getLogoUrl = (logoUrl: string | null | undefined): string | null =>
 export const getPlaceholderImage = (categoryName: string, itemName = ''): string => {
   const name = (categoryName || itemName || 'food').toLowerCase();
 
-  let bgColor = '#F3E5D8';
-  let accentColor = '#8B7355';
+  let bgColor = '#e1e5df';
+  let accentColor = '#334b26';
   let icon = 'utensils';
 
   if (name.includes('burger') || name.includes('sandwich')) {
@@ -72,7 +72,7 @@ export const getPlaceholderImage = (categoryName: string, itemName = ''): string
     icon = 'tea';
   } else if (name.includes('drink') || name.includes('juice')) {
     bgColor = '#EFF6FF';
-    accentColor = '#3B82F6';
+    accentColor = '#334b26';
     icon = 'drink';
   }
 

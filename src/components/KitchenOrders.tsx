@@ -597,7 +597,7 @@ const KitchenOrders: React.FC<KitchenOrdersProps> = ({ cart, setCart }) => {
               className="h-12 w-12 mr-4"
             />
           ) : (
-            <div className="h-12 w-12 mr-4 bg-primary-600 rounded flex items-center justify-center text-white font-bold">
+            <div className="h-12 w-12 mr-4 bg-primary rounded flex items-center justify-center text-on-primary font-bold">
               {cafeSettings.cafe_name ? cafeSettings.cafe_name.charAt(0).toUpperCase() : 'C'}
             </div>
           )}
@@ -1182,7 +1182,7 @@ const KitchenOrders: React.FC<KitchenOrdersProps> = ({ cart, setCart }) => {
                         {editingOrder === order.id && (
                           <button
                             onClick={addItemToOrder}
-                            className="text-sm px-2 py-1 bg-green-600 text-white rounded hover:bg-green-700 flex items-center"
+                            className="text-sm px-2 py-1 bg-[var(--color-success)] text-[var(--color-on-success)] rounded hover:opacity-90 flex items-center"
                           >
                             <Plus className="h-3 w-3 mr-1" />
                             Add Item
@@ -1370,7 +1370,7 @@ const KitchenOrders: React.FC<KitchenOrdersProps> = ({ cart, setCart }) => {
                       <div className="flex space-x-2">
                         <button
                           onClick={saveOrder}
-                          className="text-sm px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700 flex items-center"
+                          className="text-sm px-3 py-1 bg-[var(--color-success)] text-[var(--color-on-success)] rounded hover:opacity-90 flex items-center"
                         >
                           <Save className="h-3 w-3 mr-1" />
                           Save

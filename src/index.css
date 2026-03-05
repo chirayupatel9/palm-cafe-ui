@@ -390,7 +390,7 @@ body {
   textarea.input-field:focus {
     @apply focus:ring-2 focus:ring-primary focus:border-transparent outline-none;
     border-color: var(--color-primary);
-    box-shadow: var(--elevation-1), 0 0 0 3px rgba(var(--color-primary-rgb, 111, 78, 55), 0.1);
+    box-shadow: var(--elevation-1), 0 0 0 3px rgba(51, 75, 38, 0.15);
   }
   .input-field::placeholder {
     color: var(--color-on-surface-variant);
@@ -401,15 +401,15 @@ body {
     padding-right: 2.5rem;
     background-color: var(--color-surface);
     box-shadow: var(--elevation-1);
-    /* Chevron in theme primary (brown) - encoded #6F4E37 */
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236F4E37'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+    /* Chevron in theme primary #334b26 */
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23334b26'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
     background-repeat: no-repeat;
     background-position: right 0.75rem center;
     background-size: 1.25rem;
   }
   [data-theme="dark"] select.input-field,
   .dark select.input-field {
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%238B6F47'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23a57f42'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
   }
   select.input-field option {
     background-color: var(--color-surface);
@@ -418,11 +418,11 @@ body {
   /* Material-style focus: primary border + soft ring */
   select.input-field:focus {
     border-color: var(--color-primary);
-    box-shadow: var(--elevation-2), 0 0 0 3px rgba(111, 78, 55, 0.12);
+    box-shadow: var(--elevation-2), 0 0 0 3px rgba(51, 75, 38, 0.2);
   }
   .dark select.input-field:focus,
   [data-theme="dark"] select.input-field:focus {
-    box-shadow: var(--elevation-2), 0 0 0 3px rgba(139, 111, 71, 0.25);
+    box-shadow: var(--elevation-2), 0 0 0 3px rgba(165, 127, 66, 0.3);
   }
 
   /* Navigation styles - Gradient button active state */
@@ -885,34 +885,34 @@ img {
   opacity: 0.85;
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.14), 0 4px 16px rgba(0, 0, 0, 0.1);
 }
-/* Glass button selected (e.g. category chip – solid golden-brown) */
+/* Glass button selected (e.g. category chip – palette accent #a57f42) */
 .glass-button-wrap.glass-button-selected .glass-button {
-  background: #C68E3C;
-  border-color: rgba(198, 142, 60, 0.7);
-  color: #fff;
+  background: #a57f42;
+  border-color: rgba(165, 127, 66, 0.7);
+  color: #e1e5df;
   box-shadow:
     0 0 0 1px rgba(255, 255, 255, 0.2) inset,
     2px 2px 8px -2px rgba(255, 255, 255, 0.2) inset,
-    0 6px 24px rgba(198, 142, 60, 0.3),
+    0 6px 24px rgba(165, 127, 66, 0.3),
     0 2px 8px rgba(0, 0, 0, 0.08);
 }
 .glass-button-wrap.glass-button-selected .glass-button:hover {
-  background: #b87d2e;
+  background: #91590b;
   box-shadow:
     0 0 0 1px rgba(255, 255, 255, 0.25) inset,
     2px 2px 10px -2px rgba(255, 255, 255, 0.25) inset,
-    0 8px 28px rgba(198, 142, 60, 0.35),
+    0 8px 28px rgba(165, 127, 66, 0.35),
     0 2px 10px rgba(0, 0, 0, 0.1);
 }
-/* Glass button primary (dark fill, e.g. Clear search) */
+/* Glass button primary (dark fill – palette #334b26) */
 .glass-button-wrap.glass-button-primary .glass-button {
-  background: #2A2A2A;
-  border-color: rgba(42, 42, 42, 0.8);
-  color: #fff;
+  background: #334b26;
+  border-color: rgba(51, 75, 38, 0.8);
+  color: #e1e5df;
 }
 .glass-button-wrap.glass-button-primary .glass-button:hover {
-  background: #C68E3C;
-  border-color: rgba(198, 142, 60, 0.8);
+  background: #a57f42;
+  border-color: rgba(165, 127, 66, 0.8);
 }
 /* Glass button on dark hero (white text) */
 .glass-button-wrap.glass-button-on-dark .glass-button {
@@ -923,44 +923,44 @@ img {
 .glass-button-wrap.glass-button-on-dark .glass-button:hover {
   background: rgba(255, 255, 255, 0.2);
 }
-/* Carousel arrow buttons – gradient tint (Our Categories) */
+/* Carousel arrow buttons – gradient tint (palette #a57f42 #91590b) */
 .glass-button-wrap.glass-button-carousel-arrow .glass-button {
-  background: linear-gradient(135deg, rgba(198, 142, 60, 0.35) 0%, rgba(139, 105, 20, 0.25) 100%);
-  border-color: rgba(198, 142, 60, 0.5);
-  color: #2A2A2A;
+  background: linear-gradient(135deg, rgba(165, 127, 66, 0.35) 0%, rgba(145, 89, 11, 0.25) 100%);
+  border-color: rgba(165, 127, 66, 0.5);
+  color: #0b0f05;
   box-shadow:
     0 0 0 1px rgba(255, 255, 255, 0.25) inset,
     2px 2px 8px -2px rgba(255, 255, 255, 0.3) inset,
-    0 6px 24px rgba(198, 142, 60, 0.25),
+    0 6px 24px rgba(165, 127, 66, 0.25),
     0 2px 8px rgba(0, 0, 0, 0.06);
 }
 .glass-button-wrap.glass-button-carousel-arrow .glass-button:hover {
-  background: linear-gradient(135deg, rgba(198, 142, 60, 0.5) 0%, rgba(139, 105, 20, 0.4) 100%);
-  border-color: rgba(198, 142, 60, 0.65);
+  background: linear-gradient(135deg, rgba(165, 127, 66, 0.5) 0%, rgba(145, 89, 11, 0.4) 100%);
+  border-color: rgba(165, 127, 66, 0.65);
   box-shadow:
     0 0 0 1px rgba(255, 255, 255, 0.3) inset,
     2px 2px 10px -2px rgba(255, 255, 255, 0.35) inset,
-    0 8px 28px rgba(198, 142, 60, 0.3),
+    0 8px 28px rgba(165, 127, 66, 0.3),
     0 2px 10px rgba(0, 0, 0, 0.08);
 }
 .glass-button-wrap.glass-button-carousel-arrow .glass-button-shadow {
-  box-shadow: 0 0 12px rgba(198, 142, 60, 0.1);
+  box-shadow: 0 0 12px rgba(165, 127, 66, 0.1);
 }
-/* Glass button on light background (e.g. cart sheet) – dark text for contrast */
+/* Glass button on light background (e.g. cart sheet) – palette dark text */
 .glass-button-wrap.glass-button-light .glass-button {
   background: rgba(255, 255, 255, 0.95);
-  border-color: rgba(42, 42, 42, 0.2);
-  color: #2A2A2A;
+  border-color: rgba(11, 15, 5, 0.2);
+  color: #0b0f05;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.06);
 }
 .glass-button-wrap.glass-button-light .glass-button:hover {
-  background: rgba(240, 240, 238, 0.98);
-  border-color: rgba(42, 42, 42, 0.3);
-  color: #1a1a1a;
+  background: rgba(225, 229, 223, 0.98);
+  border-color: rgba(11, 15, 5, 0.3);
+  color: #0b0f05;
 }
 .glass-button-wrap.glass-button-light::before,
 .glass-button-wrap.glass-button-light::after {
-  border-color: rgba(42, 42, 42, 0.25);
+  border-color: rgba(11, 15, 5, 0.25);
 }
 /* Glass input (search field) – bubble glass to match glass buttons */
 .glass-input {
@@ -977,21 +977,54 @@ img {
   transition: background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
 }
 .glass-input::placeholder {
-  color: rgba(42, 42, 42, 0.65);
+  color: rgba(11, 15, 5, 0.65);
 }
 .glass-input:focus {
   outline: none;
   background: rgba(255, 255, 255, 0.35);
-  border-color: rgba(198, 142, 60, 0.55);
+  border-color: rgba(165, 127, 66, 0.55);
   box-shadow:
     0 0 0 1px rgba(255, 255, 255, 0.2) inset,
     2px 2px 10px -2px rgba(255, 255, 255, 0.3) inset,
-    0 0 0 2px rgba(198, 142, 60, 0.2),
+    0 0 0 2px rgba(165, 127, 66, 0.2),
     0 4px 24px rgba(0, 0, 0, 0.1),
     0 2px 10px rgba(0, 0, 0, 0.06);
 }
 .glass-input:focus::placeholder {
-  color: rgba(42, 42, 42, 0.6);
+  color: rgba(11, 15, 5, 0.6);
+}
+
+/* Select trigger – glass button effect on hover (all dropdowns except CustomerMenu) */
+.select-trigger-glass-hover {
+  transition: background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, backdrop-filter 0.2s ease;
+}
+.select-trigger-glass-hover:hover {
+  background: rgba(255, 255, 255, 0.5) !important;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-color: rgba(255, 255, 255, 0.5) !important;
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.3) inset,
+    2px 2px 8px -2px rgba(255, 255, 255, 0.25) inset,
+    0 4px 16px rgba(0, 0, 0, 0.06),
+    0 2px 8px rgba(0, 0, 0, 0.04) !important;
+}
+
+/* Select dropdown panel – glass effect */
+.select-dropdown-glass {
+  background: rgba(255, 255, 255, 0.55) !important;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.25) inset,
+    0 4px 20px rgba(0, 0, 0, 0.08),
+    0 2px 8px rgba(0, 0, 0, 0.04);
+}
+.select-dropdown-glass .select-option-glass-hover:not(.select-option-selected):hover {
+  background: rgba(255, 255, 255, 0.5) !important;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
 }
 
 /* ============================================

@@ -118,33 +118,33 @@ const CustomerLogin: React.FC<CustomerLoginProps> = ({ cafeSlug, onLogin }) => {
   };
 
   return (
-    <div className="relative w-full max-w-md bg-white dark:bg-[#221a10] rounded-xl shadow-lg p-8 sm:p-10">
+    <div className="relative w-full max-w-md bg-[#e1e5df] dark:bg-[#0b0f05] rounded-xl shadow-lg p-8 sm:p-10">
       <div className="flex flex-col w-full">
         {!showRegister ? (
           step === 'email' ? (
             <>
               <div className="text-center mb-6">
-                <h1 className="text-text-light dark:text-[#F7F4EF] tracking-tight text-3xl font-bold leading-tight">
+                <h1 className="text-text-light dark:text-[#e1e5df] tracking-tight text-3xl font-bold leading-tight">
                   Welcome Back!
                 </h1>
-                <p className="text-text-light/70 dark:text-[#F7F4EF]/70 text-base font-normal leading-normal pt-2">
+                <p className="text-text-light/70 dark:text-[#e1e5df]/70 text-base font-normal leading-normal pt-2">
                   Enter your email to receive a login code
                 </p>
               </div>
               <form onSubmit={handleSendOtp} className="flex flex-col gap-4">
                 <div className="flex flex-col">
                   <label
-                    className="text-text-light dark:text-[#F7F4EF] text-base font-medium leading-normal pb-2"
+                    className="text-text-light dark:text-[#e1e5df] text-base font-medium leading-normal pb-2"
                     htmlFor="email"
                   >
                     Email Address
                   </label>
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                      <Mail className="h-5 w-5 text-[#9a794c] dark:text-[#8a6d4c]" />
+                      <Mail className="h-5 w-5 text-[#91590b] dark:text-[#a57f42]" />
                     </div>
                     <input
-                      className="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-text-light dark:text-[#F7F4EF] focus:outline-0 focus:ring-2 focus:ring-[#6F4E37]/50 border border-[#e7ddcf] dark:border-[#443d34] bg-transparent dark:bg-[#221a10] h-14 placeholder:text-[#9a794c] dark:placeholder:text-[#8a6d4c] pl-12 pr-4 text-base font-normal leading-normal"
+                      className="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-text-light dark:text-[#e1e5df] focus:outline-0 focus:ring-2 focus:ring-[#334b26]/50 border border-[#b3af9b] dark:border-[#334b26] bg-transparent dark:bg-[#0b0f05] h-14 placeholder:text-[#91590b] dark:placeholder:text-[#a57f42] pl-12 pr-4 text-base font-normal leading-normal"
                       id="email"
                       placeholder="Enter your email address"
                       type="email"
@@ -178,24 +178,24 @@ const CustomerLogin: React.FC<CustomerLoginProps> = ({ cafeSlug, onLogin }) => {
           ) : (
             <>
               <div className="text-center mb-6">
-                <h1 className="text-text-light dark:text-[#F7F4EF] tracking-tight text-3xl font-bold leading-tight">
+                <h1 className="text-text-light dark:text-[#e1e5df] tracking-tight text-3xl font-bold leading-tight">
                   Enter code
                 </h1>
-                <p className="text-text-light/70 dark:text-[#F7F4EF]/70 text-base font-normal leading-normal pt-2">
+                <p className="text-text-light/70 dark:text-[#e1e5df]/70 text-base font-normal leading-normal pt-2">
                   We sent a 6-digit code to
                 </p>
-                <p className="font-medium text-text-light dark:text-[#F7F4EF] pt-1">{email}</p>
+                <p className="font-medium text-text-light dark:text-[#e1e5df] pt-1">{email}</p>
               </div>
               <form onSubmit={handleLogin} className="flex flex-col gap-4">
                 <div className="flex flex-col">
                   <label
-                    className="text-text-light dark:text-[#F7F4EF] text-base font-medium leading-normal pb-2"
+                    className="text-text-light dark:text-[#e1e5df] text-base font-medium leading-normal pb-2"
                     htmlFor="otp"
                   >
                     Verification code
                   </label>
                   <input
-                    className="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-text-light dark:text-[#F7F4EF] focus:outline-0 focus:ring-2 focus:ring-[#6F4E37]/50 border border-[#e7ddcf] dark:border-[#443d34] bg-transparent dark:bg-[#221a10] h-14 placeholder:text-[#9a794c] dark:placeholder:text-[#8a6d4c] px-4 text-center text-2xl tracking-widest text-base font-normal leading-normal"
+                    className="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-text-light dark:text-[#e1e5df] focus:outline-0 focus:ring-2 focus:ring-[#334b26]/50 border border-[#b3af9b] dark:border-[#334b26] bg-transparent dark:bg-[#0b0f05] h-14 placeholder:text-[#91590b] dark:placeholder:text-[#a57f42] px-4 text-center text-2xl tracking-widest text-base font-normal leading-normal"
                     id="otp"
                     placeholder="123456"
                     type="text"
@@ -227,7 +227,7 @@ const CustomerLogin: React.FC<CustomerLoginProps> = ({ cafeSlug, onLogin }) => {
                 <button
                   type="button"
                   onClick={handleCloseOtp}
-                  className="w-full text-center text-sm text-[#C8A165] hover:underline"
+                  className="w-full text-center text-sm text-[#a57f42] hover:underline"
                 >
                   Use a different email
                 </button>
@@ -237,27 +237,27 @@ const CustomerLogin: React.FC<CustomerLoginProps> = ({ cafeSlug, onLogin }) => {
         ) : (
           <>
             <div className="text-center mb-6">
-              <h1 className="text-text-light dark:text-[#F7F4EF] tracking-tight text-3xl font-bold leading-tight">
+              <h1 className="text-text-light dark:text-[#e1e5df] tracking-tight text-3xl font-bold leading-tight">
                 Create Account
               </h1>
-              <p className="text-text-light/70 dark:text-[#F7F4EF]/70 text-base font-normal leading-normal pt-2">
+              <p className="text-text-light/70 dark:text-[#e1e5df]/70 text-base font-normal leading-normal pt-2">
                 Join us to start ordering
               </p>
             </div>
             <form onSubmit={handleRegister} className="flex flex-col gap-4">
               <div className="flex flex-col">
                 <label
-                  className="text-text-light dark:text-[#F7F4EF] text-base font-medium leading-normal pb-2"
+                  className="text-text-light dark:text-[#e1e5df] text-base font-medium leading-normal pb-2"
                   htmlFor="name"
                 >
                   Full Name *
                 </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                    <User className="h-5 w-5 text-[#9a794c] dark:text-[#8a6d4c]" />
+                    <User className="h-5 w-5 text-[#91590b] dark:text-[#a57f42]" />
                   </div>
                   <input
-                    className="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-text-light dark:text-[#F7F4EF] focus:outline-0 focus:ring-2 focus:ring-[#6F4E37]/50 border border-[#e7ddcf] dark:border-[#443d34] bg-transparent dark:bg-[#221a10] h-14 placeholder:text-[#9a794c] dark:placeholder:text-[#8a6d4c] pl-12 pr-4 text-base font-normal leading-normal"
+                    className="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-text-light dark:text-[#e1e5df] focus:outline-0 focus:ring-2 focus:ring-[#334b26]/50 border border-[#b3af9b] dark:border-[#334b26] bg-transparent dark:bg-[#0b0f05] h-14 placeholder:text-[#91590b] dark:placeholder:text-[#a57f42] pl-12 pr-4 text-base font-normal leading-normal"
                     id="name"
                     placeholder="Enter your full name"
                     type="text"
@@ -269,17 +269,17 @@ const CustomerLogin: React.FC<CustomerLoginProps> = ({ cafeSlug, onLogin }) => {
               </div>
               <div className="flex flex-col">
                 <label
-                  className="text-text-light dark:text-[#F7F4EF] text-base font-medium leading-normal pb-2"
+                  className="text-text-light dark:text-[#e1e5df] text-base font-medium leading-normal pb-2"
                   htmlFor="registerEmail"
                 >
                   Email Address *
                 </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                    <Mail className="h-5 w-5 text-[#9a794c] dark:text-[#8a6d4c]" />
+                    <Mail className="h-5 w-5 text-[#91590b] dark:text-[#a57f42]" />
                   </div>
                   <input
-                    className="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-text-light dark:text-[#F7F4EF] focus:outline-0 focus:ring-2 focus:ring-[#6F4E37]/50 border border-[#e7ddcf] dark:border-[#443d34] bg-transparent dark:bg-[#221a10] h-14 placeholder:text-[#9a794c] dark:placeholder:text-[#8a6d4c] pl-12 pr-4 text-base font-normal leading-normal read-only:opacity-90 read-only:cursor-not-allowed read-only:bg-[#e7ddcf]/20 dark:read-only:bg-[#443d34]/30"
+                    className="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-text-light dark:text-[#e1e5df] focus:outline-0 focus:ring-2 focus:ring-[#334b26]/50 border border-[#b3af9b] dark:border-[#334b26] bg-transparent dark:bg-[#0b0f05] h-14 placeholder:text-[#91590b] dark:placeholder:text-[#a57f42] pl-12 pr-4 text-base font-normal leading-normal read-only:opacity-90 read-only:cursor-not-allowed read-only:bg-[#b3af9b]/20 dark:read-only:bg-[#334b26]/30"
                     id="registerEmail"
                     placeholder="Enter your email address"
                     type="email"
@@ -288,23 +288,23 @@ const CustomerLogin: React.FC<CustomerLoginProps> = ({ cafeSlug, onLogin }) => {
                     required
                   />
                 </div>
-                <p className="text-xs text-text-light/60 dark:text-[#F7F4EF]/60 mt-1">
+                <p className="text-xs text-text-light/60 dark:text-[#e1e5df]/60 mt-1">
                   This is the email you used to receive the verification code.
                 </p>
               </div>
               <div className="flex flex-col">
                 <label
-                  className="text-text-light dark:text-[#F7F4EF] text-base font-medium leading-normal pb-2"
+                  className="text-text-light dark:text-[#e1e5df] text-base font-medium leading-normal pb-2"
                   htmlFor="registerPhone"
                 >
                   Phone Number *
                 </label>
                 <div className="relative">
 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                      <Phone className="h-5 w-5 text-[#9a794c] dark:text-[#8a6d4c]" />
+                      <Phone className="h-5 w-5 text-[#91590b] dark:text-[#a57f42]" />
                     </div>
                     <input
-                    className="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-text-light dark:text-[#F7F4EF] focus:outline-0 focus:ring-2 focus:ring-[#6F4E37]/50 border border-[#e7ddcf] dark:border-[#443d34] bg-transparent dark:bg-[#221a10] h-14 placeholder:text-[#9a794c] dark:placeholder:text-[#8a6d4c] pl-12 pr-4 text-base font-normal leading-normal"
+                    className="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-text-light dark:text-[#e1e5df] focus:outline-0 focus:ring-2 focus:ring-[#334b26]/50 border border-[#b3af9b] dark:border-[#334b26] bg-transparent dark:bg-[#0b0f05] h-14 placeholder:text-[#91590b] dark:placeholder:text-[#a57f42] pl-12 pr-4 text-base font-normal leading-normal"
                     id="registerPhone"
                     placeholder="Enter your phone number"
                     type="tel"
@@ -316,17 +316,17 @@ const CustomerLogin: React.FC<CustomerLoginProps> = ({ cafeSlug, onLogin }) => {
               </div>
               <div className="flex flex-col">
                 <label
-                  className="text-text-light dark:text-[#F7F4EF] text-base font-medium leading-normal pb-2"
+                  className="text-text-light dark:text-[#e1e5df] text-base font-medium leading-normal pb-2"
                   htmlFor="address"
                 >
                   Address
                 </label>
                 <div className="relative">
                   <div className="absolute top-4 left-0 pl-4 flex items-start pointer-events-none">
-                    <MapPin className="h-5 w-5 text-[#9a794c] dark:text-[#8a6d4c]" />
+                    <MapPin className="h-5 w-5 text-[#91590b] dark:text-[#a57f42]" />
                   </div>
                   <textarea
-                    className="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-text-light dark:text-[#F7F4EF] focus:outline-0 focus:ring-2 focus:ring-[#6F4E37]/50 border border-[#e7ddcf] dark:border-[#443d34] bg-transparent dark:bg-[#221a10] placeholder:text-[#9a794c] dark:placeholder:text-[#8a6d4c] pl-12 pr-4 py-4 text-base font-normal leading-normal"
+                    className="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-text-light dark:text-[#e1e5df] focus:outline-0 focus:ring-2 focus:ring-[#334b26]/50 border border-[#b3af9b] dark:border-[#334b26] bg-transparent dark:bg-[#0b0f05] placeholder:text-[#91590b] dark:placeholder:text-[#a57f42] pl-12 pr-4 py-4 text-base font-normal leading-normal"
                     id="address"
                     placeholder="Enter your address"
                     rows={3}
@@ -360,19 +360,19 @@ const CustomerLogin: React.FC<CustomerLoginProps> = ({ cafeSlug, onLogin }) => {
         {(!showRegister && step === 'email') || showRegister ? (
           <>
             <div className="flex items-center my-8">
-              <hr className="flex-grow border-t border-[#e7ddcf] dark:border-[#443d34]" />
-              <span className="px-4 text-sm text-text-light/60 dark:text-[#F7F4EF]/60">Or</span>
-              <hr className="flex-grow border-t border-[#e7ddcf] dark:border-[#443d34]" />
+              <hr className="flex-grow border-t border-[#b3af9b] dark:border-[#334b26]" />
+              <span className="px-4 text-sm text-text-light/60 dark:text-[#e1e5df]/60">Or</span>
+              <hr className="flex-grow border-t border-[#b3af9b] dark:border-[#334b26]" />
             </div>
             <div className="text-center">
-              <p className="text-text-light dark:text-[#F7F4EF] text-base font-normal leading-normal">
+              <p className="text-text-light dark:text-[#e1e5df] text-base font-normal leading-normal">
                 {showRegister ? (
                   <>
                     Already have an account?{' '}
                     <button
                       type="button"
                       onClick={() => setShowRegister(false)}
-                      className="font-bold text-[#C8A165] hover:underline"
+                      className="font-bold text-[#a57f42] hover:underline"
                     >
                       Login
                     </button>
@@ -389,7 +389,7 @@ const CustomerLogin: React.FC<CustomerLoginProps> = ({ cafeSlug, onLogin }) => {
                         setEmail('');
                         setOtp('');
                       }}
-                      className="font-bold text-[#C8A165] hover:underline"
+                      className="font-bold text-[#a57f42] hover:underline"
                     >
                       Sign Up
                     </button>

@@ -775,7 +775,7 @@ const CustomerManagement: React.FC = () => {
       >
         {showOrderDetailsModal && selectedOrder && (
             <>
-              <p className="text-sm text-[#6F6A63] mb-4">{formatDate(selectedOrder.created_at)}</p>
+              <p className="text-sm text-[#b3af9b] mb-4">{formatDate(selectedOrder.created_at)}</p>
               <div className="space-y-4">
                 <div className="grid grid-cols-2 gap-4 text-sm">
                   <div>

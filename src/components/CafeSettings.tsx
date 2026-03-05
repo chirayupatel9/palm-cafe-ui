@@ -79,40 +79,40 @@ const CafeSettings: React.FC = () => {
   const [adminCanManageInventory, setAdminCanManageInventory] = useState(true);
   const [adminCanManageMenu, setAdminCanManageMenu] = useState(true);
 
-  // Color scheme state
-  const [lightPrimaryColor, setLightPrimaryColor] = useState('#3B82F6');
-  const [lightSecondaryColor, setLightSecondaryColor] = useState('#6B7280');
-  const [lightAccentColor, setLightAccentColor] = useState('#10B981');
-  const [lightBackgroundColor, setLightBackgroundColor] = useState('#FFFFFF');
-  const [lightTextColor, setLightTextColor] = useState('#1F2937');
-  const [lightSurfaceColor, setLightSurfaceColor] = useState('#F9FAFB');
+  // Color scheme state (palette: #e1e5df #b3af9b #a57f42 #91590b #334b26 #0b0f05)
+  const [lightPrimaryColor, setLightPrimaryColor] = useState('#334b26');
+  const [lightSecondaryColor, setLightSecondaryColor] = useState('#91590b');
+  const [lightAccentColor, setLightAccentColor] = useState('#a57f42');
+  const [lightBackgroundColor, setLightBackgroundColor] = useState('#e1e5df');
+  const [lightTextColor, setLightTextColor] = useState('#0b0f05');
+  const [lightSurfaceColor, setLightSurfaceColor] = useState('#e1e5df');
 
-  const [darkPrimaryColor, setDarkPrimaryColor] = useState('#60A5FA');
-  const [darkSecondaryColor, setDarkSecondaryColor] = useState('#9CA3AF');
-  const [darkAccentColor, setDarkAccentColor] = useState('#34D399');
-  const [darkBackgroundColor, setDarkBackgroundColor] = useState('#111827');
-  const [darkTextColor, setDarkTextColor] = useState('#F9FAFB');
-  const [darkSurfaceColor, setDarkSurfaceColor] = useState('#1F2937');
+  const [darkPrimaryColor, setDarkPrimaryColor] = useState('#334b26');
+  const [darkSecondaryColor, setDarkSecondaryColor] = useState('#91590b');
+  const [darkAccentColor, setDarkAccentColor] = useState('#a57f42');
+  const [darkBackgroundColor, setDarkBackgroundColor] = useState('#0b0f05');
+  const [darkTextColor, setDarkTextColor] = useState('#e1e5df');
+  const [darkSurfaceColor, setDarkSurfaceColor] = useState('#253419');
 
   // Predefined color schemes
   const predefinedSchemes = {
     'default': {
-      name: 'Default Blue',
+      name: 'Palm Cafe',
       light: {
-        primary: '#3B82F6',
-        secondary: '#6B7280',
-        accent: '#10B981',
-        background: '#FFFFFF',
-        text: '#1F2937',
-        surface: '#F9FAFB'
+        primary: '#334b26',
+        secondary: '#91590b',
+        accent: '#a57f42',
+        background: '#e1e5df',
+        text: '#0b0f05',
+        surface: '#e1e5df'
       },
       dark: {
-        primary: '#60A5FA',
-        secondary: '#9CA3AF',
-        accent: '#34D399',
-        background: '#111827',
-        text: '#F9FAFB',
-        surface: '#1F2937'
+        primary: '#334b26',
+        secondary: '#91590b',
+        accent: '#a57f42',
+        background: '#0b0f05',
+        text: '#e1e5df',
+        surface: '#253419'
       }
     },
     'coffee': {
@@ -123,14 +123,14 @@ const CafeSettings: React.FC = () => {
         accent: '#D2691E',
         background: '#FFF8DC',
         text: '#2F1B14',
-        surface: '#FFFFF'
+        surface: '#FFF8DC'
       },
       dark: {
         primary: '#CD853F',
         secondary: '#DEB887',
         accent: '#F4A460',
         background: '#2F1B14',
-        text: '#F7F4EF',
+        text: '#e1e5df',
         surface: '#3C2A21'
       }
     },
@@ -396,19 +396,19 @@ const CafeSettings: React.FC = () => {
       setAdminCanManageInventory(cafeSettings.admin_can_manage_inventory !== false);
       setAdminCanManageMenu(cafeSettings.admin_can_manage_menu !== false);
 
-      setLightPrimaryColor(cafeSettings.light_primary_color || '#3B82F6');
-      setLightSecondaryColor(cafeSettings.light_secondary_color || '#6B7280');
-      setLightAccentColor(cafeSettings.light_accent_color || '#10B981');
-      setLightBackgroundColor(cafeSettings.light_background_color || '#FFFFFF');
-      setLightTextColor(cafeSettings.light_text_color || '#1F2937');
-      setLightSurfaceColor(cafeSettings.light_surface_color || '#F9FAFB');
+      setLightPrimaryColor(cafeSettings.light_primary_color || '#334b26');
+      setLightSecondaryColor(cafeSettings.light_secondary_color || '#91590b');
+      setLightAccentColor(cafeSettings.light_accent_color || '#a57f42');
+      setLightBackgroundColor(cafeSettings.light_background_color || '#e1e5df');
+      setLightTextColor(cafeSettings.light_text_color || '#0b0f05');
+      setLightSurfaceColor(cafeSettings.light_surface_color || '#e1e5df');
 
-      setDarkPrimaryColor(cafeSettings.dark_primary_color || '#60A5FA');
-      setDarkSecondaryColor(cafeSettings.dark_secondary_color || '#9CA3AF');
-      setDarkAccentColor(cafeSettings.dark_accent_color || '#34D399');
-      setDarkBackgroundColor(cafeSettings.dark_background_color || '#111827');
-      setDarkTextColor(cafeSettings.dark_text_color || '#F9FAFB');
-      setDarkSurfaceColor(cafeSettings.dark_surface_color || '#1F2937');
+      setDarkPrimaryColor(cafeSettings.dark_primary_color || '#334b26');
+      setDarkSecondaryColor(cafeSettings.dark_secondary_color || '#91590b');
+      setDarkAccentColor(cafeSettings.dark_accent_color || '#a57f42');
+      setDarkBackgroundColor(cafeSettings.dark_background_color || '#0b0f05');
+      setDarkTextColor(cafeSettings.dark_text_color || '#e1e5df');
+      setDarkSurfaceColor(cafeSettings.dark_surface_color || '#253419');
     }
   }, [cafeSettings]);
 

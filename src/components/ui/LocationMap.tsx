@@ -88,7 +88,7 @@ const LocationMap: React.FC<LocationMapProps> = ({
 
   if (geocodeLoading) {
     return (
-      <div className={`h-full min-h-[200px] flex items-center justify-center bg-[#E9E4DA] text-[#6F6A63] ${className}`.trim()}>
+      <div className={`h-full min-h-[200px] flex items-center justify-center bg-[#b3af9b] text-[#b3af9b] ${className}`.trim()}>
         <span className="text-sm">Loading location…</span>
       </div>
     );
@@ -99,16 +99,16 @@ const LocationMap: React.FC<LocationMapProps> = ({
       <Map center={[lng, lat]} zoom={14}>
         <MapMarker longitude={lng} latitude={lat}>
           <MarkerContent>
-            <div className="size-4 rounded-full bg-[#C68E3C] border-2 border-white shadow-lg" />
+            <div className="size-4 rounded-full bg-[#a57f42] border-2 border-white shadow-lg" />
           </MarkerContent>
           <MarkerTooltip>{name}</MarkerTooltip>
           <MarkerPopup>
             <div className="space-y-1">
-              <p className="font-medium text-[#2A2A2A]">{name}</p>
+              <p className="font-medium text-[#0b0f05]">{name}</p>
               {address && (
-                <p className="text-xs text-[#6F6A63]">{address}</p>
+                <p className="text-xs text-[#b3af9b]">{address}</p>
               )}
-              <p className="text-xs text-[#6F6A63]">
+              <p className="text-xs text-[#b3af9b]">
                 {lat.toFixed(4)}, {lng.toFixed(4)}
               </p>
             </div>

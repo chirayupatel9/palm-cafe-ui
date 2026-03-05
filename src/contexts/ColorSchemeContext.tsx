@@ -46,31 +46,31 @@ export const ColorSchemeProvider: React.FC<ColorSchemeProviderProps> = ({ childr
   const { cafeSettings } = useCafeSettings();
   const { isDarkMode } = useDarkMode();
   const [currentColors, setCurrentColors] = useState<CurrentColors>({
-    primary: '#3B82F6',
-    secondary: '#6B7280',
-    accent: '#10B981',
-    background: '#FFFFFF',
-    text: '#1F2937',
-    surface: '#F9FAFB'
+    primary: '#334b26',
+    secondary: '#91590b',
+    accent: '#a57f42',
+    background: '#e1e5df',
+    text: '#0b0f05',
+    surface: '#e1e5df'
   });
 
   useEffect(() => {
     const newColors: CurrentColors = isDarkMode
       ? {
-          primary: cafeSettings.dark_primary_color || '#60A5FA',
-          secondary: cafeSettings.dark_secondary_color || '#9CA3AF',
-          accent: cafeSettings.dark_accent_color || '#34D399',
-          background: cafeSettings.dark_background_color || '#111827',
-          text: cafeSettings.dark_text_color || '#F9FAFB',
-          surface: cafeSettings.dark_surface_color || '#1F2937'
+          primary: cafeSettings.dark_primary_color || '#334b26',
+          secondary: cafeSettings.dark_secondary_color || '#91590b',
+          accent: cafeSettings.dark_accent_color || '#a57f42',
+          background: cafeSettings.dark_background_color || '#0b0f05',
+          text: cafeSettings.dark_text_color || '#e1e5df',
+          surface: cafeSettings.dark_surface_color || '#253419'
         }
       : {
-          primary: cafeSettings.light_primary_color || '#3B82F6',
-          secondary: cafeSettings.light_secondary_color || '#6B7280',
-          accent: cafeSettings.light_accent_color || '#10B981',
-          background: cafeSettings.light_background_color || '#FFFFFF',
-          text: cafeSettings.light_text_color || '#1F2937',
-          surface: cafeSettings.light_surface_color || '#F9FAFB'
+          primary: cafeSettings.light_primary_color || '#334b26',
+          secondary: cafeSettings.light_secondary_color || '#91590b',
+          accent: cafeSettings.light_accent_color || '#a57f42',
+          background: cafeSettings.light_background_color || '#e1e5df',
+          text: cafeSettings.light_text_color || '#0b0f05',
+          surface: cafeSettings.light_surface_color || '#e1e5df'
         };
 
     setCurrentColors(newColors);
@@ -78,13 +78,13 @@ export const ColorSchemeProvider: React.FC<ColorSchemeProviderProps> = ({ childr
     const root = document.documentElement;
     root.style.setProperty('--color-primary', newColors.primary);
     root.style.setProperty('--color-primary-dark', darkenColor(newColors.primary, 15));
-    root.style.setProperty('--color-on-primary', '#FFFFFF');
+    root.style.setProperty('--color-on-primary', '#e1e5df');
     root.style.setProperty('--color-primary-container', isDarkMode ? newColors.surface : newColors.background);
     root.style.setProperty('--color-on-primary-container', newColors.text);
     root.style.setProperty('--color-secondary', newColors.secondary);
-    root.style.setProperty('--color-on-secondary', '#FFFFFF');
+    root.style.setProperty('--color-on-secondary', '#e1e5df');
     root.style.setProperty('--color-accent', newColors.accent);
-    root.style.setProperty('--color-on-accent', '#FFFFFF');
+    root.style.setProperty('--color-on-accent', '#e1e5df');
     root.style.setProperty('--color-background', newColors.background);
     root.style.setProperty('--color-on-background', newColors.text);
     root.style.setProperty('--color-surface', newColors.surface);
@@ -94,7 +94,7 @@ export const ColorSchemeProvider: React.FC<ColorSchemeProviderProps> = ({ childr
   }, [cafeSettings, isDarkMode]);
 
   const getColor = (colorType: keyof CurrentColors): string => {
-    return currentColors[colorType] ?? '#3B82F6';
+    return currentColors[colorType] ?? '#334b26';
   };
 
   const value: ColorSchemeContextValue = { currentColors, getColor, isDarkMode };

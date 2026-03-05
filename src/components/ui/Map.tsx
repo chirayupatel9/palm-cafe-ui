@@ -376,7 +376,7 @@ const MarkerPopup: React.FC<MarkerPopupProps> = ({
   return createPortal(
     <div
       className={cn(
-        'relative rounded-md border border-[#2A2A2A]/10 bg-white p-3 text-[#2A2A2A] shadow-md animate-in fade-in-0 zoom-in-95',
+        'relative rounded-md border border-[#0b0f05]/10 bg-surface-card p-3 text-[#0b0f05] shadow-md animate-in fade-in-0 zoom-in-95',
         className
       )}
     >
@@ -470,7 +470,7 @@ const MarkerTooltip: React.FC<MarkerTooltipProps> = ({ children, className, ...p
   return createPortal(
     <div
       className={cn(
-        'rounded-md bg-[#2A2A2A] px-2 py-1 text-xs text-white shadow-md animate-in fade-in-0 zoom-in-95',
+        'rounded-md bg-[#0b0f05] px-2 py-1 text-xs text-on-primary shadow-md animate-in fade-in-0 zoom-in-95',
         className
       )}
     >

@@ -49,16 +49,17 @@ const Select: React.FC<SelectProps> = ({
 
   return (
     <div className="relative" ref={containerRef}>
+      {/* Trigger: solid light bg, rounded corners, thin light border (All Categories style) */}
       <button
         type="button"
         id={id}
         onClick={() => setOpen((o) => !o)}
-        className={`input-field w-full min-h-[40px] text-left flex items-center justify-between gap-2 pr-10 cursor-pointer ${className}`}
+        className={`select-trigger-glass-hover w-full min-h-[40px] text-left flex items-center justify-between gap-2 pr-10 cursor-pointer rounded-xl border px-4 ${className}`}
         style={{
-          backgroundColor: 'var(--color-surface)',
-          borderColor: open ? 'var(--color-primary)' : 'var(--color-outline)',
+          backgroundColor: 'var(--surface-card)',
+          borderColor: open ? 'var(--color-primary)' : 'var(--color-outline-variant)',
           color: 'var(--color-on-surface)',
-          boxShadow: open ? 'var(--elevation-2)' : 'var(--elevation-1)'
+          boxShadow: '0 1px 2px rgba(0,0,0,0.04)'
         }}
         aria-haspopup="listbox"
         aria-expanded={open}
@@ -72,15 +73,11 @@ const Select: React.FC<SelectProps> = ({
         />
       </button>
 
+      {/* Dropdown panel: glass effect (frosted, soft shadow) */}
       {open && (
         <ul
           role="listbox"
-          className="absolute left-0 right-0 top-full mt-1 py-1 z-50 rounded-xl overflow-hidden border min-w-[160px] max-h-60 overflow-y-auto"
-          style={{
-            backgroundColor: 'var(--color-surface)',
-            borderColor: 'var(--color-outline)',
-            boxShadow: 'var(--elevation-3)'
-          }}
+          className="select-dropdown-glass absolute left-0 right-0 top-full mt-1.5 z-50 rounded-2xl overflow-hidden min-w-[160px] max-h-60 overflow-y-auto py-2 transition-all duration-200"
         >
           {options.map((opt) => {
             const isSelected = opt.value === value;
@@ -100,20 +97,10 @@ const Select: React.FC<SelectProps> = ({
                     setOpen(false);
                   }
                 }}
-                className="px-4 py-2.5 cursor-pointer transition-colors text-sm hover:opacity-90"
+                className={`select-option-glass-hover px-4 py-3 cursor-pointer transition-all duration-150 text-sm font-medium rounded-lg mx-1.5 ${isSelected ? 'select-option-selected' : ''}`}
                 style={{
                   color: 'var(--color-on-surface)',
                   backgroundColor: isSelected ? 'var(--color-primary-container)' : 'transparent'
-                }}
-                onMouseEnter={(e: React.MouseEvent<HTMLLIElement>) => {
-                  if (!isSelected) {
-                    e.currentTarget.style.backgroundColor = 'var(--color-surface-variant)';
-                  }
-                }}
-                onMouseLeave={(e: React.MouseEvent<HTMLLIElement>) => {
-                  if (!isSelected) {
-                    e.currentTarget.style.backgroundColor = 'transparent';
-                  }
                 }}
               >
                 {opt.label}

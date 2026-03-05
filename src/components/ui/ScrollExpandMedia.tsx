@@ -166,7 +166,7 @@ const ScrollExpandMedia: React.FC<ScrollExpandMediaProps> = ({
       <section className="relative flex flex-col items-center justify-start min-h-[100dvh]">
         <div className="relative w-full flex flex-col items-center min-h-[100dvh]">
           <div
-            className="absolute inset-0 z-0 h-full bg-[#1a1a1a]"
+            className="absolute inset-0 z-0 h-full bg-[#0b0f05]"
             style={{ opacity: 'calc(1 - var(--hero-progress, 0))' }}
           >
             {bgImageSrc && (
@@ -253,7 +253,7 @@ const ScrollExpandMedia: React.FC<ScrollExpandMediaProps> = ({
                     </div>
                   )
                 ) : (
-                  <div className="relative w-full h-full bg-[#1a1a1a] rounded-xl overflow-hidden">
+                  <div className="relative w-full h-full bg-[#0b0f05] rounded-xl overflow-hidden">
                     {mediaSrc && (
                       <>
                         <img

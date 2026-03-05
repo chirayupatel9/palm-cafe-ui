@@ -18,22 +18,22 @@ const ColorSchemeTest: React.FC = () => {
   const currentColors: Record<string, string> = {
     primary:
       theme?.colors?.primary ||
-      (isDarkMode ? cafeSettings?.dark_primary_color || '#60A5FA' : cafeSettings?.light_primary_color || '#3B82F6'),
+      (isDarkMode ? cafeSettings?.dark_primary_color || '#334b26' : cafeSettings?.light_primary_color || '#334b26'),
     secondary:
       theme?.colors?.secondary ||
-      (isDarkMode ? cafeSettings?.dark_secondary_color || '#9CA3AF' : cafeSettings?.light_secondary_color || '#6B7280'),
+      (isDarkMode ? cafeSettings?.dark_secondary_color || '#91590b' : cafeSettings?.light_secondary_color || '#91590b'),
     accent:
       theme?.colors?.accent ||
-      (isDarkMode ? cafeSettings?.dark_accent_color || '#34D399' : cafeSettings?.light_accent_color || '#10B981'),
+      (isDarkMode ? cafeSettings?.dark_accent_color || '#a57f42' : cafeSettings?.light_accent_color || '#a57f42'),
     background:
       theme?.colors?.background ||
-      (isDarkMode ? cafeSettings?.dark_background_color || '#111827' : cafeSettings?.light_background_color || '#FFFFFF'),
+      (isDarkMode ? cafeSettings?.dark_background_color || '#0b0f05' : cafeSettings?.light_background_color || '#e1e5df'),
     surface:
       theme?.colors?.surface ||
-      (isDarkMode ? cafeSettings?.dark_surface_color || '#1F2937' : cafeSettings?.light_surface_color || '#F9FAFB'),
+      (isDarkMode ? cafeSettings?.dark_surface_color || '#253419' : cafeSettings?.light_surface_color || '#e1e5df'),
     text:
       theme?.colors?.text?.primary ||
-      (isDarkMode ? cafeSettings?.dark_text_color || '#F9FAFB' : cafeSettings?.light_text_color || '#1F2937')
+      (isDarkMode ? cafeSettings?.dark_text_color || '#e1e5df' : cafeSettings?.light_text_color || '#0b0f05')
   };
 
   const computedSurfaceColor = getComputedCSSProperty('--color-surface');

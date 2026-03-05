@@ -359,7 +359,7 @@ const InventoryManagement: React.FC = () => {
               className="h-12 w-12 mr-4"
             />
           ) : (
-            <div className="h-12 w-12 mr-4 bg-primary-600 rounded flex items-center justify-center text-white font-bold">
+            <div className="h-12 w-12 mr-4 bg-primary rounded flex items-center justify-center text-on-primary font-bold">
               {cafeSettings.cafe_name ? cafeSettings.cafe_name.charAt(0).toUpperCase() : 'C'}
             </div>
           )}

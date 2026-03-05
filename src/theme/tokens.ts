@@ -59,17 +59,17 @@ export const baseTokens: BaseTokens = {
 };
 
 export const defaultLightColors: ThemeColors = {
-  primary: '#6F4E37',
-  secondary: '#153059',
-  accent: '#D4A574',
-  background: '#F7F4EF',
-  surface: '#FFFCF7',
+  primary: '#334b26',
+  secondary: '#91590b',
+  accent: '#a57f42',
+  background: '#e1e5df',
+  surface: '#e1e5df',
   text: {
-    primary: '#2C1810',
-    muted: '#6B7280',
-    disabled: '#9CA3AF'
+    primary: '#0b0f05',
+    muted: '#b3af9b',
+    disabled: '#91590b'
   },
-  border: '#E5E7EB',
+  border: '#b3af9b',
   success: '#10B981',
   warning: '#F59E0B',
   error: '#EF4444',
@@ -77,17 +77,17 @@ export const defaultLightColors: ThemeColors = {
 };
 
 export const defaultDarkColors: ThemeColors = {
-  primary: '#8B6F47',
-  secondary: '#A0826D',
-  accent: '#D4A574',
-  background: '#1a1612',
-  surface: '#2c241d',
+  primary: '#334b26',
+  secondary: '#91590b',
+  accent: '#a57f42',
+  background: '#0b0f05',
+  surface: '#253419',
   text: {
-    primary: '#F7F4EF',
-    muted: '#9CA3AF',
-    disabled: '#6B7280'
+    primary: '#e1e5df',
+    muted: '#b3af9b',
+    disabled: '#a57f42'
   },
-  border: '#374151',
+  border: '#334b26',
   success: '#34D399',
   warning: '#FBBF24',
   error: '#F87171',

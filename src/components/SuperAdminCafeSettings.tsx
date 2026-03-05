@@ -328,7 +328,7 @@ const SuperAdminCafeSettings: React.FC = () => {
       </div>
 
       {/* Form */}
-      <form onSubmit={handleSubmit} className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 space-y-6">
+      <form onSubmit={handleSubmit} className="bg-surface-card rounded-lg shadow p-6 space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
             <label className="block text-sm font-medium text-secondary-700 dark:text-gray-300 mb-2">
@@ -437,7 +437,7 @@ const SuperAdminCafeSettings: React.FC = () => {
                 <input
                   type="color"
                   name="primary_color"
-                  value={formData.primary_color || '#6F4E37'}
+                  value={formData.primary_color || '#334b26'}
                   onChange={handleInputChange}
                   className="h-10 w-20 rounded border border-accent-300 dark:border-gray-600 cursor-pointer"
                 />
@@ -446,7 +446,7 @@ const SuperAdminCafeSettings: React.FC = () => {
                   name="primary_color"
                   value={formData.primary_color}
                   onChange={handleInputChange}
-                  placeholder="#6F4E37"
+                  placeholder="#334b26"
                   pattern="^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$"
                   className="input-field flex-1"
                 />
@@ -464,7 +464,7 @@ const SuperAdminCafeSettings: React.FC = () => {
                 <input
                   type="color"
                   name="accent_color"
-                  value={formData.accent_color || '#D4A574'}
+                  value={formData.accent_color || '#a57f42'}
                   onChange={handleInputChange}
                   className="h-10 w-20 rounded border border-accent-300 dark:border-gray-600 cursor-pointer"
                 />
@@ -473,7 +473,7 @@ const SuperAdminCafeSettings: React.FC = () => {
                   name="accent_color"
                   value={formData.accent_color}
                   onChange={handleInputChange}
-                  placeholder="#D4A574"
+                  placeholder="#a57f42"
                   pattern="^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$"
                   className="input-field flex-1"
                 />
@@ -584,7 +584,7 @@ const SuperAdminCafeSettings: React.FC = () => {
       </form>
 
       {/* Onboarding Status Section */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 space-y-4">
+      <div className="bg-surface-card rounded-lg shadow p-6 space-y-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2">
             <UserCheck className="h-5 w-5 text-secondary-600 dark:text-gray-400" />
@@ -633,7 +633,7 @@ const SuperAdminCafeSettings: React.FC = () => {
 
       {/* Subscription Management Section */}
       {subscription && (
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 space-y-6">
+        <div className="bg-surface-card rounded-lg shadow p-6 space-y-6">
           <div className="flex items-center space-x-2 mb-4">
             <CreditCard className="h-5 w-5 text-secondary-600 dark:text-gray-400" />
             <h3 className="text-xl font-bold text-secondary-700 dark:text-gray-100">

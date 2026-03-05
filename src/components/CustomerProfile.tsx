@@ -140,7 +140,7 @@ const CustomerProfile: React.FC<CustomerProfileProps> = ({
                   value={formData.name}
                   onChange={(e) => handleInputChange('name', e.target.value)}
                   disabled={!isEditing}
-                  className="form-input flex w-full rounded-lg h-12 px-4 py-3 text-text-light dark:text-text-dark focus:outline-0 focus:ring-2 focus:ring-[#C68E3C]/30 focus:ring-inset text-base font-normal disabled:opacity-60 disabled:cursor-not-allowed bg-transparent border-b-2 border-[#E0E0E0] focus:border-[#C68E3C] transition-colors"
+                  className="form-input flex w-full rounded-lg h-12 px-4 py-3 text-text-light dark:text-text-dark focus:outline-0 focus:ring-2 focus:ring-[#a57f42]/30 focus:ring-inset text-base font-normal disabled:opacity-60 disabled:cursor-not-allowed bg-transparent border-b-2 border-[#b3af9b] focus:border-[#a57f42] transition-colors"
                   style={{ color: 'var(--color-on-surface)' }}
                   required
                 />
@@ -151,7 +151,7 @@ const CustomerProfile: React.FC<CustomerProfileProps> = ({
                   type="tel"
                   value={formData.phone}
                   disabled
-                  className="form-input flex w-full rounded-lg h-12 px-4 py-3 text-text-light dark:text-text-dark text-base font-normal opacity-60 cursor-not-allowed bg-transparent border-b-2 border-[#E0E0E0]"
+                  className="form-input flex w-full rounded-lg h-12 px-4 py-3 text-text-light dark:text-text-dark text-base font-normal opacity-60 cursor-not-allowed bg-transparent border-b-2 border-[#b3af9b]"
                 />
               </label>
               <label className="flex flex-col gap-2">
@@ -161,7 +161,7 @@ const CustomerProfile: React.FC<CustomerProfileProps> = ({
                   value={formData.email}
                   onChange={(e) => handleInputChange('email', e.target.value)}
                   disabled={!isEditing}
-                  className="form-input flex w-full rounded-lg h-12 px-4 py-3 text-text-light dark:text-text-dark focus:outline-0 focus:ring-2 focus:ring-[#C68E3C]/30 focus:ring-inset text-base font-normal disabled:opacity-60 disabled:cursor-not-allowed bg-transparent border-b-2 border-[#E0E0E0] focus:border-[#C68E3C] transition-colors"
+                  className="form-input flex w-full rounded-lg h-12 px-4 py-3 text-text-light dark:text-text-dark focus:outline-0 focus:ring-2 focus:ring-[#a57f42]/30 focus:ring-inset text-base font-normal disabled:opacity-60 disabled:cursor-not-allowed bg-transparent border-b-2 border-[#b3af9b] focus:border-[#a57f42] transition-colors"
                   style={{ color: 'var(--color-on-surface)' }}
                 />
               </label>
@@ -172,7 +172,7 @@ const CustomerProfile: React.FC<CustomerProfileProps> = ({
                   value={formData.date_of_birth}
                   onChange={(e) => handleInputChange('date_of_birth', e.target.value)}
                   disabled={!isEditing}
-                  className="form-input flex w-full rounded-lg h-12 px-4 py-3 text-text-light dark:text-text-dark focus:outline-0 focus:ring-2 focus:ring-[#C68E3C]/30 focus:ring-inset text-base font-normal disabled:opacity-60 disabled:cursor-not-allowed bg-transparent border-b-2 border-[#E0E0E0] focus:border-[#C68E3C] transition-colors"
+                  className="form-input flex w-full rounded-lg h-12 px-4 py-3 text-text-light dark:text-text-dark focus:outline-0 focus:ring-2 focus:ring-[#a57f42]/30 focus:ring-inset text-base font-normal disabled:opacity-60 disabled:cursor-not-allowed bg-transparent border-b-2 border-[#b3af9b] focus:border-[#a57f42] transition-colors"
                   style={{ color: 'var(--color-on-surface)' }}
                 />
               </label>
@@ -184,7 +184,7 @@ const CustomerProfile: React.FC<CustomerProfileProps> = ({
                 onChange={(e) => handleInputChange('address', e.target.value)}
                 disabled={!isEditing}
                 rows={3}
-                className="form-input flex w-full rounded-lg px-4 py-3 text-text-light dark:text-text-dark focus:outline-0 focus:ring-2 focus:ring-[#C68E3C]/30 focus:ring-inset text-base font-normal disabled:opacity-60 disabled:cursor-not-allowed resize-none bg-transparent border-b-2 border-[#E0E0E0] focus:border-[#C68E3C] transition-colors"
+                className="form-input flex w-full rounded-lg px-4 py-3 text-text-light dark:text-text-dark focus:outline-0 focus:ring-2 focus:ring-[#a57f42]/30 focus:ring-inset text-base font-normal disabled:opacity-60 disabled:cursor-not-allowed resize-none bg-transparent border-b-2 border-[#b3af9b] focus:border-[#a57f42] transition-colors"
                 style={{ color: 'var(--color-on-surface)' }}
               />
             </label>
@@ -292,18 +292,18 @@ const CustomerProfile: React.FC<CustomerProfileProps> = ({
             <>
               <div className="flex items-center justify-between gap-4 py-5 px-2">
                 <div className="flex items-center gap-4 min-w-0">
-                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[#C68E3C] text-white elevation-2">
+                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[#a57f42] text-on-primary elevation-2">
                     <User className="h-6 w-6" />
                   </div>
                   <div className="min-w-0">
-                    <p className="text-[#2A2A2A] font-bold text-base truncate">{customer?.name || 'Customer'}</p>
-                    <p className="text-[#6F6A63] text-sm truncate">{customer?.email || customer?.phone}</p>
+                    <p className="text-[#0b0f05] font-bold text-base truncate">{customer?.name || 'Customer'}</p>
+                    <p className="text-[#b3af9b] text-sm truncate">{customer?.email || customer?.phone}</p>
                   </div>
                 </div>
                 <button
                   onClick={onLogout}
                   type="button"
-                  className="shrink-0 flex items-center gap-2 rounded-full px-4 py-2.5 text-sm font-medium text-[#6F6A63] hover:bg-black/5 transition-colors"
+                  className="shrink-0 flex items-center gap-2 rounded-full px-4 py-2.5 text-sm font-medium text-[#b3af9b] hover:bg-black/5 transition-colors"
                 >
                   <LogOut className="h-4 w-4" />
                   <span>Log out</span>
@@ -323,8 +323,8 @@ const CustomerProfile: React.FC<CustomerProfileProps> = ({
                     onClick={() => setActiveSection(id)}
                     className={`shrink-0 flex items-center gap-2 px-4 py-2.5 rounded-full text-sm font-medium transition-all ${
                       activeSection === id
-                        ? 'text-[#2A2A2A] font-semibold bg-white shadow-sm border border-[#E0E0E0]'
-                        : 'text-[#6F6A63] hover:bg-black/5'
+                        ? 'text-[#0b0f05] font-semibold bg-surface-card shadow-sm border border-[#b3af9b]'
+                        : 'text-[#b3af9b] hover:bg-black/5'
                     }`}
                   >
                     <Icon className="h-4 w-4 shrink-0" />
@@ -365,7 +365,7 @@ const CustomerProfile: React.FC<CustomerProfileProps> = ({
                         onClick={() => setActiveSection('account')}
                         className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors ${
                           activeSection === 'account'
-                            ? 'text-primary font-semibold bg-white shadow-sm border border-[#E0E0E0]'
+                            ? 'text-primary font-semibold bg-surface-card shadow-sm border border-[#b3af9b]'
                             : 'text-text-light/70 dark:text-text-dark/70 hover:bg-black/5 hover:text-primary'
                         }`}
                       >
@@ -376,7 +376,7 @@ const CustomerProfile: React.FC<CustomerProfileProps> = ({
                         onClick={() => setActiveSection('payment')}
                         className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors ${
                           activeSection === 'payment'
-                            ? 'text-primary font-semibold bg-white shadow-sm border border-[#E0E0E0]'
+                            ? 'text-primary font-semibold bg-surface-card shadow-sm border border-[#b3af9b]'
                             : 'text-text-light/70 dark:text-text-dark/70 hover:bg-black/5 hover:text-primary'
                         }`}
                       >
@@ -387,7 +387,7 @@ const CustomerProfile: React.FC<CustomerProfileProps> = ({
                         onClick={() => setActiveSection('addresses')}
                         className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors ${
                           activeSection === 'addresses'
-                            ? 'text-primary font-semibold bg-white shadow-sm border border-[#E0E0E0]'
+                            ? 'text-primary font-semibold bg-surface-card shadow-sm border border-[#b3af9b]'
                             : 'text-text-light/70 dark:text-text-dark/70 hover:bg-black/5 hover:text-primary'
                         }`}
                       >
@@ -398,7 +398,7 @@ const CustomerProfile: React.FC<CustomerProfileProps> = ({
                         onClick={() => setActiveSection('notifications')}
                         className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors ${
                           activeSection === 'notifications'
-                            ? 'text-primary font-semibold bg-white shadow-sm border border-[#E0E0E0]'
+                            ? 'text-primary font-semibold bg-surface-card shadow-sm border border-[#b3af9b]'
                             : 'text-text-light/70 dark:text-text-dark/70 hover:bg-black/5 hover:text-primary'
                         }`}
                       >
@@ -409,7 +409,7 @@ const CustomerProfile: React.FC<CustomerProfileProps> = ({
                         onClick={() => setActiveSection('orders')}
                         className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors ${
                           activeSection === 'orders'
-                            ? 'text-primary font-semibold bg-white shadow-sm border border-[#E0E0E0]'
+                            ? 'text-primary font-semibold bg-surface-card shadow-sm border border-[#b3af9b]'
                             : 'text-text-light/70 dark:text-text-dark/70 hover:bg-black/5 hover:text-primary'
                         }`}
                       >

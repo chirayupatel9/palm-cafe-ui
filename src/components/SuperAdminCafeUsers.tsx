@@ -176,7 +176,7 @@ const SuperAdminCafeUsers: React.FC = () => {
       </div>
 
       {/* Search */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
+      <div className="bg-surface-card rounded-lg shadow p-4">
         <div className="relative">
           <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-secondary-400 pointer-events-none" />
           <input
@@ -190,7 +190,7 @@ const SuperAdminCafeUsers: React.FC = () => {
       </div>
 
       {/* Users Table */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
+      <div className="bg-surface-card rounded-lg shadow overflow-hidden">
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-accent-200 dark:divide-gray-700">
             <thead className="bg-accent-50 dark:bg-gray-700">
@@ -212,7 +212,7 @@ const SuperAdminCafeUsers: React.FC = () => {
                 </th>
               </tr>
             </thead>
-            <tbody className="bg-white dark:bg-gray-800 divide-y divide-accent-200 dark:divide-gray-700">
+            <tbody className="bg-surface-card divide-y divide-accent-200 dark:divide-gray-700">
               {filteredUsers.map((user) => (
                 <tr key={user.id} className="hover:bg-accent-50 dark:hover:bg-gray-700">
                   <td className="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap">

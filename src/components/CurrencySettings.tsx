@@ -142,7 +142,7 @@ const CurrencySettings: React.FC = () => {
               className="h-10 w-10 mr-3"
             />
           ) : (
-            <div className="h-10 w-10 mr-3 bg-primary-600 rounded flex items-center justify-center text-white font-bold">
+            <div className="h-10 w-10 mr-3 bg-primary rounded flex items-center justify-center text-on-primary font-bold">
               {cafeSettings.cafe_name ? cafeSettings.cafe_name.charAt(0).toUpperCase() : 'C'}
             </div>
           )}
@@ -326,7 +326,7 @@ const CurrencySettings: React.FC = () => {
                 className="h-12 w-12 mx-auto mb-3 opacity-50"
               />
             ) : (
-              <div className="h-12 w-12 mx-auto mb-3 bg-primary-600 rounded flex items-center justify-center text-white font-bold opacity-50">
+              <div className="h-12 w-12 mx-auto mb-3 bg-primary rounded flex items-center justify-center text-on-primary font-bold opacity-50">
                 {cafeSettings.cafe_name ? cafeSettings.cafe_name.charAt(0).toUpperCase() : 'C'}
               </div>
             )}

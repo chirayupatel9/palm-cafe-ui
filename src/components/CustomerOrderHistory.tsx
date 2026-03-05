@@ -358,7 +358,7 @@ const CustomerOrderHistory: React.FC<CustomerOrderHistoryProps> = ({
         {filteredOrders.map((order) => (
           <div
             key={order.id}
-            className="flex flex-col sm:flex-row items-stretch justify-between gap-4 py-4 border-b border-[#E0E0E0] last:border-b-0"
+            className="flex flex-col sm:flex-row items-stretch justify-between gap-4 py-4 border-b border-[#b3af9b] last:border-b-0"
           >
             <div className="flex flex-[2_2_0px] flex-col gap-4 justify-between">
               <div className="flex flex-col gap-1">
@@ -440,7 +440,7 @@ const CustomerOrderHistory: React.FC<CustomerOrderHistoryProps> = ({
       </div>
 
       {orders.length > 0 && (
-        <div className="flex items-center justify-between py-4 border-b border-[#E0E0E0]">
+        <div className="flex items-center justify-between py-4 border-b border-[#b3af9b]">
           <div className="flex items-center space-x-3">
             <Star className="h-5 w-5 text-text-light/60 dark:text-text-dark/60" />
             <div>

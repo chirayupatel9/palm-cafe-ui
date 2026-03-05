@@ -581,36 +581,48 @@ const MenuManagement: React.FC<MenuManagementProps> = ({ menuItems, onUpdate, on
         </div>
       </div>
 
-      {/* Tab Navigation */}
-      <div className={`border-b ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}`}>
-        <nav className="-mb-px flex space-x-8">
-          <button
-            onClick={() => setActiveTab('menu-items')}
-            className={`py-2 px-1 border-b-2 font-medium text-sm ${
-              activeTab === 'menu-items'
-                ? `border-secondary-500 ${isDarkMode ? 'text-secondary-400' : 'text-secondary-600'}`
-                : `border-transparent ${isDarkMode ? 'text-gray-400 hover:text-gray-300' : 'text-gray-500 hover:text-gray-700 hover:border-gray-300'}`
-            }`}
-          >
-            <div className="flex items-center">
-              <FolderOpen className="h-4 w-4 mr-2" />
-              Menu Items
-            </div>
-          </button>
-          <button
-            onClick={() => setActiveTab('categories')}
-            className={`py-2 px-1 border-b-2 font-medium text-sm ${
-              activeTab === 'categories'
-                ? `border-secondary-500 ${isDarkMode ? 'text-secondary-400' : 'text-secondary-600'}`
-                : `border-transparent ${isDarkMode ? 'text-gray-400 hover:text-gray-300' : 'text-gray-500 hover:text-gray-700 hover:border-gray-300'}`
-            }`}
-          >
-            <div className="flex items-center">
-              <FolderOpen className="h-4 w-4 mr-2" />
-              Categories
-            </div>
-          </button>
-        </nav>
+      {/* Tab Navigation - light pill style (same as main app nav: Dashboard / Orders / Customers / Menu / Analytics) */}
+      <div className="flex items-center gap-1 rounded-full p-1">
+        <button
+          onClick={() => setActiveTab('menu-items')}
+          className={`relative flex items-center rounded-full py-2.5 px-4 text-sm transition-colors ${
+            activeTab === 'menu-items'
+              ? 'font-semibold text-[var(--color-on-primary-container)]'
+              : 'font-medium text-[var(--color-on-surface-variant)] hover:text-[var(--color-on-surface)]'
+          }`}
+        >
+          {activeTab === 'menu-items' && (
+            <span
+              className="absolute inset-0 rounded-full pointer-events-none"
+              style={{
+                background: 'var(--color-primary-container)',
+                boxShadow: 'var(--elevation-1), inset 0 0 0 1px var(--color-outline-variant)'
+              }}
+            />
+          )}
+          <FolderOpen className="h-4 w-4 mr-2 shrink-0 relative z-10" />
+          <span className="relative z-10">Menu Items</span>
+        </button>
+        <button
+          onClick={() => setActiveTab('categories')}
+          className={`relative flex items-center rounded-full py-2.5 px-4 text-sm transition-colors ${
+            activeTab === 'categories'
+              ? 'font-semibold text-[var(--color-on-primary-container)]'
+              : 'font-medium text-[var(--color-on-surface-variant)] hover:text-[var(--color-on-surface)]'
+          }`}
+        >
+          {activeTab === 'categories' && (
+            <span
+              className="absolute inset-0 rounded-full pointer-events-none"
+              style={{
+                background: 'var(--color-primary-container)',
+                boxShadow: 'var(--elevation-1), inset 0 0 0 1px var(--color-outline-variant)'
+              }}
+            />
+          )}
+          <FolderOpen className="h-4 w-4 mr-2 shrink-0 relative z-10" />
+          <span className="relative z-10">Categories</span>
+        </button>
       </div>
 
       {/* Menu Items Tab */}
@@ -626,7 +638,7 @@ const MenuManagement: React.FC<MenuManagementProps> = ({ menuItems, onUpdate, on
                   className="h-10 w-10 mr-3"
                 />
               ) : (
-                <div className="h-10 w-10 mr-3 bg-primary-600 rounded flex items-center justify-center text-white font-bold">
+                <div className="h-10 w-10 mr-3 bg-primary rounded flex items-center justify-center text-on-primary font-bold">
                   {cafeSettings.cafe_name ? cafeSettings.cafe_name.charAt(0).toUpperCase() : 'C'}
                 </div>
               )}
@@ -1035,7 +1047,7 @@ const MenuManagement: React.FC<MenuManagementProps> = ({ menuItems, onUpdate, on
                   className="h-10 w-10 mr-3"
                 />
               ) : (
-                <div className="h-10 w-10 mr-3 bg-primary-600 rounded flex items-center justify-center text-white font-bold">
+                <div className="h-10 w-10 mr-3 bg-primary rounded flex items-center justify-center text-on-primary font-bold">
                   {cafeSettings.cafe_name ? cafeSettings.cafe_name.charAt(0).toUpperCase() : 'C'}
                 </div>
               )}
@@ -1123,7 +1135,7 @@ const MenuManagement: React.FC<MenuManagementProps> = ({ menuItems, onUpdate, on
                     className="h-16 w-16 mx-auto mb-4 opacity-50"
                   />
                 ) : (
-                  <div className="h-16 w-16 mx-auto mb-4 bg-primary-600 rounded flex items-center justify-center text-white font-bold opacity-50">
+                  <div className="h-16 w-16 mx-auto mb-4 bg-primary rounded flex items-center justify-center text-on-primary font-bold opacity-50">
                     {cafeSettings.cafe_name ? cafeSettings.cafe_name.charAt(0).toUpperCase() : 'C'}
                   </div>
                 )}

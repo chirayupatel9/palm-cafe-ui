@@ -236,7 +236,7 @@ const CustomerApp: React.FC = () => {
           <>
             {cafeBranding.logo_url && (
               <div className="flex justify-center mb-4">
-                <div className="w-14 h-14 rounded-full flex items-center justify-center overflow-hidden bg-[#E9E4DA]">
+                <div className="w-14 h-14 rounded-full flex items-center justify-center overflow-hidden bg-[#b3af9b]">
                   <img
                     src={getImageUrl(cafeBranding.logo_url) ?? ''}
                     alt=""
@@ -245,15 +245,15 @@ const CustomerApp: React.FC = () => {
                 </div>
               </div>
             )}
-            <p className="text-[#6F6A63] text-sm text-center mb-4">Enter your phone number to continue</p>
+            <p className="text-[#b3af9b] text-sm text-center mb-4">Enter your phone number to continue</p>
             <CustomerLogin cafeSlug={slug} onLogin={handleLogin} />
-            <div className="mt-6 pt-4 border-t border-[#E9E4DA]">
+            <div className="mt-6 pt-4 border-t border-[#b3af9b]">
               <button
                 onClick={() => {
                   setShowLoginModal(false);
                   setLoginIntent(null);
                 }}
-                className="w-full text-sm text-[#6F6A63] hover:text-[#2A2A2A] transition-colors flex items-center justify-center min-h-[44px] py-2"
+                className="w-full text-sm text-[#b3af9b] hover:text-[#0b0f05] transition-colors flex items-center justify-center min-h-[44px] py-2"
               >
                 <span className="mr-2">←</span>
                 Continue browsing without login

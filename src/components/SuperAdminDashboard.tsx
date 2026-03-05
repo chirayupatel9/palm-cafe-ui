@@ -110,7 +110,7 @@ const SuperAdminDashboard: React.FC = () => {
 
       {/* Impersonation Section */}
       {!impersonationState?.isImpersonating && (
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 border-l-4 border-blue-500">
+        <div className="bg-surface-card rounded-lg shadow p-6 border-l-4 border-blue-500">
           <div className="flex items-center justify-between">
             <div className="flex-1">
               <h3 className="text-lg font-semibold text-secondary-700 dark:text-gray-100 mb-2 flex items-center gap-2">
@@ -158,7 +158,7 @@ const SuperAdminDashboard: React.FC = () => {
 
       {/* System Overview Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+        <div className="bg-surface-card rounded-lg shadow p-6">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-secondary-600 dark:text-gray-400">Total Cafes</p>
@@ -170,7 +170,7 @@ const SuperAdminDashboard: React.FC = () => {
           </div>
         </div>
 
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+        <div className="bg-surface-card rounded-lg shadow p-6">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-secondary-600 dark:text-gray-400">Active Cafes</p>
@@ -182,7 +182,7 @@ const SuperAdminDashboard: React.FC = () => {
           </div>
         </div>
 
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+        <div className="bg-surface-card rounded-lg shadow p-6">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-secondary-600 dark:text-gray-400">Total Orders</p>
@@ -194,7 +194,7 @@ const SuperAdminDashboard: React.FC = () => {
           </div>
         </div>
 
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+        <div className="bg-surface-card rounded-lg shadow p-6">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-secondary-600 dark:text-gray-400">Total Revenue</p>
@@ -211,7 +211,7 @@ const SuperAdminDashboard: React.FC = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Cafes List */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow">
+        <div className="bg-surface-card rounded-lg shadow">
           <div className="p-6 border-b border-accent-200 dark:border-gray-700">
             <h3 className="text-lg font-semibold text-secondary-700 dark:text-gray-100">
               All Cafes
@@ -259,7 +259,7 @@ const SuperAdminDashboard: React.FC = () => {
         </div>
 
         {/* Selected Cafe Details */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow">
+        <div className="bg-surface-card rounded-lg shadow">
           <div className="p-6 border-b border-accent-200 dark:border-gray-700">
             <h3 className="text-lg font-semibold text-secondary-700 dark:text-gray-100">
               {selectedCafe ? `${selectedCafe.name} - Details` : 'Select a Cafe'}

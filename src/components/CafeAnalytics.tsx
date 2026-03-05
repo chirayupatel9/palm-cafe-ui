@@ -16,7 +16,7 @@ import LockedFeature from './ui/LockedFeature';
 import Select from './ui/Select';
 
 // Theme primary (matches theme.css) for Highcharts
-const CHART_PRIMARY = '#6F4E37';
+const CHART_PRIMARY = '#334b26';
 
 interface HighchartsBarChartProps {
   data: any[];
@@ -46,23 +46,23 @@ const HighchartsBarChart: React.FC<HighchartsBarChartProps> = ({ data, labelKey 
       xAxis: {
         categories,
         crosshair: true,
-        labels: { style: { color: '#6B7280' } },
-        lineColor: '#E5E7EB',
-        tickColor: '#E5E7EB'
+        labels: { style: { color: '#b3af9b' } },
+        lineColor: '#b3af9b',
+        tickColor: '#b3af9b'
       },
       yAxis: {
         title: { text: null },
-        labels: { style: { color: '#6B7280' } },
-        gridLineColor: '#E5E7EB',
+        labels: { style: { color: '#b3af9b' } },
+        gridLineColor: '#b3af9b',
         gridLineDashStyle: 'Dot',
         min: 0,
         allowDecimals: false
       },
       tooltip: {
         shared: true,
-        backgroundColor: '#FFFCF7',
-        borderColor: '#E5E7EB',
-        style: { color: '#2C1810' }
+        backgroundColor: '#e1e5df',
+        borderColor: '#b3af9b',
+        style: { color: '#0b0f05' }
       },
       plotOptions: {
         column: {
@@ -125,23 +125,23 @@ const HighchartsLineChart: React.FC<HighchartsLineChartProps> = ({ data, labelKe
       xAxis: {
         categories,
         crosshair: true,
-        labels: { style: { color: '#6B7280' } },
-        lineColor: '#E5E7EB',
-        tickColor: '#E5E7EB'
+        labels: { style: { color: '#b3af9b' } },
+        lineColor: '#b3af9b',
+        tickColor: '#b3af9b'
       },
       yAxis: {
         title: { text: null },
-        labels: { style: { color: '#6B7280' } },
-        gridLineColor: '#E5E7EB',
+        labels: { style: { color: '#b3af9b' } },
+        gridLineColor: '#b3af9b',
         gridLineDashStyle: 'Dot',
         min: 0
       },
       tooltip: {
         shared: true,
         valuePrefix,
-        backgroundColor: '#FFFCF7',
-        borderColor: '#E5E7EB',
-        style: { color: '#2C1810' }
+        backgroundColor: '#e1e5df',
+        borderColor: '#b3af9b',
+        style: { color: '#0b0f05' }
       },
       plotOptions: {
         areaspline: {
@@ -154,7 +154,7 @@ const HighchartsLineChart: React.FC<HighchartsLineChartProps> = ({ data, labelKe
         name: 'Revenue',
         data: seriesData,
         color: CHART_PRIMARY,
-        fillColor: { linearGradient: { x1: 0, y1: 0, x2: 0, y2: 1 }, stops: [[0, CHART_PRIMARY], [1, 'rgba(111, 78, 55, 0.08)']] }
+        fillColor: { linearGradient: { x1: 0, y1: 0, x2: 0, y2: 1 }, stops: [[0, CHART_PRIMARY], [1, 'rgba(51, 75, 38, 0.08)']] }
       }]
     };
   }, [data, labelKey, valueKey, height, valuePrefix]);

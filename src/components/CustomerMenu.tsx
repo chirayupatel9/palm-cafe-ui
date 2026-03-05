@@ -788,15 +788,15 @@ const CustomerMenu: React.FC<CustomerMenuProps> = ({
 
   if (loading) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-[#F6F4F0]">
+      <div className="min-h-screen flex flex-col items-center justify-center bg-[#e1e5df]">
         <div className="relative z-10 flex flex-col items-center">
-          <div className="w-20 h-20 bg-[#C68E3C] rounded-2xl flex items-center justify-center mb-6 shadow-2xl">
+          <div className="w-20 h-20 bg-[#a57f42] rounded-2xl flex items-center justify-center mb-6 shadow-2xl">
             <Utensils className="h-10 w-10 text-white animate-pulse" />
           </div>
           <div className="relative">
-            <div className="animate-spin rounded-full h-16 w-16 border-4 border-[#C68E3C]/20 border-t-[#C68E3C]"></div>
+            <div className="animate-spin rounded-full h-16 w-16 border-4 border-[#a57f42]/20 border-t-[#a57f42]"></div>
           </div>
-          <p className="mt-6 text-xl font-medium text-[#2A2A2A]">Loading menu...</p>
+          <p className="mt-6 text-xl font-medium text-[#0b0f05]">Loading menu...</p>
         </div>
       </div>
     );
@@ -828,7 +828,7 @@ const CustomerMenu: React.FC<CustomerMenuProps> = ({
 
   return (
     <div
-      className="relative w-full flex flex-col min-h-screen bg-[#F6F4F0] overflow-x-hidden grain-overlay"
+      className="relative w-full flex flex-col min-h-screen bg-[#e1e5df] overflow-x-hidden grain-overlay"
     >
       {/* DIR-style fixed header */}
       {activeTab === 'menu' && (
@@ -844,7 +844,7 @@ const CustomerMenu: React.FC<CustomerMenuProps> = ({
                 size="sm"
                 type="button"
                 onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-                contentClassName={'font-bold text-base sm:text-xl lg:text-2xl tracking-tight truncate max-w-full ' + (isScrolled ? 'text-[#2A2A2A]' : 'text-white')}
+                contentClassName={'font-bold text-base sm:text-xl lg:text-2xl tracking-tight truncate max-w-full ' + (isScrolled ? 'text-[#0b0f05]' : 'text-white')}
                 className={'min-w-0 max-w-full pointer-events-auto ' + (!isScrolled ? 'glass-button-on-dark [&_.glass-button]:!bg-transparent [&_.glass-button]:!border-transparent [&_.glass-button]:!shadow-none' : '')}
               >
                 <span className="truncate block">{cafeDisplayName}</span>
@@ -878,7 +878,7 @@ const CustomerMenu: React.FC<CustomerMenuProps> = ({
                 </GlassButton>
                 {cart.length > 0 && (
                   <span
-                    className="absolute top-0 right-0 min-w-[16px] h-4 px-1 flex items-center justify-center text-[10px] font-bold text-white bg-[#C68E3C] rounded-full shadow-sm translate-x-1/2 -translate-y-1/2"
+                    className="absolute top-0 right-0 min-w-[16px] h-4 px-1 flex items-center justify-center text-[10px] font-bold text-on-primary bg-[#a57f42] rounded-full shadow-sm translate-x-1/2 -translate-y-1/2"
                     aria-label={`${cart.reduce((t, i) => t + i.quantity, 0)} items in cart`}
                   >
                     {cart.reduce((t, i) => t + i.quantity, 0)}
@@ -892,7 +892,7 @@ const CustomerMenu: React.FC<CustomerMenuProps> = ({
 
       {/* Main Content */}
       <main className="min-h-screen w-full overflow-x-hidden">
-        <div id="menu-section" className="w-full max-w-full pb-12 sm:pb-16 bg-[#F6F4F0]">
+        <div id="menu-section" className="w-full max-w-full pb-12 sm:pb-16 bg-[#e1e5df]">
           {activeTab === 'menu' ? (
             <div>
               {(() => {
@@ -913,12 +913,12 @@ const CustomerMenu: React.FC<CustomerMenuProps> = ({
                 >
                   <div className="max-w-3xl mx-auto text-center space-y-4 mb-10">
                     {/* {cafeBranding.cafe_name && (
-                      // <h2 className="text-3xl sm:text-4xl font-bold text-[#2A2A2A]">
+                      // <h2 className="text-3xl sm:text-4xl font-bold text-[#0b0f05]">
                       //   {cafeBranding.cafe_name}
                       // </h2>
                     )} */}
                     {cafeSettings.description && (
-                      <p className="text-base sm:text-lg text-[#6F6A63]">
+                      <p className="text-base sm:text-lg text-[#b3af9b]">
                         {cafeSettings.description}
                       </p>
                     )}
@@ -928,7 +928,7 @@ const CustomerMenu: React.FC<CustomerMenuProps> = ({
                   <div className="max-w-3xl mx-auto">
                     <div className="relative max-w-xl mx-auto mb-10">
                       <div className="relative group">
-                        <Search className="absolute left-5 top-1/2 -translate-y-1/2 h-5 w-5 text-[#6F6A63] group-focus-within:text-[#C68E3C] transition-colors" />
+                        <Search className="absolute left-5 top-1/2 -translate-y-1/2 h-5 w-5 text-[#b3af9b] group-focus-within:text-[#a57f42] transition-colors" />
                         <input
                           ref={searchInputRef}
                           type="text"
@@ -942,7 +942,7 @@ const CustomerMenu: React.FC<CustomerMenuProps> = ({
                               setTimeout(() => setShowAutocomplete(false), 200);
                             }
                           }}
-                          className="glass-input w-full pl-14 pr-12 py-4 text-base text-[#2A2A2A] transition-all duration-300"
+                          className="glass-input w-full pl-14 pr-12 py-4 text-base text-[#0b0f05] transition-all duration-300"
                         />
                         {searchQuery && (
                           <div className="search-clear-btn absolute right-4 top-1/2 -translate-y-1/2">
@@ -952,7 +952,7 @@ const CustomerMenu: React.FC<CustomerMenuProps> = ({
                               onClick={() => { setSearchQuery(''); setShowAutocomplete(false); setSelectedSuggestionIndex(-1); }}
                               aria-label="Clear search"
                             >
-                              <X className="h-4 w-4 text-[#8A8478]" />
+                              <X className="h-4 w-4 text-[#b3af9b]" />
                             </GlassButton>
                           </div>
                         )}
@@ -960,7 +960,7 @@ const CustomerMenu: React.FC<CustomerMenuProps> = ({
                       {showAutocomplete && autocompleteSuggestions.length > 0 && (
                         <div
                           ref={autocompleteRef}
-                          className="absolute top-full left-0 right-0 mt-3 bg-white rounded-2xl shadow-xl overflow-hidden z-50 border border-[#E0DED8]"
+                          className="absolute top-full left-0 right-0 mt-3 bg-surface-card rounded-2xl shadow-xl overflow-hidden z-50 border border-[#b3af9b]"
                         >
                           {autocompleteSuggestions.map((suggestion, index) => (
                             <button
@@ -969,13 +969,13 @@ const CustomerMenu: React.FC<CustomerMenuProps> = ({
                               onClick={() => handleSuggestionClick(suggestion)}
                               onMouseDown={(e) => e.preventDefault()}
                               className={
-                                'autocomplete-suggestion w-full px-5 py-4 text-left flex items-center justify-between hover:bg-[#F6F4F0] transition-colors ' +
-                                (selectedSuggestionIndex === index ? 'bg-[#F6F4F0]' : '')
+                                'autocomplete-suggestion w-full px-5 py-4 text-left flex items-center justify-between hover:bg-[#e1e5df] transition-colors ' +
+                                (selectedSuggestionIndex === index ? 'bg-[#e1e5df]' : '')
                               }
                             >
-                              <span className="font-medium text-[#2A2A2A]">{suggestion.name}</span>
+                              <span className="font-medium text-[#0b0f05]">{suggestion.name}</span>
                               {suggestion.category && (
-                                <span className="font-mono text-xs uppercase tracking-wider text-[#6F6A63] bg-[#E9E4DA] px-2 py-1 rounded">
+                                <span className="font-mono text-xs uppercase tracking-wider text-[#b3af9b] bg-[#b3af9b] px-2 py-1 rounded">
                                   {suggestion.category}
                                 </span>
                               )}
@@ -984,8 +984,8 @@ const CustomerMenu: React.FC<CustomerMenuProps> = ({
                         </div>
                       )}
                       {showAutocomplete && searchQuery && autocompleteSuggestions.length === 0 && (
-                        <div className="absolute top-full left-0 right-0 mt-3 bg-white rounded-2xl shadow-xl p-6 text-center z-50 border border-[#E0DED8]">
-                          <p className="text-[#6F6A63]">No results found</p>
+                        <div className="absolute top-full left-0 right-0 mt-3 bg-surface-card rounded-2xl shadow-xl p-6 text-center z-50 border border-[#b3af9b]">
+                          <p className="text-[#b3af9b]">No results found</p>
                         </div>
                       )}
                     </div>
@@ -1044,16 +1044,16 @@ const CustomerMenu: React.FC<CustomerMenuProps> = ({
 
               {/* Categories Showcase Section - DIR "Our Categories" carousel + scroll animate */}
               {!searchQuery.trim() && selectedCategory === 'All' && Object.keys(groupedMenuItems).length > 0 && (
-                <section id="categories-section" data-scroll-animate className="py-16 sm:py-24 bg-[#F6F4F0] relative overflow-hidden scroll-mt-24">
-                  <div className="absolute top-0 right-0 w-96 h-96 bg-[#C68E3C]/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
-                  <div className="absolute bottom-0 left-0 w-64 h-64 bg-[#C68E3C]/5 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2" />
+                <section id="categories-section" data-scroll-animate className="py-16 sm:py-24 bg-[#e1e5df] relative overflow-hidden scroll-mt-24">
+                  <div className="absolute top-0 right-0 w-96 h-96 bg-[#a57f42]/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
+                  <div className="absolute bottom-0 left-0 w-64 h-64 bg-[#a57f42]/5 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2" />
                   <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
                     <div className="flex items-end justify-between mb-12">
                       <div className="scroll-animate-left">
-                        <span className="font-mono text-xs uppercase tracking-[0.2em] text-[#C68E3C] mb-3 block">
+                        <span className="font-mono text-xs uppercase tracking-[0.2em] text-[#a57f42] mb-3 block">
                           Browse
                         </span>
-                        <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-[#2A2A2A] tracking-tight">
+                        <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-[#0b0f05] tracking-tight">
                           Our Categories
                         </h2>
                       </div>
@@ -1122,10 +1122,10 @@ const CustomerMenu: React.FC<CustomerMenuProps> = ({
                                 </span>
                               </div>
                             </div>
-                            <p className="font-medium text-sm sm:text-base text-[#2A2A2A] group-hover:text-[#C68E3C] transition-colors duration-300">
+                            <p className="font-medium text-sm sm:text-base text-[#0b0f05] group-hover:text-[#a57f42] transition-colors duration-300">
                               {categoryName}
                             </p>
-                            <p className="font-mono text-xs text-[#6F6A63] mt-1">
+                            <p className="font-mono text-xs text-[#b3af9b] mt-1">
                               {itemCount} items
                             </p>
                           </button>
@@ -1135,7 +1135,7 @@ const CustomerMenu: React.FC<CustomerMenuProps> = ({
 
                     <div className="flex justify-center gap-2 mt-6 sm:hidden">
                       {Object.keys(groupedMenuItems).map((_, i) => (
-                        <div key={i} className="w-1.5 h-1.5 rounded-full bg-[#2A2A2A]/20" />
+                        <div key={i} className="w-1.5 h-1.5 rounded-full bg-[#0b0f05]/20" />
                       ))}
                     </div>
                   </div>
@@ -1143,7 +1143,7 @@ const CustomerMenu: React.FC<CustomerMenuProps> = ({
               )}
 
               {Object.keys(groupedMenuItems).length === 0 ? (
-                <div className="text-center py-16 bg-[#F6F4F0]">
+                <div className="text-center py-16 bg-[#e1e5df]">
                   {cafeBranding.logo_url && (
                     <img
                       src={getImageUrl(cafeBranding.logo_url)}
@@ -1151,14 +1151,14 @@ const CustomerMenu: React.FC<CustomerMenuProps> = ({
                       className="h-24 w-24 mx-auto mb-6 opacity-50"
                     />
                   )}
-                  <h3 className="text-xl font-semibold mb-2 text-[#2A2A2A]">No menu items available</h3>
-                  <p className="text-base text-[#6F6A63]">Add items in Menu Management to get started</p>
+                  <h3 className="text-xl font-semibold mb-2 text-[#0b0f05]">No menu items available</h3>
+                  <p className="text-base text-[#b3af9b]">Add items in Menu Management to get started</p>
                 </div>
               ) : searchQuery.trim() && Object.keys(filteredMenuItems).length === 0 ? (
-                <div className="text-center py-16 max-w-6xl mx-auto bg-[#F6F4F0]">
-                  <Search className="h-16 w-16 mx-auto mb-4 text-[#6F6A63]" />
-                  <h3 className="text-xl font-semibold mb-2 text-[#2A2A2A]">No results found</h3>
-                  <p className="text-base text-[#6F6A63] mb-4">
+                <div className="text-center py-16 max-w-6xl mx-auto bg-[#e1e5df]">
+                  <Search className="h-16 w-16 mx-auto mb-4 text-[#b3af9b]" />
+                  <h3 className="text-xl font-semibold mb-2 text-[#0b0f05]">No results found</h3>
+                  <p className="text-base text-[#b3af9b] mb-4">
                     We couldn&apos;t find any items matching &quot;{searchQuery}&quot;
                   </p>
                   <GlassButton
@@ -1197,7 +1197,7 @@ const CustomerMenu: React.FC<CustomerMenuProps> = ({
                   {searchQuery.trim() && (
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
                       <div className="flex items-center justify-between mb-6">
-                        <h3 className="text-lg font-semibold text-[#2A2A2A]">
+                        <h3 className="text-lg font-semibold text-[#0b0f05]">
                           Search Results for &quot;{searchQuery}&quot;
                         </h3>
                         <button
@@ -1206,7 +1206,7 @@ const CustomerMenu: React.FC<CustomerMenuProps> = ({
                             setShowAutocomplete(false);
                             setSelectedSuggestionIndex(-1);
                           }}
-                          className="text-sm text-[#C68E3C] hover:text-[#2A2A2A] transition-colors"
+                          className="text-sm text-[#a57f42] hover:text-[#0b0f05] transition-colors"
                         >
                           Clear search
                         </button>
@@ -1226,9 +1226,9 @@ const CustomerMenu: React.FC<CustomerMenuProps> = ({
                           key={categoryName}
                           id={slug ? `category-${slug}` : undefined}
                           data-scroll-animate
-                          className="py-6 sm:py-24 bg-[#F6F4F0] relative scroll-mt-24"
+                          className="py-6 sm:py-24 bg-[#e1e5df] relative scroll-mt-24"
                         >
-                          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#C68E3C]/[0.02] to-transparent pointer-events-none" />
+                          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#a57f42]/[0.02] to-transparent pointer-events-none" />
                           <div className="px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto relative z-10">
                             <button
                               type="button"
@@ -1240,15 +1240,15 @@ const CustomerMenu: React.FC<CustomerMenuProps> = ({
                             >
                               <div className="scroll-animate-left flex items-center justify-between gap-4">
                                 <div className="flex items-baseline gap-4">
-                                  <span className="font-mono text-sm text-[#C68E3C] bg-[#C68E3C]/10 px-3 py-1 rounded-full">
+                                  <span className="font-mono text-sm text-[#a57f42] bg-[#a57f42]/10 px-3 py-1 rounded-full">
                                     {categoryNumber}
                                   </span>
-                                  <h2 className="text-2xl sm:text-4xl lg:text-5xl font-bold text-[#2A2A2A] tracking-tight">
+                                  <h2 className="text-2xl sm:text-4xl lg:text-5xl font-bold text-[#0b0f05] tracking-tight">
                                     {categoryName}
                                   </h2>
                                 </div>
                                 <span className="sm:hidden flex-shrink-0 transition-transform duration-200" aria-hidden>
-                                  <ChevronDown className={`h-6 w-6 text-[#2A2A2A] ${openCategoryMobile === categoryName ? 'rotate-180' : ''}`} />
+                                  <ChevronDown className={`h-6 w-6 text-[#0b0f05] ${openCategoryMobile === categoryName ? 'rotate-180' : ''}`} />
                                 </span>
                               </div>
                             </button>
@@ -1278,16 +1278,16 @@ const CustomerMenu: React.FC<CustomerMenuProps> = ({
                                       />
                                       <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                                       <div className="absolute top-4 right-4 bg-white/95 backdrop-blur-sm px-3 py-1.5 rounded-full shadow-lg">
-                                        <span className="font-mono text-sm font-medium text-[#C68E3C]">
+                                        <span className="font-mono text-sm font-medium text-[#a57f42]">
                                           {formatCurrency(ensureNumber(item.price))}
                                         </span>
                                       </div>
                                     </div>
                                     <div className="p-5 sm:p-6">
-                                      <h3 className="font-semibold text-lg sm:text-xl text-[#2A2A2A] mb-2 group-hover:text-[#C68E3C] transition-colors duration-300">
+                                      <h3 className="font-semibold text-lg sm:text-xl text-[#0b0f05] mb-2 group-hover:text-[#a57f42] transition-colors duration-300">
                                         {item.name}
                                       </h3>
-                                      <p className="text-sm text-[#6F6A63] mb-5 line-clamp-2 leading-relaxed">
+                                      <p className="text-sm text-[#b3af9b] mb-5 line-clamp-2 leading-relaxed">
                                         {item.description || 'Delicious choice from our menu.'}
                                       </p>
                                       {quantity === 0 ? (
@@ -1302,26 +1302,26 @@ const CustomerMenu: React.FC<CustomerMenuProps> = ({
                                           Add to cart
                                         </GlassButton>
                                       ) : (
-                                        <div className="flex items-center justify-between bg-[#F6F4F0] rounded-xl p-2">
+                                        <div className="flex items-center justify-between bg-[#e1e5df] rounded-xl p-2">
                                           <GlassButton
                                             size="icon"
                                             type="button"
                                             onClick={() => updateQuantity(item.id, quantity - 1)}
                                             aria-label="Decrease quantity"
-                                            contentClassName="text-[#2A2A2A]"
-                                            className="[&_.glass-button]:!bg-white/80 [&_.glass-button]:!border-[#E0DED8] [&_.glass-button]:text-[#2A2A2A]"
+                                            contentClassName="text-[#0b0f05]"
+                                            className="[&_.glass-button]:!bg-white/80 [&_.glass-button]:!border-[#b3af9b] [&_.glass-button]:text-[#0b0f05]"
                                           >
                                             <Minus className="h-4 w-4" />
                                           </GlassButton>
-                                          <span className="font-mono text-lg font-medium text-[#2A2A2A]">{quantity}</span>
+                                          <span className="font-mono text-lg font-medium text-[#0b0f05]">{quantity}</span>
                                           <GlassButton
                                             size="icon"
                                             type="button"
                                             disabled={quantity >= MAX_ITEM_QUANTITY}
                                             onClick={() => quantity < MAX_ITEM_QUANTITY && updateQuantity(item.id, quantity + 1)}
                                             aria-label="Increase quantity"
-                                            contentClassName="text-[#2A2A2A]"
-                                            className="[&_.glass-button]:!bg-white/80 [&_.glass-button]:!border-[#E0DED8] [&_.glass-button]:text-[#2A2A2A] disabled:opacity-50 disabled:pointer-events-none"
+                                            contentClassName="text-[#0b0f05]"
+                                            className="[&_.glass-button]:!bg-white/80 [&_.glass-button]:!border-[#b3af9b] [&_.glass-button]:text-[#0b0f05] disabled:opacity-50 disabled:pointer-events-none"
                                           >
                                             <Plus className="h-4 w-4" />
                                           </GlassButton>
@@ -1345,24 +1345,24 @@ const CustomerMenu: React.FC<CustomerMenuProps> = ({
                     error={brandingError}
                   />
 
-                  {/* Special Proposals - DIR style (#E9E4DA bg, Featured pill, Popular badge) + scroll animate */}
+                  {/* Special Proposals - DIR style (#b3af9b bg, Featured pill, Popular badge) + scroll animate */}
                   {(loadingMostOrdered || mostOrderedItems.length > 0) && (
-                    <section data-scroll-animate className="py-20 sm:py-28 bg-[#E9E4DA] relative overflow-hidden">
-                      <div className="absolute top-0 left-1/4 w-96 h-96 bg-[#C68E3C]/10 rounded-full blur-3xl -translate-y-1/2" />
-                      <div className="absolute bottom-0 right-1/4 w-80 h-80 bg-[#C68E3C]/5 rounded-full blur-3xl translate-y-1/2" />
-                      <div className="absolute inset-0 opacity-[0.02]" style={{ backgroundImage: 'radial-gradient(circle at 1px 1px, #2A2A2A 1px, transparent 0)', backgroundSize: '40px 40px' }} />
+                    <section data-scroll-animate className="py-20 sm:py-28 bg-[#b3af9b] relative overflow-hidden">
+                      <div className="absolute top-0 left-1/4 w-96 h-96 bg-[#a57f42]/10 rounded-full blur-3xl -translate-y-1/2" />
+                      <div className="absolute bottom-0 right-1/4 w-80 h-80 bg-[#a57f42]/5 rounded-full blur-3xl translate-y-1/2" />
+                      <div className="absolute inset-0 opacity-[0.02]" style={{ backgroundImage: 'radial-gradient(circle at 1px 1px, #0b0f05 1px, transparent 0)', backgroundSize: '40px 40px' }} />
                       <div className="px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto relative z-10">
                         <div className="text-center mb-14 sm:mb-20">
                           <div className="scroll-animate-in inline-flex items-center gap-2 bg-white/80 backdrop-blur-sm px-4 py-2 rounded-full mb-6 shadow-sm">
-                            <Star className="h-4 w-4 text-[#C68E3C] fill-[#C68E3C]" />
-                            <span className="font-mono text-xs uppercase tracking-[0.2em] text-[#6F6A63]">
+                            <Star className="h-4 w-4 text-[#a57f42] fill-[#a57f42]" />
+                            <span className="font-mono text-xs uppercase tracking-[0.2em] text-[#b3af9b]">
                               Featured
                             </span>
                           </div>
-                          <h2 className="scroll-animate-in scroll-stagger-1 text-4xl sm:text-5xl lg:text-6xl font-bold text-[#2A2A2A] mb-5 tracking-tight">
+                          <h2 className="scroll-animate-in scroll-stagger-1 text-4xl sm:text-5xl lg:text-6xl font-bold text-[#0b0f05] mb-5 tracking-tight">
                             Special Proposals
                           </h2>
-                          <p className="text-[#6F6A63] max-w-lg mx-auto text-lg leading-relaxed">
+                          <p className="text-[#b3af9b] max-w-lg mx-auto text-lg leading-relaxed">
                             Our most popular items, handpicked for first-timers and regulars alike.
                           </p>
                         </div>
@@ -1371,11 +1371,11 @@ const CustomerMenu: React.FC<CustomerMenuProps> = ({
                           {loadingMostOrdered ? (
                             [1, 2, 3].map((i) => (
                               <div key={`special-skeleton-${i}`} className="bg-white rounded-2xl overflow-hidden shadow-lg animate-pulse">
-                                <div className="aspect-[16/10] bg-[#E9E4DA]" />
+                                <div className="aspect-[16/10] bg-[#b3af9b]" />
                                 <div className="p-5 sm:p-6">
-                                  <div className="h-5 bg-[#E9E4DA] rounded w-3/4 mb-2" />
-                                  <div className="h-4 bg-[#E9E4DA]/60 rounded w-full mb-4" />
-                                  <div className="h-12 bg-[#E9E4DA] rounded-xl w-1/2" />
+                                  <div className="h-5 bg-[#b3af9b] rounded w-3/4 mb-2" />
+                                  <div className="h-4 bg-[#b3af9b]/60 rounded w-full mb-4" />
+                                  <div className="h-12 bg-[#b3af9b] rounded-xl w-1/2" />
                                 </div>
                               </div>
                             ))
@@ -1399,20 +1399,20 @@ const CustomerMenu: React.FC<CustomerMenuProps> = ({
                                   />
                                   <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
                                   <div className="absolute top-4 right-4 bg-white/95 backdrop-blur-sm px-4 py-2 rounded-full shadow-lg">
-                                    <span className="font-mono text-sm font-semibold text-[#C68E3C]">
+                                    <span className="font-mono text-sm font-semibold text-[#a57f42]">
                                       {formatCurrency(ensureNumber(item.price))}
                                     </span>
                                   </div>
-                                  <div className="absolute top-4 left-4 bg-[#C68E3C] text-white px-3 py-1.5 rounded-full shadow-lg flex items-center gap-1.5">
+                                  <div className="absolute top-4 left-4 bg-[#a57f42] text-on-primary px-3 py-1.5 rounded-full shadow-lg flex items-center gap-1.5">
                                     <Star className="h-3 w-3 fill-white" />
                                     <span className="font-mono text-xs uppercase tracking-wider">Popular</span>
                                   </div>
                                 </div>
                                 <div className="p-5 sm:p-6">
-                                  <h3 className="font-semibold text-xl text-[#2A2A2A] mb-2 group-hover:text-[#C68E3C] transition-colors duration-300">
+                                  <h3 className="font-semibold text-xl text-[#0b0f05] mb-2 group-hover:text-[#a57f42] transition-colors duration-300">
                                     {item.name}
                                   </h3>
-                                  <p className="text-sm text-[#6F6A63] mb-5 line-clamp-2 leading-relaxed">
+                                  <p className="text-sm text-[#b3af9b] mb-5 line-clamp-2 leading-relaxed">
                                     {item.description || 'A customer favorite.'}
                                   </p>
                                   {quantity === 0 ? (
@@ -1427,26 +1427,26 @@ const CustomerMenu: React.FC<CustomerMenuProps> = ({
                                       Add to cart
                                     </GlassButton>
                                   ) : (
-                                    <div className="flex items-center justify-between bg-[#F6F4F0] rounded-xl p-2">
+                                    <div className="flex items-center justify-between bg-[#e1e5df] rounded-xl p-2">
                                       <GlassButton
                                         size="icon"
                                         type="button"
                                         onClick={() => updateQuantity(item.id, quantity - 1)}
                                         aria-label="Decrease quantity"
-                                        contentClassName="text-[#2A2A2A]"
-                                        className="[&_.glass-button]:!bg-white/80 [&_.glass-button]:!border-[#E0DED8] [&_.glass-button]:text-[#2A2A2A]"
+                                        contentClassName="text-[#0b0f05]"
+                                        className="[&_.glass-button]:!bg-white/80 [&_.glass-button]:!border-[#b3af9b] [&_.glass-button]:text-[#0b0f05]"
                                       >
                                         <Minus className="h-4 w-4" />
                                       </GlassButton>
-                                      <span className="font-mono text-lg font-medium text-[#2A2A2A]">{quantity}</span>
+                                      <span className="font-mono text-lg font-medium text-[#0b0f05]">{quantity}</span>
                                       <GlassButton
                                         size="icon"
                                         type="button"
                                         disabled={quantity >= MAX_ITEM_QUANTITY}
                                         onClick={() => quantity < MAX_ITEM_QUANTITY && updateQuantity(item.id, quantity + 1)}
                                         aria-label="Increase quantity"
-                                        contentClassName="text-[#2A2A2A]"
-                                        className="[&_.glass-button]:!bg-white/80 [&_.glass-button]:!border-[#E0DED8] [&_.glass-button]:text-[#2A2A2A] disabled:opacity-50 disabled:pointer-events-none"
+                                        contentClassName="text-[#0b0f05]"
+                                        className="[&_.glass-button]:!bg-white/80 [&_.glass-button]:!border-[#b3af9b] [&_.glass-button]:text-[#0b0f05] disabled:opacity-50 disabled:pointer-events-none"
                                       >
                                         <Plus className="h-4 w-4" />
                                       </GlassButton>
@@ -1472,53 +1472,53 @@ const CustomerMenu: React.FC<CustomerMenuProps> = ({
                     </section>
                   )}
 
-                  {/* Footer - DIR style (#F6F4F0, #2A2A2A, #C68E3C) + scroll animate */}
-                  <footer data-scroll-animate className="py-20 sm:py-28 bg-[#F6F4F0] relative overflow-hidden">
-                    <div className="absolute top-0 right-0 w-96 h-96 bg-[#C68E3C]/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
+                  {/* Footer - DIR style (#e1e5df, #0b0f05, #a57f42) + scroll animate */}
+                  <footer data-scroll-animate className="py-20 sm:py-28 bg-[#e1e5df] relative overflow-hidden">
+                    <div className="absolute top-0 right-0 w-96 h-96 bg-[#a57f42]/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
                     <div className="px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto relative z-10">
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
                         <div className="scroll-animate-in space-y-5">
                           <div className="mb-6">
-                            <h3 className="text-2xl sm:text-3xl font-bold text-[#2A2A2A] mb-1">
+                            <h3 className="text-2xl sm:text-3xl font-bold text-[#0b0f05] mb-1">
                               {cafeDisplayName}
                             </h3>
-                            <p className="font-serif italic text-[#6F6A63] text-lg">Café</p>
+                            <p className="font-serif italic text-[#b3af9b] text-lg">Café</p>
                           </div>
-                          <p className="text-[#6F6A63] text-sm leading-relaxed mb-4">
+                          <p className="text-[#b3af9b] text-sm leading-relaxed mb-4">
                             Have questions or want to make a reservation? We&apos;d love to hear from you.
                           </p>
                           {cafeBranding && (
                             <div className="space-y-4">
                               {cafeBranding.address && (
                                 <div className="flex items-start gap-4 group">
-                                  <div className="w-10 h-10 rounded-full bg-[#E9E4DA] flex items-center justify-center flex-shrink-0 group-hover:bg-[#C68E3C] group-hover:text-white transition-colors duration-300">
-                                    <MapPin className="h-4 w-4 text-[#6F6A63] group-hover:text-white transition-colors" />
+                                  <div className="w-10 h-10 rounded-full bg-[#b3af9b] flex items-center justify-center flex-shrink-0 group-hover:bg-[#a57f42] group-hover:text-white transition-colors duration-300">
+                                    <MapPin className="h-4 w-4 text-[#b3af9b] group-hover:text-white transition-colors" />
                                   </div>
-                                  <span className="text-[#2A2A2A] pt-2">{cafeBranding.address}</span>
+                                  <span className="text-[#0b0f05] pt-2">{cafeBranding.address}</span>
                                 </div>
                               )}
                               {cafeBranding.phone && (
                                 <a href={`tel:${cafeBranding.phone}`} className="flex items-center gap-4 group">
-                                  <div className="w-10 h-10 rounded-full bg-[#E9E4DA] flex items-center justify-center flex-shrink-0 group-hover:bg-[#C68E3C] transition-colors duration-300">
-                                    <Phone className="h-4 w-4 text-[#6F6A63] group-hover:text-white transition-colors" />
+                                  <div className="w-10 h-10 rounded-full bg-[#b3af9b] flex items-center justify-center flex-shrink-0 group-hover:bg-[#a57f42] transition-colors duration-300">
+                                    <Phone className="h-4 w-4 text-[#b3af9b] group-hover:text-white transition-colors" />
                                   </div>
-                                  <span className="text-[#2A2A2A] group-hover:text-[#C68E3C] transition-colors">{cafeBranding.phone}</span>
+                                  <span className="text-[#0b0f05] group-hover:text-[#a57f42] transition-colors">{cafeBranding.phone}</span>
                                 </a>
                               )}
                               {cafeBranding.email && (
                                 <a href={`mailto:${cafeBranding.email}`} className="flex items-center gap-4 group">
-                                  <div className="w-10 h-10 rounded-full bg-[#E9E4DA] flex items-center justify-center flex-shrink-0 group-hover:bg-[#C68E3C] transition-colors duration-300">
-                                    <Mail className="h-4 w-4 text-[#6F6A63] group-hover:text-white transition-colors" />
+                                  <div className="w-10 h-10 rounded-full bg-[#b3af9b] flex items-center justify-center flex-shrink-0 group-hover:bg-[#a57f42] transition-colors duration-300">
+                                    <Mail className="h-4 w-4 text-[#b3af9b] group-hover:text-white transition-colors" />
                                   </div>
-                                  <span className="text-[#2A2A2A] group-hover:text-[#C68E3C] transition-colors">{cafeBranding.email}</span>
+                                  <span className="text-[#0b0f05] group-hover:text-[#a57f42] transition-colors">{cafeBranding.email}</span>
                                 </a>
                               )}
                               {cafeSettings.website && (
                                 <a href={cafeSettings.website} target="_blank" rel="noopener noreferrer" className="flex items-center gap-4 group">
-                                  <div className="w-10 h-10 rounded-full bg-[#E9E4DA] flex items-center justify-center flex-shrink-0 group-hover:bg-[#C68E3C] transition-colors duration-300">
-                                    <MapPin className="h-4 w-4 text-[#6F6A63] group-hover:text-white transition-colors" />
+                                  <div className="w-10 h-10 rounded-full bg-[#b3af9b] flex items-center justify-center flex-shrink-0 group-hover:bg-[#a57f42] transition-colors duration-300">
+                                    <MapPin className="h-4 w-4 text-[#b3af9b] group-hover:text-white transition-colors" />
                                   </div>
-                                  <span className="text-[#2A2A2A] group-hover:text-[#C68E3C] transition-colors">Website</span>
+                                  <span className="text-[#0b0f05] group-hover:text-[#a57f42] transition-colors">Website</span>
                                 </a>
                               )}
                             </div>
@@ -1527,12 +1527,12 @@ const CustomerMenu: React.FC<CustomerMenuProps> = ({
                           {/* Map under cafe details */}
                           <div className="mt-8 scroll-animate-in">
                             <div className="flex items-center gap-2 mb-4">
-                              <div className="w-8 h-8 rounded-full bg-[#C68E3C]/10 flex items-center justify-center">
-                                <MapPin className="h-4 w-4 text-[#C68E3C]" />
+                              <div className="w-8 h-8 rounded-full bg-[#a57f42]/10 flex items-center justify-center">
+                                <MapPin className="h-4 w-4 text-[#a57f42]" />
                               </div>
-                              <h4 className="font-mono text-xs uppercase tracking-[0.2em] text-[#6F6A63]">Find us</h4>
+                              <h4 className="font-mono text-xs uppercase tracking-[0.2em] text-[#b3af9b]">Find us</h4>
                             </div>
-                            <div className="rounded-xl overflow-hidden border border-[#2A2A2A]/10 shadow-sm h-[280px] bg-[#E9E4DA]">
+                            <div className="rounded-xl overflow-hidden border border-[#0b0f05]/10 shadow-sm h-[280px] bg-[#b3af9b]">
                               <LocationMap
                                 address={cafeSettings?.address || cafeBranding?.address || ''}
                                 latitude={cafeBranding?.latitude}
@@ -1547,10 +1547,10 @@ const CustomerMenu: React.FC<CustomerMenuProps> = ({
                         {bentoGalleryMediaItems.length > 0 && (
                           <div>
                               <div className="flex items-center gap-2 mb-6">
-                                <div className="w-8 h-8 rounded-full bg-[#C68E3C]/10 flex items-center justify-center">
-                                  <Star className="h-4 w-4 text-[#C68E3C]" />
+                                <div className="w-8 h-8 rounded-full bg-[#a57f42]/10 flex items-center justify-center">
+                                  <Star className="h-4 w-4 text-[#a57f42]" />
                                 </div>
-                                <h4 className="font-mono text-xs uppercase tracking-[0.2em] text-[#6F6A63]">Gallery</h4>
+                                <h4 className="font-mono text-xs uppercase tracking-[0.2em] text-[#b3af9b]">Gallery</h4>
                               </div>
                               <InteractiveBentoGallery
                                 mediaItems={bentoGalleryFirst6}
@@ -1561,8 +1561,8 @@ const CustomerMenu: React.FC<CustomerMenuProps> = ({
                                   <GlassButton
                                     size="sm"
                                     onClick={() => setShowGalleryModal(true)}
-                                    className="[&_.glass-button]:bg-[#E9E4DA] [&_.glass-button]:border-[#2A2A2A]/10"
-                                    contentClassName="font-medium text-[#2A2A2A]"
+                                    className="[&_.glass-button]:bg-[#b3af9b] [&_.glass-button]:border-[#0b0f05]/10"
+                                    contentClassName="font-medium text-[#0b0f05]"
                                   >
                                     Show more ({bentoGalleryMediaItems.length} photos)
                                   </GlassButton>
@@ -1572,8 +1572,8 @@ const CustomerMenu: React.FC<CustomerMenuProps> = ({
                           )}
                       </div>
 
-                      <div className="mt-16 pt-8 border-t border-[#2A2A2A]/10 flex flex-col sm:flex-row items-center justify-between gap-4">
-                        <p className="text-sm text-[#6F6A63]">
+                      <div className="mt-16 pt-8 border-t border-[#0b0f05]/10 flex flex-col sm:flex-row items-center justify-between gap-4">
+                        <p className="text-sm text-[#b3af9b]">
                           © {new Date().getFullYear()} {cafeDisplayName}. Crafted with care.
                         </p>
                         <FlowButton
@@ -1603,16 +1603,16 @@ const CustomerMenu: React.FC<CustomerMenuProps> = ({
 
       {/* Floating Cart Bar - mobile only, DIR style */}
       {activeTab === 'menu' && cart.length > 0 && (
-        <div className="fixed bottom-0 left-0 right-0 z-40 p-4 bg-white border-t border-[#2A2A2A]/10 shadow-lg lg:hidden">
+        <div className="fixed bottom-0 left-0 right-0 z-40 p-4 bg-surface-card border-t border-[#0b0f05]/10 shadow-lg lg:hidden">
           <button
             onClick={() => setShowCart(true)}
-            className="w-full flex items-center justify-between bg-[#2A2A2A] text-white rounded-xl px-4 py-3 min-h-[44px]"
+            className="w-full flex items-center justify-between bg-[#0b0f05] text-on-primary rounded-xl px-4 py-3 min-h-[44px]"
             aria-label="View cart"
           >
             <div className="flex items-center gap-3">
               <div className="relative">
                 <ShoppingBag className="h-5 w-5" />
-                <span className="absolute -top-2 -right-2 w-5 h-5 bg-[#C68E3C] rounded-full text-xs flex items-center justify-center font-medium">
+                <span className="absolute -top-2 -right-2 w-5 h-5 bg-[#a57f42] rounded-full text-xs flex items-center justify-center font-medium">
                   {cart.reduce((total, item) => total + item.quantity, 0)}
                 </span>
               </div>
@@ -1664,8 +1664,8 @@ const CustomerMenu: React.FC<CustomerMenuProps> = ({
                               <GlassButton
                                 size="icon"
                                 onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                                className="!min-w-[36px] !min-h-[36px] [&_.glass-button]:!h-9 [&_.glass-button]:!w-9 [&_.glass-button-text]:!h-9 [&_.glass-button-text]:!w-9 [&_.glass-button]:!bg-white/80 [&_.glass-button]:!border-[#E0DED8] [&_.glass-button]:!text-[#2A2A2A]"
-                                contentClassName="text-[#2A2A2A]"
+                                className="!min-w-[36px] !min-h-[36px] [&_.glass-button]:!h-9 [&_.glass-button]:!w-9 [&_.glass-button-text]:!h-9 [&_.glass-button-text]:!w-9 [&_.glass-button]:!bg-white/80 [&_.glass-button]:!border-[#b3af9b] [&_.glass-button]:!text-[#0b0f05]"
+                                contentClassName="text-[#0b0f05]"
                                 aria-label="Decrease quantity"
                               >
                                 <Minus className="h-4 w-4" />
@@ -1675,8 +1675,8 @@ const CustomerMenu: React.FC<CustomerMenuProps> = ({
                                 size="icon"
                                 disabled={item.quantity >= MAX_ITEM_QUANTITY}
                                 onClick={() => item.quantity < MAX_ITEM_QUANTITY && updateQuantity(item.id, item.quantity + 1)}
-                                className="!min-w-[36px] !min-h-[36px] [&_.glass-button]:!h-9 [&_.glass-button]:!w-9 [&_.glass-button-text]:!h-9 [&_.glass-button-text]:!w-9 [&_.glass-button]:!bg-white/80 [&_.glass-button]:!border-[#E0DED8] [&_.glass-button]:!text-[#2A2A2A] disabled:opacity-50 disabled:pointer-events-none"
-                                contentClassName="text-[#2A2A2A]"
+                                className="!min-w-[36px] !min-h-[36px] [&_.glass-button]:!h-9 [&_.glass-button]:!w-9 [&_.glass-button-text]:!h-9 [&_.glass-button-text]:!w-9 [&_.glass-button]:!bg-white/80 [&_.glass-button]:!border-[#b3af9b] [&_.glass-button]:!text-[#0b0f05] disabled:opacity-50 disabled:pointer-events-none"
+                                contentClassName="text-[#0b0f05]"
                                 aria-label="Increase quantity"
                               >
                                 <Plus className="h-4 w-4" />
