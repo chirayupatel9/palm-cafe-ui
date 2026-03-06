@@ -909,6 +909,7 @@ const CustomerMenu: React.FC<CustomerMenuProps> = ({
                   mediaSrc={getImageUrl(primaryImageUrl)}
                   bgImageSrc={getImageUrl(secondaryImageUrl || primaryImageUrl)}
                   title={cafeDisplayName ? `${cafeDisplayName}` : 'Cafe'}
+                  scrollToExpand="Scroll to view more"
                 >
                   <div className="max-w-3xl mx-auto text-center space-y-4 mb-10">
                     {/* {cafeBranding.cafe_name && (

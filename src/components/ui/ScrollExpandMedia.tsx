@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
+import { ChevronDown } from 'lucide-react';
 
 interface ScrollExpandMediaProps {
   mediaType?: 'video' | 'image';
@@ -34,6 +35,10 @@ const ScrollExpandMedia: React.FC<ScrollExpandMediaProps> = ({
   const expandedRef = useRef(false);
 
   expandedRef.current = mediaFullyExpanded;
+
+  const handleScrollHintClick = () => {
+    targetProgressRef.current = 1;
+  };
 
   useEffect(() => {
     setShowContent(false);
@@ -186,7 +191,7 @@ const ScrollExpandMedia: React.FC<ScrollExpandMediaProps> = ({
           <div className="container mx-auto flex flex-col items-center justify-start relative z-10">
             <div className="flex flex-col items-center justify-center w-full h-[100dvh] relative">
               <div
-                className="absolute z-0 top-1/2 left-1/2 origin-center rounded-2xl"
+                className="absolute z-0 top-1/2 left-1/2 origin-center rounded-3xl"
                 style={{
                   width: cardW,
                   height: cardH,
@@ -213,7 +218,7 @@ const ScrollExpandMedia: React.FC<ScrollExpandMediaProps> = ({
                               '?autoplay=1&mute=1&loop=1&controls=0&showinfo=0&rel=0&disablekb=1&modestbranding=1&playlist=' +
                               mediaSrc.split('v=')[1]
                         }
-                        className="w-full h-full rounded-xl"
+                        className="w-full h-full rounded-3xl"
                         frameBorder="0"
                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                         allowFullScreen
@@ -224,7 +229,7 @@ const ScrollExpandMedia: React.FC<ScrollExpandMediaProps> = ({
                       />
 
                       <div
-                        className="absolute inset-0 bg-black/30 rounded-xl"
+                        className="absolute inset-0 bg-black/30 rounded-3xl"
                         style={{ opacity: 'calc(0.5 - var(--hero-progress, 0) * 0.3)' }}
                       />
                     </div>
@@ -238,7 +243,7 @@ const ScrollExpandMedia: React.FC<ScrollExpandMediaProps> = ({
                         loop
                         playsInline
                         preload="auto"
-                        className="w-full h-full object-cover rounded-xl"
+                        className="w-full h-full object-cover rounded-3xl"
                         controls={false}
                       />
                       <div
@@ -247,13 +252,13 @@ const ScrollExpandMedia: React.FC<ScrollExpandMediaProps> = ({
                       />
 
                       <div
-                        className="absolute inset-0 bg-black/30 rounded-xl"
+                        className="absolute inset-0 bg-black/30 rounded-3xl"
                         style={{ opacity: 'calc(0.5 - var(--hero-progress, 0) * 0.3)' }}
                       />
                     </div>
                   )
                 ) : (
-                  <div className="relative w-full h-full bg-[#0b0f05] rounded-xl overflow-hidden">
+                  <div className="relative w-full h-full bg-[#0b0f05] rounded-3xl overflow-hidden">
                     {mediaSrc && (
                       <>
                         <img
@@ -261,10 +266,10 @@ const ScrollExpandMedia: React.FC<ScrollExpandMediaProps> = ({
                           alt={title || 'Media content'}
                           fetchPriority="high"
                           decoding="async"
-                          className="absolute inset-0 w-full h-full object-cover rounded-xl"
+                          className="absolute inset-0 w-full h-full object-cover rounded-3xl"
                         />
                         <div
-                          className="absolute inset-0 bg-black/50 rounded-xl"
+                          className="absolute inset-0 bg-black/50 rounded-3xl"
                           style={{ opacity: 'calc(0.7 - var(--hero-progress, 0) * 0.3)' }}
                         />
                       </>
@@ -274,7 +279,7 @@ const ScrollExpandMedia: React.FC<ScrollExpandMediaProps> = ({
 
                 <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center text-center z-20 px-8 pt-20 pb-14 sm:px-10 sm:pt-24 sm:pb-16 md:px-12 md:pt-28 md:pb-20 lg:px-14 lg:pt-32 lg:pb-24">
                   <div
-                    className="absolute inset-0 rounded-xl bg-gradient-to-b from-black/50 via-black/40 to-black/50"
+                    className="absolute inset-0 rounded-3xl bg-gradient-to-b from-black/50 via-black/40 to-black/50"
                     aria-hidden
                   />
                   <div className="relative z-10 flex flex-col items-center justify-center w-full max-w-full px-6 pt-6 pb-4 sm:px-8 sm:pt-8 sm:pb-6 md:px-10 md:pt-8 md:pb-6">
@@ -314,24 +319,32 @@ const ScrollExpandMedia: React.FC<ScrollExpandMediaProps> = ({
                         {date}
                       </p>
                     )}
-                    {scrollToExpand && (
-                      <p
-                        className="text-2xl sm:text-3xl font-normal text-center"
-                        style={{
-                          color: '#ffffff',
-                          transform: `translateX(calc(var(--hero-progress, 0) * ${textVw}vw))`,
-                          textShadow: '0 1px 3px rgba(0,0,0,0.6), 0 0 16px rgba(0,0,0,0.4)'
-                        }}
-                      >
-                        {scrollToExpand}
-                      </p>
-                    )}
                   </div>
                 </div>
               </div>
 
+              {scrollToExpand && (
+                <button
+                  type="button"
+                  onClick={handleScrollHintClick}
+                  className="group-scroll-hint absolute left-1/2 -translate-x-1/2 z-10 cursor-pointer p-2 rounded-full hover:bg-white/10 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-white/50"
+                  style={{
+                    top: 'calc(50% + 43vh + 0.75rem)',
+                    opacity: 'calc(1 - var(--hero-progress, 0))'
+                  }}
+                  aria-label="Scroll to expand"
+                >
+                  <ChevronDown
+                    className="scroll-hint-arrow w-8 h-8 sm:w-9 sm:h-9 text-white drop-shadow-[0_1px_3px_rgba(0,0,0,0.6)]"
+                    strokeWidth={2.5}
+                    aria-hidden
+                  />
+                </button>
+              )}
+
               <motion.div
                 className="relative z-20 mt-10 w-full max-w-4xl mx-auto px-6"
+                style={{ pointerEvents: showContent ? 'auto' : 'none' }}
                 initial={{ opacity: 0, translateY: 40 }}
                 animate={{ opacity: showContent ? 1 : 0, translateY: showContent ? 0 : 40 }}
                 transition={{ duration: 0.7 }}

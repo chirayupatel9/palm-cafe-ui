@@ -210,29 +210,36 @@ const MenuManagement: React.FC<MenuManagementProps> = ({ menuItems, onUpdate, on
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
+  const isImageFile = (file) => {
+    if (!file) return false;
+    if (file.type && file.type.startsWith('image/')) return true;
+    const ext = (file.name || '').toLowerCase().split('.').pop();
+    return ['jpg', 'jpeg', 'png', 'webp', 'gif', 'heic'].includes(ext);
+  };
+
   const handleImageFileChange = (event) => {
-    const file = event.target.files[0];
+    const file = event.target.files?.[0];
     if (!file) {
       setSelectedImageFile(null);
       return;
     }
 
-    if (!file.type.startsWith('image/')) {
-      toast.error('Please select an image file');
-      setSelectedImageFile(null);
+    if (!isImageFile(file)) {
+      toast.error('Please select an image file (e.g. JPG, PNG, WebP)');
+      event.target.value = '';
       return;
     }
 
-    // Validate file size (max 5MB)
     const maxSize = 5 * 1024 * 1024; // 5MB
     if (file.size > maxSize) {
       toast.error('Image size must be less than 5MB');
-      setSelectedImageFile(null);
+      event.target.value = '';
       return;
     }
 
     setSelectedImageFile(file);
-    event.target.value = ''; // Reset file input
+    event.target.value = '';
+    handleImageUpload(file);
   };
 
   const handleImageUpload = async (fileFromEvent) => {
@@ -241,8 +248,8 @@ const MenuManagement: React.FC<MenuManagementProps> = ({ menuItems, onUpdate, on
       toast.error('Please select an image file first');
       return;
     }
-    if (!fileToUpload.type.startsWith('image/')) {
-      toast.error('Please select an image file');
+    if (!isImageFile(fileToUpload)) {
+      toast.error('Please select an image file (e.g. JPG, PNG, WebP)');
       return;
     }
     const maxSize = 5 * 1024 * 1024; // 5MB
@@ -258,11 +265,7 @@ const MenuManagement: React.FC<MenuManagementProps> = ({ menuItems, onUpdate, on
 
       // If editing an existing item, use item-specific endpoint
       if (editingId) {
-        const response = await axios.post(`/menu/${editingId}/image`, formData, {
-          headers: {
-            'Content-Type': 'multipart/form-data'
-          }
-        });
+        const response = await axios.post(`/menu/${editingId}/image`, formData);
 
         if (response.data.success) {
           setFormData(prev => ({ ...prev, image_url: response.data.image_url }));
@@ -277,11 +280,7 @@ const MenuManagement: React.FC<MenuManagementProps> = ({ menuItems, onUpdate, on
         }
       } else {
         // For new items, use generic upload endpoint
-        const response = await axios.post('/menu/upload-image', formData, {
-          headers: {
-            'Content-Type': 'multipart/form-data'
-          }
-        });
+        const response = await axios.post('/menu/upload-image', formData);
 
         if (response.data.success) {
           setFormData(prev => ({ ...prev, image_url: response.data.image_url }));

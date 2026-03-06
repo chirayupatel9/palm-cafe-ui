@@ -819,6 +819,22 @@ img {
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(-20px); }
 }
+@keyframes scrollHintFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(6px); }
+}
+@keyframes scrollHintBounce {
+  0%, 100% { transform: translateY(0) scale(1); }
+  30% { transform: translateY(-12px) scale(1.15); }
+  60% { transform: translateY(2px) scale(1.05); }
+  80% { transform: translateY(-4px) scale(1.02); }
+}
+.scroll-hint-arrow {
+  animation: scrollHintFloat 2s ease-in-out infinite;
+}
+.group-scroll-hint:hover .scroll-hint-arrow {
+  animation: scrollHintBounce 0.55s ease;
+}
 .glass-dark {
   background: rgba(0, 0, 0, 0.3);
   backdrop-filter: blur(20px);
