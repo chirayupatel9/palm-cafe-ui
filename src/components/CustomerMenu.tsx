@@ -1300,10 +1300,10 @@ const CustomerMenu: React.FC<CustomerMenuProps> = ({
                                           size="default"
                                           onClick={(e) => { e.stopPropagation(); addToCart(item); }}
                                           contentClassName="w-full flex items-center justify-center gap-1.5 sm:gap-2 text-sm sm:text-base !py-3 sm:!py-5"
-                                          className="w-full glass-button-primary"
+                                          className="w-full glass-button-primary [&_.glass-button]:w-full [&_.glass-button]:min-w-0 [&_.glass-button-text]:w-full [&_.glass-button-text]:min-w-0"
                                           aria-label={`Add ${item.name} to cart`}
                                         >
-                                          <ShoppingBag className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                                          <ShoppingBag className="h-3.5 w-3.5 sm:h-4 sm:w-4 shrink-0" />
                                           Add to cart
                                         </GlassButton>
                                       ) : (
@@ -1425,10 +1425,10 @@ const CustomerMenu: React.FC<CustomerMenuProps> = ({
                                       size="default"
                                       onClick={() => addToCart(item)}
                                       contentClassName="w-full flex items-center justify-center gap-1.5 sm:gap-2 text-sm sm:text-base !py-3 sm:!py-5"
-                                      className="w-full glass-button-primary"
+                                      className="w-full glass-button-primary [&_.glass-button]:w-full [&_.glass-button]:min-w-0 [&_.glass-button-text]:w-full [&_.glass-button-text]:min-w-0"
                                       aria-label={`Add ${item.name} to cart`}
                                     >
-                                      <ShoppingBag className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                                      <ShoppingBag className="h-3.5 w-3.5 sm:h-4 sm:w-4 shrink-0" />
                                       Add to cart
                                     </GlassButton>
                                   ) : (

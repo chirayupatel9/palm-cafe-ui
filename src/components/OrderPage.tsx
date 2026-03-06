@@ -510,34 +510,41 @@ const OrderPage: React.FC<OrderPageProps> = ({ menuItems, cart: externalCart, se
                               {item.description || '—'}
                             </p>
                             {quantity === 0 ? (
-                              <button
+                              <GlassButton
                                 type="button"
                                 onClick={(e) => { e.stopPropagation(); addToCart(item); }}
-                                className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-primary hover:opacity-90 text-on-primary font-medium transition-colors duration-300"
+                                size="default"
+                                className="w-full glass-button-primary [&_.glass-button]:w-full [&_.glass-button]:min-w-0 [&_.glass-button-text]:w-full [&_.glass-button-text]:min-w-0"
+                                contentClassName="w-full flex items-center justify-center gap-2 text-sm sm:text-base"
+                                aria-label={`Add ${item.name} to cart`}
                               >
-                                <ShoppingBag className="h-4 w-4" />
+                                <ShoppingBag className="h-4 w-4 shrink-0" />
                                 Add to cart
-                              </button>
+                              </GlassButton>
                             ) : (
                               <div className="flex items-center justify-between rounded-xl p-2 bg-[var(--surface-table)]">
-                                <button
+                                <GlassButton
                                   type="button"
+                                  size="icon"
                                   onClick={(e) => { e.stopPropagation(); updateQuantity(item.id, quantity - 1); }}
-                                  className="h-10 w-10 rounded-full shadow-sm flex items-center justify-center transition-all hover:scale-105 bg-[var(--surface-card)] hover:bg-[var(--surface-elevated)] border border-[var(--color-outline)]"
                                   aria-label="Decrease quantity"
+                                  className="glass-button-secondary [&_.glass-button]:!text-[var(--color-on-surface)]"
+                                  contentClassName="text-[var(--color-on-surface)]"
                                 >
-                                  <Minus className="h-4 w-4 text-on-surface" />
-                                </button>
+                                  <Minus className="h-4 w-4" />
+                                </GlassButton>
                                 <span className="font-mono text-lg font-medium text-on-surface">{quantity}</span>
-                                <button
+                                <GlassButton
                                   type="button"
-                                  onClick={(e) => { e.stopPropagation(); quantity < MAX_ITEM_QUANTITY && updateQuantity(item.id, quantity + 1); }}
+                                  size="icon"
                                   disabled={quantity >= MAX_ITEM_QUANTITY}
-                                  className="h-10 w-10 rounded-full shadow-sm flex items-center justify-center transition-all hover:scale-105 bg-[var(--surface-card)] hover:bg-[var(--surface-elevated)] border border-[var(--color-outline)] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+                                  onClick={(e) => { e.stopPropagation(); quantity < MAX_ITEM_QUANTITY && updateQuantity(item.id, quantity + 1); }}
                                   aria-label="Increase quantity"
+                                  className="glass-button-secondary disabled:opacity-50 disabled:pointer-events-none [&_.glass-button]:!text-[var(--color-on-surface)]"
+                                  contentClassName="text-[var(--color-on-surface)]"
                                 >
-                                  <Plus className="h-4 w-4 text-on-surface" />
-                                </button>
+                                  <Plus className="h-4 w-4" />
+                                </GlassButton>
                               </div>
                             )}
                           </div>
