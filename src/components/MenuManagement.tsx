@@ -59,6 +59,8 @@ const MenuManagement: React.FC<MenuManagementProps> = ({ menuItems, onUpdate, on
 
   const importExcelInputRef = useRef<HTMLInputElement>(null);
   const importZipInputRef = useRef<HTMLInputElement>(null);
+  const addFormImageInputRef = useRef<HTMLInputElement>(null);
+  const editFormImageInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     fetchCategories();
@@ -644,30 +646,44 @@ const MenuManagement: React.FC<MenuManagementProps> = ({ menuItems, onUpdate, on
                 className="hidden"
                 disabled={loading}
               />
-              <GlassButton
-                type="button"
-                onClick={() => importExcelInputRef.current?.click()}
-                disabled={loading}
-                size="sm"
-                className="glass-button-secondary"
-                contentClassName="flex items-center gap-2"
-                title="Import Excel file (without images)"
-              >
-                <Upload className="h-4 w-4" />
-                Import Excel
-              </GlassButton>
-              <GlassButton
-                type="button"
-                onClick={() => importZipInputRef.current?.click()}
-                disabled={loading}
-                size="sm"
-                className="glass-button-secondary"
-                contentClassName="flex items-center gap-2"
-                title="Import ZIP file with Excel and images folder"
-              >
-                <FolderOpen className="h-4 w-4" />
-                Import ZIP
-              </GlassButton>
+              <div className="relative group inline-flex">
+                <span
+                  className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 w-64 text-xs font-normal text-[var(--color-on-surface)] bg-[var(--color-surface-container-high)] border border-[var(--color-outline-variant)] rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 pointer-events-none"
+                  role="tooltip"
+                >
+                  Upload a .xlsx or .xls file with a sheet named &quot;Menu Items&quot; (columns: Item Name, Price, Category, Description, Sort Order, Image). No images in file—use Import ZIP to include images.
+                </span>
+                <GlassButton
+                  type="button"
+                  onClick={() => importExcelInputRef.current?.click()}
+                  disabled={loading}
+                  size="sm"
+                  className="glass-button-secondary"
+                  contentClassName="flex items-center gap-2"
+                >
+                  <Upload className="h-4 w-4" />
+                  Import Excel
+                </GlassButton>
+              </div>
+              <div className="relative group inline-flex">
+                <span
+                  className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 w-64 text-xs font-normal text-[var(--color-on-surface)] bg-[var(--color-surface-container-high)] border border-[var(--color-outline-variant)] rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 pointer-events-none"
+                  role="tooltip"
+                >
+                  Upload a .zip containing an Excel file (e.g. menu.xlsx) with a &quot;Menu Items&quot; sheet and an optional &quot;images&quot; folder. Image column in Excel should match filenames in the images folder.
+                </span>
+                <GlassButton
+                  type="button"
+                  onClick={() => importZipInputRef.current?.click()}
+                  disabled={loading}
+                  size="sm"
+                  className="glass-button-secondary"
+                  contentClassName="flex items-center gap-2"
+                >
+                  <FolderOpen className="h-4 w-4" />
+                  Import ZIP
+                </GlassButton>
+              </div>
               <GlassButton
                 onClick={handleExport}
                 disabled={loading}
@@ -710,166 +726,208 @@ const MenuManagement: React.FC<MenuManagementProps> = ({ menuItems, onUpdate, on
 
           {/* Add New Item Form */}
           {showAddForm && (
-            <div className="card">
-              <h3 className="text-lg font-semibold mb-4 text-[var(--color-on-surface)]">Add New Menu Item</h3>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4">
-                <Select
-                  options={[
-                    { value: '', label: 'Select Category *' },
-                    ...categories.map(c => ({ value: String(c.id), label: c.name }))
-                  ]}
-                  value={formData.category_id === '' || formData.category_id == null ? '' : String(formData.category_id)}
-                  onChange={(v) => handleInputChange('category_id', v)}
-                  placeholder="Select Category *"
-                />
-                <input
-                  type="text"
-                  placeholder="Item Name *"
-                  value={formData.name}
-                  onChange={(e) => handleInputChange('name', e.target.value)}
-                  className="input-field"
-                />
-                <input
-                  type="text"
-                  placeholder="Description"
-                  value={formData.description}
-                  onChange={(e) => handleInputChange('description', e.target.value)}
-                  className="input-field"
-                />
-                <input
-                  type="number"
-                  step="0.01"
-                  min="0"
-                  placeholder="Price *"
-                  value={formData.price}
-                  onChange={(e) => handleInputChange('price', e.target.value)}
-                  className="input-field"
-                />
-                <input
-                  type="number"
-                  min="0"
-                  placeholder="Sort Order"
-                  value={formData.sort_order}
-                  onChange={(e) => handleInputChange('sort_order', e.target.value)}
-                  className="input-field"
-                />
-                <input
-                  type="number"
-                  min="0"
-                  placeholder="Featured Priority"
-                  value={formData.featured_priority}
-                  onChange={(e) => handleInputChange('featured_priority', e.target.value)}
-                  className="input-field"
-                  title="Set priority to feature this item (higher = more prominent, leave empty to not feature)"
-                />
+            <div className="glass-card overflow-hidden rounded-2xl shadow-sm">
+              <div className="px-5 py-4 border-b border-[var(--color-outline)]/20 bg-[var(--color-surface-container)]/50">
+                <h3 className="text-lg font-semibold text-[var(--color-on-surface)]">Add New Menu Item</h3>
+                <p className="text-sm text-[var(--color-on-surface-variant)] mt-0.5">Fill in the details below</p>
               </div>
-              {/* Image Upload Section */}
-              <div className="mt-4">
-                <label className="block text-sm font-medium mb-2 text-[var(--color-on-surface)]">
-                  Item Image
-                </label>
-                <p className="text-xs mb-3 text-[var(--color-on-surface-variant)]">
-                  Upload an image for this menu item (max 5MB)
-                </p>
-                <div className="flex items-start space-x-4">
-                  {(formData.image_url || selectedImageFile) && (
-                    <div className="relative">
-                      <img
-                        src={selectedImageFile ? URL.createObjectURL(selectedImageFile) : getImageUrl(formData.image_url)}
-                        alt="Menu Item Preview"
-                        className="w-24 h-24 object-cover border rounded-lg"
-                      />
-                      {selectedImageFile && (
-                        <div className="absolute -top-2 -right-2 bg-blue-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs">
-                          New
-                        </div>
-                      )}
-                    </div>
-                  )}
-                  <div className="flex-1 space-y-2">
-                    <div className="flex items-center space-x-2">
-                      <label className="btn-secondary flex items-center justify-center cursor-pointer text-sm flex-shrink-0">
-                        <Upload className="h-4 w-4 mr-2" />
-                        {formData.image_url || selectedImageFile ? 'Replace' : 'Select'} Image
-                        <input
-                          type="file"
-                          accept="image/jpeg,image/png,image/webp"
-                          onChange={handleImageFileChange}
-                          className="hidden"
-                          disabled={imageUploading || removingImage}
+              <div className="p-5 space-y-5">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4">
+                  <div className="[&_button]:min-h-[40px] [&_button]:rounded-xl">
+                    <label className="block text-sm font-medium text-[var(--color-on-surface)] mb-1.5">Category *</label>
+                    <Select
+                      options={[
+                        { value: '', label: 'Select Category' },
+                        ...categories.map(c => ({ value: String(c.id), label: c.name }))
+                      ]}
+                      value={formData.category_id === '' || formData.category_id == null ? '' : String(formData.category_id)}
+                      onChange={(v) => handleInputChange('category_id', v)}
+                      placeholder="Select Category"
+                      className="select-trigger-glass select-trigger-glass-hover"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-[var(--color-on-surface)] mb-1.5">Item Name *</label>
+                    <input
+                      type="text"
+                      placeholder="e.g. Cappuccino"
+                      value={formData.name}
+                      onChange={(e) => handleInputChange('name', e.target.value)}
+                      className="glass-input w-full min-h-[40px] rounded-xl border border-[var(--color-outline-variant)] bg-[var(--surface-card)] text-[var(--color-on-surface)] placeholder-[var(--color-on-surface-variant)] px-4 py-2.5 text-sm"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-[var(--color-on-surface)] mb-1.5">Description</label>
+                    <input
+                      type="text"
+                      placeholder="Optional"
+                      value={formData.description}
+                      onChange={(e) => handleInputChange('description', e.target.value)}
+                      className="glass-input w-full min-h-[40px] rounded-xl border border-[var(--color-outline-variant)] bg-[var(--surface-card)] text-[var(--color-on-surface)] placeholder-[var(--color-on-surface-variant)] px-4 py-2.5 text-sm"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-[var(--color-on-surface)] mb-1.5">Price *</label>
+                    <input
+                      type="number"
+                      step="0.01"
+                      min="0"
+                      placeholder="0.00"
+                      value={formData.price}
+                      onChange={(e) => handleInputChange('price', e.target.value)}
+                      className="glass-input w-full min-h-[40px] rounded-xl border border-[var(--color-outline-variant)] bg-[var(--surface-card)] text-[var(--color-on-surface)] placeholder-[var(--color-on-surface-variant)] px-4 py-2.5 text-sm"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-[var(--color-on-surface)] mb-1.5">Sort Order</label>
+                    <input
+                      type="number"
+                      min="0"
+                      placeholder="0"
+                      value={formData.sort_order}
+                      onChange={(e) => handleInputChange('sort_order', e.target.value)}
+                      className="glass-input w-full min-h-[40px] rounded-xl border border-[var(--color-outline-variant)] bg-[var(--surface-card)] text-[var(--color-on-surface)] placeholder-[var(--color-on-surface-variant)] px-4 py-2.5 text-sm"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-[var(--color-on-surface)] mb-1.5">Featured Priority</label>
+                    <input
+                      type="number"
+                      min="0"
+                      placeholder="Leave empty to not feature"
+                      value={formData.featured_priority}
+                      onChange={(e) => handleInputChange('featured_priority', e.target.value)}
+                      className="glass-input w-full min-h-[40px] rounded-xl border border-[var(--color-outline-variant)] bg-[var(--surface-card)] text-[var(--color-on-surface)] placeholder-[var(--color-on-surface-variant)] px-4 py-2.5 text-sm"
+                      title="Higher = more prominent on featured section"
+                    />
+                  </div>
+                </div>
+
+                {/* Image Upload Section */}
+                <div className="pt-4 border-t border-[var(--color-outline)]/20">
+                  <label className="block text-sm font-medium text-[var(--color-on-surface)] mb-1.5">Item Image</label>
+                  <p className="text-xs text-[var(--color-on-surface-variant)] mb-3">JPEG, PNG or WebP, max 5MB. Optional.</p>
+                  <div className="flex flex-wrap items-center gap-3">
+                    {(formData.image_url || selectedImageFile) && (
+                      <div className="relative shrink-0">
+                        <img
+                          src={selectedImageFile ? URL.createObjectURL(selectedImageFile) : getImageUrl(formData.image_url)}
+                          alt="Preview"
+                          className="w-24 h-24 object-cover rounded-xl border-2 border-[var(--color-outline-variant)]/50"
                         />
-                      </label>
+                        {selectedImageFile && (
+                          <span className="absolute -top-1.5 -right-1.5 bg-[var(--color-primary)] text-[var(--color-on-primary)] rounded-full w-5 h-5 flex items-center justify-center text-xs font-medium">
+                            New
+                          </span>
+                        )}
+                      </div>
+                    )}
+                    <input
+                      ref={addFormImageInputRef}
+                      type="file"
+                      accept="image/jpeg,image/png,image/webp"
+                      onChange={handleImageFileChange}
+                      className="hidden"
+                      disabled={imageUploading || removingImage}
+                    />
+                    <div className="flex flex-wrap items-center gap-2">
+                      <div className="relative group inline-flex">
+                        <span
+                          className="absolute bottom-full left-0 mb-2 px-3 py-2 w-56 text-xs font-normal text-[var(--color-on-surface)] bg-[var(--color-surface-container-high)] border border-[var(--color-outline-variant)] rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 pointer-events-none"
+                          role="tooltip"
+                        >
+                          Click to choose an image (JPEG, PNG, or WebP). Max 5MB. After selecting, click Upload to save.
+                        </span>
+                        <GlassButton
+                          type="button"
+                          onClick={() => addFormImageInputRef.current?.click()}
+                          disabled={imageUploading || removingImage}
+                          size="sm"
+                          className="glass-button-secondary"
+                          contentClassName="flex items-center gap-2"
+                        >
+                          <Upload className="h-4 w-4" />
+                          {formData.image_url || selectedImageFile ? 'Replace' : 'Select'} Image
+                        </GlassButton>
+                      </div>
                       {selectedImageFile && (
-                        <button
+                        <GlassButton
+                          type="button"
                           onClick={handleImageUpload}
                           disabled={imageUploading}
-                          className="btn-primary flex items-center justify-center text-sm flex-shrink-0"
+                          size="sm"
+                          className="glass-button-primary"
+                          contentClassName="flex items-center gap-2"
                         >
                           {imageUploading ? (
                             <>
-                              <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent mr-2"></div>
+                              <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent" />
                               Uploading...
                             </>
                           ) : (
                             <>
-                              <Upload className="h-4 w-4 mr-2" />
+                              <Upload className="h-4 w-4" />
                               Upload
                             </>
                           )}
-                        </button>
+                        </GlassButton>
                       )}
                       {(formData.image_url || selectedImageFile) && (
-                        <button
+                        <GlassButton
+                          type="button"
                           onClick={handleRemoveImage}
                           disabled={removingImage || imageUploading}
-                          className="btn-secondary flex items-center justify-center text-sm flex-shrink-0 text-red-600 hover:text-red-700"
+                          size="sm"
+                          className="glass-button-secondary"
+                          contentClassName="flex items-center gap-2 text-[var(--color-error)]"
                         >
                           {removingImage ? (
                             <>
-                              <div className="animate-spin rounded-full h-4 w-4 border-2 border-red-600 border-t-transparent mr-2"></div>
+                              <div className="animate-spin rounded-full h-4 w-4 border-2 border-[var(--color-error)] border-t-transparent" />
                               Removing...
                             </>
                           ) : (
                             <>
-                              <X className="h-4 w-4 mr-2" />
+                              <X className="h-4 w-4" />
                               Remove
                             </>
                           )}
-                        </button>
+                        </GlassButton>
                       )}
                     </div>
                     {selectedImageFile && (
-                      <p className="text-xs text-[var(--color-on-surface-variant)]">
-                        Selected: {selectedImageFile.name} ({(selectedImageFile.size / 1024 / 1024).toFixed(2)} MB)
+                      <p className="text-xs text-[var(--color-on-surface-variant)] w-full">
+                        {selectedImageFile.name} ({(selectedImageFile.size / 1024).toFixed(1)} KB)
                       </p>
                     )}
                   </div>
                 </div>
-              </div>
-              <div className="flex flex-col sm:flex-row justify-end space-y-2 sm:space-y-0 sm:space-x-3 mt-4">
-                <GlassButton onClick={handleCancel} size="default" className="glass-button-secondary" contentClassName="flex items-center gap-2">
-                  <X className="h-4 w-4" />
-                  Cancel
-                </GlassButton>
-                <GlassButton
-                  onClick={handleSave}
-                  size="default"
-                  className="glass-button-primary"
-                  contentClassName="flex items-center justify-center gap-2"
-                  disabled={isSaving}
-                >
-                  {isSaving ? (
-                    <>
-                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white" />
-                      Saving...
-                    </>
-                  ) : (
-                    <>
-                      <Save className="h-4 w-4" />
-                      Save
-                    </>
-                  )}
-                </GlassButton>
+
+                <div className="flex flex-col sm:flex-row justify-end gap-2 sm:gap-3 pt-2">
+                  <GlassButton onClick={handleCancel} size="default" className="glass-button-secondary" contentClassName="flex items-center gap-2">
+                    <X className="h-4 w-4" />
+                    Cancel
+                  </GlassButton>
+                  <GlassButton
+                    onClick={handleSave}
+                    size="default"
+                    className="glass-button-primary"
+                    contentClassName="flex items-center gap-2"
+                    disabled={isSaving}
+                  >
+                    {isSaving ? (
+                      <>
+                        <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent" />
+                        Saving...
+                      </>
+                    ) : (
+                      <>
+                        <Save className="h-4 w-4" />
+                        Save
+                      </>
+                    )}
+                  </GlassButton>
+                </div>
               </div>
             </div>
           )}
@@ -1357,123 +1415,147 @@ const MenuManagement: React.FC<MenuManagementProps> = ({ menuItems, onUpdate, on
         {editingId && (
           <div className="space-y-4">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium mb-1 text-[var(--color-on-surface)]">Category *</label>
+              <div className="[&_button]:min-h-[40px] [&_button]:rounded-xl">
+                <label className="block text-sm font-medium mb-1.5 text-[var(--color-on-surface)]">Category *</label>
                 <Select
                   options={categories.map(c => ({ value: String(c.id), label: c.name }))}
                   value={formData.category_id === '' || formData.category_id == null ? '' : String(formData.category_id)}
                   onChange={(v) => handleInputChange('category_id', v)}
                   placeholder="Category"
-                  className="w-full text-base py-2.5"
+                  className="select-trigger-glass select-trigger-glass-hover"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1 text-[var(--color-on-surface)]">Item Name *</label>
+                <label className="block text-sm font-medium mb-1.5 text-[var(--color-on-surface)]">Item Name *</label>
                 <input
                   type="text"
                   value={formData.name}
                   onChange={(e) => handleInputChange('name', e.target.value)}
-                  className="input-field w-full text-base py-2.5"
+                  className="glass-input w-full min-h-[40px] rounded-xl border border-[var(--color-outline-variant)] bg-[var(--surface-card)] text-[var(--color-on-surface)] placeholder-[var(--color-on-surface-variant)] px-4 py-2.5 text-sm"
                   placeholder="Item name"
                 />
               </div>
             </div>
             <div>
-              <label className="block text-sm font-medium mb-1 text-[var(--color-on-surface)]">Description</label>
+              <label className="block text-sm font-medium mb-1.5 text-[var(--color-on-surface)]">Description</label>
               <input
                 type="text"
                 value={formData.description}
                 onChange={(e) => handleInputChange('description', e.target.value)}
-                className="input-field w-full text-base py-2.5"
+                className="glass-input w-full min-h-[40px] rounded-xl border border-[var(--color-outline-variant)] bg-[var(--surface-card)] text-[var(--color-on-surface)] placeholder-[var(--color-on-surface-variant)] px-4 py-2.5 text-sm"
                 placeholder="Description"
               />
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div>
-                <label className="block text-sm font-medium mb-1 text-[var(--color-on-surface)]">Price *</label>
+                <label className="block text-sm font-medium mb-1.5 text-[var(--color-on-surface)]">Price *</label>
                 <input
                   type="number"
                   step="0.01"
                   min="0"
                   value={formData.price}
                   onChange={(e) => handleInputChange('price', e.target.value)}
-                  className="input-field w-full text-base py-2.5"
+                  className="glass-input w-full min-h-[40px] rounded-xl border border-[var(--color-outline-variant)] bg-[var(--surface-card)] text-[var(--color-on-surface)] placeholder-[var(--color-on-surface-variant)] px-4 py-2.5 text-sm"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1 text-[var(--color-on-surface)]">Sort Order</label>
+                <label className="block text-sm font-medium mb-1.5 text-[var(--color-on-surface)]">Sort Order</label>
                 <input
                   type="number"
                   min="0"
                   value={formData.sort_order}
                   onChange={(e) => handleInputChange('sort_order', e.target.value)}
-                  className="input-field w-full text-base py-2.5"
+                  className="glass-input w-full min-h-[40px] rounded-xl border border-[var(--color-outline-variant)] bg-[var(--surface-card)] text-[var(--color-on-surface)] placeholder-[var(--color-on-surface-variant)] px-4 py-2.5 text-sm"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1 text-[var(--color-on-surface)]">Featured Priority</label>
+                <label className="block text-sm font-medium mb-1.5 text-[var(--color-on-surface)]">Featured Priority</label>
                 <input
                   type="number"
                   min="0"
                   placeholder="Optional"
                   value={formData.featured_priority}
                   onChange={(e) => handleInputChange('featured_priority', e.target.value)}
-                  className="input-field w-full text-base py-2.5"
+                  className="glass-input w-full min-h-[40px] rounded-xl border border-[var(--color-outline-variant)] bg-[var(--surface-card)] text-[var(--color-on-surface)] placeholder-[var(--color-on-surface-variant)] px-4 py-2.5 text-sm"
                   title="Higher = more prominent on featured section"
                 />
               </div>
             </div>
             <div>
-              <label className="block text-sm font-medium mb-2 text-[var(--color-on-surface)]">Item Image</label>
-              <p className="text-xs mb-2 text-[var(--color-on-surface-variant)]">Upload an image for this menu item (max 5MB)</p>
-              <div className="flex items-start space-x-4 flex-wrap gap-2">
+              <label className="block text-sm font-medium mb-1.5 text-[var(--color-on-surface)]">Item Image</label>
+              <p className="text-xs mb-3 text-[var(--color-on-surface-variant)]">JPEG, PNG or WebP, max 5MB. Optional.</p>
+              <div className="flex flex-wrap items-center gap-3">
                 {(formData.image_url || selectedImageFile) && (
-                  <div className="relative">
+                  <div className="relative shrink-0">
                     <img
                       src={selectedImageFile ? URL.createObjectURL(selectedImageFile) : getImageUrl(formData.image_url)}
                       alt="Preview"
-                      className="w-24 h-24 object-cover border rounded-lg"
+                      className="w-24 h-24 object-cover rounded-xl border-2 border-[var(--color-outline-variant)]/50"
                     />
                     {selectedImageFile && (
-                      <div className="absolute -top-2 -right-2 bg-blue-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs">New</div>
+                      <span className="absolute -top-1.5 -right-1.5 bg-[var(--color-primary)] text-[var(--color-on-primary)] rounded-full w-5 h-5 flex items-center justify-center text-xs font-medium">New</span>
                     )}
                   </div>
                 )}
-                <div className="flex items-center gap-2 flex-wrap">
-                  <label className="btn-secondary flex items-center justify-center cursor-pointer text-sm">
-                    <Upload className="h-4 w-4 mr-2" />
-                    {formData.image_url || selectedImageFile ? 'Replace' : 'Select'} Image
-                    <input
-                      type="file"
-                      accept="image/jpeg,image/png,image/webp"
-                      onChange={handleImageFileChange}
-                      className="hidden"
+                <input
+                  ref={editFormImageInputRef}
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp"
+                  onChange={handleImageFileChange}
+                  className="hidden"
+                  disabled={imageUploading || removingImage}
+                />
+                <div className="flex flex-wrap items-center gap-2">
+                  <div className="relative group inline-flex">
+                    <span
+                      className="absolute bottom-full left-0 mb-2 px-3 py-2 w-56 text-xs font-normal text-[var(--color-on-surface)] bg-[var(--color-surface-container-high)] border border-[var(--color-outline-variant)] rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 pointer-events-none"
+                      role="tooltip"
+                    >
+                      Click to choose an image (JPEG, PNG, or WebP). Max 5MB. After selecting, click Upload to save.
+                    </span>
+                    <GlassButton
+                      type="button"
+                      onClick={() => editFormImageInputRef.current?.click()}
                       disabled={imageUploading || removingImage}
-                    />
-                  </label>
+                      size="sm"
+                      className="glass-button-secondary"
+                      contentClassName="flex items-center gap-2"
+                    >
+                      <Upload className="h-4 w-4" />
+                      {formData.image_url || selectedImageFile ? 'Replace' : 'Select'} Image
+                    </GlassButton>
+                  </div>
                   {selectedImageFile && (
-                    <button
+                    <GlassButton
                       type="button"
                       onClick={handleImageUpload}
                       disabled={imageUploading}
-                      className="btn-primary flex items-center justify-center text-sm"
+                      size="sm"
+                      className="glass-button-primary"
+                      contentClassName="flex items-center gap-2"
                     >
                       {imageUploading ? (
-                        <><div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent mr-2" /> Uploading...</>
+                        <><div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent" /> Uploading...</>
                       ) : (
-                        <><Upload className="h-4 w-4 mr-2" /> Upload</>
+                        <><Upload className="h-4 w-4" /> Upload</>
                       )}
-                    </button>
+                    </GlassButton>
                   )}
                   {(formData.image_url || selectedImageFile) && (
-                    <button
+                    <GlassButton
                       type="button"
                       onClick={handleRemoveImage}
                       disabled={removingImage || imageUploading}
-                      className="btn-secondary text-red-600 hover:text-red-700 text-sm"
+                      size="sm"
+                      className="glass-button-secondary"
+                      contentClassName="flex items-center gap-2 text-[var(--color-error)]"
                     >
-                      {removingImage ? 'Removing...' : 'Remove'}
-                    </button>
+                      {removingImage ? (
+                        <><div className="animate-spin rounded-full h-4 w-4 border-2 border-[var(--color-error)] border-t-transparent" /> Removing...</>
+                      ) : (
+                        <><X className="h-4 w-4" /> Remove</>
+                      )}
+                    </GlassButton>
                   )}
                 </div>
               </div>
