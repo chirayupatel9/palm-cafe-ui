@@ -1642,7 +1642,7 @@ const CustomerMenu: React.FC<CustomerMenuProps> = ({
         <div className="flex flex-col gap-6">
                 {/* 1. Cart Items */}
                 {cart.length === 0 ? (
-                  <div className="glass-card flex flex-col items-center justify-center gap-6 rounded-2xl p-12 text-center">
+                  <div className="flex flex-col items-center justify-center gap-6 rounded-2xl p-12 text-center bg-white/30 dark:bg-white/5 backdrop-blur-sm border border-white/40 dark:border-white/10">
                     <div className="text-[var(--color-on-surface-variant)]">
                       <ShoppingCart className="h-24 w-24" />
                     </div>
