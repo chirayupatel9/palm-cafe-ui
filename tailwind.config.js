@@ -4,6 +4,10 @@ module.exports = {
   content: ['./src/**/*.{js,jsx,ts,tsx}'],
   theme: {
     extend: {
+      fontFamily: {
+        sans: ['"Open Sans"', '"Noto Sans"', 'sans-serif'],
+        display: ['Fuggles', 'cursive']
+      },
       colors: {
         primary: { DEFAULT: 'var(--color-primary)', 50: 'var(--color-primary-50, #e8ebe6)', 100: 'var(--color-primary-100, #d1d7cc)', 200: 'var(--color-primary-200, #a3af99)', 300: 'var(--color-primary-300, #6b7d5c)', 400: 'var(--color-primary-400, #4d5c42)', 500: 'var(--color-primary)', 600: 'var(--color-primary)', 700: 'var(--color-primary)', 800: 'var(--color-primary)', 900: 'var(--color-primary)' },
         secondary: { DEFAULT: 'var(--color-secondary)', 50: 'var(--color-secondary-50, #f5efe5)', 100: 'var(--color-secondary-100, #e6d9c4)', 200: 'var(--color-secondary-200, #cdb389)', 300: 'var(--color-secondary-300, #a57f42)', 400: 'var(--color-secondary-400, #91590b)', 500: 'var(--color-secondary)', 600: 'var(--color-secondary)', 700: 'var(--color-secondary)', 800: 'var(--color-secondary)', 900: 'var(--color-secondary)' },
