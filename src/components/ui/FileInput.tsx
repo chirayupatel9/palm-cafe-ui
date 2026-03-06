@@ -1,5 +1,6 @@
 import React, { useRef } from 'react';
 import { Upload } from 'lucide-react';
+import { GlassButton } from './GlassButton';
 
 export interface FileInputProps {
   selectedFile?: File | null;
@@ -34,13 +35,7 @@ const FileInput: React.FC<FileInputProps> = ({
 
   return (
     <div
-      className={`flex items-center gap-3 min-h-[40px] px-3 py-2 rounded-xl border transition-all duration-200 ${className}`}
-      style={{
-        backgroundColor: 'var(--color-surface)',
-        borderColor: 'var(--color-outline)',
-        color: 'var(--color-on-surface)',
-        boxShadow: 'var(--elevation-0)'
-      }}
+      className={`glass-file-input-wrap flex items-center gap-3 min-h-[44px] px-3 py-2 ${className}`}
     >
       <input
         ref={inputRef}
@@ -52,18 +47,19 @@ const FileInput: React.FC<FileInputProps> = ({
         id={id}
         aria-label={placeholder}
       />
-      <button
+      <GlassButton
         type="button"
         onClick={handleClick}
         disabled={disabled}
-        className="btn-secondary shrink-0 inline-flex items-center gap-2"
+        size="sm"
+        className="glass-button-secondary shrink-0"
+        contentClassName="inline-flex items-center gap-2"
       >
-        <Upload className="h-4 w-4" aria-hidden />
+        <Upload className="h-4 w-4 shrink-0" aria-hidden />
         Choose file
-      </button>
+      </GlassButton>
       <span
-        className="flex-1 min-w-0 truncate text-sm"
-        style={{ color: 'var(--color-on-surface-variant)' }}
+        className={`flex-1 min-w-0 truncate text-sm ${selectedFile ? 'text-[var(--color-on-surface)]' : 'text-[var(--color-on-surface-variant)]'}`}
       >
         {selectedFile ? selectedFile.name : placeholder}
       </span>
