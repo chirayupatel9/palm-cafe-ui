@@ -1056,24 +1056,28 @@ const CafeSettings: React.FC = () => {
                               <span>Priority: {b.priority}</span>
                               <span className={b.active ? 'text-[var(--color-success)] font-medium' : ''}>{b.active ? 'On' : 'Off'}</span>
                             </div>
-                            <div className="flex gap-2 mt-2 min-w-0">
-                              <button
+                            <div className="flex flex-wrap gap-2 mt-2 min-w-0">
+                              <GlassButton
                                 type="button"
                                 onClick={() => { setEditingBannerId(b.id); setEditingBannerForm({ link_url: b.link_url || '', priority: b.priority, active: b.active }); setEditingBannerReplaceFile(null); }}
                                 title="Edit banner"
-                                className="flex-1 min-w-0 flex items-center justify-center gap-1.5 rounded-full border border-[var(--color-outline-variant)] bg-[var(--color-surface-container)] text-[var(--color-on-surface)] py-1.5 px-2 text-xs font-medium hover:bg-[var(--color-surface-container-high)] transition-colors"
+                                size="sm"
+                                className="flex-1 min-w-[4.5rem] glass-button-secondary [&_.glass-button]:w-full [&_.glass-button]:min-w-0 [&_.glass-button-text]:w-full [&_.glass-button-text]:min-w-0"
+                                contentClassName="flex items-center justify-center gap-1.5 text-xs"
                               >
                                 <Pencil className="h-3 w-3 shrink-0" /> <span className="truncate">Edit</span>
-                              </button>
-                              <button
+                              </GlassButton>
+                              <GlassButton
                                 type="button"
                                 onClick={() => handleDeletePromoBanner(b.id)}
                                 disabled={promoBanners.length <= 1}
                                 title={promoBanners.length <= 1 ? 'Keep at least one banner' : 'Remove banner'}
-                                className="flex-1 min-w-0 flex items-center justify-center gap-1.5 rounded-full border border-red-300 bg-[var(--color-error)] text-[var(--color-on-error)] py-1.5 px-2 text-xs font-medium hover:brightness-110 disabled:opacity-50 transition-all"
+                                size="sm"
+                                className="flex-1 min-w-[4.5rem] glass-button-destructive disabled:opacity-50 [&_.glass-button]:w-full [&_.glass-button]:min-w-0 [&_.glass-button-text]:w-full [&_.glass-button-text]:min-w-0"
+                                contentClassName="flex items-center justify-center gap-1.5 text-xs"
                               >
                                 <Trash2 className="h-3 w-3 shrink-0" /> <span className="truncate">Delete</span>
-                              </button>
+                              </GlassButton>
                             </div>
                           </div>
                         </div>
@@ -1087,7 +1091,7 @@ const CafeSettings: React.FC = () => {
                           <p className="text-sm font-medium mb-2">Edit banner</p>
                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                             <div className="sm:col-span-2">
-                              <label className="block text-xs text-gray-500 mb-1">Replace image (optional)</label>
+                              <label className="block text-xs text-[var(--color-on-surface-variant)] mb-1">Replace image (optional)</label>
                               <FileInput
                                 selectedFile={editingBannerReplaceFile}
                                 onChange={setEditingBannerReplaceFile}
@@ -1098,22 +1102,22 @@ const CafeSettings: React.FC = () => {
                               />
                             </div>
                             <div>
-                              <label className="block text-xs text-gray-500 mb-1">Link URL</label>
+                              <label className="block text-xs text-[var(--color-on-surface-variant)] mb-1">Link URL</label>
                               <input
                                 type="url"
                                 value={editingBannerForm.link_url}
                                 onChange={(e) => setEditingBannerForm((f) => ({ ...f, link_url: e.target.value }))}
-                                className="input-field text-sm"
+                                className="glass-input w-full rounded-xl border border-[var(--color-outline-variant)] bg-[var(--surface-card)] text-[var(--color-on-surface)] placeholder-[var(--color-on-surface-variant)] px-4 py-2.5 text-sm"
                                 placeholder="https://..."
                               />
                             </div>
                             <div>
-                              <label className="block text-xs text-gray-500 mb-1">Priority</label>
+                              <label className="block text-xs text-[var(--color-on-surface-variant)] mb-1">Priority</label>
                               <input
                                 type="number"
                                 value={editingBannerForm.priority}
                                 onChange={(e) => setEditingBannerForm((f) => ({ ...f, priority: Number(e.target.value) || 0 }))}
-                                className="input-field text-sm"
+                                className="glass-input w-full rounded-xl border border-[var(--color-outline-variant)] bg-[var(--surface-card)] text-[var(--color-on-surface)] placeholder-[var(--color-on-surface-variant)] px-4 py-2.5 text-sm"
                               />
                             </div>
                             <div className="flex items-center gap-2">
@@ -1136,11 +1140,11 @@ const CafeSettings: React.FC = () => {
                       );
                     })()}
                     {promoBannerForm.show && (
-                      <div className="card card-sm">
+                      <div className="glass-card p-4 rounded-xl">
                         <p className="text-sm font-medium mb-2">Add banner</p>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                           <div>
-                            <label className="block text-xs text-gray-500 mb-1">Image *</label>
+                            <label className="block text-xs text-[var(--color-on-surface-variant)] mb-1">Image *</label>
                             <FileInput
                               selectedFile={promoBannerForm.file}
                               onChange={(file) => setPromoBannerForm((f) => ({ ...f, file: file || null }))}
@@ -1150,22 +1154,22 @@ const CafeSettings: React.FC = () => {
                             />
                           </div>
                           <div>
-                            <label className="block text-xs text-gray-500 mb-1">Link URL (optional)</label>
+                            <label className="block text-xs text-[var(--color-on-surface-variant)] mb-1">Link URL (optional)</label>
                             <input
                               type="url"
                               value={promoBannerForm.link_url}
                               onChange={(e) => setPromoBannerForm((f) => ({ ...f, link_url: e.target.value }))}
-                              className="input-field text-sm"
+                              className="glass-input w-full rounded-xl border border-[var(--color-outline-variant)] bg-[var(--surface-card)] text-[var(--color-on-surface)] placeholder-[var(--color-on-surface-variant)] px-4 py-2.5 text-sm"
                               placeholder="https://..."
                             />
                           </div>
                           <div>
-                            <label className="block text-xs text-gray-500 mb-1">Priority</label>
+                            <label className="block text-xs text-[var(--color-on-surface-variant)] mb-1">Priority</label>
                             <input
                               type="number"
                               value={promoBannerForm.priority}
                               onChange={(e) => setPromoBannerForm((f) => ({ ...f, priority: Number(e.target.value) || 0 }))}
-                              className="input-field text-sm"
+                              className="glass-input w-full rounded-xl border border-[var(--color-outline-variant)] bg-[var(--surface-card)] text-[var(--color-on-surface)] placeholder-[var(--color-on-surface-variant)] px-4 py-2.5 text-sm"
                             />
                           </div>
                           <div className="flex items-center gap-2">
