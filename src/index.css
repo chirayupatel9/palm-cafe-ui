@@ -984,18 +984,41 @@ img {
 .glass-button-wrap.glass-button-light::after {
   border-color: rgba(11, 15, 5, 0.25);
 }
-/* Glass button secondary (outline / surface) */
+/* Glass button secondary (outline / surface) – frosted glass to match sheet */
 .glass-button-wrap.glass-button-secondary .glass-button {
-  background: var(--surface-card);
-  border-color: var(--color-outline);
-  color: var(--on-surface-card);
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.5) 0%, rgba(255, 255, 255, 0.28) 100%);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  color: var(--color-on-surface);
+  box-shadow:
+    0 1px 2px rgba(255, 255, 255, 0.4) inset,
+    0 -1px 1px rgba(0, 0, 0, 0.05) inset,
+    0 2px 8px rgba(0, 0, 0, 0.06);
 }
 .glass-button-wrap.glass-button-secondary .glass-button:hover {
-  background: var(--surface-table);
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.6) 0%, rgba(255, 255, 255, 0.35) 100%);
+  border-color: rgba(165, 127, 66, 0.35);
+  box-shadow:
+    0 1px 3px rgba(255, 255, 255, 0.5) inset,
+    0 -1px 2px rgba(0, 0, 0, 0.06) inset,
+    0 4px 12px rgba(0, 0, 0, 0.08);
 }
 .glass-button-wrap.glass-button-secondary::before,
 .glass-button-wrap.glass-button-secondary::after {
-  border-color: rgba(0, 0, 0, 0.2);
+  border-color: rgba(0, 0, 0, 0.15);
+}
+.dark .glass-button-wrap.glass-button-secondary .glass-button {
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.04) 100%);
+  border-color: rgba(255, 255, 255, 0.12);
+  box-shadow:
+    0 1px 2px rgba(255, 255, 255, 0.06) inset,
+    0 -1px 2px rgba(0, 0, 0, 0.15) inset,
+    0 2px 8px rgba(0, 0, 0, 0.2);
+}
+.dark .glass-button-wrap.glass-button-secondary .glass-button:hover {
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.14) 0%, rgba(255, 255, 255, 0.06) 100%);
+  border-color: rgba(165, 127, 66, 0.3);
 }
 /* Glass button destructive (danger) */
 .glass-button-wrap.glass-button-destructive .glass-button {
@@ -1076,6 +1099,61 @@ img {
     0 -1px 2px rgba(0, 0, 0, 0.22) inset,
     0 6px 28px rgba(0, 0, 0, 0.28),
     0 2px 10px rgba(0, 0, 0, 0.18);
+}
+
+/* Glass option buttons (Payment, Dining, Tip) – unselected = bubble glass */
+.glass-option-btn {
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.55) 0%, rgba(255, 255, 255, 0.3) 100%);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  box-shadow:
+    0 1px 2px rgba(255, 255, 255, 0.5) inset,
+    0 -1px 1px rgba(0, 0, 0, 0.04) inset,
+    0 2px 8px rgba(0, 0, 0, 0.06);
+  color: var(--color-on-surface);
+  transition: background 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+.glass-option-btn:hover {
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.65) 0%, rgba(255, 255, 255, 0.38) 100%);
+  border-color: rgba(165, 127, 66, 0.4);
+  box-shadow:
+    0 1px 3px rgba(255, 255, 255, 0.55) inset,
+    0 -1px 2px rgba(0, 0, 0, 0.05) inset,
+    0 4px 12px rgba(0, 0, 0, 0.08);
+}
+.dark .glass-option-btn {
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0.05) 100%);
+  border-color: rgba(255, 255, 255, 0.15);
+  box-shadow:
+    0 1px 2px rgba(255, 255, 255, 0.08) inset,
+    0 -1px 2px rgba(0, 0, 0, 0.15) inset,
+    0 2px 8px rgba(0, 0, 0, 0.2);
+}
+.dark .glass-option-btn:hover {
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.16) 0%, rgba(255, 255, 255, 0.08) 100%);
+  border-color: rgba(165, 127, 66, 0.35);
+}
+/* Selected state – primary with glass highlight */
+.glass-option-btn-selected {
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.2) 0%, transparent 50%), var(--color-primary) !important;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.25) !important;
+  color: var(--color-on-primary) !important;
+  box-shadow:
+    0 1px 2px rgba(255, 255, 255, 0.3) inset,
+    0 -1px 1px rgba(0, 0, 0, 0.15) inset,
+    0 4px 16px rgba(51, 75, 38, 0.35),
+    0 2px 8px rgba(0, 0, 0, 0.1) !important;
+}
+.glass-option-btn-selected:hover {
+  filter: brightness(1.06);
+  box-shadow:
+    0 1px 3px rgba(255, 255, 255, 0.35) inset,
+    0 -1px 2px rgba(0, 0, 0, 0.12) inset,
+    0 6px 20px rgba(51, 75, 38, 0.4),
+    0 2px 10px rgba(0, 0, 0, 0.12) !important;
 }
 
 /* Select trigger – bubble glass */

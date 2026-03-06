@@ -182,22 +182,23 @@ const CustomerLogin: React.FC<CustomerLoginProps> = ({ cafeSlug, onLogin }) => {
                 <p className="text-text-light/70 dark:text-[#e1e5df]/70 text-base font-normal leading-normal pt-2">
                   We sent a 6-digit code to
                 </p>
-                <p className="font-medium text-text-light dark:text-[#e1e5df] pt-1">{email}</p>
+                <p className="font-medium text-text-light dark:text-[#e1e5df] pt-1 break-all">{email}</p>
               </div>
-              <form onSubmit={handleLogin} className="flex flex-col gap-4">
-                <div className="flex flex-col">
+              <form onSubmit={handleLogin} className="flex flex-col gap-4 pb-1">
+                <div className="flex flex-col gap-2">
                   <label
-                    className="text-text-light dark:text-[#e1e5df] text-base font-medium leading-normal pb-2"
+                    className="text-text-light dark:text-[#e1e5df] text-base font-medium leading-normal"
                     htmlFor="otp"
                   >
                     Verification code
                   </label>
                   <input
-                    className="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-text-light dark:text-[#e1e5df] focus:outline-0 focus:ring-2 focus:ring-[#334b26]/50 border border-[#b3af9b] dark:border-[#334b26] bg-transparent dark:bg-[#0b0f05] h-14 placeholder:text-[#91590b] dark:placeholder:text-[#a57f42] px-4 text-center text-2xl tracking-widest text-base font-normal leading-normal"
+                    className="form-input w-full rounded-lg border border-[#b3af9b] dark:border-[#334b26] bg-[#f5f3ee] dark:bg-[#141a0d] h-14 px-4 text-center text-2xl tracking-[0.4em] font-medium text-[#1a1a1a] dark:text-[#e1e5df] placeholder:text-[#91590b]/50 dark:placeholder:text-[#a57f42]/50 focus:outline-none focus:ring-2 focus:ring-[#334b26]/50 focus:border-[#334b26]"
                     id="otp"
-                    placeholder="123456"
+                    placeholder="000000"
                     type="text"
                     inputMode="numeric"
+                    autoComplete="one-time-code"
                     maxLength={6}
                     value={otp}
                     onChange={(e) => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}

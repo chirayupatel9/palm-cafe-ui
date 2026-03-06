@@ -564,6 +564,7 @@ const CustomerMenu: React.FC<CustomerMenuProps> = ({
         customerName: customer.name,
         ...(validPhone !== null && { customerPhone: validPhone }),
         customerEmail: (customer.email && String(customer.email) !== 'undefined') ? customer.email : '',
+        ...(customer.id != null && { customerId: customer.id }),
         tableNumber: tableNumber,
         paymentMethod: paymentMethod,
         pickupOption: pickupOption,
@@ -1641,20 +1642,20 @@ const CustomerMenu: React.FC<CustomerMenuProps> = ({
         <div className="flex flex-col gap-6">
                 {/* 1. Cart Items */}
                 {cart.length === 0 ? (
-                  <div className="flex flex-col items-center justify-center gap-6 rounded-lg p-12 text-center shadow-sm border border-[var(--color-outline-variant)]" style={{ backgroundColor: 'var(--surface-table)' }}>
-                    <div style={{ color: 'var(--color-on-surface-variant)' }}>
+                  <div className="glass-card flex flex-col items-center justify-center gap-6 rounded-2xl p-12 text-center">
+                    <div className="text-[var(--color-on-surface-variant)]">
                       <ShoppingCart className="h-24 w-24" />
                     </div>
-                    <h3 className="text-2xl font-bold" style={{ color: 'var(--color-on-surface)' }}>Your cart is empty</h3>
-                    <p className="max-w-sm" style={{ color: 'var(--color-on-surface-variant)' }}>Looks like you haven&apos;t added anything to your order yet. Let&apos;s fix that!</p>
+                    <h3 className="text-2xl font-bold text-[var(--color-on-surface)]">Your cart is empty</h3>
+                    <p className="max-w-sm text-[var(--color-on-surface-variant)]">Looks like you haven&apos;t added anything to your order yet. Let&apos;s fix that!</p>
                   </div>
                 ) : (
                   <div className="flex flex-col gap-6">
-                    <div>
-                      <h2 className="text-lg font-bold mb-3" style={{ color: 'var(--color-on-surface)' }}>Items</h2>
+                    <div className="glass-card rounded-2xl p-4">
+                      <h2 className="text-sm font-bold mb-3 text-[var(--color-on-surface)]">Items</h2>
                       <div className="flex flex-col gap-3">
                         {cart.map((item) => (
-                          <div key={item.id} className="flex items-center gap-3 rounded-lg p-3 shadow-sm border border-[var(--color-outline-variant)]" style={{ backgroundColor: 'var(--surface-table)' }}>
+                          <div key={item.id} className="flex items-center gap-3 rounded-xl p-3 bg-white/40 dark:bg-white/10 backdrop-blur-sm border border-white/40 dark:border-white/10">
                             <div
                               className="bg-center bg-no-repeat aspect-square bg-cover rounded-lg size-14 flex-shrink-0"
                               style={{
@@ -1705,28 +1706,28 @@ const CustomerMenu: React.FC<CustomerMenuProps> = ({
                     </div>
 
                 {/* 2. Order Summary */}
-                    <div className="rounded-xl p-4 shadow-sm border border-[var(--color-outline-variant)]" style={{ backgroundColor: 'var(--surface-table)' }}>
-                      <h3 className="font-bold mb-3 text-sm" style={{ color: 'var(--color-on-surface)' }}>Order Summary</h3>
+                    <div className="glass-card rounded-2xl p-4">
+                      <h3 className="font-bold mb-3 text-sm text-[var(--color-on-surface)]">Order Summary</h3>
 
-                      <div className="flex flex-col gap-3 border-b border-[var(--color-outline-variant)] pb-4">
+                      <div className="flex flex-col gap-3 border-b border-white/30 dark:border-white/10 pb-4">
                         <div className="flex justify-between">
-                          <p style={{ color: 'var(--color-on-surface-variant)' }}>Subtotal</p>
-                          <p className="font-medium" style={{ color: 'var(--color-on-surface)' }}>{formatCurrency(getSubtotal())}</p>
+                          <p className="text-[var(--color-on-surface-variant)]">Subtotal</p>
+                          <p className="font-medium text-[var(--color-on-surface)]">{formatCurrency(getSubtotal())}</p>
                         </div>
-                        {showTaxInMenu && taxAmount > 0 && (
+                        {taxAmount > 0 && (
                           <div className="flex justify-between">
-                            <p style={{ color: 'var(--color-on-surface-variant)' }}>Taxes ({taxRate}%)</p>
-                            <p className="font-medium" style={{ color: 'var(--color-on-surface)' }}>{formatCurrency(taxAmount)}</p>
+                            <p className="text-[var(--color-on-surface-variant)]">{showTaxInMenu ? `Taxes (${taxRate}%)` : 'Tax'}</p>
+                            <p className="font-medium text-[var(--color-on-surface)]">{formatCurrency(taxAmount)}</p>
                           </div>
                         )}
                         {tipAmount > 0 && (
                           <div className="flex justify-between">
-                            <p style={{ color: 'var(--color-on-surface-variant)' }}>Tip</p>
-                            <p className="font-medium" style={{ color: 'var(--color-on-surface)' }}>{formatCurrency(tipAmount)}</p>
+                            <p className="text-[var(--color-on-surface-variant)]">Tip</p>
+                            <p className="font-medium text-[var(--color-on-surface)]">{formatCurrency(tipAmount)}</p>
                           </div>
                         )}
                         {pointsToRedeem > 0 && (
-                          <div className="flex justify-between" style={{ color: 'var(--color-success)' }}>
+                          <div className="flex justify-between text-[var(--color-success)]">
                             <p>Points Redeemed ({pointsToRedeem} pts)</p>
                             <p className="font-medium">-{formatCurrency(pointsToRedeem * 0.1)}</p>
                           </div>
@@ -1734,23 +1735,23 @@ const CustomerMenu: React.FC<CustomerMenuProps> = ({
                       </div>
 
                       <div className="flex justify-between">
-                        <p className="text-lg font-bold" style={{ color: 'var(--color-on-surface)' }}>Total</p>
-                        <p className="text-xl font-extrabold" style={{ color: 'var(--color-on-surface)' }}>{formatCurrency(getTotal())}</p>
+                        <p className="text-lg font-bold text-[var(--color-on-surface)]">Total</p>
+                        <p className="text-xl font-extrabold text-[var(--color-on-surface)]">{formatCurrency(getTotal())}</p>
                       </div>
                     </div>
 
                     {/* 3. Login or Customer & checkout options */}
                     <>
                     {!customer ? (
-                        <div className="p-6 rounded-lg border border-[var(--color-outline-variant)]" style={{ backgroundColor: 'var(--surface-table)' }}>
+                        <div className="glass-card p-6 rounded-2xl">
                           <div className="text-center">
                             <div className="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4" style={{ backgroundColor: 'var(--color-primary)', color: 'var(--color-on-primary)' }}>
                               <User className="h-6 w-6" />
                             </div>
-                            <h3 className="text-lg font-bold mb-2" style={{ color: 'var(--color-on-surface)' }}>
+                            <h3 className="text-lg font-bold mb-2 text-[var(--color-on-surface)]">
                               Login Required
                             </h3>
-                            <p className="mb-4 text-sm" style={{ color: 'var(--color-on-surface-variant)' }}>
+                            <p className="mb-4 text-sm text-[var(--color-on-surface-variant)]">
                               Please login to place your order
                             </p>
                             <GlassButton
@@ -1769,84 +1770,79 @@ const CustomerMenu: React.FC<CustomerMenuProps> = ({
                       ) : (
                         <React.Fragment>
                           {/* Customer Information */}
-                          <div className="p-4 rounded-lg border border-[var(--color-outline-variant)]" style={{ backgroundColor: 'var(--surface-table)' }}>
-                            <div className="flex items-center justify-between gap-2 mb-3">
-                              <h3 className="font-bold flex items-center text-base shrink-0" style={{ color: 'var(--color-on-surface)' }}>
-                                <User className="h-4 w-4 mr-2" style={{ color: 'var(--color-on-surface-variant)' }} />
-                                Customer Info
-                              </h3>
-                              <div className="flex items-center gap-2 shrink-0">
-                                <button
-                                  type="button"
-                                  onClick={openEditProfile}
-                                  className="flex items-center justify-center gap-1 px-3 py-1.5 rounded-lg transition-colors text-xs whitespace-nowrap btn-primary"
-                                >
-                                  <Edit3 className="h-3 w-3 shrink-0" />
-                                  <span>Edit Profile</span>
-                                </button>
-                                {onLogout && (
-                                  <button
-                                    type="button"
-                                    onClick={onLogout}
-                                    className="flex items-center justify-center gap-1 px-3 py-1.5 rounded-lg transition-colors text-xs whitespace-nowrap btn-destructive"
-                                  >
-                                    <LogOut className="h-3 w-3 shrink-0" />
-                                    <span>Logout</span>
-                                  </button>
-                                )}
-                              </div>
-                            </div>
-                            <div className="space-y-2 text-sm">
+                          <div className="glass-card rounded-2xl p-4">
+                            <h3 className="font-bold flex items-center text-sm mb-3 text-[var(--color-on-surface)]">
+                              <User className="h-4 w-4 mr-2" style={{ color: 'var(--color-on-surface-variant)' }} />
+                              Customer Info
+                            </h3>
+                            <div className="space-y-2 text-sm mb-4">
                               <div className="flex justify-between">
-                                <span style={{ color: 'var(--color-on-surface-variant)' }}>Name:</span>
-                                <span className="font-semibold" style={{ color: 'var(--color-on-surface)' }}>{customer.name}</span>
+                                <span className="text-[var(--color-on-surface-variant)]">Name</span>
+                                <span className="font-semibold text-[var(--color-on-surface)]">{customer.name}</span>
                               </div>
                               {customer.phone && (
                                 <div className="flex justify-between">
-                                  <span style={{ color: 'var(--color-on-surface-variant)' }}>Phone:</span>
-                                  <span className="font-semibold" style={{ color: 'var(--color-on-surface)' }}>{customer.phone}</span>
+                                  <span className="text-[var(--color-on-surface-variant)]">Phone</span>
+                                  <span className="font-semibold text-[var(--color-on-surface)]">{customer.phone}</span>
                                 </div>
                               )}
                               {customer.loyalty_points > 0 && (
                                 <div className="flex justify-between">
-                                  <span style={{ color: 'var(--color-on-surface-variant)' }}>Points:</span>
-                                  <span className="flex items-center font-semibold" style={{ color: 'var(--color-warning)' }}>
+                                  <span className="text-[var(--color-on-surface-variant)]">Points</span>
+                                  <span className="flex items-center font-semibold text-[var(--color-warning)]">
                                     <Star className="h-3 w-3 mr-1" />
                                     {customer.loyalty_points}
                                   </span>
                                 </div>
                               )}
                             </div>
+                            <div className="flex flex-wrap gap-2 pt-2 border-t border-white/30 dark:border-white/10">
+                              <GlassButton
+                                type="button"
+                                onClick={openEditProfile}
+                                size="default"
+                                className="glass-button-primary min-h-[44px]"
+                                contentClassName="flex items-center justify-center gap-1.5"
+                              >
+                                <Edit3 className="h-4 w-4 shrink-0" />
+                                <span>Edit Profile</span>
+                              </GlassButton>
+                              {onLogout && (
+                                <GlassButton
+                                  type="button"
+                                  onClick={onLogout}
+                                  size="default"
+                                  className="glass-button-destructive min-h-[44px]"
+                                  contentClassName="flex items-center justify-center gap-1.5"
+                                >
+                                  <LogOut className="h-4 w-4 shrink-0" />
+                                  <span>Logout</span>
+                                </GlassButton>
+                              )}
+                            </div>
                           </div>
 
                           {/* Payment Method */}
-                          <div>
-                            <h3 className="font-bold mb-3 text-sm" style={{ color: 'var(--color-on-surface)' }}>Payment Method</h3>
+                          <div className="glass-card rounded-2xl p-4">
+                            <h3 className="font-bold mb-3 text-sm text-[var(--color-on-surface)]">Payment Method</h3>
                             <div className="grid grid-cols-2 gap-2">
                               {paymentMethods.map((method) => (
                                 <button
                                   key={method.code}
                                   type="button"
                                   onClick={() => setPaymentMethod(method.code)}
-                                  className={`flex items-center justify-center p-3 rounded-lg border-2 transition-colors ${paymentMethod === method.code
-                                    ? 'border-[var(--color-primary)]'
-                                    : 'border-[var(--color-outline-variant)] hover:border-[var(--color-primary)]'
-                                    }`}
-                                  style={{
-                                    backgroundColor: paymentMethod === method.code ? 'var(--color-primary)' : 'var(--surface-card)',
-                                    color: paymentMethod === method.code ? 'var(--color-on-primary)' : 'var(--color-on-surface)'
-                                  }}
+                                  className={`flex items-center justify-center gap-2 p-3 rounded-xl min-h-[48px] font-semibold text-sm ${paymentMethod === method.code ? 'glass-option-btn-selected' : 'glass-option-btn'}`}
                                 >
-                                  <span className="mr-2">{method.icon}</span>
-                                  <span className="font-semibold text-sm">{method.name}</span>
+                                  <span className="shrink-0">{method.icon}</span>
+                                  <span>{method.name}</span>
                                 </button>
                               ))}
                             </div>
                           </div>
 
                           {/* Pickup Option */}
-                          <div className="min-w-0">
-                            <h3 className="font-bold mb-3 text-sm" style={{ color: 'var(--color-on-surface)' }}>Dining Preference</h3>
+                          <div className="glass-card rounded-2xl p-4 min-w-0">
+                            <h3 className="font-bold mb-3 text-sm text-[var(--color-on-surface)]">Dining Preference</h3>
                             <div className="grid grid-cols-2 gap-2">
                               {[
                                 { value: 'pickup', label: 'Pick up', icon: '🥡' },
@@ -1856,19 +1852,10 @@ const CustomerMenu: React.FC<CustomerMenuProps> = ({
                                   key={option.value}
                                   type="button"
                                   onClick={() => setPickupOption(option.value)}
-                                  className={`p-3 rounded-lg border-2 transition-colors min-w-0 ${pickupOption === option.value
-                                    ? 'border-[var(--color-primary)]'
-                                    : 'border-[var(--color-outline-variant)] hover:border-[var(--color-primary)]'
-                                    }`}
-                                  style={{
-                                    backgroundColor: pickupOption === option.value ? 'var(--color-primary)' : 'var(--surface-card)',
-                                    color: pickupOption === option.value ? 'var(--color-on-primary)' : 'var(--color-on-surface)'
-                                  }}
+                                  className={`flex items-center justify-center gap-1.5 p-3 rounded-xl min-h-[48px] min-w-0 overflow-hidden font-semibold text-sm ${pickupOption === option.value ? 'glass-option-btn-selected' : 'glass-option-btn'}`}
                                 >
-                                  <div className="flex items-center justify-center gap-1.5 overflow-hidden">
-                                    <span className="text-lg shrink-0">{option.icon}</span>
-                                    <span className="font-semibold text-sm truncate">{option.label}</span>
-                                  </div>
+                                  <span className="text-lg shrink-0">{option.icon}</span>
+                                  <span className="truncate">{option.label}</span>
                                 </button>
                               ))}
                             </div>
@@ -1876,37 +1863,37 @@ const CustomerMenu: React.FC<CustomerMenuProps> = ({
 
                           {/* Table Number for Dine-in */}
                           {pickupOption === 'dine-in' && (
-                            <div>
-                              <label className="block font-bold mb-2 text-sm" style={{ color: 'var(--color-on-surface)' }}>Table Number</label>
+                            <div className="glass-card rounded-2xl p-4">
+                              <label className="block font-bold mb-2 text-sm text-[var(--color-on-surface)]">Table Number</label>
                               <input
                                 type="text"
                                 placeholder="Enter table number (optional)"
                                 value={tableNumber}
                                 onChange={(e) => setTableNumber(e.target.value)}
-                                className="input-field"
+                                className="glass-input w-full rounded-xl px-4 py-2.5 text-[var(--color-on-surface)] placeholder-[var(--color-on-surface-variant)] border border-white/40 dark:border-white/20 bg-white/30 dark:bg-white/10 backdrop-blur-sm"
                               />
                             </div>
                           )}
 
                           {/* Points Redemption */}
                           {customer?.loyalty_points > 0 && (
-                            <div>
-                              <h3 className="font-bold mb-3 text-sm flex items-center" style={{ color: 'var(--color-on-surface)' }}>
-                                <Star className="h-4 w-4 mr-2" style={{ color: 'var(--color-warning)' }} />
+                            <div className="glass-card rounded-2xl p-4">
+                              <h3 className="font-bold mb-3 text-sm flex items-center text-[var(--color-on-surface)]">
+                                <Star className="h-4 w-4 mr-2 text-[var(--color-warning)]" />
                                 Redeem Points
                               </h3>
-                              <div className="rounded-lg p-4 mb-3 border border-[var(--color-outline-variant)]" style={{ backgroundColor: 'var(--surface-table)' }}>
+                              <div className="rounded-xl p-4 mb-3 bg-white/40 dark:bg-white/10 backdrop-blur-sm border border-white/30 dark:border-white/10">
                                 <div className="grid grid-cols-2 gap-3 text-xs">
                                   <div className="text-center">
-                                    <div className="text-lg font-bold" style={{ color: 'var(--color-on-surface)' }}>{customer.loyalty_points}</div>
-                                    <div style={{ color: 'var(--color-on-surface-variant)' }}>Available</div>
+                                    <div className="text-lg font-bold text-[var(--color-on-surface)]">{customer.loyalty_points}</div>
+                                    <div className="text-[var(--color-on-surface-variant)]">Available</div>
                                   </div>
                                   <div className="text-center">
-                                    <div className="text-lg font-bold" style={{ color: 'var(--color-on-surface)' }}>{maxRedeemablePoints}</div>
-                                    <div style={{ color: 'var(--color-on-surface-variant)' }}>Max Redeemable</div>
+                                    <div className="text-lg font-bold text-[var(--color-on-surface)]">{maxRedeemablePoints}</div>
+                                    <div className="text-[var(--color-on-surface-variant)]">Max Redeemable</div>
                                   </div>
                                 </div>
-                                <div className="text-center mt-2 text-xs" style={{ color: 'var(--color-on-surface-variant)' }}>
+                                <div className="text-center mt-2 text-xs text-[var(--color-on-surface-variant)]">
                                   1 point = {formatCurrency(0.10)}
                                 </div>
                               </div>
@@ -1916,41 +1903,37 @@ const CustomerMenu: React.FC<CustomerMenuProps> = ({
                                 onChange={(e) => handlePointsRedemption(parseInt(e.target.value) || 0)}
                                 min="0"
                                 max={maxRedeemablePoints}
-                                className="input-field"
+                                className="glass-input w-full rounded-xl px-4 py-2.5 text-[var(--color-on-surface)] placeholder-[var(--color-on-surface-variant)] border border-white/40 dark:border-white/20 bg-white/30 dark:bg-white/10 backdrop-blur-sm"
                                 placeholder="Enter points"
                               />
                             </div>
                           )}
 
                           {/* Tip Selection */}
-                          <div className="min-w-0">
-                            <h3 className="font-bold mb-3 text-sm" style={{ color: 'var(--color-on-surface)' }}>Add Tip</h3>
+                          <div className="glass-card rounded-2xl p-4 min-w-0">
+                            <h3 className="font-bold mb-3 text-sm text-[var(--color-on-surface)]">Add Tip</h3>
                             <div className="flex flex-wrap gap-2 mb-3">
                               {[0, 10, 15, 18, 20, 25].map((percentage) => (
                                 <button
                                   key={percentage}
                                   type="button"
                                   onClick={() => handleTipPercentageChange(percentage)}
-                                  className={`py-2 px-3 text-xs rounded-lg border-2 transition-colors font-semibold shrink-0 ${tipPercentage === percentage
-                                    ? 'border-[var(--color-primary)]'
-                                    : 'border-[var(--color-outline-variant)] hover:border-[var(--color-primary)]'
-                                    }`}
-                                  style={{
-                                    backgroundColor: tipPercentage === percentage ? 'var(--color-primary)' : 'var(--surface-card)',
-                                    color: tipPercentage === percentage ? 'var(--color-on-primary)' : 'var(--color-on-surface)'
-                                  }}
+                                  className={`py-2.5 px-4 rounded-xl font-semibold text-sm shrink-0 min-h-[44px] ${tipPercentage === percentage ? 'glass-option-btn-selected' : 'glass-option-btn'}`}
                                 >
                                   {percentage === 0 ? 'No Tip' : `${percentage}%`}
                                 </button>
                               ))}
                             </div>
-                            <input
-                              type="number"
-                              value={tipAmount.toFixed(2)}
-                              onChange={(e) => handleTipAmountChange(e.target.value)}
-                              className="input-field"
-                              placeholder="Custom tip"
-                            />
+                            <div>
+                              <label className="block text-xs font-medium mb-1.5 text-[var(--color-on-surface-variant)]">Custom amount (₹)</label>
+                              <input
+                                type="number"
+                                value={tipAmount.toFixed(2)}
+                                onChange={(e) => handleTipAmountChange(e.target.value)}
+                                className="glass-input w-full rounded-xl px-4 py-2.5 text-[var(--color-on-surface)] placeholder-[var(--color-on-surface-variant)] border border-white/40 dark:border-white/20 bg-white/30 dark:bg-white/10 backdrop-blur-sm"
+                                placeholder="0.00"
+                              />
+                            </div>
                           </div>
                         </React.Fragment>
                       )}
@@ -1979,9 +1962,9 @@ const CustomerMenu: React.FC<CustomerMenuProps> = ({
                       </GlassButton>
 
                       <GlassButton
-                        size="sm"
+                        size="default"
                         onClick={clearCart}
-                        className="glass-button-light w-full"
+                        className="glass-button-secondary w-full min-h-[44px]"
                         contentClassName="w-full flex items-center justify-center"
                       >
                         Clear Cart
