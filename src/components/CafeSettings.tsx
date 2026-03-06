@@ -1047,22 +1047,33 @@ const CafeSettings: React.FC = () => {
                     <div className="flex flex-wrap gap-3">
                       {promoBanners.map((b) => (
                         <div key={b.id} className="glass-card overflow-hidden w-48 p-0 rounded-xl">
-                          <div className="h-28 bg-gray-100 dark:bg-gray-700">
+                          <div className="h-28 bg-[var(--color-surface-container)]">
                             <img src={getImageUrl(b.image_url)} alt="Banner" className="w-full h-full object-cover" />
                           </div>
-                          <div className="p-2 text-xs">
-                            <div className="truncate" title={b.link_url || '—'}>{b.link_url || 'No link'}</div>
-                            <div className="flex items-center justify-between mt-1">
+                          <div className="p-2.5 text-xs">
+                            <div className="truncate text-[var(--color-on-surface)]" title={b.link_url || '—'}>{b.link_url || 'No link'}</div>
+                            <div className="flex items-center justify-between mt-1.5 text-[var(--color-on-surface-variant)]">
                               <span>Priority: {b.priority}</span>
-                              <span className={b.active ? 'text-green-600' : 'text-gray-400'}>{b.active ? 'On' : 'Off'}</span>
+                              <span className={b.active ? 'text-[var(--color-success)] font-medium' : ''}>{b.active ? 'On' : 'Off'}</span>
                             </div>
-                            <div className="flex gap-1 mt-2">
-                              <GlassButton type="button" onClick={() => { setEditingBannerId(b.id); setEditingBannerForm({ link_url: b.link_url || '', priority: b.priority, active: b.active }); setEditingBannerReplaceFile(null); }} size="sm" className="flex-1 glass-button-secondary !py-1 text-xs" contentClassName="flex items-center justify-center gap-1">
-                                <Pencil className="h-3 w-3" /> Edit
-                              </GlassButton>
-                              <GlassButton type="button" onClick={() => handleDeletePromoBanner(b.id)} disabled={promoBanners.length <= 1} size="sm" className="glass-button-destructive !py-1 !px-2 text-xs disabled:opacity-50" title={promoBanners.length <= 1 ? 'Keep at least one banner' : 'Remove banner'}>
-                                <Trash2 className="h-3 w-3" />
-                              </GlassButton>
+                            <div className="flex gap-2 mt-2 min-w-0">
+                              <button
+                                type="button"
+                                onClick={() => { setEditingBannerId(b.id); setEditingBannerForm({ link_url: b.link_url || '', priority: b.priority, active: b.active }); setEditingBannerReplaceFile(null); }}
+                                title="Edit banner"
+                                className="flex-1 min-w-0 flex items-center justify-center gap-1.5 rounded-full border border-[var(--color-outline-variant)] bg-[var(--color-surface-container)] text-[var(--color-on-surface)] py-1.5 px-2 text-xs font-medium hover:bg-[var(--color-surface-container-high)] transition-colors"
+                              >
+                                <Pencil className="h-3 w-3 shrink-0" /> <span className="truncate">Edit</span>
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => handleDeletePromoBanner(b.id)}
+                                disabled={promoBanners.length <= 1}
+                                title={promoBanners.length <= 1 ? 'Keep at least one banner' : 'Remove banner'}
+                                className="flex-1 min-w-0 flex items-center justify-center gap-1.5 rounded-full border border-red-300 bg-[var(--color-error)] text-[var(--color-on-error)] py-1.5 px-2 text-xs font-medium hover:brightness-110 disabled:opacity-50 transition-all"
+                              >
+                                <Trash2 className="h-3 w-3 shrink-0" /> <span className="truncate">Delete</span>
+                              </button>
                             </div>
                           </div>
                         </div>

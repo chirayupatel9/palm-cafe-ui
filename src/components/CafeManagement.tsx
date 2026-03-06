@@ -7,6 +7,7 @@ import { CardSkeleton, TableSkeleton } from './ui/Skeleton';
 import EmptyState from './ui/EmptyState';
 import ConfirmModal from './ui/ConfirmModal';
 import Dialog from './ui/Dialog';
+import { GlassButton } from './ui/GlassButton';
 import { useFormChanges } from '../hooks/useUnsavedChanges';
 import { getImageUrl } from '../utils/imageUtils';
 
@@ -254,22 +255,28 @@ const CafeManagement: React.FC = () => {
               )}
             </div>
 
-            <div className="flex items-center space-x-3 pt-4 border-t border-gray-200 dark:border-gray-700">
-              <button
+            <div className="flex items-center gap-2 pt-4 border-t border-[var(--color-outline)]/20">
+              <GlassButton
+                type="button"
                 onClick={() => handleEdit(cafe)}
-                className="flex-1 btn-secondary flex items-center justify-center"
+                size="sm"
+                className="glass-button-secondary flex-1"
+                contentClassName="flex items-center justify-center gap-2"
               >
-                <Edit className="h-4 w-4 mr-1.5" />
+                <Edit className="h-4 w-4" />
                 <span>Edit</span>
-              </button>
-              <button
+              </GlassButton>
+              <GlassButton
+                type="button"
                 onClick={() => setDeleteConfirm(cafe)}
-                className="flex-1 btn-destructive flex items-center justify-center"
                 disabled={isDeleting}
+                size="sm"
+                className="glass-button-destructive flex-1"
+                contentClassName="flex items-center justify-center gap-2"
               >
-                <Trash2 className="h-4 w-4 mr-1.5" />
+                <Trash2 className="h-4 w-4" />
                 <span>Delete</span>
-              </button>
+              </GlassButton>
             </div>
           </div>
         ))}
