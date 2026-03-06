@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Plus, Minus, Trash2, Receipt, ShoppingCart, FolderOpen, Star, ShoppingBag, BarChart3 } from 'lucide-react';
 import Dialog from './ui/Dialog';
 import Sheet from './ui/Sheet';
+import { GlassButton } from './ui/GlassButton';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 import { useCurrency } from '../contexts/CurrencyContext';
@@ -41,6 +42,8 @@ const OrderPage: React.FC<OrderPageProps> = ({ menuItems, cart: externalCart, se
   const [cart, setCart] = useState([]);
   const [customerName, setCustomerName] = useState('');
   const [customerPhone, setCustomerPhone] = useState('');
+  const [customerEmail, setCustomerEmail] = useState('');
+  const [customerLookup, setCustomerLookup] = useState(''); // single field: phone or email for lookup
   const [tableNumber, setTableNumber] = useState('');
   const [customerInfo, setCustomerInfo] = useState(null);
   const [paymentMethod, setPaymentMethod] = useState('cash');
@@ -62,8 +65,8 @@ const OrderPage: React.FC<OrderPageProps> = ({ menuItems, cart: externalCart, se
   const [extraChargeEnabled, setExtraChargeEnabled] = useState(false);
   const [showInvoicePrompt, setShowInvoicePrompt] = useState(false);
 
-  // Debounced phone number to reduce API calls
-  const debouncedPhone = useDebounce(customerPhone, 500);
+  // Debounced phone or email for customer lookup (single field)
+  const debouncedLookup = useDebounce(customerLookup, 500);
 
   // Use external cart if provided, otherwise use internal cart
   const currentCart = externalCart || cart;
@@ -148,14 +151,50 @@ const OrderPage: React.FC<OrderPageProps> = ({ menuItems, cart: externalCart, se
     }
   }, [currentCart, customerInfo?.loyalty_points, pointsToRedeem, getSubtotal]);
 
-  // Search customer when debounced phone number changes
-  useEffect(() => {
-    if (debouncedPhone && debouncedPhone.length >= 5) {
-      searchCustomer(debouncedPhone);
-    } else if (debouncedPhone.length === 0) {
+  // Search customer when debounced lookup (phone or email) changes
+  const searchCustomer = useCallback(async (query: string) => {
+    const val = (query || '').trim();
+    const hasEmail = val.includes('@') && val.length >= 5;
+    const hasPhone = !hasEmail && val.length >= 4;
+    if (!hasPhone && !hasEmail) {
+      setCustomerInfo(null);
+      return;
+    }
+
+    try {
+      const cafeSlug = (user?.cafe_slug as string) || 'default';
+      const response = await axios.post('/customer/lookup', { query: val, cafeSlug });
+      const data = response.data;
+      if (data && (data.id != null || data.name != null)) {
+        const customer = data as { name?: string; phone?: string; email?: string; loyalty_points?: number };
+        setCustomerInfo(customer);
+        const name = (customer.name && String(customer.name).trim()) || '';
+        setCustomerName(name);
+        if (customer.phone) setCustomerPhone(customer.phone);
+        if (customer.email) setCustomerEmail(customer.email);
+        setCustomerLookup(customer.email || customer.phone || val);
+        toast.success(`Welcome back, ${customer.name}! You have ${customer.loyalty_points} loyalty points.`);
+      } else {
+        setCustomerInfo(null);
+      }
+    } catch (error) {
+      if (error.response?.status !== 404) {
+        console.error('Unexpected error searching customer:', error);
+      }
       setCustomerInfo(null);
     }
-  }, [debouncedPhone]);
+  }, [user?.cafe_slug]);
+
+  useEffect(() => {
+    const val = (debouncedLookup || '').trim();
+    const hasEmail = val.includes('@') && val.length >= 5;
+    const hasPhone = !hasEmail && val.length >= 4;
+    if (hasPhone || hasEmail) {
+      searchCustomer(val);
+    } else if (val.length === 0) {
+      setCustomerInfo(null);
+    }
+  }, [debouncedLookup, searchCustomer]);
 
   // Fetch payment methods
   const fetchPaymentMethods = async () => {
@@ -203,33 +242,6 @@ const OrderPage: React.FC<OrderPageProps> = ({ menuItems, cart: externalCart, se
   const handlePointsRedemption = (points) => {
     const newPoints = Math.min(Math.max(0, points), maxRedeemablePoints);
     setPointsToRedeem(newPoints);
-  };
-
-  const searchCustomer = async (phone) => {
-    if (!phone || phone.length < 5) {
-      setCustomerInfo(null);
-      return;
-    }
-
-    try {
-      const cafeSlug = user?.cafe_slug || 'default';
-      const payload = { phone, cafeSlug };
-      const response = await axios.post('/customer/lookup', payload);
-      if (response.data) {
-        const customer = response.data;
-        setCustomerInfo(customer);
-        setCustomerName(customer.name);
-        toast.success(`Welcome back, ${customer.name}! You have ${customer.loyalty_points} loyalty points.`);
-      } else {
-        setCustomerInfo(null);
-      }
-    } catch (error) {
-      // Only log unexpected errors, not 404s (customer not found)
-      if (error.response?.status !== 404) {
-        console.error('Unexpected error searching customer:', error);
-      }
-      setCustomerInfo(null);
-    }
   };
 
   const MAX_ITEM_QUANTITY = 10;
@@ -312,6 +324,7 @@ const OrderPage: React.FC<OrderPageProps> = ({ menuItems, cart: externalCart, se
       const orderData = {
         customerName: customerName.trim(),
         customerPhone: customerPhone.trim(),
+        customerEmail: customerEmail.trim(),
         tableNumber: tableNumber.trim(),
         paymentMethod: paymentMethod,
         pickupOption: pickupOption,
@@ -574,11 +587,12 @@ const OrderPage: React.FC<OrderPageProps> = ({ menuItems, cart: externalCart, se
                   className="input-field"
                 />
                 <input
-                  type="tel"
-                  placeholder="Phone Number (optional)"
-                  value={customerPhone}
-                  onChange={(e) => setCustomerPhone(e.target.value)}
+                  type="text"
+                  placeholder="Phone or Email (optional – lookup customer)"
+                  value={customerLookup}
+                  onChange={(e) => setCustomerLookup(e.target.value)}
                   className="input-field"
+                  autoComplete="tel email"
                 />
                 <input
                   type="text"
@@ -654,13 +668,9 @@ const OrderPage: React.FC<OrderPageProps> = ({ menuItems, cart: externalCart, se
                         key={method.code}
                         type="button"
                         onClick={() => setPaymentMethod(method.code)}
-                        className={`h-10 flex items-center justify-center rounded-lg border transition-colors text-sm font-medium ${
-                          paymentMethod === method.code
-                            ? 'bg-primary text-on-primary border-primary'
-                            : 'btn-secondary'
-                        }`}
+                        className={`flex items-center justify-center gap-2 min-h-[48px] rounded-xl font-semibold text-sm ${paymentMethod === method.code ? 'glass-option-btn-selected' : 'glass-option-btn'}`}
                       >
-                        <span className="mr-2">{method.icon}</span>
+                        <span className="shrink-0">{method.icon}</span>
                         <span>{method.name}</span>
                       </button>
                     ))}
@@ -700,13 +710,9 @@ const OrderPage: React.FC<OrderPageProps> = ({ menuItems, cart: externalCart, se
                                 key={method.code}
                                 type="button"
                                 onClick={() => setSplitPaymentMethod(method.code)}
-                                className={`h-10 flex items-center justify-center rounded-lg border transition-colors text-sm font-medium ${
-                                  splitPaymentMethod === method.code
-                                    ? 'bg-primary text-on-primary border-primary'
-                                    : 'btn-secondary'
-                                }`}
+                                className={`flex items-center justify-center gap-2 min-h-[48px] rounded-xl font-semibold text-sm ${splitPaymentMethod === method.code ? 'glass-option-btn-selected' : 'glass-option-btn'}`}
                               >
-                                <span className="mr-2">{method.icon}</span>
+                                <span className="shrink-0">{method.icon}</span>
                                 <span>{method.name}</span>
                               </button>
                             ))}
@@ -747,11 +753,7 @@ const OrderPage: React.FC<OrderPageProps> = ({ menuItems, cart: externalCart, se
                     <button
                       type="button"
                       onClick={() => setPickupOption('pickup')}
-                      className={`w-full min-h-10 h-10 flex items-center justify-center gap-2 rounded-lg border transition-colors text-sm font-medium ${
-                        pickupOption === 'pickup'
-                          ? 'bg-secondary-600 text-white border-secondary-600'
-                          : 'btn-secondary'
-                      }`}
+                      className={`w-full min-h-[48px] flex items-center justify-center gap-2 rounded-xl font-semibold text-sm ${pickupOption === 'pickup' ? 'glass-option-btn-selected' : 'glass-option-btn'}`}
                     >
                       <span>🏪</span>
                       <span>Pickup</span>
@@ -759,11 +761,7 @@ const OrderPage: React.FC<OrderPageProps> = ({ menuItems, cart: externalCart, se
                     <button
                       type="button"
                       onClick={() => setPickupOption('dine-in')}
-                      className={`w-full min-h-10 h-10 flex items-center justify-center gap-2 rounded-lg border transition-colors text-sm font-medium ${
-                        pickupOption === 'dine-in'
-                          ? 'bg-secondary-600 text-white border-secondary-600'
-                          : 'btn-secondary'
-                      }`}
+                      className={`w-full min-h-[48px] flex items-center justify-center gap-2 rounded-xl font-semibold text-sm ${pickupOption === 'dine-in' ? 'glass-option-btn-selected' : 'glass-option-btn'}`}
                     >
                       <span>🍽️</span>
                       <span>Dine-in</span>
@@ -918,16 +916,12 @@ const OrderPage: React.FC<OrderPageProps> = ({ menuItems, cart: externalCart, se
                   <h3 className="font-medium text-on-surface mb-3">Tip</h3>
                   
                   {/* Quick tip buttons */}
-                  <div className="grid grid-cols-3 gap-2 mb-3">
+                  <div className="flex flex-wrap gap-2 mb-3">
                     {[0, 10, 15, 18, 20, 25].map((percentage) => (
                       <button
                         key={percentage}
                         onClick={() => handleTipPercentageChange(percentage)}
-                        className={`h-10 text-sm rounded-lg border transition-colors font-medium ${
-                          tipPercentage === percentage
-                            ? 'bg-primary text-on-primary border-primary'
-                            : 'btn-secondary'
-                        }`}
+                        className={`py-2.5 px-4 rounded-xl font-semibold text-sm shrink-0 min-h-[44px] ${tipPercentage === percentage ? 'glass-option-btn-selected' : 'glass-option-btn'}`}
                       >
                         {percentage === 0 ? 'No Tip' : `${percentage}%`}
                       </button>
@@ -943,7 +937,7 @@ const OrderPage: React.FC<OrderPageProps> = ({ menuItems, cart: externalCart, se
                       onChange={(e) => handleTipAmountChange(e.target.value)}
                       step="0.01"
                       min="0"
-                      className="flex-1 input-field"
+                      className="flex-1 glass-input rounded-xl px-4 py-2.5 text-[var(--color-on-surface)] placeholder-[var(--color-on-surface-variant)] border border-white/40 dark:border-white/20 bg-white/30 dark:bg-white/10 backdrop-blur-sm"
                       placeholder="0.00"
                     />
                   </div>
@@ -993,18 +987,21 @@ const OrderPage: React.FC<OrderPageProps> = ({ menuItems, cart: externalCart, se
                 </div>
               )}
 
-              {/* Generate Invoice Button */}
-              <button
+              {/* Complete order */}
+              <GlassButton
+                type="button"
                 onClick={() => {
                   startCheckout();
                   setShowCart(false);
                 }}
                 disabled={currentCart.length === 0 || loading}
-                className="btn-primary w-full flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
+                size="default"
+                className="w-full glass-button-primary disabled:opacity-50 disabled:cursor-not-allowed"
+                contentClassName="w-full flex items-center justify-center gap-2"
               >
-                <Receipt className="h-4 w-4 mr-2" />
-                {loading ? 'Completing...' : 'Complete order'}
-              </button>
+                <Receipt className="h-4 w-4 shrink-0" />
+                <span>{loading ? 'Completing...' : 'Complete order'}</span>
+              </GlassButton>
           </Sheet>
       )}
     </>
