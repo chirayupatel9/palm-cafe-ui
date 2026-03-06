@@ -695,7 +695,7 @@ const CafeSettings: React.FC = () => {
             </div>
           </div>
         ) : (
-        <div className="w-full max-w-4xl mx-auto">
+        <div className="w-full mx-auto">
           <div className="space-y-6">
             {/* Cafe Slug & Public URL Section (multi-cafe: show when admin/superadmin has a cafe slug) */}
             {(user?.role === 'admin' || user?.role === 'superadmin') && publicSlug && (
