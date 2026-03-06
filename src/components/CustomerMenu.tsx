@@ -1399,8 +1399,8 @@ const CustomerMenu: React.FC<CustomerMenuProps> = ({
                                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
                                   />
                                   <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
-                                  <div className="absolute top-4 right-4 bg-white/95 backdrop-blur-sm px-4 py-2 rounded-full shadow-lg">
-                                    <span className="font-mono text-sm font-semibold text-[#a57f42]">
+                                  <div className="absolute top-4 right-4 menu-price-badge">
+                                    <span className="font-mono text-sm font-semibold menu-price-badge-text">
                                       {formatCurrency(ensureNumber(item.price))}
                                     </span>
                                   </div>
