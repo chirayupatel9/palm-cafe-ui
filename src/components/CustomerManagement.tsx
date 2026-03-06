@@ -503,185 +503,184 @@ const CustomerManagement: React.FC = () => {
         )}
       </div>
 
-      {/* Add Customer Modal - Template Dialog */}
+      {/* Add Customer Modal */}
       <Dialog open={showAddModal} onClose={() => setShowAddModal(false)} title="Add New Customer">
         <form onSubmit={handleSubmit} className="pt-0">
-              <div className="space-y-4">
-                <div>
-                  <label className={`block text-sm font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>Name *</label>
-                  <input
-                    type="text"
-                    required
-                    value={formData.name}
-                    onChange={(e) => setFormData({...formData, name: e.target.value})}
-                    className="input-field"
-                  />
-                </div>
-                
-                <div>
-                  <label className={`block text-sm font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>Email</label>
-                  <input
-                    type="email"
-                    value={formData.email}
-                    onChange={(e) => setFormData({...formData, email: e.target.value})}
-                    className="input-field"
-                  />
-                </div>
-                
-                <div>
-                  <label className={`block text-sm font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>Phone</label>
-                  <input
-                    type="tel"
-                    value={formData.phone}
-                    onChange={(e) => setFormData({...formData, phone: e.target.value})}
-                    className="input-field"
-                  />
-                </div>
-                
-                <div>
-                  <label className={`block text-sm font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>Address</label>
-                  <textarea
-                    value={formData.address}
-                    onChange={(e) => setFormData({...formData, address: e.target.value})}
-                    rows={3}
-                    className="input-field"
-                  />
-                </div>
-                
-                <div>
-                  <label className={`block text-sm font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>Date of Birth</label>
-                  <input
-                    type="date"
-                    value={formData.date_of_birth}
-                    onChange={(e) => setFormData({...formData, date_of_birth: e.target.value})}
-                    className="input-field"
-                  />
-                </div>
-                
-                <div>
-                  <label className={`block text-sm font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>Notes</label>
-                  <textarea
-                    value={formData.notes}
-                    onChange={(e) => setFormData({...formData, notes: e.target.value})}
-                    rows={2}
-                    className="input-field"
-                  />
-                </div>
-              </div>
-              
-              <div className="flex justify-end space-x-3 mt-6">
-                <GlassButton
-                  type="button"
-                  onClick={() => setShowAddModal(false)}
-                  size="default"
-                  className="glass-button-secondary"
-                >
-                  Cancel
-                </GlassButton>
-                <GlassButton type="submit" size="default" className="glass-button-primary">
-                  Add Customer
-                </GlassButton>
-              </div>
-            </form>
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-[var(--color-on-surface)] mb-1.5">Name *</label>
+              <input
+                type="text"
+                required
+                value={formData.name}
+                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                placeholder="Customer name"
+                className="glass-input w-full min-h-[40px] rounded-xl border border-[var(--color-outline-variant)] bg-[var(--surface-card)] text-[var(--color-on-surface)] placeholder-[var(--color-on-surface-variant)] px-4 py-2.5 text-sm"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-[var(--color-on-surface)] mb-1.5">Email</label>
+              <input
+                type="email"
+                value={formData.email}
+                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                placeholder="email@example.com"
+                className="glass-input w-full min-h-[40px] rounded-xl border border-[var(--color-outline-variant)] bg-[var(--surface-card)] text-[var(--color-on-surface)] placeholder-[var(--color-on-surface-variant)] px-4 py-2.5 text-sm"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-[var(--color-on-surface)] mb-1.5">Phone</label>
+              <input
+                type="tel"
+                value={formData.phone}
+                onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                placeholder="Phone number"
+                className="glass-input w-full min-h-[40px] rounded-xl border border-[var(--color-outline-variant)] bg-[var(--surface-card)] text-[var(--color-on-surface)] placeholder-[var(--color-on-surface-variant)] px-4 py-2.5 text-sm"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-[var(--color-on-surface)] mb-1.5">Address</label>
+              <textarea
+                value={formData.address}
+                onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                rows={3}
+                placeholder="Street, city, state"
+                className="glass-input w-full rounded-xl border border-[var(--color-outline-variant)] bg-[var(--surface-card)] text-[var(--color-on-surface)] placeholder-[var(--color-on-surface-variant)] px-4 py-2.5 text-sm min-h-[80px] resize-none"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-[var(--color-on-surface)] mb-1.5">Date of Birth</label>
+              <input
+                type="date"
+                value={formData.date_of_birth}
+                onChange={(e) => setFormData({ ...formData, date_of_birth: e.target.value })}
+                className="glass-input w-full min-h-[40px] rounded-xl border border-[var(--color-outline-variant)] bg-[var(--surface-card)] text-[var(--color-on-surface)] px-4 py-2.5 text-sm [color-scheme:inherit]"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-[var(--color-on-surface)] mb-1.5">Notes</label>
+              <textarea
+                value={formData.notes}
+                onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+                rows={2}
+                placeholder="Optional notes"
+                className="glass-input w-full rounded-xl border border-[var(--color-outline-variant)] bg-[var(--surface-card)] text-[var(--color-on-surface)] placeholder-[var(--color-on-surface-variant)] px-4 py-2.5 text-sm min-h-[60px] resize-none"
+              />
+            </div>
+          </div>
+          <div className="flex flex-col sm:flex-row justify-end gap-2 sm:gap-3 mt-6">
+            <GlassButton
+              type="button"
+              onClick={() => setShowAddModal(false)}
+              size="default"
+              className="glass-button-secondary"
+              contentClassName="flex items-center gap-2"
+            >
+              Cancel
+            </GlassButton>
+            <GlassButton type="submit" size="default" className="glass-button-primary" contentClassName="flex items-center gap-2">
+              Add Customer
+            </GlassButton>
+          </div>
+        </form>
       </Dialog>
 
-      {/* Edit Customer Modal - Template Dialog */}
+      {/* Edit Customer Modal */}
       <Dialog
         open={!!(showEditModal && selectedCustomer)}
         onClose={() => setShowEditModal(false)}
         title="Edit Customer"
       >
         {showEditModal && selectedCustomer && (
-            <form onSubmit={handleSubmit} className="pt-0">
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Name *</label>
-                  <input
-                    type="text"
-                    required
-                    value={formData.name}
-                    onChange={(e) => setFormData({...formData, name: e.target.value})}
-                    className="input-field"
-                  />
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Email</label>
-                  <input
-                    type="email"
-                    value={formData.email}
-                    onChange={(e) => setFormData({...formData, email: e.target.value})}
-                    className="input-field"
-                  />
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Phone</label>
-                  <input
-                    type="tel"
-                    value={formData.phone}
-                    onChange={(e) => setFormData({...formData, phone: e.target.value})}
-                    className="input-field"
-                  />
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Address</label>
-                  <textarea
-                    value={formData.address}
-                    onChange={(e) => setFormData({...formData, address: e.target.value})}
-                    rows={3}
-                    className="input-field"
-                  />
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Date of Birth</label>
-                  <input
-                    type="date"
-                    value={formData.date_of_birth}
-                    onChange={(e) => setFormData({...formData, date_of_birth: e.target.value})}
-                    className="input-field"
-                  />
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Notes</label>
-                  <textarea
-                    value={formData.notes}
-                    onChange={(e) => setFormData({...formData, notes: e.target.value})}
-                    rows={2}
-                    className="input-field"
-                  />
-                </div>
-                
-                <div>
-                  <label className="flex items-center">
-                    <input
-                      type="checkbox"
-                      checked={formData.is_active !== false}
-                      onChange={(e) => setFormData({...formData, is_active: e.target.checked})}
-                      className="rounded border-gray-300 text-secondary-600 focus:ring-secondary-500"
-                    />
-                    <span className="ml-2 text-sm text-gray-700">Active Customer</span>
-                  </label>
-                </div>
+          <form onSubmit={handleSubmit} className="pt-0">
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-[var(--color-on-surface)] mb-1.5">Name *</label>
+                <input
+                  type="text"
+                  required
+                  value={formData.name}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  placeholder="Customer name"
+                  className="glass-input w-full min-h-[40px] rounded-xl border border-[var(--color-outline-variant)] bg-[var(--surface-card)] text-[var(--color-on-surface)] placeholder-[var(--color-on-surface-variant)] px-4 py-2.5 text-sm"
+                />
               </div>
-              
-              <div className="flex justify-end space-x-3 mt-6">
-                <GlassButton
-                  type="button"
-                  onClick={() => setShowEditModal(false)}
-                  size="default"
-                  className="glass-button-secondary"
-                >
-                  Cancel
-                </GlassButton>
-                <GlassButton type="submit" size="default" className="glass-button-primary">
-                  Update Customer
-                </GlassButton>
+              <div>
+                <label className="block text-sm font-medium text-[var(--color-on-surface)] mb-1.5">Email</label>
+                <input
+                  type="email"
+                  value={formData.email}
+                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  placeholder="email@example.com"
+                  className="glass-input w-full min-h-[40px] rounded-xl border border-[var(--color-outline-variant)] bg-[var(--surface-card)] text-[var(--color-on-surface)] placeholder-[var(--color-on-surface-variant)] px-4 py-2.5 text-sm"
+                />
               </div>
-            </form>
+              <div>
+                <label className="block text-sm font-medium text-[var(--color-on-surface)] mb-1.5">Phone</label>
+                <input
+                  type="tel"
+                  value={formData.phone}
+                  onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                  placeholder="Phone number"
+                  className="glass-input w-full min-h-[40px] rounded-xl border border-[var(--color-outline-variant)] bg-[var(--surface-card)] text-[var(--color-on-surface)] placeholder-[var(--color-on-surface-variant)] px-4 py-2.5 text-sm"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-[var(--color-on-surface)] mb-1.5">Address</label>
+                <textarea
+                  value={formData.address}
+                  onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                  rows={3}
+                  placeholder="Street, city, state"
+                  className="glass-input w-full rounded-xl border border-[var(--color-outline-variant)] bg-[var(--surface-card)] text-[var(--color-on-surface)] placeholder-[var(--color-on-surface-variant)] px-4 py-2.5 text-sm min-h-[80px] resize-none"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-[var(--color-on-surface)] mb-1.5">Date of Birth</label>
+                <input
+                  type="date"
+                  value={formData.date_of_birth}
+                  onChange={(e) => setFormData({ ...formData, date_of_birth: e.target.value })}
+                  className="glass-input w-full min-h-[40px] rounded-xl border border-[var(--color-outline-variant)] bg-[var(--surface-card)] text-[var(--color-on-surface)] px-4 py-2.5 text-sm [color-scheme:inherit]"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-[var(--color-on-surface)] mb-1.5">Notes</label>
+                <textarea
+                  value={formData.notes}
+                  onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+                  rows={2}
+                  placeholder="Optional notes"
+                  className="glass-input w-full rounded-xl border border-[var(--color-outline-variant)] bg-[var(--surface-card)] text-[var(--color-on-surface)] placeholder-[var(--color-on-surface-variant)] px-4 py-2.5 text-sm min-h-[60px] resize-none"
+                />
+              </div>
+              <div>
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={formData.is_active !== false}
+                    onChange={(e) => setFormData({ ...formData, is_active: e.target.checked })}
+                    className="rounded border-[var(--color-outline)] text-[var(--color-primary)] focus:ring-[var(--color-primary)]"
+                  />
+                  <span className="text-sm text-[var(--color-on-surface)]">Active Customer</span>
+                </label>
+              </div>
+            </div>
+            <div className="flex flex-col sm:flex-row justify-end gap-2 sm:gap-3 mt-6">
+              <GlassButton
+                type="button"
+                onClick={() => setShowEditModal(false)}
+                size="default"
+                className="glass-button-secondary"
+                contentClassName="flex items-center gap-2"
+              >
+                Cancel
+              </GlassButton>
+              <GlassButton type="submit" size="default" className="glass-button-primary" contentClassName="flex items-center gap-2">
+                Update Customer
+              </GlassButton>
+            </div>
+          </form>
         )}
       </Dialog>
 
