@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { ArrowRight, User, Mail, MapPin, Phone } from 'lucide-react';
 import axios from 'axios';
 import toast from 'react-hot-toast';
+import { GlassButton } from './ui/GlassButton';
 
 export interface CustomerLoginCustomer {
   id?: number;
@@ -154,25 +155,22 @@ const CustomerLogin: React.FC<CustomerLoginProps> = ({ cafeSlug, onLogin }) => {
                     />
                   </div>
                 </div>
-                <button
-                  className="flex items-center justify-center text-center w-full h-14 px-6 py-2 mt-4 text-base font-bold leading-normal rounded-lg hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors disabled:opacity-50"
-                  style={{
-                    backgroundColor: 'var(--color-primary)',
-                    color: 'var(--color-on-primary)',
-                    ['--tw-ring-color' as string]: 'var(--color-primary)'
-                  }}
+                <GlassButton
                   type="submit"
                   disabled={loading}
+                  size="default"
+                  className="w-full mt-4 glass-button-primary disabled:opacity-50 disabled:cursor-not-allowed"
+                  contentClassName="w-full flex items-center justify-center gap-2"
                 >
                   {loading ? (
-                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                    <div className="animate-spin rounded-full h-5 w-5 border-2 border-transparent border-t-current" />
                   ) : (
                     <>
                       Send verification code
-                      <ArrowRight className="ml-2 h-4 w-4" />
+                      <ArrowRight className="h-4 w-4" />
                     </>
                   )}
-                </button>
+                </GlassButton>
               </form>
             </>
           ) : (
@@ -205,25 +203,22 @@ const CustomerLogin: React.FC<CustomerLoginProps> = ({ cafeSlug, onLogin }) => {
                     onChange={(e) => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
                   />
                 </div>
-                <button
-                  className="flex items-center justify-center text-center w-full h-14 px-6 py-2 mt-4 text-base font-bold leading-normal rounded-lg hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors disabled:opacity-50"
-                  style={{
-                    backgroundColor: 'var(--color-primary)',
-                    color: 'var(--color-on-primary)',
-                    ['--tw-ring-color' as string]: 'var(--color-primary)'
-                  }}
+                <GlassButton
                   type="submit"
                   disabled={loading || otp.length < 6}
+                  size="default"
+                  className="w-full mt-4 glass-button-primary disabled:opacity-50 disabled:cursor-not-allowed"
+                  contentClassName="w-full flex items-center justify-center gap-2"
                 >
                   {loading ? (
-                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                    <div className="animate-spin rounded-full h-5 w-5 border-2 border-transparent border-t-current" />
                   ) : (
                     <>
                       Verify & Login
-                      <ArrowRight className="ml-2 h-4 w-4" />
+                      <ArrowRight className="h-4 w-4" />
                     </>
                   )}
-                </button>
+                </GlassButton>
                 <button
                   type="button"
                   onClick={handleCloseOtp}

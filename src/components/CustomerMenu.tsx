@@ -928,7 +928,7 @@ const CustomerMenu: React.FC<CustomerMenuProps> = ({
                   <div className="max-w-3xl mx-auto">
                     <div className="relative max-w-xl mx-auto mb-10">
                       <div className="relative group">
-                        <Search className="absolute left-5 top-1/2 -translate-y-1/2 h-5 w-5 text-[#b3af9b] group-focus-within:text-[#a57f42] transition-colors" />
+                        <Search className="absolute left-5 top-1/2 -translate-y-1/2 h-5 w-5 text-[#b3af9b] group-focus-within:text-[#a57f42] transition-colors z-10 pointer-events-none" />
                         <input
                           ref={searchInputRef}
                           type="text"
@@ -1641,20 +1641,20 @@ const CustomerMenu: React.FC<CustomerMenuProps> = ({
         <div className="flex flex-col gap-6">
                 {/* 1. Cart Items */}
                 {cart.length === 0 ? (
-                  <div className="flex flex-col items-center justify-center gap-6 rounded-lg bg-accent-50 p-12 text-center shadow-sm">
-                    <div className="text-secondary-600">
+                  <div className="flex flex-col items-center justify-center gap-6 rounded-lg p-12 text-center shadow-sm border border-[var(--color-outline-variant)]" style={{ backgroundColor: 'var(--surface-table)' }}>
+                    <div style={{ color: 'var(--color-on-surface-variant)' }}>
                       <ShoppingCart className="h-24 w-24" />
                     </div>
-                    <h3 className="text-2xl font-bold text-secondary-700">Your cart is empty</h3>
-                    <p className="max-w-sm text-secondary-600">Looks like you haven&apos;t added anything to your order yet. Let&apos;s fix that!</p>
+                    <h3 className="text-2xl font-bold" style={{ color: 'var(--color-on-surface)' }}>Your cart is empty</h3>
+                    <p className="max-w-sm" style={{ color: 'var(--color-on-surface-variant)' }}>Looks like you haven&apos;t added anything to your order yet. Let&apos;s fix that!</p>
                   </div>
                 ) : (
                   <div className="flex flex-col gap-6">
                     <div>
-                      <h2 className="text-lg font-bold text-secondary-700 mb-3">Items</h2>
+                      <h2 className="text-lg font-bold mb-3" style={{ color: 'var(--color-on-surface)' }}>Items</h2>
                       <div className="flex flex-col gap-3">
                         {cart.map((item) => (
-                          <div key={item.id} className="flex items-center gap-3 rounded-lg bg-accent-50 p-3 shadow-sm border border-accent-200">
+                          <div key={item.id} className="flex items-center gap-3 rounded-lg p-3 shadow-sm border border-[var(--color-outline-variant)]" style={{ backgroundColor: 'var(--surface-table)' }}>
                             <div
                               className="bg-center bg-no-repeat aspect-square bg-cover rounded-lg size-14 flex-shrink-0"
                               style={{
@@ -1665,36 +1665,36 @@ const CustomerMenu: React.FC<CustomerMenuProps> = ({
                               }}
                             />
                             <div className="flex-1 min-w-0">
-                              <p className="text-sm font-bold text-secondary-700 truncate">{item.name}</p>
-                              <p className="text-xs text-secondary-600">{formatCurrency(item.price)}</p>
+                              <p className="text-sm font-bold truncate" style={{ color: 'var(--color-on-surface)' }}>{item.name}</p>
+                              <p className="text-xs" style={{ color: 'var(--color-on-surface-variant)' }}>{formatCurrency(item.price)}</p>
                             </div>
                             <div className="flex items-center gap-2">
                               <GlassButton
                                 size="icon"
                                 onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                                className="!min-w-[36px] !min-h-[36px] [&_.glass-button]:!h-9 [&_.glass-button]:!w-9 [&_.glass-button-text]:!h-9 [&_.glass-button-text]:!w-9 [&_.glass-button]:!bg-white/80 [&_.glass-button]:!border-[#b3af9b] [&_.glass-button]:!text-[#0b0f05]"
-                                contentClassName="text-[#0b0f05]"
+                                className="!min-w-[36px] !min-h-[36px] [&_.glass-button]:!h-9 [&_.glass-button]:!w-9 [&_.glass-button-text]:!h-9 [&_.glass-button-text]:!w-9 glass-button-light"
+                                contentClassName="[&]:text-[var(--color-on-surface)]"
                                 aria-label="Decrease quantity"
                               >
                                 <Minus className="h-4 w-4" />
                               </GlassButton>
-                              <span className="w-8 text-center text-sm font-medium text-secondary-700">{item.quantity}</span>
+                              <span className="w-8 text-center text-sm font-medium" style={{ color: 'var(--color-on-surface)' }}>{item.quantity}</span>
                               <GlassButton
                                 size="icon"
                                 disabled={item.quantity >= MAX_ITEM_QUANTITY}
                                 onClick={() => item.quantity < MAX_ITEM_QUANTITY && updateQuantity(item.id, item.quantity + 1)}
-                                className="!min-w-[36px] !min-h-[36px] [&_.glass-button]:!h-9 [&_.glass-button]:!w-9 [&_.glass-button-text]:!h-9 [&_.glass-button-text]:!w-9 [&_.glass-button]:!bg-white/80 [&_.glass-button]:!border-[#b3af9b] [&_.glass-button]:!text-[#0b0f05] disabled:opacity-50 disabled:pointer-events-none"
-                                contentClassName="text-[#0b0f05]"
+                                className="!min-w-[36px] !min-h-[36px] [&_.glass-button]:!h-9 [&_.glass-button]:!w-9 [&_.glass-button-text]:!h-9 [&_.glass-button-text]:!w-9 glass-button-light disabled:opacity-50 disabled:pointer-events-none"
+                                contentClassName="[&]:text-[var(--color-on-surface)]"
                                 aria-label="Increase quantity"
                               >
                                 <Plus className="h-4 w-4" />
                               </GlassButton>
                             </div>
-                            <p className="text-sm font-semibold text-secondary-700 w-16 text-right">{formatCurrency(item.price * item.quantity)}</p>
+                            <p className="text-sm font-semibold w-16 text-right" style={{ color: 'var(--color-on-surface)' }}>{formatCurrency(item.price * item.quantity)}</p>
                             <GlassButton
                               size="icon"
                               onClick={() => removeFromCart(item.id)}
-                              className="[&_.glass-button]:!bg-transparent [&_.glass-button]:!border-transparent [&_.glass-button]:!shadow-none [&_.glass-button:hover]:!bg-red-50 [&_.glass-button]:text-secondary-600 [&_.glass-button:hover]:!text-red-500"
+                              className="[&_.glass-button]:!bg-transparent [&_.glass-button]:!border-transparent [&_.glass-button]:!shadow-none [&_.glass-button]:text-[var(--color-on-surface-variant)] [&_.glass-button:hover]:!bg-[var(--color-error)]/10 [&_.glass-button:hover]:!text-[var(--color-error)]"
                               aria-label="Remove item"
                             >
                               <Trash2 className="h-4 w-4" />
@@ -1705,28 +1705,28 @@ const CustomerMenu: React.FC<CustomerMenuProps> = ({
                     </div>
 
                 {/* 2. Order Summary */}
-                    <div className="rounded-xl bg-accent-50 p-4 shadow-sm border border-accent-200">
-                      <h3 className="font-bold text-secondary-700 mb-3 text-sm">Order Summary</h3>
+                    <div className="rounded-xl p-4 shadow-sm border border-[var(--color-outline-variant)]" style={{ backgroundColor: 'var(--surface-table)' }}>
+                      <h3 className="font-bold mb-3 text-sm" style={{ color: 'var(--color-on-surface)' }}>Order Summary</h3>
 
-                      <div className="flex flex-col gap-3 border-b border-accent-200 pb-4">
+                      <div className="flex flex-col gap-3 border-b border-[var(--color-outline-variant)] pb-4">
                         <div className="flex justify-between">
-                          <p className="text-secondary-600">Subtotal</p>
-                          <p className="font-medium text-secondary-700">{formatCurrency(getSubtotal())}</p>
+                          <p style={{ color: 'var(--color-on-surface-variant)' }}>Subtotal</p>
+                          <p className="font-medium" style={{ color: 'var(--color-on-surface)' }}>{formatCurrency(getSubtotal())}</p>
                         </div>
                         {showTaxInMenu && taxAmount > 0 && (
                           <div className="flex justify-between">
-                            <p className="text-secondary-600">Taxes ({taxRate}%)</p>
-                            <p className="font-medium text-secondary-700">{formatCurrency(taxAmount)}</p>
+                            <p style={{ color: 'var(--color-on-surface-variant)' }}>Taxes ({taxRate}%)</p>
+                            <p className="font-medium" style={{ color: 'var(--color-on-surface)' }}>{formatCurrency(taxAmount)}</p>
                           </div>
                         )}
                         {tipAmount > 0 && (
                           <div className="flex justify-between">
-                            <p className="text-secondary-600">Tip</p>
-                            <p className="font-medium text-secondary-700">{formatCurrency(tipAmount)}</p>
+                            <p style={{ color: 'var(--color-on-surface-variant)' }}>Tip</p>
+                            <p className="font-medium" style={{ color: 'var(--color-on-surface)' }}>{formatCurrency(tipAmount)}</p>
                           </div>
                         )}
                         {pointsToRedeem > 0 && (
-                          <div className="flex justify-between text-green-600">
+                          <div className="flex justify-between" style={{ color: 'var(--color-success)' }}>
                             <p>Points Redeemed ({pointsToRedeem} pts)</p>
                             <p className="font-medium">-{formatCurrency(pointsToRedeem * 0.1)}</p>
                           </div>
@@ -1734,50 +1734,52 @@ const CustomerMenu: React.FC<CustomerMenuProps> = ({
                       </div>
 
                       <div className="flex justify-between">
-                        <p className="text-lg font-bold text-secondary-700">Total</p>
-                        <p className="text-xl font-extrabold text-secondary-700">{formatCurrency(getTotal())}</p>
+                        <p className="text-lg font-bold" style={{ color: 'var(--color-on-surface)' }}>Total</p>
+                        <p className="text-xl font-extrabold" style={{ color: 'var(--color-on-surface)' }}>{formatCurrency(getTotal())}</p>
                       </div>
                     </div>
 
                     {/* 3. Login or Customer & checkout options */}
                     <>
                     {!customer ? (
-                        <div className="p-6 bg-secondary-50 border border-secondary-200 rounded-lg">
+                        <div className="p-6 rounded-lg border border-[var(--color-outline-variant)]" style={{ backgroundColor: 'var(--surface-table)' }}>
                           <div className="text-center">
-                            <div className="w-12 h-12 bg-secondary-500 rounded-full flex items-center justify-center mx-auto mb-4">
-                              <User className="h-6 w-6 text-white" />
+                            <div className="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4" style={{ backgroundColor: 'var(--color-primary)', color: 'var(--color-on-primary)' }}>
+                              <User className="h-6 w-6" />
                             </div>
-                            <h3 className="text-lg font-bold text-secondary-700 mb-2">
+                            <h3 className="text-lg font-bold mb-2" style={{ color: 'var(--color-on-surface)' }}>
                               Login Required
                             </h3>
-                            <p className="text-secondary-600 mb-4 text-sm">
+                            <p className="mb-4 text-sm" style={{ color: 'var(--color-on-surface-variant)' }}>
                               Please login to place your order
                             </p>
-                            <button
+                            <GlassButton
                               onClick={() => {
                                 setShowCart(false);
                                 setShowLoginModal(true);
                               }}
-                              className="w-full bg-secondary-500 text-white px-6 py-3 rounded-lg font-bold hover:bg-secondary-600 transition-colors"
+                              size="default"
+                              className="w-full glass-button-primary"
+                              contentClassName="w-full flex items-center justify-center"
                             >
                               Login & Continue
-                            </button>
+                            </GlassButton>
                           </div>
                         </div>
                       ) : (
                         <React.Fragment>
                           {/* Customer Information */}
-                          <div className="p-4 bg-secondary-50 border border-secondary-200 rounded-lg">
+                          <div className="p-4 rounded-lg border border-[var(--color-outline-variant)]" style={{ backgroundColor: 'var(--surface-table)' }}>
                             <div className="flex items-center justify-between gap-2 mb-3">
-                              <h3 className="font-bold text-secondary-700 flex items-center text-base shrink-0">
-                                <User className="h-4 w-4 mr-2 text-secondary-600" />
+                              <h3 className="font-bold flex items-center text-base shrink-0" style={{ color: 'var(--color-on-surface)' }}>
+                                <User className="h-4 w-4 mr-2" style={{ color: 'var(--color-on-surface-variant)' }} />
                                 Customer Info
                               </h3>
                               <div className="flex items-center gap-2 shrink-0">
                                 <button
                                   type="button"
                                   onClick={openEditProfile}
-                                  className="flex items-center justify-center gap-1 px-3 py-1.5 bg-secondary-500 text-white rounded-lg hover:bg-secondary-600 transition-colors text-xs whitespace-nowrap"
+                                  className="flex items-center justify-center gap-1 px-3 py-1.5 rounded-lg transition-colors text-xs whitespace-nowrap btn-primary"
                                 >
                                   <Edit3 className="h-3 w-3 shrink-0" />
                                   <span>Edit Profile</span>
@@ -1786,7 +1788,7 @@ const CustomerMenu: React.FC<CustomerMenuProps> = ({
                                   <button
                                     type="button"
                                     onClick={onLogout}
-                                    className="flex items-center justify-center gap-1 px-3 py-1.5 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors text-xs whitespace-nowrap"
+                                    className="flex items-center justify-center gap-1 px-3 py-1.5 rounded-lg transition-colors text-xs whitespace-nowrap btn-destructive"
                                   >
                                     <LogOut className="h-3 w-3 shrink-0" />
                                     <span>Logout</span>
@@ -1796,19 +1798,19 @@ const CustomerMenu: React.FC<CustomerMenuProps> = ({
                             </div>
                             <div className="space-y-2 text-sm">
                               <div className="flex justify-between">
-                                <span className="text-secondary-600">Name:</span>
-                                <span className="font-semibold text-secondary-700">{customer.name}</span>
+                                <span style={{ color: 'var(--color-on-surface-variant)' }}>Name:</span>
+                                <span className="font-semibold" style={{ color: 'var(--color-on-surface)' }}>{customer.name}</span>
                               </div>
                               {customer.phone && (
                                 <div className="flex justify-between">
-                                  <span className="text-secondary-600">Phone:</span>
-                                  <span className="font-semibold text-secondary-700">{customer.phone}</span>
+                                  <span style={{ color: 'var(--color-on-surface-variant)' }}>Phone:</span>
+                                  <span className="font-semibold" style={{ color: 'var(--color-on-surface)' }}>{customer.phone}</span>
                                 </div>
                               )}
                               {customer.loyalty_points > 0 && (
                                 <div className="flex justify-between">
-                                  <span className="text-secondary-600">Points:</span>
-                                  <span className="flex items-center text-yellow-600 font-semibold">
+                                  <span style={{ color: 'var(--color-on-surface-variant)' }}>Points:</span>
+                                  <span className="flex items-center font-semibold" style={{ color: 'var(--color-warning)' }}>
                                     <Star className="h-3 w-3 mr-1" />
                                     {customer.loyalty_points}
                                   </span>
@@ -1819,7 +1821,7 @@ const CustomerMenu: React.FC<CustomerMenuProps> = ({
 
                           {/* Payment Method */}
                           <div>
-                            <h3 className="font-bold text-secondary-700 mb-3 text-sm">Payment Method</h3>
+                            <h3 className="font-bold mb-3 text-sm" style={{ color: 'var(--color-on-surface)' }}>Payment Method</h3>
                             <div className="grid grid-cols-2 gap-2">
                               {paymentMethods.map((method) => (
                                 <button
@@ -1827,9 +1829,13 @@ const CustomerMenu: React.FC<CustomerMenuProps> = ({
                                   type="button"
                                   onClick={() => setPaymentMethod(method.code)}
                                   className={`flex items-center justify-center p-3 rounded-lg border-2 transition-colors ${paymentMethod === method.code
-                                    ? 'bg-secondary-500 text-white border-secondary-500'
-                                    : 'bg-white text-secondary-700 border-accent-200 hover:border-secondary-500'
+                                    ? 'border-[var(--color-primary)]'
+                                    : 'border-[var(--color-outline-variant)] hover:border-[var(--color-primary)]'
                                     }`}
+                                  style={{
+                                    backgroundColor: paymentMethod === method.code ? 'var(--color-primary)' : 'var(--surface-card)',
+                                    color: paymentMethod === method.code ? 'var(--color-on-primary)' : 'var(--color-on-surface)'
+                                  }}
                                 >
                                   <span className="mr-2">{method.icon}</span>
                                   <span className="font-semibold text-sm">{method.name}</span>
@@ -1840,7 +1846,7 @@ const CustomerMenu: React.FC<CustomerMenuProps> = ({
 
                           {/* Pickup Option */}
                           <div className="min-w-0">
-                            <h3 className="font-bold text-secondary-700 mb-3 text-sm">Dining Preference</h3>
+                            <h3 className="font-bold mb-3 text-sm" style={{ color: 'var(--color-on-surface)' }}>Dining Preference</h3>
                             <div className="grid grid-cols-2 gap-2">
                               {[
                                 { value: 'pickup', label: 'Pick up', icon: '🥡' },
@@ -1851,9 +1857,13 @@ const CustomerMenu: React.FC<CustomerMenuProps> = ({
                                   type="button"
                                   onClick={() => setPickupOption(option.value)}
                                   className={`p-3 rounded-lg border-2 transition-colors min-w-0 ${pickupOption === option.value
-                                    ? 'bg-secondary-500 text-white border-secondary-500'
-                                    : 'bg-white text-secondary-700 border-accent-200 hover:border-secondary-500'
+                                    ? 'border-[var(--color-primary)]'
+                                    : 'border-[var(--color-outline-variant)] hover:border-[var(--color-primary)]'
                                     }`}
+                                  style={{
+                                    backgroundColor: pickupOption === option.value ? 'var(--color-primary)' : 'var(--surface-card)',
+                                    color: pickupOption === option.value ? 'var(--color-on-primary)' : 'var(--color-on-surface)'
+                                  }}
                                 >
                                   <div className="flex items-center justify-center gap-1.5 overflow-hidden">
                                     <span className="text-lg shrink-0">{option.icon}</span>
@@ -1867,13 +1877,13 @@ const CustomerMenu: React.FC<CustomerMenuProps> = ({
                           {/* Table Number for Dine-in */}
                           {pickupOption === 'dine-in' && (
                             <div>
-                              <label className="block font-bold text-secondary-700 mb-2 text-sm">Table Number</label>
+                              <label className="block font-bold mb-2 text-sm" style={{ color: 'var(--color-on-surface)' }}>Table Number</label>
                               <input
                                 type="text"
                                 placeholder="Enter table number (optional)"
                                 value={tableNumber}
                                 onChange={(e) => setTableNumber(e.target.value)}
-                                className="w-full p-3 border-2 border-accent-200 rounded-lg focus:ring-2 focus:ring-secondary-500 focus:border-secondary-500 bg-white text-secondary-700 transition-colors"
+                                className="input-field"
                               />
                             </div>
                           )}
@@ -1881,22 +1891,22 @@ const CustomerMenu: React.FC<CustomerMenuProps> = ({
                           {/* Points Redemption */}
                           {customer?.loyalty_points > 0 && (
                             <div>
-                              <h3 className="font-bold text-secondary-700 mb-3 text-sm flex items-center">
-                                <Star className="h-4 w-4 mr-2 text-yellow-600" />
+                              <h3 className="font-bold mb-3 text-sm flex items-center" style={{ color: 'var(--color-on-surface)' }}>
+                                <Star className="h-4 w-4 mr-2" style={{ color: 'var(--color-warning)' }} />
                                 Redeem Points
                               </h3>
-                              <div className="bg-yellow-50 rounded-lg p-4 mb-3 border border-yellow-200">
+                              <div className="rounded-lg p-4 mb-3 border border-[var(--color-outline-variant)]" style={{ backgroundColor: 'var(--surface-table)' }}>
                                 <div className="grid grid-cols-2 gap-3 text-xs">
                                   <div className="text-center">
-                                    <div className="text-lg font-bold text-secondary-700">{customer.loyalty_points}</div>
-                                    <div className="text-secondary-600">Available</div>
+                                    <div className="text-lg font-bold" style={{ color: 'var(--color-on-surface)' }}>{customer.loyalty_points}</div>
+                                    <div style={{ color: 'var(--color-on-surface-variant)' }}>Available</div>
                                   </div>
                                   <div className="text-center">
-                                    <div className="text-lg font-bold text-secondary-700">{maxRedeemablePoints}</div>
-                                    <div className="text-secondary-600">Max Redeemable</div>
+                                    <div className="text-lg font-bold" style={{ color: 'var(--color-on-surface)' }}>{maxRedeemablePoints}</div>
+                                    <div style={{ color: 'var(--color-on-surface-variant)' }}>Max Redeemable</div>
                                   </div>
                                 </div>
-                                <div className="text-center mt-2 text-xs text-secondary-600">
+                                <div className="text-center mt-2 text-xs" style={{ color: 'var(--color-on-surface-variant)' }}>
                                   1 point = {formatCurrency(0.10)}
                                 </div>
                               </div>
@@ -1906,7 +1916,7 @@ const CustomerMenu: React.FC<CustomerMenuProps> = ({
                                 onChange={(e) => handlePointsRedemption(parseInt(e.target.value) || 0)}
                                 min="0"
                                 max={maxRedeemablePoints}
-                                className="w-full p-3 border-2 border-accent-200 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 bg-white text-secondary-700 transition-colors"
+                                className="input-field"
                                 placeholder="Enter points"
                               />
                             </div>
@@ -1914,7 +1924,7 @@ const CustomerMenu: React.FC<CustomerMenuProps> = ({
 
                           {/* Tip Selection */}
                           <div className="min-w-0">
-                            <h3 className="font-bold text-secondary-700 mb-3 text-sm">Add Tip</h3>
+                            <h3 className="font-bold mb-3 text-sm" style={{ color: 'var(--color-on-surface)' }}>Add Tip</h3>
                             <div className="flex flex-wrap gap-2 mb-3">
                               {[0, 10, 15, 18, 20, 25].map((percentage) => (
                                 <button
@@ -1922,9 +1932,13 @@ const CustomerMenu: React.FC<CustomerMenuProps> = ({
                                   type="button"
                                   onClick={() => handleTipPercentageChange(percentage)}
                                   className={`py-2 px-3 text-xs rounded-lg border-2 transition-colors font-semibold shrink-0 ${tipPercentage === percentage
-                                    ? 'bg-secondary-500 text-white border-secondary-500'
-                                    : 'bg-white text-secondary-700 border-accent-200 hover:border-secondary-500'
+                                    ? 'border-[var(--color-primary)]'
+                                    : 'border-[var(--color-outline-variant)] hover:border-[var(--color-primary)]'
                                     }`}
+                                  style={{
+                                    backgroundColor: tipPercentage === percentage ? 'var(--color-primary)' : 'var(--surface-card)',
+                                    color: tipPercentage === percentage ? 'var(--color-on-primary)' : 'var(--color-on-surface)'
+                                  }}
                                 >
                                   {percentage === 0 ? 'No Tip' : `${percentage}%`}
                                 </button>
@@ -1934,7 +1948,7 @@ const CustomerMenu: React.FC<CustomerMenuProps> = ({
                               type="number"
                               value={tipAmount.toFixed(2)}
                               onChange={(e) => handleTipAmountChange(e.target.value)}
-                              className="w-full p-3 border-2 border-accent-200 rounded-lg focus:ring-2 focus:ring-secondary-500 focus:border-secondary-500 bg-white text-secondary-700 transition-colors"
+                              className="input-field"
                               placeholder="Custom tip"
                             />
                           </div>
@@ -1980,24 +1994,24 @@ const CustomerMenu: React.FC<CustomerMenuProps> = ({
 
       {/* Floating Cart Summary Bar - Mobile Only */}
       {cart.length > 0 && (
-        <footer className="lg:hidden fixed bottom-0 left-0 right-0 z-20 bg-white border-t border-accent-200 shadow-lg">
+        <footer className="lg:hidden fixed bottom-0 left-0 right-0 z-20 border-t shadow-lg sheet-header-border" style={{ backgroundColor: 'var(--surface-nav)', borderColor: 'var(--color-outline)' }}>
           <div className="container mx-auto px-4 py-4">
             <div className="flex items-center justify-between gap-4">
               <div className="flex flex-col">
-                <p className="text-secondary-600 text-sm font-medium">
+                <p className="text-sm font-medium" style={{ color: 'var(--color-on-surface-variant)' }}>
                   {cart.reduce((total, item) => total + item.quantity, 0)} items
                 </p>
-                <p className="text-secondary-700 text-lg font-bold">
+                <p className="text-lg font-bold" style={{ color: 'var(--color-on-surface)' }}>
                   {formatCurrency(getSubtotal())}
                 </p>
               </div>
               <button
                 onClick={() => setShowCart(true)}
-                className="flex items-center justify-center gap-2 rounded-lg bg-secondary-500 min-h-[44px] h-12 px-6 hover:bg-secondary-600 transition-colors"
+                className="flex items-center justify-center gap-2 rounded-lg min-h-[44px] h-12 px-6 transition-colors btn-primary"
                 aria-label="View cart"
               >
-                <ShoppingCart className="h-5 w-5 text-white" />
-                <span className="text-white text-base font-bold">View Cart</span>
+                <ShoppingCart className="h-5 w-5" />
+                <span className="text-base font-bold">View Cart</span>
               </button>
             </div>
           </div>

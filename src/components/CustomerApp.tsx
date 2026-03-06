@@ -5,6 +5,7 @@ import CustomerLogin, { CustomerLoginCustomer } from './CustomerLogin';
 import CustomerMenu from './CustomerMenu';
 import CafeNotFound from './CafeNotFound';
 import LoginDialog from './ui/Dialog';
+import { GlassButton } from './ui/GlassButton';
 import { useDarkMode } from '../contexts/DarkModeContext';
 import { getImageUrl } from '../utils/imageUtils';
 import axios from 'axios';
@@ -182,10 +183,13 @@ const CustomerApp: React.FC = () => {
 
   if (cafeValid === null) {
     return (
-      <div className={`min-h-screen flex items-center justify-center ${isDarkMode ? 'bg-gray-900' : 'bg-accent-50'}`}>
+      <div className="min-h-screen flex items-center justify-center surface-page">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto mb-4"></div>
-          <p className="text-on-surface-variant">Loading cafe...</p>
+          <div
+            className="animate-spin rounded-full h-12 w-12 border-2 border-t-transparent mx-auto mb-4"
+            style={{ borderColor: 'var(--color-primary)' }}
+          />
+          <p className="text-[var(--color-on-surface-variant)]">Loading cafe...</p>
         </div>
       </div>
     );
@@ -202,7 +206,7 @@ const CustomerApp: React.FC = () => {
   })();
 
   return (
-    <div className={`min-h-screen ${isDarkMode ? 'bg-gray-900' : 'bg-accent-50'}`}>
+    <div className="min-h-screen surface-page">
       <CustomerMenu
         cafeSlug={slug}
         customer={customer}
@@ -236,28 +240,30 @@ const CustomerApp: React.FC = () => {
           <>
             {cafeBranding.logo_url && (
               <div className="flex justify-center mb-4">
-                <div className="w-14 h-14 rounded-full flex items-center justify-center overflow-hidden bg-[#b3af9b]">
+                <div className="w-14 h-14 rounded-full overflow-hidden flex-shrink-0 bg-[var(--surface-table)] border border-[var(--color-outline-variant)]">
                   <img
                     src={getImageUrl(cafeBranding.logo_url) ?? ''}
                     alt=""
-                    className="w-9 h-9 object-contain"
+                    className="w-full h-full object-cover object-center"
                   />
                 </div>
               </div>
             )}
-            <p className="text-[#b3af9b] text-sm text-center mb-4">Enter your phone number to continue</p>
+            <p className="text-sm text-center mb-4" style={{ color: 'var(--color-on-surface-variant)' }}>Enter your phone number to continue</p>
             <CustomerLogin cafeSlug={slug} onLogin={handleLogin} />
-            <div className="mt-6 pt-4 border-t border-[#b3af9b]">
-              <button
+            <div className="mt-6 pt-4 border-t border-[var(--color-outline-variant)]">
+              <GlassButton
                 onClick={() => {
                   setShowLoginModal(false);
                   setLoginIntent(null);
                 }}
-                className="w-full text-sm text-[#b3af9b] hover:text-[#0b0f05] transition-colors flex items-center justify-center min-h-[44px] py-2"
+                size="sm"
+                className="w-full glass-button-secondary"
+                contentClassName="w-full flex items-center justify-center"
               >
                 <span className="mr-2">←</span>
                 Continue browsing without login
-              </button>
+              </GlassButton>
             </div>
           </>
         )}
