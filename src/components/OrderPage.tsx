@@ -492,8 +492,8 @@ const OrderPage: React.FC<OrderPageProps> = ({ menuItems, cart: externalCart, se
                                 <FolderOpen className="h-12 w-12 text-primary opacity-40" />
                               </div>
                             )}
-                            <div className="absolute top-3 right-3 px-3 py-1.5 rounded-full bg-[var(--surface-card)]/95">
-                              <span className="font-mono text-sm font-medium text-primary">
+                            <div className="absolute top-3 right-3 menu-price-badge">
+                              <span className="font-mono text-sm font-medium menu-price-badge-text">
                                 {formatCurrency(ensureNumber(item.price))}
                               </span>
                             </div>
