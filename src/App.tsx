@@ -17,7 +17,6 @@ import InvoiceHistory from './components/InvoiceHistory';
 import InventoryManagement from './components/InventoryManagement';
 import KitchenOrders from './components/KitchenOrders';
 import CustomerManagement from './components/CustomerManagement';
-import PaymentMethodManagement from './components/PaymentMethodManagement';
 import CafeSettings from './components/CafeSettings';
 import CafeUserManagement from './components/CafeUserManagement';
 import CafeAnalytics from './components/CafeAnalytics';
@@ -191,8 +190,6 @@ function MainApp() {
         return <CafeUserManagement />;
       case 'advanced-reports':
         return <InvoiceHistory cart={cart} setCart={setCart} setCurrentPage={setCurrentPage} />;
-      case 'payment-methods':
-        return <PaymentMethodManagement />;
       default:
         return <OrderPage menuItems={menuItems} cart={cart} setCart={setCart} />;
     }

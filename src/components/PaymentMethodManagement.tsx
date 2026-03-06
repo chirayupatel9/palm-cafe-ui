@@ -3,6 +3,7 @@ import { Plus, Edit, Trash2, Save, X, ArrowUp, ArrowDown, DollarSign, Globe, Fla
 import axios from 'axios';
 import toast from 'react-hot-toast';
 import { useCurrency } from '../contexts/CurrencyContext';
+import { GlassButton } from './ui/GlassButton';
 
 const PaymentMethodManagement: React.FC = () => {
   const [activeTab, setActiveTab] = useState('payment-methods');
@@ -355,346 +356,280 @@ const PaymentMethodManagement: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-2xl font-bold text-secondary-700 dark:text-secondary-300">
-            Payment, Currency & Tax Settings
-          </h2>
-          <p className="text-gray-600 dark:text-gray-400">
-            Manage payment methods, currency settings, and tax rates
-          </p>
-        </div>
-      </div>
-
       {/* Tab Navigation */}
-      <div className="border-b border-gray-200 dark:border-gray-700">
-        <nav className="-mb-px flex space-x-8">
-          <button
-            onClick={() => setActiveTab('payment-methods')}
-            className={`py-2 px-1 border-b-2 font-medium text-sm ${
-              activeTab === 'payment-methods'
-                ? 'border-secondary-500 text-secondary-600 dark:text-secondary-400'
-                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'
-            }`}
-          >
-            <div className="flex items-center">
-              <CreditCard className="h-4 w-4 mr-2" />
-              Payment Methods
-            </div>
-          </button>
-          <button
-            onClick={() => setActiveTab('currency-settings')}
-            className={`py-2 px-1 border-b-2 font-medium text-sm ${
-              activeTab === 'currency-settings'
-                ? 'border-secondary-500 text-secondary-600 dark:text-secondary-400'
-                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'
-            }`}
-          >
-            <div className="flex items-center">
-              <DollarSign className="h-4 w-4 mr-2" />
-              Currency Settings
-            </div>
-          </button>
-          <button
-            onClick={() => setActiveTab('tax-settings')}
-            className={`py-2 px-1 border-b-2 font-medium text-sm ${
-              activeTab === 'tax-settings'
-                ? 'border-secondary-500 text-secondary-600 dark:text-secondary-400'
-                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'
-            }`}
-          >
-            <div className="flex items-center">
-              <Calculator className="h-4 w-4 mr-2" />
-              Tax Settings
-            </div>
-          </button>
-        </nav>
+      <div className="flex flex-wrap gap-2">
+        <button
+          type="button"
+          onClick={() => setActiveTab('payment-methods')}
+          className={`flex items-center justify-center gap-2 min-h-[44px] px-4 rounded-xl font-semibold text-sm ${activeTab === 'payment-methods' ? 'glass-option-btn-selected' : 'glass-option-btn'}`}
+        >
+          <CreditCard className="h-4 w-4 shrink-0" />
+          Payment Methods
+        </button>
+        <button
+          type="button"
+          onClick={() => setActiveTab('currency-settings')}
+          className={`flex items-center justify-center gap-2 min-h-[44px] px-4 rounded-xl font-semibold text-sm ${activeTab === 'currency-settings' ? 'glass-option-btn-selected' : 'glass-option-btn'}`}
+        >
+          <DollarSign className="h-4 w-4 shrink-0" />
+          Currency Settings
+        </button>
+        <button
+          type="button"
+          onClick={() => setActiveTab('tax-settings')}
+          className={`flex items-center justify-center gap-2 min-h-[44px] px-4 rounded-xl font-semibold text-sm ${activeTab === 'tax-settings' ? 'glass-option-btn-selected' : 'glass-option-btn'}`}
+        >
+          <Calculator className="h-4 w-4 shrink-0" />
+          Tax Settings
+        </button>
       </div>
 
       {/* Payment Methods Tab */}
       {activeTab === 'payment-methods' && (
         <div className="space-y-6">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
-              <h3 className="text-xl font-semibold text-secondary-700 dark:text-secondary-300">
+              <h3 className="text-lg font-semibold text-[var(--color-on-surface)]">
                 Payment Methods
               </h3>
-              <p className="text-gray-600 dark:text-gray-400">
+              <p className="text-sm text-[var(--color-on-surface-variant)] mt-0.5">
                 Manage payment methods for customer orders
               </p>
             </div>
-            <button
+            <GlassButton
+              type="button"
               onClick={() => setShowForm(true)}
-              className="bg-secondary-500 text-white px-4 py-2 rounded-lg hover:bg-secondary-600 transition-colors flex items-center"
+              size="default"
+              className="glass-button-primary shrink-0"
+              contentClassName="inline-flex items-center gap-2"
             >
-              <Plus className="h-4 w-4 mr-2" />
+              <Plus className="h-4 w-4" />
               Add Payment Method
-            </button>
+            </GlassButton>
           </div>
 
-      {/* Form */}
-      {showForm && (
-        <div className="bg-surface-card rounded-lg shadow-md p-6">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-secondary-700 dark:text-secondary-300">
-              {editingId ? 'Edit Payment Method' : 'Add Payment Method'}
-            </h3>
-            <button
-              onClick={cancelEdit}
-              className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
-            >
-              <X className="h-5 w-5" />
-            </button>
-          </div>
-
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Name *
-                </label>
-                <input
-                  type="text"
-                  value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-secondary-500 focus:border-transparent"
-                  required
-                />
+          {/* Form */}
+          {showForm && (
+            <div className="glass-card rounded-2xl overflow-hidden p-5 space-y-4">
+              <div className="flex items-center justify-between">
+                <h4 className="text-[var(--color-on-surface)] font-semibold">
+                  {editingId ? 'Edit Payment Method' : 'Add Payment Method'}
+                </h4>
+                <button
+                  type="button"
+                  onClick={cancelEdit}
+                  className="p-1.5 rounded-lg text-[var(--color-on-surface-variant)] hover:bg-[var(--surface-table)]/60 hover:text-[var(--color-on-surface)]"
+                  aria-label="Close"
+                >
+                  <X className="h-5 w-5" />
+                </button>
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Code *
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-[var(--color-on-surface)] mb-1.5">Name *</label>
+                    <input
+                      type="text"
+                      value={formData.name}
+                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                      className="glass-input w-full rounded-xl border border-[var(--color-outline-variant)] bg-[var(--surface-card)] text-[var(--color-on-surface)] placeholder-[var(--color-on-surface-variant)] px-4 py-2.5"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-[var(--color-on-surface)] mb-1.5">Code *</label>
+                    <input
+                      type="text"
+                      value={formData.code}
+                      onChange={(e) => setFormData({ ...formData, code: e.target.value.toLowerCase() })}
+                      className="glass-input w-full rounded-xl border border-[var(--color-outline-variant)] bg-[var(--surface-card)] text-[var(--color-on-surface)] px-4 py-2.5 disabled:opacity-60"
+                      required
+                      disabled={!!editingId}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-[var(--color-on-surface)] mb-1.5">Icon</label>
+                    <input
+                      type="text"
+                      value={formData.icon}
+                      onChange={(e) => setFormData({ ...formData, icon: e.target.value })}
+                      className="glass-input w-full rounded-xl border border-[var(--color-outline-variant)] bg-[var(--surface-card)] text-[var(--color-on-surface)] placeholder-[var(--color-on-surface-variant)] px-4 py-2.5"
+                      placeholder="💵"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-[var(--color-on-surface)] mb-1.5">Display Order</label>
+                    <input
+                      type="number"
+                      value={formData.display_order}
+                      onChange={(e) => setFormData({ ...formData, display_order: parseInt(e.target.value) || 0 })}
+                      className="glass-input w-full rounded-xl border border-[var(--color-outline-variant)] bg-[var(--surface-card)] text-[var(--color-on-surface)] px-4 py-2.5"
+                      min={0}
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-[var(--color-on-surface)] mb-1.5">Description</label>
+                  <textarea
+                    value={formData.description}
+                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                    className="glass-input w-full rounded-xl border border-[var(--color-outline-variant)] bg-[var(--surface-card)] text-[var(--color-on-surface)] placeholder-[var(--color-on-surface-variant)] px-4 py-2.5 min-h-[80px]"
+                    rows={3}
+                    placeholder="Brief description of the payment method"
+                  />
+                </div>
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    id="is_active"
+                    checked={formData.is_active}
+                    onChange={(e) => setFormData({ ...formData, is_active: e.target.checked })}
+                    className="rounded border-[var(--color-outline)] text-[var(--color-primary)] focus:ring-[var(--color-primary)]"
+                  />
+                  <span className="text-sm text-[var(--color-on-surface)]">Active</span>
                 </label>
-                <input
-                  type="text"
-                  value={formData.code}
-                  onChange={(e) => setFormData({ ...formData, code: e.target.value.toLowerCase() })}
-                  className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-secondary-500 focus:border-transparent"
-                  required
-                  disabled={editingId} // Code cannot be changed after creation
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Icon
-                </label>
-                <input
-                  type="text"
-                  value={formData.icon}
-                  onChange={(e) => setFormData({ ...formData, icon: e.target.value })}
-                  className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-secondary-500 focus:border-transparent"
-                  placeholder="💵"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Display Order
-                </label>
-                <input
-                  type="number"
-                  value={formData.display_order}
-                  onChange={(e) => setFormData({ ...formData, display_order: parseInt(e.target.value) || 0 })}
-                  className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-secondary-500 focus:border-transparent"
-                  min="0"
-                />
-              </div>
+                <div className="flex flex-wrap gap-2 pt-2">
+                  <GlassButton type="button" onClick={cancelEdit} size="default" className="glass-button-secondary" contentClassName="inline-flex items-center gap-2">
+                    Cancel
+                  </GlassButton>
+                  <GlassButton type="submit" size="default" className="glass-button-primary" contentClassName="inline-flex items-center gap-2">
+                    <Save className="h-4 w-4" />
+                    {editingId ? 'Update' : 'Create'}
+                  </GlassButton>
+                </div>
+              </form>
             </div>
+          )}
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Description
-              </label>
-              <textarea
-                value={formData.description}
-                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-secondary-500 focus:border-transparent"
-                rows={3}
-                placeholder="Brief description of the payment method"
-              />
-            </div>
-
-            <div className="flex items-center">
-              <input
-                type="checkbox"
-                id="is_active"
-                checked={formData.is_active}
-                onChange={(e) => setFormData({ ...formData, is_active: e.target.checked })}
-                className="h-4 w-4 text-secondary-500 focus:ring-secondary-500 border-gray-300 rounded"
-              />
-              <label htmlFor="is_active" className="ml-2 text-sm text-gray-700 dark:text-gray-300">
-                Active
-              </label>
-            </div>
-
-            <div className="flex justify-end space-x-3">
-              <button
-                type="button"
-                onClick={cancelEdit}
-                className="px-4 py-2 text-gray-700 bg-gray-200 rounded-lg hover:bg-gray-300 transition-colors"
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                className="px-4 py-2 bg-secondary-500 text-white rounded-lg hover:bg-secondary-600 transition-colors flex items-center"
-              >
-                <Save className="h-4 w-4 mr-2" />
-                {editingId ? 'Update' : 'Create'}
-              </button>
-            </div>
-          </form>
-        </div>
-      )}
-
-      {/* Payment Methods List */}
-      <div className="bg-surface-card rounded-lg shadow-md overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-            <thead className="bg-gray-50 dark:bg-gray-700">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                  Order
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                  Payment Method
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                  Code
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                  Status
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-surface-card divide-y divide-gray-200 dark:divide-gray-700">
-              {paymentMethods.map((method, index) => (
-                <tr key={method.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300">
-                    <div className="flex items-center space-x-1">
-                      <button
-                        onClick={() => handleReorder(method.id, 'up')}
-                        disabled={index === 0}
-                        className="p-1 text-gray-400 hover:text-gray-600 disabled:opacity-50"
-                      >
-                        <ArrowUp className="h-4 w-4" />
-                      </button>
-                      <span className="font-medium">{method.display_order}</span>
-                      <button
-                        onClick={() => handleReorder(method.id, 'down')}
-                        disabled={index === paymentMethods.length - 1}
-                        className="p-1 text-gray-400 hover:text-gray-600 disabled:opacity-50"
-                      >
-                        <ArrowDown className="h-4 w-4" />
-                      </button>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="flex items-center">
-                      <span className="text-lg mr-2">{method.icon}</span>
-                      <div>
-                        <div className="text-sm font-medium text-gray-900 dark:text-gray-300">
-                          {method.name}
+          {/* Payment Methods List */}
+          <div className="glass-card overflow-hidden rounded-2xl shadow-sm">
+            <div className="overflow-x-auto">
+              <table className="min-w-full">
+                <thead>
+                  <tr className="bg-[var(--surface-table)]/60 text-[var(--color-on-surface)]">
+                    <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider border-b border-[var(--color-outline)]/20">Order</th>
+                    <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider border-b border-[var(--color-outline)]/20">Payment Method</th>
+                    <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider border-b border-[var(--color-outline)]/20">Code</th>
+                    <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider border-b border-[var(--color-outline)]/20">Status</th>
+                    <th className="px-6 py-4 text-right text-xs font-semibold uppercase tracking-wider border-b border-[var(--color-outline)]/20">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-[var(--color-outline)]/30">
+                  {paymentMethods.map((method, index) => (
+                    <tr key={method.id} className="hover:bg-[var(--surface-table)]/50 transition-colors">
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="flex items-center gap-0.5">
+                          <button
+                            type="button"
+                            onClick={() => handleReorder(method.id, 'up')}
+                            disabled={index === 0}
+                            className="p-1.5 rounded-lg text-[var(--color-on-surface-variant)] hover:bg-[var(--surface-table)]/60 hover:text-[var(--color-on-surface)] disabled:opacity-40 disabled:cursor-not-allowed"
+                            aria-label="Move up"
+                          >
+                            <ArrowUp className="h-4 w-4" />
+                          </button>
+                          <span className="text-sm font-medium text-[var(--color-on-surface)] w-6 text-center tabular-nums">{method.display_order}</span>
+                          <button
+                            type="button"
+                            onClick={() => handleReorder(method.id, 'down')}
+                            disabled={index === paymentMethods.length - 1}
+                            className="p-1.5 rounded-lg text-[var(--color-on-surface-variant)] hover:bg-[var(--surface-table)]/60 hover:text-[var(--color-on-surface)] disabled:opacity-40 disabled:cursor-not-allowed"
+                            aria-label="Move down"
+                          >
+                            <ArrowDown className="h-4 w-4" />
+                          </button>
                         </div>
-                        {method.description && (
-                          <div className="text-sm text-gray-500 dark:text-gray-400">
-                            {method.description}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="flex items-center">
+                          {method.icon && <span className="text-lg mr-2">{method.icon}</span>}
+                          <div>
+                            <div className="text-sm font-medium text-[var(--color-on-surface)]">{method.name}</div>
+                            {method.description && (
+                              <div className="text-sm text-[var(--color-on-surface-variant)]">{method.description}</div>
+                            )}
                           </div>
-                        )}
-                      </div>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300">
-                    <code className="bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded text-xs">
-                      {method.code}
-                    </code>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span
-                      className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                        method.is_active
-                          ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
-                          : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
-                      }`}
-                    >
-                      {method.is_active ? 'Active' : 'Inactive'}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                    <div className="flex items-center space-x-2">
-                      <button
-                        onClick={() => handleToggleStatus(method.id)}
-                        className={`px-2 py-1 text-xs rounded ${
-                          method.is_active
-                            ? 'bg-red-100 text-red-700 hover:bg-red-200'
-                            : 'bg-green-100 text-green-700 hover:bg-green-200'
-                        }`}
-                      >
-                        {method.is_active ? 'Deactivate' : 'Activate'}
-                      </button>
-                      <button
-                        onClick={() => handleEdit(method)}
-                        className="text-secondary-600 hover:text-secondary-900 dark:text-secondary-400 dark:hover:text-secondary-300"
-                      >
-                        <Edit className="h-4 w-4" />
-                      </button>
-                      <button
-                        onClick={() => handleDelete(method.id)}
-                        className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <code className="inline-flex px-2.5 py-0.5 rounded-full text-xs font-medium bg-[var(--surface-table)]/80 text-[var(--color-on-surface)]">
+                          {method.code}
+                        </code>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span
+                          className={`inline-flex px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                            method.is_active
+                              ? 'bg-[var(--color-success)]/15 text-[var(--color-success)]'
+                              : 'bg-[var(--color-error)]/15 text-[var(--color-error)]'
+                          }`}
+                        >
+                          {method.is_active ? 'Active' : 'Inactive'}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                        <div className="flex items-center justify-end gap-1.5">
+                          <button
+                            type="button"
+                            onClick={() => handleToggleStatus(method.id)}
+                            className={`text-xs font-medium px-2 py-1 rounded-lg ${
+                              method.is_active
+                                ? 'text-[var(--color-error)] hover:bg-[var(--color-error)]/10'
+                                : 'text-[var(--color-success)] hover:bg-[var(--color-success)]/10'
+                            }`}
+                          >
+                            {method.is_active ? 'Deactivate' : 'Activate'}
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleEdit(method)}
+                            className="p-1.5 rounded-lg text-[var(--color-on-surface-variant)] hover:bg-[var(--surface-table)]/60 hover:text-[var(--color-primary)] transition-colors"
+                            title="Edit"
+                          >
+                            <Edit className="h-4 w-4" />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleDelete(method.id)}
+                            className="p-1.5 rounded-lg text-[var(--color-on-surface-variant)] hover:bg-[var(--color-error)]/10 hover:text-[var(--color-error)] transition-colors"
+                            title="Delete"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
         </div>
       )}
 
       {/* Currency Settings Tab */}
       {activeTab === 'currency-settings' && (
         <div className="space-y-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <h3 className="text-xl font-semibold text-secondary-700 dark:text-secondary-300">
-                Currency Settings
-              </h3>
-              <p className="text-gray-600 dark:text-gray-400">
-                Manage currency display and formatting
-              </p>
-            </div>
+          <div>
+            <h3 className="text-lg font-semibold text-[var(--color-on-surface)]">Currency Settings</h3>
+            <p className="text-sm text-[var(--color-on-surface-variant)] mt-0.5">Manage currency display and formatting</p>
           </div>
 
-          {/* Current Settings */}
-          <div className="bg-surface-card rounded-lg shadow-md p-6">
-            <div className="flex items-center justify-between mb-4">
-              <h4 className="text-lg font-semibold text-secondary-700 dark:text-secondary-300">
-                Current Currency Settings
-              </h4>
+          <div className="glass-card rounded-2xl overflow-hidden p-5 space-y-4">
+            <div className="flex items-center justify-between">
+              <h4 className="text-[var(--color-on-surface)] font-semibold">Current Currency Settings</h4>
               {!isEditingCurrency && (
-                <button
-                  onClick={handleCurrencyEdit}
-                  className="bg-secondary-500 text-white px-3 py-1 rounded-lg hover:bg-secondary-600 transition-colors flex items-center text-sm"
-                >
-                  <Edit className="h-4 w-4 mr-1" />
+                <GlassButton type="button" onClick={handleCurrencyEdit} size="sm" className="glass-button-primary" contentClassName="inline-flex items-center gap-2">
+                  <Edit className="h-4 w-4" />
                   Edit
-                </button>
+                </GlassButton>
               )}
             </div>
 
             {currencyError && (
-              <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
-                <p className="text-sm text-red-600">{currencyError}</p>
+              <div className="p-3 rounded-xl border" style={{ backgroundColor: 'color-mix(in srgb, var(--color-error) 12%, transparent)', borderColor: 'var(--color-error)' }}>
+                <p className="text-sm" style={{ color: 'var(--color-error)' }}>{currencyError}</p>
               </div>
             )}
 
@@ -702,159 +637,114 @@ const PaymentMethodManagement: React.FC = () => {
               <form onSubmit={handleCurrencySubmit} className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      Currency Code *
-                    </label>
+                    <label className="block text-sm font-medium text-[var(--color-on-surface)] mb-1.5">Currency Code *</label>
                     <input
                       type="text"
                       name="currency_code"
                       value={currencyFormData.currency_code}
                       onChange={handleCurrencyInputChange}
-                      className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-secondary-500 focus:border-transparent"
+                      className="glass-input w-full rounded-xl border border-[var(--color-outline-variant)] bg-[var(--surface-card)] text-[var(--color-on-surface)] placeholder-[var(--color-on-surface-variant)] px-4 py-2.5"
                       required
                       placeholder="INR"
                     />
                   </div>
-
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      Currency Symbol *
-                    </label>
+                    <label className="block text-sm font-medium text-[var(--color-on-surface)] mb-1.5">Currency Symbol *</label>
                     <input
                       type="text"
                       name="currency_symbol"
                       value={currencyFormData.currency_symbol}
                       onChange={handleCurrencyInputChange}
-                      className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-secondary-500 focus:border-transparent"
+                      className="glass-input w-full rounded-xl border border-[var(--color-outline-variant)] bg-[var(--surface-card)] text-[var(--color-on-surface)] placeholder-[var(--color-on-surface-variant)] px-4 py-2.5"
                       required
                       placeholder="₹"
                     />
                   </div>
-
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      Currency Name *
-                    </label>
+                    <label className="block text-sm font-medium text-[var(--color-on-surface)] mb-1.5">Currency Name *</label>
                     <input
                       type="text"
                       name="currency_name"
                       value={currencyFormData.currency_name}
                       onChange={handleCurrencyInputChange}
-                      className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-secondary-500 focus:border-transparent"
+                      className="glass-input w-full rounded-xl border border-[var(--color-outline-variant)] bg-[var(--surface-card)] text-[var(--color-on-surface)] placeholder-[var(--color-on-surface-variant)] px-4 py-2.5"
                       required
                       placeholder="Indian Rupee"
                     />
                   </div>
                 </div>
-
-                <div className="flex items-center space-x-3">
-                  <button
-                    type="submit"
-                    disabled={currencyLoading}
-                    className="bg-secondary-500 text-white px-4 py-2 rounded-lg hover:bg-secondary-600 transition-colors disabled:opacity-50 flex items-center"
-                  >
-                    <Save className="h-4 w-4 mr-2" />
+                <div className="flex flex-wrap gap-2">
+                  <GlassButton type="submit" disabled={currencyLoading} size="default" className="glass-button-primary disabled:opacity-50" contentClassName="inline-flex items-center gap-2">
+                    <Save className="h-4 w-4" />
                     {currencyLoading ? 'Saving...' : 'Save Changes'}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={handleCurrencyCancel}
-                    className="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition-colors flex items-center"
-                  >
-                    <X className="h-4 w-4 mr-2" />
+                  </GlassButton>
+                  <GlassButton type="button" onClick={handleCurrencyCancel} size="default" className="glass-button-secondary" contentClassName="inline-flex items-center gap-2">
+                    <X className="h-4 w-4" />
                     Cancel
-                  </button>
+                  </GlassButton>
                 </div>
               </form>
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div className="bg-gradient-to-br from-warm-50 to-warm-100 dark:from-warm-900/30 dark:to-warm-800/20 p-6 rounded-xl border border-warm-200 dark:border-warm-700 shadow-sm hover:shadow-md transition-all duration-200">
-                  <div className="flex items-center mb-3">
-                    <div className="p-2 bg-secondary-100 dark:bg-secondary-800/50 rounded-lg mr-3">
-                      <Flag className="h-5 w-5 text-secondary-600 dark:text-secondary-400" />
+                <div className="p-4 rounded-xl border border-[var(--color-outline)]/30 bg-[var(--surface-table)]/40">
+                  <div className="flex items-center gap-2 mb-2">
+                    <div className="p-1.5 rounded-lg bg-[var(--color-primary-container)]">
+                      <Flag className="h-4 w-4 text-[var(--color-primary)]" />
                     </div>
-                    <h5 className="text-sm font-semibold text-secondary-700 dark:text-secondary-300 uppercase tracking-wide">Currency Code</h5>
+                    <span className="text-xs font-medium uppercase tracking-wider text-[var(--color-on-surface-variant)]">Currency Code</span>
                   </div>
-                  <p className="text-xl font-bold text-secondary-800 dark:text-secondary-200">
-                    {currentCurrencySettings?.currency_code || 'Not set'}
-                  </p>
+                  <p className="text-lg font-semibold text-[var(--color-on-surface)]">{currentCurrencySettings?.currency_code || 'Not set'}</p>
                 </div>
-
-                <div className="bg-gradient-to-br from-warm-50 to-warm-100 dark:from-warm-900/30 dark:to-warm-800/20 p-6 rounded-xl border border-warm-200 dark:border-warm-700 shadow-sm hover:shadow-md transition-all duration-200">
-                  <div className="flex items-center mb-3">
-                    <div className="p-2 bg-secondary-100 dark:bg-secondary-800/50 rounded-lg mr-3">
-                      <DollarSign className="h-5 w-5 text-secondary-600 dark:text-secondary-400" />
+                <div className="p-4 rounded-xl border border-[var(--color-outline)]/30 bg-[var(--surface-table)]/40">
+                  <div className="flex items-center gap-2 mb-2">
+                    <div className="p-1.5 rounded-lg bg-[var(--color-primary-container)]">
+                      <DollarSign className="h-4 w-4 text-[var(--color-primary)]" />
                     </div>
-                    <h5 className="text-sm font-semibold text-secondary-700 dark:text-secondary-300 uppercase tracking-wide">Currency Symbol</h5>
+                    <span className="text-xs font-medium uppercase tracking-wider text-[var(--color-on-surface-variant)]">Currency Symbol</span>
                   </div>
-                  <p className="text-xl font-bold text-secondary-800 dark:text-secondary-200">
-                    {currentCurrencySettings?.currency_symbol || 'Not set'}
-                  </p>
+                  <p className="text-lg font-semibold text-[var(--color-on-surface)]">{currentCurrencySettings?.currency_symbol || 'Not set'}</p>
                 </div>
-
-                <div className="bg-gradient-to-br from-warm-50 to-warm-100 dark:from-warm-900/30 dark:to-warm-800/20 p-6 rounded-xl border border-warm-200 dark:border-warm-700 shadow-sm hover:shadow-md transition-all duration-200">
-                  <div className="flex items-center mb-3">
-                    <div className="p-2 bg-secondary-100 dark:bg-secondary-800/50 rounded-lg mr-3">
-                      <Globe className="h-5 w-5 text-secondary-600 dark:text-secondary-400" />
+                <div className="p-4 rounded-xl border border-[var(--color-outline)]/30 bg-[var(--surface-table)]/40">
+                  <div className="flex items-center gap-2 mb-2">
+                    <div className="p-1.5 rounded-lg bg-[var(--color-primary-container)]">
+                      <Globe className="h-4 w-4 text-[var(--color-primary)]" />
                     </div>
-                    <h5 className="text-sm font-semibold text-secondary-700 dark:text-secondary-300 uppercase tracking-wide">Currency Name</h5>
+                    <span className="text-xs font-medium uppercase tracking-wider text-[var(--color-on-surface-variant)]">Currency Name</span>
                   </div>
-                  <p className="text-xl font-bold text-secondary-800 dark:text-secondary-200">
-                    {currentCurrencySettings?.currency_name || 'Not set'}
-                  </p>
+                  <p className="text-lg font-semibold text-[var(--color-on-surface)]">{currentCurrencySettings?.currency_name || 'Not set'}</p>
                 </div>
               </div>
             )}
           </div>
 
-          {/* Currency History */}
-          <div className="bg-surface-card rounded-lg shadow-md p-6">
-            <h4 className="text-lg font-semibold text-secondary-700 dark:text-secondary-300 mb-4 flex items-center">
-              <Calendar className="h-5 w-5 mr-2" />
+          <div className="glass-card rounded-2xl overflow-hidden p-5">
+            <h4 className="text-[var(--color-on-surface)] font-semibold mb-4 flex items-center gap-2">
+              <Calendar className="h-5 w-5 text-[var(--color-on-surface-variant)]" />
               Currency History
             </h4>
-            
             {currencyHistory.length === 0 ? (
-              <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+              <div className="text-center py-8 text-[var(--color-on-surface-variant)]">
                 <Globe className="h-12 w-12 mx-auto mb-3 opacity-50" />
                 <p>No currency history available</p>
               </div>
             ) : (
               <div className="overflow-x-auto">
-                <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                  <thead className="bg-gray-50 dark:bg-gray-700">
-                    <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                        Date
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                        Currency Code
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                        Currency Symbol
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                        Currency Name
-                      </th>
+                <table className="min-w-full">
+                  <thead>
+                    <tr className="bg-[var(--surface-table)]/60 text-[var(--color-on-surface)]">
+                      <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider border-b border-[var(--color-outline)]/20">Date</th>
+                      <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider border-b border-[var(--color-outline)]/20">Currency Code</th>
+                      <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider border-b border-[var(--color-outline)]/20">Currency Symbol</th>
+                      <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider border-b border-[var(--color-outline)]/20">Currency Name</th>
                     </tr>
                   </thead>
-                  <tbody className="bg-surface-card divide-y divide-gray-200 dark:divide-gray-700">
+                  <tbody className="divide-y divide-[var(--color-outline)]/30">
                     {currencyHistory.map((record, index) => (
-                      <tr key={index} className="hover:bg-gray-50 dark:hover:bg-gray-700">
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300">
-                          {new Date(record.created_at).toLocaleDateString()}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300">
-                          <code className="bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded text-xs">
-                            {record.currency_code}
-                          </code>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300">
-                          {record.currency_symbol}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300">
-                          {record.currency_name}
-                        </td>
+                      <tr key={index} className="hover:bg-[var(--surface-table)]/50 transition-colors">
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-[var(--color-on-surface)]">{new Date(record.created_at).toLocaleDateString()}</td>
+                        <td className="px-6 py-4 whitespace-nowrap"><code className="text-xs px-2.5 py-0.5 rounded-full font-medium bg-[var(--surface-table)]/80 text-[var(--color-on-surface)]">{record.currency_code}</code></td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-[var(--color-on-surface)]">{record.currency_symbol}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-[var(--color-on-surface)]">{record.currency_name}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -868,231 +758,167 @@ const PaymentMethodManagement: React.FC = () => {
       {/* Tax Settings Tab */}
       {activeTab === 'tax-settings' && (
         <div className="space-y-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <h3 className="text-xl font-semibold text-secondary-700 dark:text-secondary-300">
-                Tax Settings
-              </h3>
-              <p className="text-gray-600 dark:text-gray-400">
-                Manage tax rates and settings for your cafe
-              </p>
-            </div>
+          <div>
+            <h3 className="text-lg font-semibold text-[var(--color-on-surface)]">Tax Settings</h3>
+            <p className="text-sm text-[var(--color-on-surface-variant)] mt-0.5">Manage tax rates and settings for your cafe</p>
           </div>
 
           {taxError && (
-            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
-              {taxError}
+            <div className="p-3 rounded-xl border" style={{ backgroundColor: 'color-mix(in srgb, var(--color-error) 12%, transparent)', borderColor: 'var(--color-error)' }}>
+              <p className="text-sm" style={{ color: 'var(--color-error)' }}>{taxError}</p>
             </div>
           )}
 
-          {/* Current Tax Settings */}
-          <div className="bg-surface-card rounded-lg shadow-md p-6">
-            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-4 space-y-2 sm:space-y-0">
-              <h3 className="text-lg font-semibold text-secondary-700 dark:text-secondary-300">Current Tax Settings</h3>
+          <div className="glass-card rounded-2xl overflow-hidden p-5 space-y-4">
+            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2">
+              <h4 className="text-[var(--color-on-surface)] font-semibold">Current Tax Settings</h4>
               {!isEditingTax && (
-                <button
-                  onClick={handleTaxEdit}
-                  className="btn-primary flex items-center justify-center text-sm"
-                >
-                  <Edit className="h-4 w-4 mr-2" />
+                <GlassButton type="button" onClick={handleTaxEdit} size="sm" className="glass-button-primary" contentClassName="inline-flex items-center gap-2">
+                  <Edit className="h-4 w-4" />
                   Edit Settings
-                </button>
+                </GlassButton>
               )}
             </div>
 
             {isEditingTax ? (
               <form onSubmit={handleTaxSubmit} className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-secondary-700 dark:text-secondary-300 mb-2">
-                    Tax Name
-                  </label>
+                  <label className="block text-sm font-medium text-[var(--color-on-surface)] mb-1.5">Tax Name</label>
                   <input
                     type="text"
                     name="tax_name"
                     value={taxFormData.tax_name}
                     onChange={handleTaxInputChange}
-                    className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-secondary-500 focus:border-transparent"
+                    className="glass-input w-full rounded-xl border border-[var(--color-outline-variant)] bg-[var(--surface-card)] text-[var(--color-on-surface)] placeholder-[var(--color-on-surface-variant)] px-4 py-2.5"
                     placeholder="e.g., Sales Tax, VAT"
                     required
                   />
                 </div>
-                
                 <div>
-                  <label className="block text-sm font-medium text-secondary-700 dark:text-secondary-300 mb-2">
-                    Tax Rate (%)
-                  </label>
+                  <label className="block text-sm font-medium text-[var(--color-on-surface)] mb-1.5">Tax Rate (%)</label>
                   <input
                     type="number"
                     name="tax_rate"
                     value={taxFormData.tax_rate}
                     onChange={handleTaxInputChange}
                     step="0.01"
-                    min="0"
-                    max="100"
-                    className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-secondary-500 focus:border-transparent"
+                    min={0}
+                    max={100}
+                    className="glass-input w-full rounded-xl border border-[var(--color-outline-variant)] bg-[var(--surface-card)] text-[var(--color-on-surface)] placeholder-[var(--color-on-surface-variant)] px-4 py-2.5"
                     placeholder="e.g., 8.5"
                     required
                   />
                 </div>
-
-                <div className="flex items-center">
+                <label className="flex items-center gap-2 cursor-pointer">
                   <input
                     type="checkbox"
                     id="show_tax_in_menu"
                     name="show_tax_in_menu"
                     checked={taxFormData.show_tax_in_menu}
                     onChange={(e) => setTaxFormData(prev => ({ ...prev, show_tax_in_menu: e.target.checked }))}
-                    className="h-4 w-4 text-secondary-500 focus:ring-secondary-500 border-gray-300 rounded"
+                    className="rounded border-[var(--color-outline)] text-[var(--color-primary)] focus:ring-[var(--color-primary)]"
                   />
-                  <label htmlFor="show_tax_in_menu" className="ml-2 text-sm text-secondary-700 dark:text-secondary-300">
-                    Show tax rate on customer ordering page
-                  </label>
-                </div>
-
-                <div className="flex items-center">
+                  <span className="text-sm text-[var(--color-on-surface)]">Show tax rate on customer ordering page</span>
+                </label>
+                <label className="flex items-center gap-2 cursor-pointer">
                   <input
                     type="checkbox"
                     id="include_tax"
                     name="include_tax"
                     checked={taxFormData.include_tax}
                     onChange={(e) => setTaxFormData(prev => ({ ...prev, include_tax: e.target.checked }))}
-                    className="h-4 w-4 text-secondary-500 focus:ring-secondary-500 border-gray-300 rounded"
+                    className="rounded border-[var(--color-outline)] text-[var(--color-primary)] focus:ring-[var(--color-primary)]"
                   />
-                  <label htmlFor="include_tax" className="ml-2 text-sm text-secondary-700 dark:text-secondary-300">
-                    Include tax in order calculations
-                  </label>
-                </div>
-
-                <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3">
-                  <button
-                    type="submit"
-                    disabled={taxLoading}
-                    className="btn-primary flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    <Save className="h-4 w-4 mr-2" />
+                  <span className="text-sm text-[var(--color-on-surface)]">Include tax in order calculations</span>
+                </label>
+                <div className="flex flex-wrap gap-2 pt-2">
+                  <GlassButton type="submit" disabled={taxLoading} size="default" className="glass-button-primary disabled:opacity-50" contentClassName="inline-flex items-center gap-2">
+                    <Save className="h-4 w-4" />
                     {taxLoading ? 'Saving...' : 'Save Changes'}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={handleTaxCancel}
-                    className="btn-secondary flex items-center justify-center"
-                  >
-                    <X className="h-4 w-4 mr-2" />
+                  </GlassButton>
+                  <GlassButton type="button" onClick={handleTaxCancel} size="default" className="glass-button-secondary" contentClassName="inline-flex items-center gap-2">
+                    <X className="h-4 w-4" />
                     Cancel
-                  </button>
+                  </GlassButton>
                 </div>
               </form>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-                <div className="bg-gradient-to-br from-warm-50 to-warm-100 dark:from-warm-900/30 dark:to-warm-800/20 p-6 rounded-xl border border-warm-200 dark:border-warm-700 shadow-sm hover:shadow-md transition-all duration-200">
-                  <div className="flex items-center mb-3">
-                    <div className="p-2 bg-secondary-100 dark:bg-secondary-800/50 rounded-lg mr-3">
-                      <Calculator className="h-5 w-5 text-secondary-600 dark:text-secondary-400" />
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div className="p-4 rounded-xl border border-[var(--color-outline)]/30 bg-[var(--surface-table)]/40">
+                  <div className="flex items-center gap-2 mb-2">
+                    <div className="p-1.5 rounded-lg bg-[var(--color-primary-container)]">
+                      <Calculator className="h-4 w-4 text-[var(--color-primary)]" />
                     </div>
-                    <h5 className="text-sm font-semibold text-secondary-700 dark:text-secondary-300 uppercase tracking-wide">Tax Name</h5>
+                    <span className="text-xs font-medium uppercase tracking-wider text-[var(--color-on-surface-variant)]">Tax Name</span>
                   </div>
-                  <p className="text-xl font-bold text-secondary-800 dark:text-secondary-200">
-                    {currentTaxSettings?.tax_name || 'Not set'}
-                  </p>
+                  <p className="text-lg font-semibold text-[var(--color-on-surface)]">{currentTaxSettings?.tax_name || 'Not set'}</p>
                 </div>
-                <div className="bg-gradient-to-br from-warm-50 to-warm-100 dark:from-warm-900/30 dark:to-warm-800/20 p-6 rounded-xl border border-warm-200 dark:border-warm-700 shadow-sm hover:shadow-md transition-all duration-200">
-                  <div className="flex items-center mb-3">
-                    <div className="p-2 bg-secondary-100 dark:bg-secondary-800/50 rounded-lg mr-3">
-                      <Percent className="h-5 w-5 text-secondary-600 dark:text-secondary-400" />
+                <div className="p-4 rounded-xl border border-[var(--color-outline)]/30 bg-[var(--surface-table)]/40">
+                  <div className="flex items-center gap-2 mb-2">
+                    <div className="p-1.5 rounded-lg bg-[var(--color-primary-container)]">
+                      <Percent className="h-4 w-4 text-[var(--color-primary)]" />
                     </div>
-                    <h5 className="text-sm font-semibold text-secondary-700 dark:text-secondary-300 uppercase tracking-wide">Tax Rate</h5>
+                    <span className="text-xs font-medium uppercase tracking-wider text-[var(--color-on-surface-variant)]">Tax Rate</span>
                   </div>
-                  <p className="text-xl font-bold text-secondary-800 dark:text-secondary-200">
-                    {currentTaxSettings?.tax_rate ? `${currentTaxSettings.tax_rate}%` : '0%'}
-                  </p>
+                  <p className="text-lg font-semibold text-[var(--color-on-surface)]">{currentTaxSettings?.tax_rate ? `${currentTaxSettings.tax_rate}%` : '0%'}</p>
                 </div>
-                <div className="bg-gradient-to-br from-warm-50 to-warm-100 dark:from-warm-900/30 dark:to-warm-800/20 p-6 rounded-xl border border-warm-200 dark:border-warm-700 shadow-sm hover:shadow-md transition-all duration-200">
-                  <div className="flex items-center mb-3">
-                    <div className="p-2 bg-secondary-100 dark:bg-secondary-800/50 rounded-lg mr-3">
-                      <Calculator className="h-5 w-5 text-secondary-600 dark:text-secondary-400" />
+                <div className="p-4 rounded-xl border border-[var(--color-outline)]/30 bg-[var(--surface-table)]/40">
+                  <div className="flex items-center gap-2 mb-2">
+                    <div className="p-1.5 rounded-lg bg-[var(--color-primary-container)]">
+                      <Calculator className="h-4 w-4 text-[var(--color-primary)]" />
                     </div>
-                    <h5 className="text-sm font-semibold text-secondary-700 dark:text-secondary-300 uppercase tracking-wide">Customer Display</h5>
+                    <span className="text-xs font-medium uppercase tracking-wider text-[var(--color-on-surface-variant)]">Customer Display</span>
                   </div>
-                  <p className="text-xl font-bold text-secondary-800 dark:text-secondary-200">
-                    {currentTaxSettings?.show_tax_in_menu ? 'Tax Rate Visible' : 'Tax Rate Hidden'}
-                  </p>
+                  <p className="text-lg font-semibold text-[var(--color-on-surface)]">{currentTaxSettings?.show_tax_in_menu ? 'Tax Rate Visible' : 'Tax Rate Hidden'}</p>
                 </div>
-                <div className="bg-gradient-to-br from-warm-50 to-warm-100 dark:from-warm-900/30 dark:to-warm-800/20 p-6 rounded-xl border border-warm-200 dark:border-warm-700 shadow-sm hover:shadow-md transition-all duration-200">
-                  <div className="flex items-center mb-3">
-                    <div className="p-2 bg-secondary-100 dark:bg-secondary-800/50 rounded-lg mr-3">
-                      <Calculator className="h-5 w-5 text-secondary-600 dark:text-secondary-400" />
+                <div className="p-4 rounded-xl border border-[var(--color-outline)]/30 bg-[var(--surface-table)]/40">
+                  <div className="flex items-center gap-2 mb-2">
+                    <div className="p-1.5 rounded-lg bg-[var(--color-primary-container)]">
+                      <Calculator className="h-4 w-4 text-[var(--color-primary)]" />
                     </div>
-                    <h5 className="text-sm font-semibold text-secondary-700 dark:text-secondary-300 uppercase tracking-wide">Tax Calculation</h5>
+                    <span className="text-xs font-medium uppercase tracking-wider text-[var(--color-on-surface-variant)]">Tax Calculation</span>
                   </div>
-                  <p className="text-xl font-bold text-secondary-800 dark:text-secondary-200">
-                    {currentTaxSettings?.include_tax ? 'Tax Included' : 'Tax Excluded'}
-                  </p>
+                  <p className="text-lg font-semibold text-[var(--color-on-surface)]">{currentTaxSettings?.include_tax ? 'Tax Included' : 'Tax Excluded'}</p>
                 </div>
               </div>
             )}
           </div>
 
-          {/* Tax History */}
-          <div className="bg-surface-card rounded-lg shadow-md p-6">
-            <h4 className="text-lg font-semibold text-secondary-700 dark:text-secondary-300 mb-4 flex items-center">
-              <Calendar className="h-5 w-5 mr-2" />
+          <div className="glass-card rounded-2xl overflow-hidden p-5">
+            <h4 className="text-[var(--color-on-surface)] font-semibold mb-4 flex items-center gap-2">
+              <Calendar className="h-5 w-5 text-[var(--color-on-surface-variant)]" />
               Tax History
             </h4>
-            
             {taxHistory.length === 0 ? (
-              <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+              <div className="text-center py-8 text-[var(--color-on-surface-variant)]">
                 <Calculator className="h-12 w-12 mx-auto mb-3 opacity-50" />
                 <p>No tax history available</p>
               </div>
             ) : (
               <div className="overflow-x-auto">
-                <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                  <thead className="bg-gray-50 dark:bg-gray-700">
-                    <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                        Date
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                        Tax Name
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                        Tax Rate
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                        Tax Calculation
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                        Status
-                      </th>
+                <table className="min-w-full">
+                  <thead>
+                    <tr className="bg-[var(--surface-table)]/60 text-[var(--color-on-surface)]">
+                      <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider border-b border-[var(--color-outline)]/20">Date</th>
+                      <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider border-b border-[var(--color-outline)]/20">Tax Name</th>
+                      <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider border-b border-[var(--color-outline)]/20">Tax Rate</th>
+                      <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider border-b border-[var(--color-outline)]/20">Tax Calculation</th>
+                      <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider border-b border-[var(--color-outline)]/20">Status</th>
                     </tr>
                   </thead>
-                  <tbody className="bg-surface-card divide-y divide-gray-200 dark:divide-gray-700">
+                  <tbody className="divide-y divide-[var(--color-outline)]/30">
                     {taxHistory.map((setting) => (
-                      <tr key={setting.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300">
-                          {new Date(setting.created_at).toLocaleDateString()}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300">
-                          {setting.tax_name}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300">
-                          {setting.tax_rate}%
-                        </td>
+                      <tr key={setting.id} className="hover:bg-[var(--surface-table)]/50 transition-colors">
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-[var(--color-on-surface)]">{new Date(setting.created_at).toLocaleDateString()}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-[var(--color-on-surface)]">{setting.tax_name}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-[var(--color-on-surface)]">{setting.tax_rate}%</td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                            setting.include_tax 
-                              ? 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300' 
-                              : 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300'
-                          }`}>
+                          <span className={`inline-flex px-2.5 py-0.5 rounded-full text-xs font-medium ${setting.include_tax ? 'bg-[var(--color-success)]/15 text-[var(--color-success)]' : 'bg-[var(--color-error)]/15 text-[var(--color-error)]'}`}>
                             {setting.include_tax ? 'Included' : 'Excluded'}
                           </span>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                            setting.is_active 
-                              ? 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300' 
-                              : 'bg-accent-100 dark:bg-accent-900/30 text-accent-800 dark:text-accent-300'
-                          }`}>
+                          <span className={`inline-flex px-2.5 py-0.5 rounded-full text-xs font-medium ${setting.is_active ? 'bg-[var(--color-success)]/15 text-[var(--color-success)]' : 'bg-[var(--color-outline)]/30 text-[var(--color-on-surface-variant)]'}`}>
                             {setting.is_active ? 'Active' : 'Inactive'}
                           </span>
                         </td>

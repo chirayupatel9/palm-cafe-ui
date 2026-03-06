@@ -1060,6 +1060,11 @@ img {
 .glass-input:focus::placeholder {
   color: rgba(11, 15, 5, 0.6);
 }
+/* Textareas: use normal rounded corners, not pill; hide resize handle */
+textarea.glass-input {
+  border-radius: 0.75rem;
+  resize: none;
+}
 
 /* Sheet panel – same glass as glass-card for consistency */
 .sheet-panel {

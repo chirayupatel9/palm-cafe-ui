@@ -9,6 +9,7 @@ import { Copy, ExternalLink, Check, Plus, Pencil, Trash2, Settings, Link2, Info,
 import toast from 'react-hot-toast';
 import FileInput from './ui/FileInput';
 import { GlassButton } from './ui/GlassButton';
+import PaymentMethodManagement from './PaymentMethodManagement';
 
 const CafeSettings: React.FC = () => {
   const { cafeSettings, loading: cafeSettingsLoading, error: cafeSettingsError, fetchCafeSettings, updateCafeSettings, updateLogo, updateHeroImage, updatePromoBannerImage, removeHeroImage, removePromoBannerImage, removeLogo } = useCafeSettings();
@@ -900,6 +901,13 @@ const CafeSettings: React.FC = () => {
                   </div>
                 </div>
               </form>
+            </div>
+
+            {/* Payment, Currency & Tax */}
+            <div className="glass-card overflow-hidden rounded-2xl shadow-sm">
+              <div className="p-5">
+                <PaymentMethodManagement />
+              </div>
             </div>
 
             {/* Branding Section */}
