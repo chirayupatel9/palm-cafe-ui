@@ -1219,12 +1219,11 @@ const CustomerMenu: React.FC<CustomerMenuProps> = ({
                     </div>
                   )}
 
-                  {/* Category Sections - DIR layout: number badge + title + card grid */}
+                  {/* Category Sections - title + card grid */}
                   <div key={`menu-list-${selectedCategory}`} className="contents">
                   {Object.entries(searchQuery.trim() ? filteredMenuItems : groupedMenuItems)
                     .filter(([categoryName]) => selectedCategory === 'All' || categoryName === selectedCategory)
-                    .map(([categoryName, items], index) => {
-                      const categoryNumber = String(index + 1).padStart(2, '0');
+                    .map(([categoryName, items]) => {
                       const slug = getCategorySlug(categoryName);
                       return (
                         <section
@@ -1244,10 +1243,7 @@ const CustomerMenu: React.FC<CustomerMenuProps> = ({
                               id={slug ? `category-heading-${slug}` : undefined}
                             >
                               <div className="scroll-animate-left flex items-center justify-between gap-4">
-                                <div className="flex items-baseline gap-4">
-                                  <span className="font-mono text-sm text-[#a57f42] bg-[#a57f42]/10 px-3 py-1 rounded-full">
-                                    {categoryNumber}
-                                  </span>
+                                <div>
                                   <h2 className="text-2xl sm:text-4xl lg:text-5xl font-bold text-[#0b0f05] tracking-tight">
                                     {categoryName}
                                   </h2>

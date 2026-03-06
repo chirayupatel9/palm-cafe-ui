@@ -458,8 +458,7 @@ const OrderPage: React.FC<OrderPageProps> = ({ menuItems, cart: externalCart, se
           </div>
         ) : (
           <div className="space-y-12 sm:space-y-16">
-            {Object.entries(groupedMenuItems).map(([categoryName, items], catIndex) => {
-              const categoryNumber = String(catIndex + 1).padStart(2, '0');
+            {Object.entries(groupedMenuItems).map(([categoryName, items]) => {
               return (
                 <section
                   key={categoryName}
@@ -467,10 +466,7 @@ const OrderPage: React.FC<OrderPageProps> = ({ menuItems, cart: externalCart, se
                   className="relative"
                 >
                   <div className="mb-6 sm:mb-8">
-                    <div className="flex items-baseline gap-4 mb-2">
-                      <span className="font-mono text-sm px-3 py-1 rounded-full text-primary bg-primary-container">
-                        {categoryNumber}
-                      </span>
+                    <div className="mb-2">
                       <h3 className="text-2xl sm:text-3xl font-bold tracking-tight text-on-surface">
                         {categoryName}
                       </h3>
@@ -482,7 +478,7 @@ const OrderPage: React.FC<OrderPageProps> = ({ menuItems, cart: externalCart, se
                       return (
                         <div
                           key={item.id}
-                          className="group overflow-hidden border-b last:border-b-0 transition-colors border-[var(--color-outline)] hover:bg-[var(--color-outline-variant)]"
+                          className="group overflow-hidden transition-colors hover:bg-[var(--color-outline-variant)]"
                         >
                           <div className="relative aspect-[4/3] overflow-hidden flex-shrink-0 bg-[var(--surface-table)]">
                             {cafeSettings?.show_menu_images && item.image_url ? (
