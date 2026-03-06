@@ -61,7 +61,6 @@ const createAnimatedIcon = (candidates: string[]) => {
 };
 
 export type LucideIcon = React.ComponentType<IconProps>;
-export const LucideIcon = null as unknown as LucideIcon;
 
 export const AlertCircle = createAnimatedIcon(['FaExclamationCircle']);
 export const AlertTriangle = createAnimatedIcon(['FaExclamationTriangle']);

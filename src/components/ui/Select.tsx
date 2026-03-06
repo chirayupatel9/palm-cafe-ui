@@ -1,5 +1,4 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { ChevronDown } from 'lucide-react';
 
 export interface SelectOption {
   value: string;
@@ -47,6 +46,22 @@ const Select: React.FC<SelectProps> = ({
   const selected = options.find((o) => String(o.value) === String(value));
   const displayLabel = selected ? selected.label : placeholder;
 
+  const TriggerChevron = ({ openState }: { openState: boolean }) => (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={`w-5 h-5 shrink-0 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none transition-transform ${openState ? 'rotate-180' : ''}`}
+      style={{ color: 'var(--color-primary)' }}
+      aria-hidden
+    >
+      <path d="m6 9 6 6 6-6" />
+    </svg>
+  );
+
   return (
     <div className="relative" ref={containerRef}>
       {/* Trigger: solid light bg, rounded corners, thin light border (All Categories style) */}
@@ -66,11 +81,7 @@ const Select: React.FC<SelectProps> = ({
         aria-labelledby={id ? `${id}-label` : undefined}
       >
         <span className={!selected ? 'opacity-70' : ''}>{displayLabel}</span>
-        <ChevronDown
-          className={`w-5 h-5 shrink-0 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none transition-transform ${open ? 'rotate-180' : ''}`}
-          style={{ color: 'var(--color-primary)' }}
-          aria-hidden
-        />
+        <TriggerChevron openState={open} />
       </button>
 
       {/* Dropdown panel: glass effect (frosted, soft shadow) */}
