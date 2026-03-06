@@ -578,7 +578,7 @@ const OrderPage: React.FC<OrderPageProps> = ({ menuItems, cart: externalCart, se
       {showCart && (
         <Sheet open={showCart} onClose={() => setShowCart(false)} title={currentCart.length > 0 ? `Cart (${currentCart.length})` : 'Cart'}>
               {/* Customer Info */}
-              <div className="space-form">
+              <div className="space-form mb-4">
                 <input
                   type="text"
                   placeholder="Customer Name *"
@@ -593,13 +593,6 @@ const OrderPage: React.FC<OrderPageProps> = ({ menuItems, cart: externalCart, se
                   onChange={(e) => setCustomerLookup(e.target.value)}
                   className="input-field"
                   autoComplete="tel email"
-                />
-                <input
-                  type="text"
-                  placeholder="Table Number/Character (optional)"
-                  value={tableNumber}
-                  onChange={(e) => setTableNumber(e.target.value)}
-                  className="input-field"
                 />
                 {customerInfo && (
                   <div className="mb-2 p-2 bg-[var(--color-primary-container)] border border-[var(--color-outline)] rounded-lg">
@@ -772,6 +765,20 @@ const OrderPage: React.FC<OrderPageProps> = ({ menuItems, cart: externalCart, se
                       ? 'Order will be ready for pickup at the counter' 
                       : 'Order will be served at the table'}
                   </p>
+                  {pickupOption === 'dine-in' && (
+                    <div className="mt-3">
+                      <label className="block text-sm font-medium text-on-surface mb-2">
+                        Table Number/Character (optional)
+                      </label>
+                      <input
+                        type="text"
+                        placeholder="e.g. 5 or A"
+                        value={tableNumber}
+                        onChange={(e) => setTableNumber(e.target.value)}
+                        className="input-field"
+                      />
+                    </div>
+                  )}
                 </div>
               </div>
 
