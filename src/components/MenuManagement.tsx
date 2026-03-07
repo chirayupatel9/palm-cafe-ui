@@ -89,6 +89,90 @@ const MenuManagement: React.FC<MenuManagementProps> = ({ menuItems, onUpdate, on
     return isNaN(num) ? 0 : num;
   };
 
+  const generateItemDescription = (itemName, categoryId = '', itemCategoryName = '', itemPrice = 0) => {
+    const cleanName = (itemName || '').trim();
+    if (!cleanName) return '';
+
+    const selectedCategoryName =
+      itemCategoryName ||
+      categories.find((category) => String(category.id) === String(categoryId))?.name ||
+      '';
+
+    const lowerName = cleanName.toLowerCase();
+    const lowerCategory = selectedCategoryName.toLowerCase();
+    const combinedText = `${lowerName} ${lowerCategory}`;
+    const normalizedPrice = ensureNumber(itemPrice);
+
+    const hasKeyword = (keywords) => keywords.some((keyword) => combinedText.includes(keyword));
+
+    const isBeverage = hasKeyword(['coffee', 'latte', 'cappuccino', 'mocha', 'espresso', 'tea', 'smoothie', 'juice', 'shake', 'frappe']);
+    const isDessert = hasKeyword(['cake', 'brownie', 'cookie', 'muffin', 'pastry', 'tart', 'donut', 'dessert', 'ice cream']);
+    const isSavory = hasKeyword(['sandwich', 'burger', 'wrap', 'pasta', 'pizza', 'salad', 'panini', 'noodle', 'rice', 'toast']);
+    const isCold = hasKeyword(['iced', 'cold', 'chilled', 'frozen']);
+    const isSpicy = hasKeyword(['spicy', 'masala', 'chili', 'schezwan', 'peri', 'pepper']);
+
+    const getStableIndex = (seed, length) => {
+      let hash = 0;
+      for (let i = 0; i < seed.length; i += 1) {
+        hash = (hash << 5) - hash + seed.charCodeAt(i);
+        hash |= 0;
+      }
+      return Math.abs(hash) % length;
+    };
+
+    const pick = (options) => options[getStableIndex(cleanName, options.length)];
+
+    let prepPhrase = 'prepared fresh to order with quality ingredients';
+    let pairingPhrase = 'A great pick for any time of day.';
+
+    if (isBeverage && isCold) {
+      prepPhrase = 'served chilled with a smooth, refreshing finish';
+      pairingPhrase = 'Perfect for a cool, easy cafe break.';
+    } else if (isBeverage) {
+      prepPhrase = 'crafted fresh for a rich, comforting sip';
+      pairingPhrase = 'Perfect for a morning boost or afternoon reset.';
+    } else if (isDessert) {
+      prepPhrase = 'made with a soft texture and balanced sweetness';
+      pairingPhrase = 'Great with coffee or as a sweet anytime treat.';
+    } else if (isSavory && isSpicy) {
+      prepPhrase = 'made fresh with bold spices and satisfying flavor';
+      pairingPhrase = 'Ideal when you want something hearty with a kick.';
+    } else if (isSavory) {
+      prepPhrase = 'made fresh with a satisfying, savory bite';
+      pairingPhrase = 'A solid choice for lunch, snacking, or sharing.';
+    }
+
+    const intros = [
+      `${cleanName} is ${prepPhrase}.`,
+      `Our ${cleanName} is ${prepPhrase}.`,
+      `A customer favorite, ${cleanName} is ${prepPhrase}.`
+    ];
+
+    const categorySentence = selectedCategoryName
+      ? `From our ${selectedCategoryName} selection.`
+      : '';
+
+    let valueSentence = 'Great value for a quality cafe item.';
+    if (normalizedPrice > 0 && normalizedPrice <= 4) {
+      valueSentence = 'A budget-friendly option that is easy to love.';
+    } else if (normalizedPrice > 4 && normalizedPrice <= 8) {
+      valueSentence = 'A well-balanced everyday pick with great value.';
+    } else if (normalizedPrice > 8) {
+      valueSentence = 'A premium cafe pick worth savoring.';
+    }
+
+    return [pick(intros), categorySentence, pairingPhrase, valueSentence].filter(Boolean).join(' ');
+  };
+
+  const getDisplayDescription = (item) => {
+    const existingDescription = (item?.description || '').trim();
+    if (existingDescription) {
+      return existingDescription;
+    }
+
+    return generateItemDescription(item?.name, item?.category_id, item?.category_name, item?.price);
+  };
+
   const handleEdit = (item) => {
     setEditingId(item.id);
     setSelectedImageFile(null); // Clear any selected file when editing
@@ -116,11 +200,14 @@ const MenuManagement: React.FC<MenuManagementProps> = ({ menuItems, onUpdate, on
     }
 
     try {
+      const finalDescription =
+        formData.description.trim() || generateItemDescription(formData.name, formData.category_id, '', price);
+
       if (editingId) {
         const updateData = {
           category_id: formData.category_id,
           name: formData.name.trim(),
-          description: formData.description.trim(),
+          description: finalDescription,
           price: price,
           sort_order: parseInt(formData.sort_order) || 0,
           image_url: formData.image_url,
@@ -134,7 +221,7 @@ const MenuManagement: React.FC<MenuManagementProps> = ({ menuItems, onUpdate, on
         const addData = {
           category_id: formData.category_id,
           name: formData.name.trim(),
-          description: formData.description.trim(),
+          description: finalDescription,
           price: price,
           sort_order: parseInt(formData.sort_order) || 0,
           image_url: formData.image_url,
@@ -999,7 +1086,9 @@ const MenuManagement: React.FC<MenuManagementProps> = ({ menuItems, onUpdate, on
                             <div className="text-sm font-medium truncate text-[var(--color-on-surface)]">{item.name}</div>
                           </td>
                           <td className="px-4 py-3 align-middle min-w-0">
-                            <div className="text-sm truncate text-[var(--color-on-surface-variant)]" title={item.description}>{item.description}</div>
+                            <div className="text-sm truncate text-[var(--color-on-surface-variant)]" title={getDisplayDescription(item)}>
+                              {getDisplayDescription(item)}
+                            </div>
                           </td>
                           <td className="px-4 py-3 align-middle">
                             <div className="text-sm font-semibold tabular-nums text-[var(--color-on-surface)]">
@@ -1078,7 +1167,7 @@ const MenuManagement: React.FC<MenuManagementProps> = ({ menuItems, onUpdate, on
                                   </GlassButton>
                                 </div>
                               </div>
-                              <p className="text-sm mb-2 text-[var(--color-on-surface-variant)]">{item.description}</p>
+                              <p className="text-sm mb-2 text-[var(--color-on-surface-variant)]">{getDisplayDescription(item)}</p>
                               <div className="flex justify-between items-center text-sm">
                                 <span className="font-semibold text-[var(--color-primary)]">
                                   {formatCurrency(ensureNumber(item.price))}
