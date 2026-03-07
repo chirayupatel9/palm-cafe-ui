@@ -302,7 +302,7 @@ const CustomerManagement: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <div className="glass-card p-5">
             <div className="flex items-center">
-              <div className="p-2 rounded-lg bg-[var(--color-primary-container)]">
+              <div className="p-2 rounded-lg">
                 <Users className="h-6 w-6" style={{ color: 'var(--color-primary)' }} />
               </div>
               <div className="ml-4">
@@ -313,7 +313,7 @@ const CustomerManagement: React.FC = () => {
           </div>
           <div className="glass-card p-5">
             <div className="flex items-center">
-              <div className="p-2 rounded-lg bg-[var(--color-primary-container)]">
+              <div className="p-2 rounded-lg">
                 <UserCheck className="h-6 w-6" style={{ color: 'var(--color-success)' }} />
               </div>
               <div className="ml-4">
@@ -324,7 +324,7 @@ const CustomerManagement: React.FC = () => {
           </div>
           <div className="glass-card p-5">
             <div className="flex items-center">
-              <div className="p-2 rounded-lg bg-[var(--color-primary-container)]">
+              <div className="p-2 rounded-lg">
                 <Star className="h-6 w-6" style={{ color: 'var(--color-warning)' }} />
               </div>
               <div className="ml-4">
@@ -335,7 +335,7 @@ const CustomerManagement: React.FC = () => {
           </div>
           <div className="glass-card p-5">
             <div className="flex items-center">
-              <div className="p-2 rounded-lg bg-[var(--color-primary-container)]">
+              <div className="p-2 rounded-lg">
                 <TrendingUp className="h-6 w-6" style={{ color: 'var(--color-primary)' }} />
               </div>
               <div className="ml-4">

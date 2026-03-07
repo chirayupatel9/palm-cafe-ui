@@ -34,7 +34,7 @@ const PageHeader: React.FC<PageHeaderProps> = ({
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div className="flex items-center gap-3 min-w-0 flex-1">
           {Icon && (
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[var(--color-primary-container)]">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl">
               <Icon className="h-6 w-6 text-[var(--color-primary)]" />
             </div>
           )}

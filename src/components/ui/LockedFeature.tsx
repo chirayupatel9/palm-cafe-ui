@@ -35,7 +35,7 @@ const LockedFeature: React.FC<LockedFeatureProps> = ({
       <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm p-8">
         <div className="text-center max-w-md mx-auto">
           <div className="mb-4 flex justify-center">
-            <div className="p-3 bg-gray-100 dark:bg-gray-700 rounded-full">
+            <div className="p-3 rounded-full">
               <Lock className="h-6 w-6 text-gray-500 dark:text-gray-400" />
             </div>
           </div>

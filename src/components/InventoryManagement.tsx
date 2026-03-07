@@ -355,7 +355,7 @@ const InventoryManagement: React.FC = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div className="flex items-center gap-3 min-w-0">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[var(--color-primary-container)]">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl">
             <Package className="h-6 w-6 text-[var(--color-primary)]" />
           </div>
           <div className="min-w-0">
@@ -430,7 +430,7 @@ const InventoryManagement: React.FC = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="glass-card p-5 rounded-2xl">
           <div className="flex items-center">
-            <div className="p-2 rounded-lg bg-[var(--color-primary-container)]">
+            <div className="p-2 rounded-lg">
               <Package className="h-6 w-6" style={{ color: 'var(--color-primary)' }} />
             </div>
             <div className="ml-4">
@@ -441,7 +441,7 @@ const InventoryManagement: React.FC = () => {
         </div>
         <div className="glass-card p-5 rounded-2xl">
           <div className="flex items-center">
-            <div className="p-2 rounded-lg bg-[var(--color-primary-container)]">
+            <div className="p-2 rounded-lg">
               <AlertTriangle className="h-6 w-6" style={{ color: 'var(--color-warning)' }} />
             </div>
             <div className="ml-4">
@@ -452,7 +452,7 @@ const InventoryManagement: React.FC = () => {
         </div>
         <div className="glass-card p-5 rounded-2xl">
           <div className="flex items-center">
-            <div className="p-2 rounded-lg bg-[var(--color-primary-container)]">
+            <div className="p-2 rounded-lg">
               <AlertTriangle className="h-6 w-6" style={{ color: 'var(--color-error)' }} />
             </div>
             <div className="ml-4">
@@ -463,7 +463,7 @@ const InventoryManagement: React.FC = () => {
         </div>
         <div className="glass-card p-5 rounded-2xl">
           <div className="flex items-center">
-            <div className="p-2 rounded-lg bg-[var(--color-primary-container)]">
+            <div className="p-2 rounded-lg">
               <TrendingUp className="h-6 w-6" style={{ color: 'var(--color-success)' }} />
             </div>
             <div className="ml-4">

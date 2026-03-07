@@ -577,7 +577,7 @@ const MenuManagement: React.FC<MenuManagementProps> = ({ menuItems, onUpdate, on
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
         <div className="flex items-center gap-3 min-w-0">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[var(--color-primary-container)]">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl">
             <FolderOpen className="h-6 w-6 text-[var(--color-primary)]" />
           </div>
           <div className="min-w-0">
@@ -621,7 +621,7 @@ const MenuManagement: React.FC<MenuManagementProps> = ({ menuItems, onUpdate, on
           {/* Header */}
           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center space-y-4 sm:space-y-0">
             <div className="flex items-center gap-3 min-w-0">
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[var(--color-primary-container)]">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl">
                 <FolderOpen className="h-6 w-6 text-[var(--color-primary)]" />
               </div>
               <div className="min-w-0">
@@ -1104,7 +1104,7 @@ const MenuManagement: React.FC<MenuManagementProps> = ({ menuItems, onUpdate, on
           {/* Header */}
           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center space-y-4 sm:space-y-0">
             <div className="flex items-center gap-3 min-w-0">
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[var(--color-primary-container)]">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl">
                 <FolderOpen className="h-6 w-6 text-[var(--color-primary)]" />
               </div>
               <div className="min-w-0">

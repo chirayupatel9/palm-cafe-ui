@@ -287,7 +287,7 @@ const InvoiceHistory: React.FC<InvoiceHistoryProps> = ({ cart, setCart, setCurre
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center space-y-2 sm:space-y-0 gap-4">
         <div className="flex items-center gap-3 min-w-0">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[var(--color-primary-container)]">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl">
             <FileText className="h-6 w-6 text-[var(--color-primary)]" />
           </div>
           <div className="min-w-0">
@@ -384,7 +384,7 @@ const InvoiceHistory: React.FC<InvoiceHistoryProps> = ({ cart, setCart, setCurre
                 ].map((stat, i) => (
                   <div key={i} className="glass-card p-5 rounded-2xl">
                     <div className="flex items-center">
-                      <div className="p-2 rounded-lg bg-[var(--color-primary-container)] flex-shrink-0">{stat.icon}</div>
+                      <div className="p-2 rounded-lg flex-shrink-0">{stat.icon}</div>
                       <div className="ml-3 sm:ml-4">
                         <div className="text-xs sm:text-sm font-medium text-[var(--color-on-surface-variant)]">{stat.label}</div>
                         <div className="text-lg sm:text-2xl font-semibold text-[var(--color-on-surface)]">{stat.value}</div>

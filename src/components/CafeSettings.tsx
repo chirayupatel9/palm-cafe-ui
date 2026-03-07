@@ -651,7 +651,7 @@ const CafeSettings: React.FC = () => {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div className="flex items-center gap-3 min-w-0">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[var(--color-primary-container)]">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl">
               <Settings className="h-6 w-6 text-[var(--color-primary)]" />
             </div>
             <div className="min-w-0">
@@ -701,7 +701,7 @@ const CafeSettings: React.FC = () => {
             {(user?.role === 'admin' || user?.role === 'superadmin') && publicSlug && (
               <div className="glass-card overflow-hidden rounded-2xl shadow-sm">
                 <div className="bg-[var(--surface-table)]/60 backdrop-blur-sm px-5 py-4 border-b border-[var(--color-outline)]/20 flex items-start gap-3">
-                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[var(--color-primary-container)]">
+                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg">
                     <Link2 className="h-5 w-5 text-[var(--color-primary)]" />
                   </div>
                   <div className="min-w-0">
@@ -765,7 +765,7 @@ const CafeSettings: React.FC = () => {
             {/* Basic Information */}
             <div className="glass-card overflow-hidden rounded-2xl shadow-sm">
               <div className="bg-[var(--surface-table)]/60 backdrop-blur-sm px-5 py-4 border-b border-[var(--color-outline)]/20 flex items-start gap-3">
-                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[var(--color-primary-container)]">
+                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg">
                   <Info className="h-5 w-5 text-[var(--color-primary)]" />
                 </div>
                 <div className="min-w-0">
@@ -812,7 +812,7 @@ const CafeSettings: React.FC = () => {
             {/* Tab & Role Visibility */}
             <div className="glass-card overflow-hidden rounded-2xl shadow-sm">
               <div className="bg-[var(--surface-table)]/60 backdrop-blur-sm px-5 py-4 border-b border-[var(--color-outline)]/20 flex items-start gap-3">
-                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[var(--color-primary-container)]">
+                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg">
                   <LayoutDashboard className="h-5 w-5 text-[var(--color-primary)]" />
                 </div>
                 <div className="min-w-0">
@@ -913,7 +913,7 @@ const CafeSettings: React.FC = () => {
             {/* Branding Section */}
             <div className="glass-card overflow-hidden rounded-2xl shadow-sm">
               <div className="bg-[var(--surface-table)]/60 backdrop-blur-sm px-5 py-4 border-b border-[var(--color-outline)]/20 flex items-start gap-3">
-                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[var(--color-primary-container)]">
+                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg">
                   <Palette className="h-5 w-5 text-[var(--color-primary)]" />
                 </div>
                 <div className="min-w-0">

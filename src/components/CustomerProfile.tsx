@@ -292,7 +292,7 @@ const CustomerProfile: React.FC<CustomerProfileProps> = ({
             <>
               <div className="flex items-center justify-between gap-4 py-5 px-2">
                 <div className="flex items-center gap-4 min-w-0">
-                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[#a57f42] text-on-primary elevation-2">
+                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full text-on-primary elevation-2">
                     <User className="h-6 w-6" />
                   </div>
                   <div className="min-w-0">
@@ -348,7 +348,7 @@ const CustomerProfile: React.FC<CustomerProfileProps> = ({
                       className="flex items-center gap-3 pb-4 border-b"
                       style={{ borderColor: 'var(--color-outline)' }}
                     >
-                      <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary text-on-primary">
+                      <div className="flex h-12 w-12 items-center justify-center rounded-full text-on-primary">
                         <User className="h-6 w-6" />
                       </div>
                       <div className="flex flex-col">

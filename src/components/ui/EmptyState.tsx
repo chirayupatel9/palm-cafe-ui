@@ -21,7 +21,7 @@ const EmptyState: React.FC<EmptyStateProps> = ({
 }) => {
   return (
     <div className={`flex flex-col items-center justify-center py-12 px-4 text-center ${className}`}>
-      <div className="mb-4 p-4 bg-gray-100 dark:bg-gray-800 rounded-full">
+      <div className="mb-4 p-4 rounded-full">
         <Icon className="h-8 w-8 text-gray-400 dark:text-gray-500" />
       </div>
       <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">{title}</h3>

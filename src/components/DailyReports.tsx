@@ -45,7 +45,7 @@ const DailyReports: React.FC = () => {
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-3 min-w-0">
-        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[var(--color-primary-container)]">
+        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl">
           <FileText className="h-6 w-6 text-[var(--color-primary)]" />
         </div>
         <div className="min-w-0">
@@ -78,7 +78,7 @@ const DailyReports: React.FC = () => {
                 className="flex items-center justify-between px-5 py-4 hover:bg-[var(--surface-table)]/50 transition-colors"
               >
                 <div className="flex items-center">
-                  <div className="w-8 h-8 rounded-full flex items-center justify-center mr-3 bg-[var(--color-primary-container)]">
+                  <div className="w-8 h-8 rounded-full flex items-center justify-center mr-3">
                     <span className="text-sm font-bold text-[var(--color-on-primary-container)]">
                       #{index + 1}
                     </span>

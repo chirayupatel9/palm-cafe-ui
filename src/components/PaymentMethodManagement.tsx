@@ -688,7 +688,7 @@ const PaymentMethodManagement: React.FC = () => {
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div className="p-4 rounded-xl border border-[var(--color-outline)]/30 bg-[var(--surface-table)]/40">
                   <div className="flex items-center gap-2 mb-2">
-                    <div className="p-1.5 rounded-lg bg-[var(--color-primary-container)]">
+                    <div className="p-1.5 rounded-lg">
                       <Flag className="h-4 w-4 text-[var(--color-primary)]" />
                     </div>
                     <span className="text-xs font-medium uppercase tracking-wider text-[var(--color-on-surface-variant)]">Currency Code</span>
@@ -697,7 +697,7 @@ const PaymentMethodManagement: React.FC = () => {
                 </div>
                 <div className="p-4 rounded-xl border border-[var(--color-outline)]/30 bg-[var(--surface-table)]/40">
                   <div className="flex items-center gap-2 mb-2">
-                    <div className="p-1.5 rounded-lg bg-[var(--color-primary-container)]">
+                    <div className="p-1.5 rounded-lg">
                       <DollarSign className="h-4 w-4 text-[var(--color-primary)]" />
                     </div>
                     <span className="text-xs font-medium uppercase tracking-wider text-[var(--color-on-surface-variant)]">Currency Symbol</span>
@@ -706,7 +706,7 @@ const PaymentMethodManagement: React.FC = () => {
                 </div>
                 <div className="p-4 rounded-xl border border-[var(--color-outline)]/30 bg-[var(--surface-table)]/40">
                   <div className="flex items-center gap-2 mb-2">
-                    <div className="p-1.5 rounded-lg bg-[var(--color-primary-container)]">
+                    <div className="p-1.5 rounded-lg">
                       <Globe className="h-4 w-4 text-[var(--color-primary)]" />
                     </div>
                     <span className="text-xs font-medium uppercase tracking-wider text-[var(--color-on-surface-variant)]">Currency Name</span>
@@ -846,7 +846,7 @@ const PaymentMethodManagement: React.FC = () => {
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 <div className="p-4 rounded-xl border border-[var(--color-outline)]/30 bg-[var(--surface-table)]/40">
                   <div className="flex items-center gap-2 mb-2">
-                    <div className="p-1.5 rounded-lg bg-[var(--color-primary-container)]">
+                    <div className="p-1.5 rounded-lg">
                       <Calculator className="h-4 w-4 text-[var(--color-primary)]" />
                     </div>
                     <span className="text-xs font-medium uppercase tracking-wider text-[var(--color-on-surface-variant)]">Tax Name</span>
@@ -855,7 +855,7 @@ const PaymentMethodManagement: React.FC = () => {
                 </div>
                 <div className="p-4 rounded-xl border border-[var(--color-outline)]/30 bg-[var(--surface-table)]/40">
                   <div className="flex items-center gap-2 mb-2">
-                    <div className="p-1.5 rounded-lg bg-[var(--color-primary-container)]">
+                    <div className="p-1.5 rounded-lg">
                       <Percent className="h-4 w-4 text-[var(--color-primary)]" />
                     </div>
                     <span className="text-xs font-medium uppercase tracking-wider text-[var(--color-on-surface-variant)]">Tax Rate</span>
@@ -864,7 +864,7 @@ const PaymentMethodManagement: React.FC = () => {
                 </div>
                 <div className="p-4 rounded-xl border border-[var(--color-outline)]/30 bg-[var(--surface-table)]/40">
                   <div className="flex items-center gap-2 mb-2">
-                    <div className="p-1.5 rounded-lg bg-[var(--color-primary-container)]">
+                    <div className="p-1.5 rounded-lg">
                       <Calculator className="h-4 w-4 text-[var(--color-primary)]" />
                     </div>
                     <span className="text-xs font-medium uppercase tracking-wider text-[var(--color-on-surface-variant)]">Customer Display</span>
@@ -873,7 +873,7 @@ const PaymentMethodManagement: React.FC = () => {
                 </div>
                 <div className="p-4 rounded-xl border border-[var(--color-outline)]/30 bg-[var(--surface-table)]/40">
                   <div className="flex items-center gap-2 mb-2">
-                    <div className="p-1.5 rounded-lg bg-[var(--color-primary-container)]">
+                    <div className="p-1.5 rounded-lg">
                       <Calculator className="h-4 w-4 text-[var(--color-primary)]" />
                     </div>
                     <span className="text-xs font-medium uppercase tracking-wider text-[var(--color-on-surface-variant)]">Tax Calculation</span>

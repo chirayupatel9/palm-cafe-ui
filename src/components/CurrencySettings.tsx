@@ -275,7 +275,7 @@ const CurrencySettings: React.FC = () => {
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
             <div className="bg-gradient-to-br from-warm-50 to-warm-100 dark:from-warm-900/30 dark:to-warm-800/20 p-6 rounded-xl border border-warm-200 dark:border-warm-700 shadow-sm hover:shadow-md transition-all duration-200">
               <div className="flex items-center mb-3">
-                <div className="p-2 bg-secondary-100 dark:bg-secondary-800/50 rounded-lg mr-3">
+                <div className="p-2 rounded-lg mr-3">
                   <Globe className="h-5 w-5 text-secondary-600 dark:text-secondary-400" />
                 </div>
                 <h4 className="text-sm font-semibold text-secondary-700 dark:text-secondary-300 uppercase tracking-wide">Currency Code</h4>
@@ -286,7 +286,7 @@ const CurrencySettings: React.FC = () => {
             </div>
             <div className="bg-gradient-to-br from-warm-50 to-warm-100 dark:from-warm-900/30 dark:to-warm-800/20 p-6 rounded-xl border border-warm-200 dark:border-warm-700 shadow-sm hover:shadow-md transition-all duration-200">
               <div className="flex items-center mb-3">
-                <div className="p-2 bg-secondary-100 dark:bg-secondary-800/50 rounded-lg mr-3">
+                <div className="p-2 rounded-lg mr-3">
                   <DollarSign className="h-5 w-5 text-secondary-600 dark:text-secondary-400" />
                 </div>
                 <h4 className="text-sm font-semibold text-secondary-700 dark:text-secondary-300 uppercase tracking-wide">Currency Symbol</h4>
@@ -297,7 +297,7 @@ const CurrencySettings: React.FC = () => {
             </div>
             <div className="bg-gradient-to-br from-warm-50 to-warm-100 dark:from-warm-900/30 dark:to-warm-800/20 p-6 rounded-xl border border-warm-200 dark:border-warm-700 shadow-sm hover:shadow-md transition-all duration-200">
               <div className="flex items-center mb-3">
-                <div className="p-2 bg-secondary-100 dark:bg-secondary-800/50 rounded-lg mr-3">
+                <div className="p-2 rounded-lg mr-3">
                   <Flag className="h-5 w-5 text-secondary-600 dark:text-secondary-400" />
                 </div>
                 <h4 className="text-sm font-semibold text-secondary-700 dark:text-secondary-300 uppercase tracking-wide">Currency Name</h4>

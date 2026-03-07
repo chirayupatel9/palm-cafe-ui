@@ -790,7 +790,7 @@ const CustomerMenu: React.FC<CustomerMenuProps> = ({
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-[#e1e5df]">
         <div className="relative z-10 flex flex-col items-center">
-          <div className="w-20 h-20 bg-[#a57f42] rounded-2xl flex items-center justify-center mb-6 shadow-2xl">
+          <div className="w-20 h-20 rounded-2xl flex items-center justify-center mb-6 shadow-2xl">
             <Utensils className="h-10 w-10 text-white animate-pulse" />
           </div>
           <div className="relative">
@@ -1492,7 +1492,7 @@ const CustomerMenu: React.FC<CustomerMenuProps> = ({
                             <div className="space-y-4">
                               {cafeBranding.address && (
                                 <div className="flex items-start gap-4 group">
-                                  <div className="w-10 h-10 rounded-full bg-[#b3af9b] flex items-center justify-center flex-shrink-0 group-hover:bg-[#a57f42] group-hover:text-white transition-colors duration-300">
+                                  <div className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 group-hover:text-white transition-colors duration-300">
                                     <MapPin className="h-4 w-4 text-[#b3af9b] group-hover:text-white transition-colors" />
                                   </div>
                                   <span className="text-[#0b0f05] pt-2">{cafeBranding.address}</span>
@@ -1500,7 +1500,7 @@ const CustomerMenu: React.FC<CustomerMenuProps> = ({
                               )}
                               {cafeBranding.phone && (
                                 <a href={`tel:${cafeBranding.phone}`} className="flex items-center gap-4 group">
-                                  <div className="w-10 h-10 rounded-full bg-[#b3af9b] flex items-center justify-center flex-shrink-0 group-hover:bg-[#a57f42] transition-colors duration-300">
+                                  <div className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 transition-colors duration-300">
                                     <Phone className="h-4 w-4 text-[#b3af9b] group-hover:text-white transition-colors" />
                                   </div>
                                   <span className="text-[#0b0f05] group-hover:text-[#a57f42] transition-colors">{cafeBranding.phone}</span>
@@ -1508,7 +1508,7 @@ const CustomerMenu: React.FC<CustomerMenuProps> = ({
                               )}
                               {cafeBranding.email && (
                                 <a href={`mailto:${cafeBranding.email}`} className="flex items-center gap-4 group">
-                                  <div className="w-10 h-10 rounded-full bg-[#b3af9b] flex items-center justify-center flex-shrink-0 group-hover:bg-[#a57f42] transition-colors duration-300">
+                                  <div className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 transition-colors duration-300">
                                     <Mail className="h-4 w-4 text-[#b3af9b] group-hover:text-white transition-colors" />
                                   </div>
                                   <span className="text-[#0b0f05] group-hover:text-[#a57f42] transition-colors">{cafeBranding.email}</span>
@@ -1516,7 +1516,7 @@ const CustomerMenu: React.FC<CustomerMenuProps> = ({
                               )}
                               {cafeSettings.website && (
                                 <a href={cafeSettings.website} target="_blank" rel="noopener noreferrer" className="flex items-center gap-4 group">
-                                  <div className="w-10 h-10 rounded-full bg-[#b3af9b] flex items-center justify-center flex-shrink-0 group-hover:bg-[#a57f42] transition-colors duration-300">
+                                  <div className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 transition-colors duration-300">
                                     <MapPin className="h-4 w-4 text-[#b3af9b] group-hover:text-white transition-colors" />
                                   </div>
                                   <span className="text-[#0b0f05] group-hover:text-[#a57f42] transition-colors">Website</span>
@@ -1528,7 +1528,7 @@ const CustomerMenu: React.FC<CustomerMenuProps> = ({
                           {/* Map under cafe details */}
                           <div className="mt-8 scroll-animate-in">
                             <div className="flex items-center gap-2 mb-4">
-                              <div className="w-8 h-8 rounded-full bg-[#a57f42]/10 flex items-center justify-center">
+                              <div className="w-8 h-8 rounded-full flex items-center justify-center">
                                 <MapPin className="h-4 w-4 text-[#a57f42]" />
                               </div>
                               <h4 className="font-mono text-xs uppercase tracking-[0.2em] text-[#b3af9b]">Find us</h4>
@@ -1548,7 +1548,7 @@ const CustomerMenu: React.FC<CustomerMenuProps> = ({
                         {bentoGalleryMediaItems.length > 0 && (
                           <div>
                               <div className="flex items-center gap-2 mb-6">
-                                <div className="w-8 h-8 rounded-full bg-[#a57f42]/10 flex items-center justify-center">
+                                <div className="w-8 h-8 rounded-full flex items-center justify-center">
                                   <Star className="h-4 w-4 text-[#a57f42]" />
                                 </div>
                                 <h4 className="font-mono text-xs uppercase tracking-[0.2em] text-[#b3af9b]">Gallery</h4>

@@ -206,9 +206,7 @@ const MetricCard: React.FC<MetricCardProps> = ({ title, value, subtitle, icon: I
           )}
         </div>
         {Icon && (
-          <div className="p-3 rounded-lg" style={{ 
-            backgroundColor: 'var(--color-primary-container)'
-          }}>
+          <div className="p-3 rounded-lg">
             <Icon className="h-6 w-6" style={{ color: 'var(--color-primary)' }} />
           </div>
         )}
@@ -380,7 +378,7 @@ const CafeAnalytics: React.FC = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div className="flex items-center gap-3 min-w-0">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[var(--color-primary-container)]">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl">
             <BarChart3 className="h-6 w-6 text-[var(--color-primary)]" />
           </div>
           <div className="min-w-0">

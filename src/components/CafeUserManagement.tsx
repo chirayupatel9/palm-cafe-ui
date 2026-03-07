@@ -189,7 +189,7 @@ const CafeUserManagement: React.FC = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div className="flex items-center gap-3 min-w-0">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[var(--color-primary-container)]">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl">
             <Users className="h-6 w-6 text-[var(--color-primary)]" />
           </div>
           <div className="min-w-0">

@@ -438,7 +438,7 @@ const OrderPage: React.FC<OrderPageProps> = ({ menuItems, cart: externalCart, se
       <div className="space-y-6">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div className="flex items-center gap-3 min-w-0">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[var(--color-primary-container)]">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl">
               <BarChart3 className="h-6 w-6 text-[var(--color-primary)]" />
             </div>
             <div className="min-w-0">
@@ -450,7 +450,7 @@ const OrderPage: React.FC<OrderPageProps> = ({ menuItems, cart: externalCart, se
 
         {Object.keys(groupedMenuItems).length === 0 ? (
           <div className="text-center py-16">
-            <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-[var(--color-primary-container)] mx-auto mb-4">
+            <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl mx-auto mb-4">
               <FolderOpen className="h-8 w-8 text-[var(--color-primary)]" />
             </div>
             <h3 className="text-xl font-semibold mb-2 text-[var(--color-on-surface)]">No menu items available</h3>

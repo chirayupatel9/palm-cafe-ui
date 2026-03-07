@@ -11,7 +11,7 @@ const CafeNotFound: React.FC<CafeNotFoundProps> = ({ slug }) => {
     <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-gray-50 dark:bg-gray-900">
       <div className="max-w-md w-full text-center">
         <div className="mb-6 flex justify-center">
-          <div className="rounded-full bg-red-100 dark:bg-red-900/20 p-4">
+          <div className="rounded-full p-4">
             <AlertCircle className="h-12 w-12 text-red-600 dark:text-red-400" />
           </div>
         </div>
