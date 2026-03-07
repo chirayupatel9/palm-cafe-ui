@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Clock, CheckCircle, XCircle, Printer, RefreshCw, AlertTriangle, Coffee, Utensils, ChevronDown, ChevronUp, ShoppingCart, Plus, Edit, Save, X, Trash2, FileText, Search, ClipboardList } from 'lucide-react';
+import { Clock, Check, Printer, RefreshCw, AlertTriangle, Coffee, Utensils, ChevronDown, ChevronUp, ShoppingCart, Plus, Edit, Save, X, Trash2, FileText, Search, ClipboardList } from 'lucide-react';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 import { useAuth } from '../contexts/AuthContext';
@@ -357,11 +357,11 @@ const KitchenOrders: React.FC<KitchenOrdersProps> = ({ cart, setCart }) => {
       case 'preparing':
         return <Utensils className="h-5 w-5 text-blue-500" />;
       case 'ready':
-        return <CheckCircle className="h-5 w-5 text-green-500" />;
+        return <Check className="h-5 w-5 text-green-500" />;
       case 'completed':
-        return <CheckCircle className="h-5 w-5 text-green-600" />;
+        return <Check className="h-5 w-5 text-green-600" />;
       case 'cancelled':
-        return <XCircle className="h-5 w-5 text-red-500" />;
+        return <X className="h-5 w-5 text-red-500" />;
       default:
         return <AlertTriangle className="h-5 w-5 text-on-surface-variant" />;
     }
@@ -651,11 +651,11 @@ const KitchenOrders: React.FC<KitchenOrdersProps> = ({ cart, setCart }) => {
       {/* Statistics – glass cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <div className="glass-card p-5">
-          <div className="flex items-center">
-            <div className="p-2 rounded-lg bg-[var(--color-primary-container)]">
+          <div className="flex items-center gap-3">
+            <div className="shrink-0">
               <Clock className="h-6 w-6" style={{ color: 'var(--color-warning)' }} />
             </div>
-            <div className="ml-4">
+            <div>
               <p className="text-sm font-medium text-body-muted">Pending</p>
               <p className="text-2xl font-bold text-on-surface">
                 {todayOrders.filter(o => o.status === 'pending').length}
@@ -664,11 +664,11 @@ const KitchenOrders: React.FC<KitchenOrdersProps> = ({ cart, setCart }) => {
           </div>
         </div>
         <div className="glass-card p-5">
-          <div className="flex items-center">
-            <div className="p-2 rounded-lg bg-[var(--color-primary-container)]">
+          <div className="flex items-center gap-3">
+            <div className="shrink-0">
               <Utensils className="h-6 w-6" style={{ color: 'var(--color-info)' }} />
             </div>
-            <div className="ml-4">
+            <div>
               <p className="text-sm font-medium text-body-muted">Preparing</p>
               <p className="text-2xl font-bold text-on-surface">
                 {todayOrders.filter(o => o.status === 'preparing').length}
@@ -677,11 +677,11 @@ const KitchenOrders: React.FC<KitchenOrdersProps> = ({ cart, setCart }) => {
           </div>
         </div>
         <div className="glass-card p-5">
-          <div className="flex items-center">
-            <div className="p-2 rounded-lg bg-[var(--color-primary-container)]">
-              <CheckCircle className="h-6 w-6" style={{ color: 'var(--color-success)' }} />
+          <div className="flex items-center gap-3">
+            <div className="shrink-0">
+              <Check className="h-6 w-6" style={{ color: 'var(--color-success)' }} />
             </div>
-            <div className="ml-4">
+            <div>
               <p className="text-sm font-medium text-body-muted">Ready</p>
               <p className="text-2xl font-bold text-on-surface">
                 {todayOrders.filter(o => o.status === 'ready').length}
@@ -690,11 +690,11 @@ const KitchenOrders: React.FC<KitchenOrdersProps> = ({ cart, setCart }) => {
           </div>
         </div>
         <div className="glass-card p-5">
-          <div className="flex items-center">
-            <div className="p-2 rounded-lg bg-[var(--surface-table)]">
+          <div className="flex items-center gap-3">
+            <div className="shrink-0">
               <Coffee className="h-6 w-6" style={{ color: 'var(--color-on-surface-variant)' }} />
             </div>
-            <div className="ml-4">
+            <div>
               <p className="text-sm font-medium text-body-muted">
                 {activeTab === 'today' && todaySubTab === 'active' ? 'Total Active' : 
                  activeTab === 'today' && todaySubTab === 'ready' ? 'Total Ready' :
@@ -914,7 +914,7 @@ const KitchenOrders: React.FC<KitchenOrdersProps> = ({ cart, setCart }) => {
               return (
                 <div
                   key={order.id}
-                  className={`card card-status-${order.status}`}
+                  className={`glass-card order-glass-card card-status-${order.status} rounded-2xl p-6`}
                 >
                 {/* Order Header */}
                 <div className="flex items-center justify-between mb-4">
@@ -934,7 +934,7 @@ const KitchenOrders: React.FC<KitchenOrdersProps> = ({ cart, setCart }) => {
                     {(isHistoryCard || isCancelledCard) && (
                       <button
                         onClick={() => toggleHistoryCard(order.id)}
-                        className="p-1 hover:bg-[var(--surface-table)] rounded"
+                        className="p-1 rounded hover:bg-white/25 dark:hover:bg-white/10"
                       >
                         {isExpanded ? (
                           <ChevronUp className="h-4 w-4 text-on-surface-variant" />
@@ -951,7 +951,7 @@ const KitchenOrders: React.FC<KitchenOrdersProps> = ({ cart, setCart }) => {
                   <>
                                     {/* Customer Info */}
                 {editingOrder === order.id ? (
-                  <div className="mb-4 p-3 bg-[var(--surface-table)] rounded-lg space-y-3">
+                  <div className="mb-4 p-3 rounded-lg space-y-3 bg-white/35 dark:bg-white/10 border border-white/45 dark:border-white/15 backdrop-blur-md">
                     <div>
                       <label className="block text-sm font-medium text-on-surface mb-1">
                         Customer Name
@@ -1105,7 +1105,7 @@ const KitchenOrders: React.FC<KitchenOrdersProps> = ({ cart, setCart }) => {
                     </div>
                   </div>
                 ) : (
-                  <div className="mb-4 p-3 bg-[var(--surface-table)] rounded-lg">
+                  <div className="mb-4 p-3 rounded-lg bg-white/35 dark:bg-white/10 border border-white/45 dark:border-white/15 backdrop-blur-md">
                     <p className="font-medium text-on-surface">
                       {order.customer_name || 'Walk-in Customer'}
                     </p>
@@ -1170,7 +1170,7 @@ const KitchenOrders: React.FC<KitchenOrdersProps> = ({ cart, setCart }) => {
                         <div className="space-y-3">
                           {editFormData.items && editFormData.items.length > 0 ? (
                             editFormData.items.map((item, index) => (
-                              <div key={index} className="p-3 bg-[var(--surface-table)] rounded-lg space-y-2">
+                              <div key={index} className="p-3 rounded-lg space-y-2 bg-white/35 dark:bg-white/10 border border-white/45 dark:border-white/15 backdrop-blur-md">
                                 <div className="flex items-center justify-between">
                                   <span className="text-sm font-medium text-on-surface">
                                     Item {index + 1}
@@ -1340,115 +1340,115 @@ const KitchenOrders: React.FC<KitchenOrdersProps> = ({ cart, setCart }) => {
                 )}
 
                 {/* Actions */}
-                <div className="flex items-center justify-between pt-3 border-t">
-                  <div className="flex space-x-2">
-                    {editingOrder === order.id ? (
-                      // Editing mode actions
-                      <div className="flex space-x-2">
-                        <button
-                          onClick={saveOrder}
-                          className="text-sm px-3 py-1 bg-[var(--color-success)] text-[var(--color-on-success)] rounded hover:opacity-90 flex items-center"
-                        >
-                          <Save className="h-3 w-3 mr-1" />
-                          Save
-                        </button>
-                        <button
-                          onClick={cancelEditing}
-                          className="text-sm px-3 py-1 bg-[var(--color-primary)] text-on-primary rounded hover:opacity-90 flex items-center"
-                        >
-                          <X className="h-3 w-3 mr-1" />
-                          Cancel
-                        </button>
-                      </div>
-                    ) : (
-                      // Normal mode actions
-                      <>
-                        {/* Show update buttons for today's orders and for admin/chef in history/cancelled tabs */}
-                        {(activeTab === 'today' || (user?.role === 'admin' || user?.role === 'chef')) && (
-                          <div className="flex flex-wrap gap-1">
-                            {getStatusOptions(order.status).map((status) => (
-                              <button
-                                key={status}
-                                onClick={() => updateOrderStatus(order.id, status)}
-                                className={`text-xs px-2 py-1 rounded border ${
-                                  status === 'cancelled' 
-                                    ? isDarkMode 
-                                      ? 'text-red-400 border-red-600 hover:bg-red-900' 
-                                      : 'text-red-600 border-red-300 hover:bg-red-50'
-                                    : status === 'completed'
-                                    ? isDarkMode
-                                      ? 'text-green-400 border-green-600 hover:bg-green-900'
-                                      : 'text-green-600 border-green-300 hover:bg-green-50'
-                                    : isDarkMode
-                                      ? 'text-blue-400 border-blue-600 hover:bg-blue-900'
-                                      : 'text-blue-600 border-blue-300 hover:bg-blue-50'
-                                }`}
-                              >
-                                {status.charAt(0).toUpperCase() + status.slice(1)}
-                              </button>
-                            ))}
-                          </div>
-                        )}
-                      </>
-                    )}
-                  </div>
-                  <div className="flex items-center flex-wrap gap-2">
-                    {editingOrder !== order.id && (
-                      <>
-                        {(user?.role === 'admin' || (user?.role === 'chef' && cafeSettings?.chef_can_edit_orders) || (user?.role === 'reception' && cafeSettings?.reception_can_edit_orders)) && (
+                <div className="pt-3 border-t space-y-3">
+                  {editingOrder === order.id ? (
+                    // Editing mode actions
+                    <div className="grid grid-cols-2 gap-2">
+                      <GlassButton
+                        onClick={saveOrder}
+                        size="sm"
+                        className="w-full glass-button-secondary [&_.glass-button]:!bg-[var(--color-success)] [&_.glass-button]:!border-[var(--color-success)] [&_.glass-button]:!text-[var(--color-on-success)] [&_.glass-button:hover]:brightness-105"
+                        contentClassName="w-full flex items-center justify-center gap-1.5"
+                      >
+                        <Save className="h-3 w-3 shrink-0" />
+                        Save
+                      </GlassButton>
+                      <GlassButton
+                        onClick={cancelEditing}
+                        size="sm"
+                        className="w-full glass-button-primary"
+                        contentClassName="w-full flex items-center justify-center gap-1.5"
+                      >
+                        <X className="h-3 w-3 shrink-0" />
+                        Cancel
+                      </GlassButton>
+                    </div>
+                  ) : (
+                    // Normal mode actions (2-column grid)
+                    <div className="grid grid-cols-2 gap-2">
+                      {/* Show update buttons for today's orders and for admin/chef in history/cancelled tabs */}
+                      {(activeTab === 'today' || (user?.role === 'admin' || user?.role === 'chef')) &&
+                        getStatusOptions(order.status).map((status) => (
                           <GlassButton
-                            onClick={() => startEditing(order)}
+                            key={status}
+                            onClick={() => updateOrderStatus(order.id, status)}
                             size="sm"
-                            className="glass-button-secondary"
-                            contentClassName="flex items-center gap-1.5"
-                            title="Edit Order"
+                            className={`w-full glass-button-secondary ${
+                              status === 'cancelled'
+                                ? isDarkMode
+                                  ? '[&_.glass-button]:!border-red-600/70 [&_.glass-button]:!text-red-300 [&_.glass-button:hover]:!bg-red-900/35'
+                                  : '[&_.glass-button]:!border-red-300 [&_.glass-button]:!text-red-600 [&_.glass-button:hover]:!bg-red-50/90'
+                                : status === 'completed'
+                                ? isDarkMode
+                                  ? '[&_.glass-button]:!border-green-600/70 [&_.glass-button]:!text-green-300 [&_.glass-button:hover]:!bg-green-900/35'
+                                  : '[&_.glass-button]:!border-green-300 [&_.glass-button]:!text-green-700 [&_.glass-button:hover]:!bg-green-50/90'
+                                : isDarkMode
+                                  ? '[&_.glass-button]:!border-blue-600/70 [&_.glass-button]:!text-blue-300 [&_.glass-button:hover]:!bg-blue-900/35'
+                                  : '[&_.glass-button]:!border-blue-300 [&_.glass-button]:!text-blue-700 [&_.glass-button:hover]:!bg-blue-50/90'
+                            }`}
+                            contentClassName="w-full flex items-center justify-center text-sm leading-none min-h-[34px]"
                           >
-                            <Edit className="h-4 w-4 shrink-0" />
-                            Edit
+                            {status.charAt(0).toUpperCase() + status.slice(1)}
                           </GlassButton>
-                        )}
-                        <GlassButton
-                          onClick={() => addOrderToCart(order)}
-                          size="sm"
-                          className="glass-button-primary"
-                          contentClassName="flex items-center gap-1.5"
-                          title="Add to Cart"
-                        >
-                          <ShoppingCart className="h-4 w-4 shrink-0" />
-                          Add to Cart
-                        </GlassButton>
-                        <GlassButton
-                          onClick={() => printOrder(order)}
-                          size="sm"
-                          className="glass-button-secondary"
-                          contentClassName="flex items-center gap-1.5"
-                          title="Print Order"
-                        >
-                          <Printer className="h-4 w-4 shrink-0" />
-                          Print
-                        </GlassButton>
-                        {user?.role === 'admin' && (
+                        ))}
+
+                      {editingOrder !== order.id && (
+                        <>
+                          {(user?.role === 'admin' || (user?.role === 'chef' && cafeSettings?.chef_can_edit_orders) || (user?.role === 'reception' && cafeSettings?.reception_can_edit_orders)) && (
+                            <GlassButton
+                              onClick={() => startEditing(order)}
+                              size="sm"
+                              className="w-full glass-button-secondary"
+                              contentClassName="w-full flex items-center justify-center gap-1.5"
+                              title="Edit Order"
+                            >
+                              <Edit className="h-4 w-4 shrink-0" />
+                              Edit
+                            </GlassButton>
+                          )}
                           <GlassButton
-                            onClick={() => handleGenerateInvoice(order)}
-                            disabled={generatingInvoiceId === order.id}
+                            onClick={() => addOrderToCart(order)}
                             size="sm"
-                            className="glass-button-secondary [&_.glass-button]:!border-purple-300 [&_.glass-button]:text-purple-600 [&_.glass-button:hover]:!bg-purple-50"
-                            contentClassName="flex items-center gap-1.5"
-                            title="Generate Invoice"
+                            className="w-full glass-button-primary"
+                            contentClassName="w-full flex items-center justify-center gap-1.5"
+                            title="Add to Cart"
                           >
-                            {generatingInvoiceId === order.id ? (
-                              <RefreshCw className="h-4 w-4 shrink-0 animate-spin" />
-                            ) : (
-                              <>
-                                <FileText className="h-4 w-4 shrink-0" />
-                                Invoice
-                              </>
-                            )}
+                            <ShoppingCart className="h-4 w-4 shrink-0" />
+                            Add to Cart
                           </GlassButton>
-                        )}
-                      </>
-                    )}
-                  </div>
+                          <GlassButton
+                            onClick={() => printOrder(order)}
+                            size="sm"
+                            className="w-full glass-button-secondary"
+                            contentClassName="w-full flex items-center justify-center gap-1.5"
+                            title="Print Order"
+                          >
+                            <Printer className="h-4 w-4 shrink-0" />
+                            Print
+                          </GlassButton>
+                          {user?.role === 'admin' && (
+                            <GlassButton
+                              onClick={() => handleGenerateInvoice(order)}
+                              disabled={generatingInvoiceId === order.id}
+                              size="sm"
+                              className="w-full glass-button-secondary [&_.glass-button]:!border-purple-300 [&_.glass-button]:text-purple-600 [&_.glass-button:hover]:!bg-purple-50"
+                              contentClassName="w-full flex items-center justify-center gap-1.5"
+                              title="Generate Invoice"
+                            >
+                              {generatingInvoiceId === order.id ? (
+                                <RefreshCw className="h-4 w-4 shrink-0 animate-spin" />
+                              ) : (
+                                <>
+                                  <FileText className="h-4 w-4 shrink-0" />
+                                  Invoice
+                                </>
+                              )}
+                            </GlassButton>
+                          )}
+                        </>
+                      )}
+                    </div>
+                  )}
                 </div>
               </div>
             );
