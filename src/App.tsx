@@ -238,9 +238,9 @@ function MainApp() {
               )}
             </div>
             <div className="flex items-center space-x-2">
-              <div className="hidden sm:flex items-center space-x-2 text-sm" style={{ color: 'var(--color-on-surface-variant)' }}>
+              <div className="hidden sm:flex items-center space-x-2 text-xs uppercase tracking-wide glass-card px-3 py-1.5 rounded-full border border-[var(--color-outline-variant)]" style={{ color: 'var(--color-on-surface-variant)' }}>
                 <User className="h-4 w-4" />
-                <span>{user?.username}</span>
+                <span>{String(user?.username || '').toUpperCase()}</span>
               </div>
               <DarkModeToggle />
               <GlassButton onClick={handleLogout} size="icon" className="glass-button-secondary [&_.glass-button]:!bg-transparent [&_.glass-button]:!border-transparent [&_.glass-button]:text-[var(--color-on-surface-variant)] [&_.glass-button:hover]:!bg-[var(--color-primary-container)] [&_.glass-button:hover]:!text-[var(--color-primary)]" title="Logout">

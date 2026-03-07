@@ -675,11 +675,11 @@ const MenuManagement: React.FC<MenuManagementProps> = ({ menuItems, onUpdate, on
       </div>
 
       {/* Tab Navigation – same as Reports & Invoices */}
-      <div className="flex gap-2 p-1 rounded-2xl glass-card w-fit">
+      <div className="flex gap-2 p-1 rounded-none glass-card w-fit">
         <button
           type="button"
           onClick={() => setActiveTab('menu-items')}
-          className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-colors ${
+          className={`flex items-center gap-2 px-4 py-2.5 rounded-none text-sm font-medium transition-colors ${
             activeTab === 'menu-items'
               ? 'bg-[var(--color-primary)] text-[var(--color-on-primary)]'
               : 'text-[var(--color-on-surface-variant)] hover:bg-[var(--surface-table)]/50 hover:text-[var(--color-on-surface)]'
@@ -691,13 +691,13 @@ const MenuManagement: React.FC<MenuManagementProps> = ({ menuItems, onUpdate, on
         <button
           type="button"
           onClick={() => setActiveTab('categories')}
-          className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-colors ${
+          className={`flex items-center gap-2 px-4 py-2.5 rounded-none text-sm font-medium transition-colors ${
             activeTab === 'categories'
               ? 'bg-[var(--color-primary)] text-[var(--color-on-primary)]'
               : 'text-[var(--color-on-surface-variant)] hover:bg-[var(--surface-table)]/50 hover:text-[var(--color-on-surface)]'
           }`}
         >
-          <FolderOpen className="h-4 w-4 shrink-0" />
+          <Sparkles className="h-4 w-4 shrink-0" />
           Categories
         </button>
       </div>
