@@ -2,6 +2,27 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
+    <script>
+      (function() {
+        try {
+          var saved = localStorage.getItem('darkMode');
+          var isDark = saved !== null ? JSON.parse(saved) === true : false;
+          var root = document.documentElement;
+          if (isDark) {
+            root.classList.add('dark');
+            root.setAttribute('data-theme', 'dark');
+          } else {
+            root.classList.remove('dark');
+            root.removeAttribute('data-theme');
+          }
+        } catch (e) {}
+      })();
+    </script>
+    <style>
+      html { background-color: #e1e5df; }
+      html.dark { background-color: #0b0f05; }
+      body { background-color: inherit; }
+    </style>
     <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
     <link
       rel="icon"
@@ -24,12 +45,22 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Fuggles&family=Noto+Sans:ital,wght@0,100..900;1,100..900&family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#ed7a1a" />
+    <meta name="theme-color" content="#334b26" id="theme-color-meta" />
     <meta
       name="description"
       content="Professional cafe management with invoice generation"
     />
     <title>Palm Cafe Management System</title>
+    <script>
+      (function() {
+        try {
+          var meta = document.getElementById('theme-color-meta');
+          if (meta && document.documentElement.classList.contains('dark')) {
+            meta.setAttribute('content', '#0b0f05');
+          }
+        } catch (e) {}
+      })();
+    </script>
   </head>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>

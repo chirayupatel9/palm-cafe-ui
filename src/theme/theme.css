@@ -12,50 +12,50 @@
    ============================================ */
 
 :root {
-  /* Primary Colors - Material Design aligned */
-  --color-primary: #6F4E37;
-  --color-primary-dark: #5A3E2A;
-  --color-on-primary: #FFFFFF;
-  --color-primary-container: #EFE7DD;
-  --color-on-primary-container: #2C1810;
+  /* Primary Colors - palette: #e1e5df #b3af9b #a57f42 #91590b #334b26 #0b0f05 */
+  --color-primary: #334b26;
+  --color-primary-dark: #253419;
+  --color-on-primary: #e1e5df;
+  --color-primary-container: #e1e5df;
+  --color-on-primary-container: #0b0f05;
   
   /* Secondary Colors */
-  --color-secondary: #153059;
-  --color-on-secondary: #FFFFFF;
-  --color-secondary-container: #E1E7F1;
-  --color-on-secondary-container: #153059;
+  --color-secondary: #91590b;
+  --color-on-secondary: #e1e5df;
+  --color-secondary-container: #b3af9b;
+  --color-on-secondary-container: #0b0f05;
   
   /* Accent/Tertiary Colors */
-  --color-accent: #D4A574;
-  --color-on-accent: #FFFFFF;
+  --color-accent: #a57f42;
+  --color-on-accent: #e1e5df;
   
-  /* Surface Colors - aligned with unified palette */
-  --color-background: #F7F4EF;
-  --color-on-background: #2C1810;
-  --color-surface: #FFFCF7;
-  --color-on-surface: #2C1810;
-  --color-surface-variant: #F0ECE6;
-  --color-on-surface-variant: #4B5563;
+  /* Surface Colors - aligned with palette */
+  --color-background: #e1e5df;
+  --color-on-background: #0b0f05;
+  --color-surface: #e1e5df;
+  --color-on-surface: #0b0f05;
+  --color-surface-variant: #b3af9b;
+  --color-on-surface-variant: #0b0f05;
   
-  /* Explicit Surface Layers - Warm neutral palette (no beige cast) */
-  --surface-page: #F7F4EF;           /* App background - warm neutral */
-  --surface-container: #F7F4EF;      /* Main content - same as page */
-  --surface-nav: #FFFCF7;            /* Navigation - warm near-white */
-  --surface-card: #FFFCF7;           /* Cards - warm near-white */
-  --surface-elevated: #FFFCF7;       /* Elevated cards - shadow for depth */
-  --surface-table: #F0ECE6;          /* Table / image placeholders - subtle tint */
+  /* Explicit Surface Layers */
+  --surface-page: #e1e5df;
+  --surface-container: #e1e5df;
+  --surface-nav: #e1e5df;
+  --surface-card: #e1e5df;
+  --surface-elevated: #e1e5df;
+  --surface-table: #b3af9b;
   
   /* On-surface colors for each layer */
-  --on-surface-page: #2C1810;
-  --on-surface-container: #2C1810;
-  --on-surface-nav: #2C1810;
-  --on-surface-card: #2C1810;
-  --on-surface-elevated: #2C1810;
-  --on-surface-table: #2C1810;
+  --on-surface-page: #0b0f05;
+  --on-surface-container: #0b0f05;
+  --on-surface-nav: #0b0f05;
+  --on-surface-card: #0b0f05;
+  --on-surface-elevated: #0b0f05;
+  --on-surface-table: #0b0f05;
   
-  /* Outline/Border - visible against light surfaces */
-  --color-outline: #D1D5DB;
-  --color-outline-variant: #E5E7EB;
+  /* Outline/Border */
+  --color-outline: #b3af9b;
+  --color-outline-variant: #b3af9b;
   
   /* Semantic Colors */
   --color-success: #10B981;
@@ -67,10 +67,10 @@
   --color-info: #3B82F6;
   --color-on-info: #FFFFFF;
   
-  /* Text Colors - WCAG AA contrast on #FFFCF7 / #F7F4EF */
-  --color-text-primary: #2C1810;
-  --color-text-secondary: #4B5563;
-  --color-text-disabled: #6B7280;
+  /* Text Colors */
+  --color-text-primary: #0b0f05;
+  --color-text-secondary: #334b26;
+  --color-text-disabled: #91590b;
   
   /* Legacy compatibility - mapped to Material tokens */
   --color-text-muted: var(--color-text-secondary);
@@ -107,6 +107,8 @@
   --elevation-3: 0 8px 16px 0 rgba(0, 0, 0, 0.15), 0 4px 8px 0 rgba(0, 0, 0, 0.1);
   --elevation-4: 0 12px 24px 0 rgba(0, 0, 0, 0.18), 0 6px 12px 0 rgba(0, 0, 0, 0.12);
   --elevation-nav: 0 2px 8px 0 rgba(0, 0, 0, 0.08);
+  --nav-active-pill-top-highlight: linear-gradient(180deg, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0.1) 40%, transparent 100%);
+  --nav-active-pill-inner-shadow: inset 0 0 20px rgba(255, 255, 255, 0.15), inset 0 -4px 12px rgba(0, 0, 0, 0.06);
 }
 
 /* ============================================
@@ -114,50 +116,50 @@
    ============================================ */
 
 .dark {
-  /* Primary Colors */
-  --color-primary: #8B6F47;
-  --color-primary-dark: #7A5F3A;
-  --color-on-primary: #FFFFFF;
-  --color-primary-container: #2c241d;
-  --color-on-primary-container: #F7F4EF;
+  /* Primary Colors - same palette, dark mode */
+  --color-primary: #334b26;
+  --color-primary-dark: #0b0f05;
+  --color-on-primary: #e1e5df;
+  --color-primary-container: #334b26;
+  --color-on-primary-container: #e1e5df;
   
   /* Secondary Colors */
-  --color-secondary: #A0826D;
-  --color-on-secondary: #FFFFFF;
-  --color-secondary-container: #374151;
-  --color-on-secondary-container: #E1E7F1;
+  --color-secondary: #91590b;
+  --color-on-secondary: #e1e5df;
+  --color-secondary-container: #334b26;
+  --color-on-secondary-container: #e1e5df;
   
   /* Accent/Tertiary Colors */
-  --color-accent: #D4A574;
-  --color-on-accent: #FFFFFF;
+  --color-accent: #a57f42;
+  --color-on-accent: #e1e5df;
   
   /* Surface Colors */
-  --color-background: #1a1612;
-  --color-on-background: #F7F4EF;
-  --color-surface: #2c241d;
-  --color-on-surface: #F7F4EF;
-  --color-surface-variant: #374151;
-  --color-on-surface-variant: #D1D5DB;
+  --color-background: #0b0f05;
+  --color-on-background: #e1e5df;
+  --color-surface: #0b0f05;
+  --color-on-surface: #e1e5df;
+  --color-surface-variant: #334b26;
+  --color-on-surface-variant: #b3af9b;
   
-  /* Explicit Surface Layers - Unified (Dark Mode) */
-  --surface-page: #1a1612;           /* App background */
-  --surface-container: #1a1612;      /* Main content - same as page */
-  --surface-nav: #211d18;           /* Navigation - subtle lift */
-  --surface-card: #211d18;          /* Cards - same as nav */
-  --surface-elevated: #25201a;      /* Elevated - shadow for depth */
-  --surface-table: #211d18;         /* Table / placeholders */
+  /* Explicit Surface Layers (Dark Mode) */
+  --surface-page: #0b0f05;
+  --surface-container: #0b0f05;
+  --surface-nav: #253419;
+  --surface-card: #253419;
+  --surface-elevated: #334b26;
+  --surface-table: #253419;
   
   /* On-surface colors for each layer (Dark Mode) */
-  --on-surface-page: #F7F4EF;
-  --on-surface-container: #F7F4EF;
-  --on-surface-nav: #F7F4EF;
-  --on-surface-card: #F7F4EF;
-  --on-surface-elevated: #F7F4EF;
-  --on-surface-table: #F7F4EF;
+  --on-surface-page: #e1e5df;
+  --on-surface-container: #e1e5df;
+  --on-surface-nav: #e1e5df;
+  --on-surface-card: #e1e5df;
+  --on-surface-elevated: #e1e5df;
+  --on-surface-table: #e1e5df;
   
-  /* Outline/Border - visible against dark surfaces */
-  --color-outline: #4B5563;
-  --color-outline-variant: #6B7280;
+  /* Outline/Border */
+  --color-outline: #334b26;
+  --color-outline-variant: #91590b;
   
   /* Semantic Colors */
   --color-success: #34D399;
@@ -169,10 +171,10 @@
   --color-info: #60A5FA;
   --color-on-info: #FFFFFF;
   
-  /* Text Colors - WCAG AA contrast on dark backgrounds */
-  --color-text-primary: #F7F4EF;
-  --color-text-secondary: #D1D5DB;
-  --color-text-disabled: #9CA3AF;
+  /* Text Colors (Dark Mode) */
+  --color-text-primary: #e1e5df;
+  --color-text-secondary: #b3af9b;
+  --color-text-disabled: #a57f42;
   
   /* Legacy compatibility */
   --color-text-muted: var(--color-text-secondary);
@@ -193,4 +195,6 @@
   --elevation-3: 0 8px 20px 0 rgba(0, 0, 0, 0.7), 0 4px 10px 0 rgba(0, 0, 0, 0.6);
   --elevation-4: 0 12px 28px 0 rgba(0, 0, 0, 0.8), 0 6px 14px 0 rgba(0, 0, 0, 0.7);
   --elevation-nav: 0 2px 12px 0 rgba(0, 0, 0, 0.6);
+  --nav-active-pill-top-highlight: none;
+  --nav-active-pill-inner-shadow: inset 0 -4px 12px rgba(0, 0, 0, 0.18);
 }
