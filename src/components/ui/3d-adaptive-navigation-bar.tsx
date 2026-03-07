@@ -196,14 +196,14 @@ export const PillBase: React.FC<PillBaseProps> = ({
                         className="absolute inset-x-0 top-0 rounded-t-full pointer-events-none"
                         style={{
                           height: '55%',
-                          background: 'linear-gradient(180deg, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0.1) 40%, transparent 100%)',
+                          background: 'var(--nav-active-pill-top-highlight)',
                           borderRadius: '9999px 9999px 0 0'
                         }}
                       />
                       <span
                         className="absolute inset-0 rounded-full pointer-events-none"
                         style={{
-                          boxShadow: 'inset 0 0 20px rgba(255,255,255,0.15), inset 0 -4px 12px rgba(0,0,0,0.06)'
+                          boxShadow: 'var(--nav-active-pill-inner-shadow)'
                         }}
                       />
                     </motion.span>

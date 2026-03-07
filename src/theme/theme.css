@@ -107,6 +107,8 @@
   --elevation-3: 0 8px 16px 0 rgba(0, 0, 0, 0.15), 0 4px 8px 0 rgba(0, 0, 0, 0.1);
   --elevation-4: 0 12px 24px 0 rgba(0, 0, 0, 0.18), 0 6px 12px 0 rgba(0, 0, 0, 0.12);
   --elevation-nav: 0 2px 8px 0 rgba(0, 0, 0, 0.08);
+  --nav-active-pill-top-highlight: linear-gradient(180deg, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0.1) 40%, transparent 100%);
+  --nav-active-pill-inner-shadow: inset 0 0 20px rgba(255, 255, 255, 0.15), inset 0 -4px 12px rgba(0, 0, 0, 0.06);
 }
 
 /* ============================================
@@ -193,4 +195,6 @@
   --elevation-3: 0 8px 20px 0 rgba(0, 0, 0, 0.7), 0 4px 10px 0 rgba(0, 0, 0, 0.6);
   --elevation-4: 0 12px 28px 0 rgba(0, 0, 0, 0.8), 0 6px 14px 0 rgba(0, 0, 0, 0.7);
   --elevation-nav: 0 2px 12px 0 rgba(0, 0, 0, 0.6);
+  --nav-active-pill-top-highlight: none;
+  --nav-active-pill-inner-shadow: inset 0 -4px 12px rgba(0, 0, 0, 0.18);
 }
