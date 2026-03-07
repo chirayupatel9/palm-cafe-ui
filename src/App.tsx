@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, lazy, Suspense } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster, toast } from 'react-hot-toast';
 import SwipeableToast from './components/ui/SwipeableToast';
@@ -11,38 +11,57 @@ import { CafeSettingsProvider, useCafeSettings } from './contexts/CafeSettingsCo
 import { ThemeProvider } from './contexts/ThemeContext';
 import { SubscriptionProvider, useSubscription } from './contexts/SubscriptionContext';
 import { FeatureProvider, useFeatures } from './contexts/FeatureContext';
-import OrderPage from './components/OrderPage';
-import MenuManagement from './components/MenuManagement';
-import InvoiceHistory from './components/InvoiceHistory';
-import InventoryManagement from './components/InventoryManagement';
-import KitchenOrders from './components/KitchenOrders';
-import CustomerManagement from './components/CustomerManagement';
-import CafeSettings from './components/CafeSettings';
-import CafeUserManagement from './components/CafeUserManagement';
-import CafeAnalytics from './components/CafeAnalytics';
 import CafeInfo from './components/CafeInfo';
-import CustomerApp from './components/CustomerApp';
-import LandingPage from './components/LandingPage';
 import DarkModeToggle from './components/DarkModeToggle';
-import Login from './components/Login';
-import AdminRegister from './components/AdminRegister';
-import ChefRegister from './components/ChefRegister';
-import ReceptionRegister from './components/ReceptionRegister';
-import ChefApp from './components/ChefApp';
-import ReceptionApp from './components/ReceptionApp';
-import SuperadminApp from './components/SuperadminApp';
 import ImpersonationBanner from './components/ImpersonationBanner';
 import ProtectedRoute from './components/ProtectedRoute';
 import RoleBasedRedirect from './components/RoleBasedRedirect';
 import DashboardRedirect from './components/DashboardRedirect';
 import OnboardingGuard from './components/OnboardingGuard';
-import StockCategoryListDemo from './components/StockCategoryListDemo';
 import { PillBase, type NavItem } from './components/ui/3d-adaptive-navigation-bar';
 import { GlassButton } from './components/ui/GlassButton';
 
 const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
 const API_PATH = '/api';
 axios.defaults.baseURL = `${API_BASE_URL}${API_PATH}`;
+
+const OrderPage = lazy(() => import('./components/OrderPage'));
+const MenuManagement = lazy(() => import('./components/MenuManagement'));
+const InvoiceHistory = lazy(() => import('./components/InvoiceHistory'));
+const InventoryManagement = lazy(() => import('./components/InventoryManagement'));
+const KitchenOrders = lazy(() => import('./components/KitchenOrders'));
+const CustomerManagement = lazy(() => import('./components/CustomerManagement'));
+const CafeSettings = lazy(() => import('./components/CafeSettings'));
+const CafeUserManagement = lazy(() => import('./components/CafeUserManagement'));
+const CafeAnalytics = lazy(() => import('./components/CafeAnalytics'));
+const CustomerApp = lazy(() => import('./components/CustomerApp'));
+const LandingPage = lazy(() => import('./components/LandingPage'));
+const Login = lazy(() => import('./components/Login'));
+const AdminRegister = lazy(() => import('./components/AdminRegister'));
+const ChefRegister = lazy(() => import('./components/ChefRegister'));
+const ReceptionRegister = lazy(() => import('./components/ReceptionRegister'));
+const ChefApp = lazy(() => import('./components/ChefApp'));
+const ReceptionApp = lazy(() => import('./components/ReceptionApp'));
+const SuperadminApp = lazy(() => import('./components/SuperadminApp'));
+const StockCategoryListDemo = lazy(() => import('./components/StockCategoryListDemo'));
+
+const navigationItems = [
+  { id: 'order', label: 'Dashboard', icon: BarChart3, module: 'orders', primary: true },
+  { id: 'kitchen', label: 'Orders', icon: Receipt, module: 'orders' },
+  { id: 'menu', label: 'Menu', icon: Utensils, module: 'menu_management' },
+  { id: 'customers', label: 'Customers', icon: Users, module: 'customers' },
+  { id: 'analytics', label: 'Analytics', icon: TrendingUp, module: 'analytics' },
+  { id: 'inventory', label: 'Inventory', icon: Package, module: 'inventory' },
+  { id: 'users', label: 'User Management', icon: User, module: 'users' },
+  { id: 'advanced-reports', label: 'Reports', icon: FileText, module: 'advanced_reports' },
+  { id: 'cafe-settings', label: 'Settings', icon: Settings, module: 'settings' }
+];
+
+const SectionLoader = ({ message = 'Loading...' }: { message?: string }) => (
+  <div className="w-full flex items-center justify-center py-8" style={{ color: 'var(--color-on-surface-variant)' }}>
+    {message}
+  </div>
+);
 
 const CustomerRedirect = () => {
   const { user } = useAuth();
@@ -76,15 +95,15 @@ function MainApp() {
   const [cart, setCart] = useState<unknown[]>([]);
   const { user, logout, impersonation } = useAuth();
   const { cafeSettings, loading: cafeSettingsLoading } = useCafeSettings();
-  const { hasModuleAccess, loading: subscriptionLoading, subscription, isActive } = useSubscription();
+  const { hasModuleAccess, loading: subscriptionLoading } = useSubscription();
   const { hasFeature, loading: featuresLoading } = useFeatures();
 
-  const checkFeatureAccess = (featureKey: string): boolean => {
+  const checkFeatureAccess = useCallback((featureKey: string): boolean => {
     if (typeof hasFeature === 'function') {
       return hasFeature(featureKey);
     }
     return hasModuleAccess ? hasModuleAccess(featureKey) : false;
-  };
+  }, [hasFeature, hasModuleAccess]);
 
   const fetchMenuItems = useCallback(async () => {
     try {
@@ -113,13 +132,13 @@ function MainApp() {
     } finally {
       setLoading(false);
     }
-  }, [subscription, isActive]);
+  }, []);
 
   useEffect(() => {
     if (!subscriptionLoading && !cafeSettingsLoading && !featuresLoading && user) {
       fetchMenuItems();
     }
-  }, [subscriptionLoading, cafeSettingsLoading, featuresLoading, user, subscription, fetchMenuItems]);
+  }, [subscriptionLoading, cafeSettingsLoading, featuresLoading, user, fetchMenuItems]);
 
   const updateMenuItem = async (id: string | number, updatedItem: unknown) => {
     try {
@@ -157,16 +176,16 @@ function MainApp() {
     }
   };
 
-  const handlePageChange = (page: string) => {
+  const handlePageChange = useCallback((page: string) => {
     setCurrentPage(page);
     setMobileMenuOpen(false);
-  };
+  }, []);
 
   const handleLogout = () => {
     logout();
   };
 
-  const renderPage = () => {
+  const activePage = useMemo(() => {
     switch (currentPage) {
       case 'order':
         return <OrderPage menuItems={menuItems} cart={cart} setCart={setCart} />;
@@ -193,23 +212,13 @@ function MainApp() {
       default:
         return <OrderPage menuItems={menuItems} cart={cart} setCart={setCart} />;
     }
-  };
+  }, [currentPage, menuItems, cart, user?.role, cafeSettings?.admin_can_access_settings]);
 
-  const navigationItems = [
-    { id: 'order', label: 'Dashboard', icon: BarChart3, module: 'orders', primary: true },
-    { id: 'kitchen', label: 'Orders', icon: Receipt, module: 'orders' },
-    { id: 'menu', label: 'Menu', icon: Utensils, module: 'menu_management' },
-    { id: 'customers', label: 'Customers', icon: Users, module: 'customers' },
-    { id: 'analytics', label: 'Analytics', icon: TrendingUp, module: 'analytics' },
-    { id: 'inventory', label: 'Inventory', icon: Package, module: 'inventory' },
-    { id: 'users', label: 'User Management', icon: User, module: 'users' },
-    { id: 'advanced-reports', label: 'Reports', icon: FileText, module: 'advanced_reports' },
-    { id: 'cafe-settings', label: 'Settings', icon: Settings, module: 'settings' }
-  ];
-
-  const pillNavItems: NavItem[] = navigationItems
-    .filter((item) => checkFeatureAccess(item.module))
-    .map((item) => ({ id: item.id, label: item.label }));
+  const pillNavItems: NavItem[] = useMemo(() => (
+    navigationItems
+      .filter((item) => checkFeatureAccess(item.module))
+      .map((item) => ({ id: item.id, label: item.label }))
+  ), [checkFeatureAccess]);
 
   if (loading || cafeSettingsLoading || subscriptionLoading || featuresLoading) {
     return (
@@ -286,7 +295,9 @@ function MainApp() {
         </div>
       </nav>
       <main className="surface-container flex-1 max-w-7xl mx-auto my-8 sm:my-12 px-4 sm:px-6 lg:px-8 w-full">
-        {renderPage()}
+        <Suspense fallback={<SectionLoader />}>
+          {activePage}
+        </Suspense>
       </main>
     </div>
   );
@@ -323,29 +334,31 @@ function App() {
                       {(t) => <SwipeableToast toast={t as any} position="bottom-center" />}
                     </Toaster>
                     <ImpersonationBanner />
-                    <Routes>
-                      <Route path="/" element={<LandingPage />} />
-                      <Route path="/demo/stock-categories" element={<StockCategoryListDemo />} />
-                      <Route path="/login" element={<Login />} />
-                      <Route path="/admin/register" element={<ProtectedRoute><AdminRegister /></ProtectedRoute>} />
-                      <Route path="/chef/register" element={<ProtectedRoute><ChefRegister /></ProtectedRoute>} />
-                      <Route path="/reception/register" element={<ProtectedRoute><ReceptionRegister /></ProtectedRoute>} />
-                      <Route path="/cafe/:slug" element={<CustomerApp />} />
-                      <Route path="/cafe/:slug/menu" element={<CustomerApp />} />
-                      <Route path="/cafe/:slug/order" element={<CustomerApp />} />
-                      <Route path="/customer" element={<CustomerRedirect />} />
-                      <Route path="/admin" element={<ProtectedRoute><OnboardingGuard><RoleBasedRedirect><MainApp /></RoleBasedRedirect></OnboardingGuard></ProtectedRoute>} />
-                      <Route path="/chef" element={<ProtectedRoute><OnboardingGuard><RoleBasedRedirect><ChefApp /></RoleBasedRedirect></OnboardingGuard></ProtectedRoute>} />
-                      <Route path="/reception" element={<ProtectedRoute><OnboardingGuard><RoleBasedRedirect><ReceptionApp /></RoleBasedRedirect></OnboardingGuard></ProtectedRoute>} />
-                      <Route path="/superadmin" element={<ProtectedRoute><RoleBasedRedirect><SuperadminApp /></RoleBasedRedirect></ProtectedRoute>} />
-                      <Route path="/superadmin/cafes" element={<ProtectedRoute><RoleBasedRedirect><SuperadminApp /></RoleBasedRedirect></ProtectedRoute>} />
-                      <Route path="/superadmin/cafes/:cafeId" element={<ProtectedRoute><RoleBasedRedirect><SuperadminApp /></RoleBasedRedirect></ProtectedRoute>} />
-                      <Route path="/superadmin/cafes/:cafeId/users" element={<ProtectedRoute><RoleBasedRedirect><SuperadminApp /></RoleBasedRedirect></ProtectedRoute>} />
-                      <Route path="/superadmin/users" element={<ProtectedRoute><RoleBasedRedirect><SuperadminApp /></RoleBasedRedirect></ProtectedRoute>} />
-                      <Route path="/dashboard" element={<ProtectedRoute><OnboardingGuard><DashboardRedirect /></OnboardingGuard></ProtectedRoute>} />
-                      <Route path="/onboarding" element={<ProtectedRoute><OnboardingGuard><div /></OnboardingGuard></ProtectedRoute>} />
-                      <Route path="*" element={<Navigate to="/" replace />} />
-                    </Routes>
+                    <Suspense fallback={<SectionLoader message="Loading page..." />}>
+                      <Routes>
+                        <Route path="/" element={<LandingPage />} />
+                        <Route path="/demo/stock-categories" element={<StockCategoryListDemo />} />
+                        <Route path="/login" element={<Login />} />
+                        <Route path="/admin/register" element={<ProtectedRoute><AdminRegister /></ProtectedRoute>} />
+                        <Route path="/chef/register" element={<ProtectedRoute><ChefRegister /></ProtectedRoute>} />
+                        <Route path="/reception/register" element={<ProtectedRoute><ReceptionRegister /></ProtectedRoute>} />
+                        <Route path="/cafe/:slug" element={<CustomerApp />} />
+                        <Route path="/cafe/:slug/menu" element={<CustomerApp />} />
+                        <Route path="/cafe/:slug/order" element={<CustomerApp />} />
+                        <Route path="/customer" element={<CustomerRedirect />} />
+                        <Route path="/admin" element={<ProtectedRoute><OnboardingGuard><RoleBasedRedirect><MainApp /></RoleBasedRedirect></OnboardingGuard></ProtectedRoute>} />
+                        <Route path="/chef" element={<ProtectedRoute><OnboardingGuard><RoleBasedRedirect><ChefApp /></RoleBasedRedirect></OnboardingGuard></ProtectedRoute>} />
+                        <Route path="/reception" element={<ProtectedRoute><OnboardingGuard><RoleBasedRedirect><ReceptionApp /></RoleBasedRedirect></OnboardingGuard></ProtectedRoute>} />
+                        <Route path="/superadmin" element={<ProtectedRoute><RoleBasedRedirect><SuperadminApp /></RoleBasedRedirect></ProtectedRoute>} />
+                        <Route path="/superadmin/cafes" element={<ProtectedRoute><RoleBasedRedirect><SuperadminApp /></RoleBasedRedirect></ProtectedRoute>} />
+                        <Route path="/superadmin/cafes/:cafeId" element={<ProtectedRoute><RoleBasedRedirect><SuperadminApp /></RoleBasedRedirect></ProtectedRoute>} />
+                        <Route path="/superadmin/cafes/:cafeId/users" element={<ProtectedRoute><RoleBasedRedirect><SuperadminApp /></RoleBasedRedirect></ProtectedRoute>} />
+                        <Route path="/superadmin/users" element={<ProtectedRoute><RoleBasedRedirect><SuperadminApp /></RoleBasedRedirect></ProtectedRoute>} />
+                        <Route path="/dashboard" element={<ProtectedRoute><OnboardingGuard><DashboardRedirect /></OnboardingGuard></ProtectedRoute>} />
+                        <Route path="/onboarding" element={<ProtectedRoute><OnboardingGuard><div /></OnboardingGuard></ProtectedRoute>} />
+                        <Route path="*" element={<Navigate to="/" replace />} />
+                      </Routes>
+                    </Suspense>
                   </FeatureProvider>
                 </SubscriptionProvider>
               </ThemeProvider>
