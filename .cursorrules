@@ -130,10 +130,14 @@ rules:
 # Documentation
 # ========================
 
-- No documentation is needed for this project. No Creating useless documentation. Only if asked by the user.
+  - id: "documentation"
+    description: "No documentation is needed for this project. No Creating useless documentation. Only if asked by the user."
+    match: "src/**/*.js"
+    apply:
+      - disallow: ["documentation"]
 
 # ========================
-# Tests
+# Tests 
 # ========================
 
   - id: "tests"
@@ -145,4 +149,4 @@ rules:
 # ========================
 # Commit messages
 # ========================
-- One line commit messages are allowed. No need to write long commit messages. Straight to the point.
+  - One line commit messages are allowed. No need to write long commit messages. Straight to the point.
