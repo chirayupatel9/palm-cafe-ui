@@ -316,9 +316,11 @@ const SuperAdminCafeUsers: React.FC = () => {
                   value={formData.password}
                   onChange={handleInputChange}
                   required
-                  minLength={12}
+                  minLength={6}
+                  autoComplete="new-password"
                   className="input-field"
                 />
+                <p className="text-xs text-secondary-500 dark:text-gray-400 mt-1">At least 6 characters</p>
               </div>
 
               <div>
@@ -396,16 +398,21 @@ const SuperAdminCafeUsers: React.FC = () => {
 
               <div>
                 <label className="block text-sm font-medium text-secondary-700 dark:text-gray-300 mb-2">
-                  Password (leave blank to keep current)
+                  Reset password (optional)
                 </label>
                 <input
                   type="password"
                   name="password"
                   value={formData.password}
                   onChange={handleInputChange}
-                  minLength={12}
+                  autoComplete="new-password"
+                  minLength={6}
                   className="input-field"
+                  placeholder="Leave blank to keep current"
                 />
+                <p className="text-xs text-secondary-500 dark:text-gray-400 mt-1">
+                  At least 6 characters when changing password
+                </p>
               </div>
 
               <div>

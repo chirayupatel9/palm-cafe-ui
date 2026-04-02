@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import toast from 'react-hot-toast';
-import { Users, Building, Search, Edit, Check } from 'lucide-react';
+import { Users, Building, Search, Edit, KeyRound } from 'lucide-react';
 import Dialog from './ui/Dialog';
 import Select from './ui/Select';
 
@@ -11,8 +11,14 @@ const SuperAdminUserManagement: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [filterCafeId, setFilterCafeId] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
-  const [editingUser, setEditingUser] = useState(null);
+  const [editingUser, setEditingUser] = useState<any>(null);
   const [selectedCafeId, setSelectedCafeId] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [superAdminPwdTarget, setSuperAdminPwdTarget] = useState<any>(null);
+  const [saNewPassword, setSaNewPassword] = useState('');
+  const [saConfirmPassword, setSaConfirmPassword] = useState('');
+  const [saActorPassword, setSaActorPassword] = useState('');
 
   useEffect(() => {
     fetchCafes();
@@ -45,21 +51,86 @@ const SuperAdminUserManagement: React.FC = () => {
     }
   };
 
-  const handleAssignCafe = async (userId, cafeId) => {
-    if (!cafeId) {
-      toast.error('Please select a cafe');
+  const handleSaveUser = async () => {
+    if (!editingUser) return;
+    const pwd = newPassword.trim();
+    const hasPwd = pwd.length > 0;
+    const cafeIdNum = selectedCafeId ? parseInt(String(selectedCafeId), 10) : null;
+    const prevCafe = editingUser.cafe_id != null ? Number(editingUser.cafe_id) : null;
+    const cafeChanged = cafeIdNum != null && cafeIdNum !== prevCafe;
+
+    if (!hasPwd && !cafeChanged) {
+      toast.error('Select a different cafe or enter a new password');
       return;
     }
 
+    if (hasPwd) {
+      if (pwd.length < 6) {
+        toast.error('Password must be at least 6 characters');
+        return;
+      }
+      if (pwd !== confirmPassword.trim()) {
+        toast.error('Passwords do not match');
+        return;
+      }
+      try {
+        await axios.put(`/superadmin/users/${editingUser.id}`, { password: pwd });
+      } catch (error: any) {
+        console.error('Error resetting password:', error);
+        toast.error(error?.response?.data?.error || 'Failed to reset password');
+        return;
+      }
+    }
+
+    if (cafeChanged && cafeIdNum != null) {
+      try {
+        await axios.put(`/superadmin/users/${editingUser.id}/assign-cafe`, { cafe_id: cafeIdNum });
+      } catch (error: any) {
+        console.error('Error assigning user to cafe:', error);
+        toast.error(error?.response?.data?.error || 'Failed to assign user to cafe');
+        return;
+      }
+    }
+
+    toast.success(
+      hasPwd && cafeChanged ? 'Password and cafe updated' : hasPwd ? 'Password reset' : 'Cafe assignment updated'
+    );
+    setEditingUser(null);
+    setSelectedCafeId('');
+    setNewPassword('');
+    setConfirmPassword('');
+    fetchUsers();
+  };
+
+  const handleSuperAdminPasswordSave = async () => {
+    if (!superAdminPwdTarget) return;
+    const pwd = saNewPassword.trim();
+    if (pwd.length < 6) {
+      toast.error('New password must be at least 6 characters');
+      return;
+    }
+    if (pwd !== saConfirmPassword.trim()) {
+      toast.error('New passwords do not match');
+      return;
+    }
+    if (!saActorPassword) {
+      toast.error('Enter your current password to confirm');
+      return;
+    }
     try {
-      await axios.put(`/superadmin/users/${userId}/assign-cafe`, { cafe_id: parseInt(cafeId) });
-      toast.success('User assigned to cafe successfully');
-      setEditingUser(null);
-      setSelectedCafeId('');
+      await axios.post(`/superadmin/users/${superAdminPwdTarget.id}/reset-superadmin-password`, {
+        newPassword: pwd,
+        actorPassword: saActorPassword
+      });
+      toast.success('Super Admin password updated');
+      setSuperAdminPwdTarget(null);
+      setSaNewPassword('');
+      setSaConfirmPassword('');
+      setSaActorPassword('');
       fetchUsers();
-    } catch (error) {
-      console.error('Error assigning user to cafe:', error);
-      toast.error(error.response?.data?.error || 'Failed to assign user to cafe');
+    } catch (error: any) {
+      console.error('Error resetting superadmin password:', error);
+      toast.error(error?.response?.data?.error || 'Failed to reset password');
     }
   };
 
@@ -190,13 +261,32 @@ const SuperAdminUserManagement: React.FC = () => {
                     {user.last_login ? new Date(user.last_login).toLocaleDateString() : 'Never'}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                    {user.role !== 'superadmin' && (
+                    {user.role === 'superadmin' ? (
                       <button
+                        type="button"
+                        onClick={() => {
+                          setSuperAdminPwdTarget(user);
+                          setSaNewPassword('');
+                          setSaConfirmPassword('');
+                          setSaActorPassword('');
+                        }}
+                        className="text-secondary-600 hover:text-secondary-900 dark:text-gray-400 dark:hover:text-gray-100 inline-flex items-center gap-1"
+                        aria-label={`Reset password for ${user.username}`}
+                        title="Reset Super Admin password"
+                      >
+                        <KeyRound className="h-4 w-4" />
+                      </button>
+                    ) : (
+                      <button
+                        type="button"
                         onClick={() => {
                           setEditingUser(user);
-                          setSelectedCafeId(user.cafe_id || '');
+                          setSelectedCafeId(user.cafe_id ? String(user.cafe_id) : '');
+                          setNewPassword('');
+                          setConfirmPassword('');
                         }}
                         className="text-secondary-600 hover:text-secondary-900 dark:text-gray-400 dark:hover:text-gray-100"
+                        aria-label={`Manage user ${user.username}`}
                       >
                         <Edit className="h-4 w-4" />
                       </button>
@@ -216,11 +306,16 @@ const SuperAdminUserManagement: React.FC = () => {
         )}
       </div>
 
-      {/* Assign Cafe Modal - Template Dialog */}
+      {/* Assign cafe + reset password (superadmin) */}
       <Dialog
         open={!!editingUser}
-        onClose={() => { setEditingUser(null); setSelectedCafeId(''); }}
-        title="Assign User to Cafe"
+        onClose={() => {
+          setEditingUser(null);
+          setSelectedCafeId('');
+          setNewPassword('');
+          setConfirmPassword('');
+        }}
+        title="Manage user"
       >
         {editingUser && (
             <div className="space-y-4 pt-0">
@@ -229,43 +324,162 @@ const SuperAdminUserManagement: React.FC = () => {
                   User: <span className="font-semibold">{editingUser.username}</span>
                 </p>
                 <p className="text-sm text-secondary-600 dark:text-gray-400">
-                  Current Cafe: <span className="font-semibold">{getCafeName(editingUser.cafe_id)}</span>
+                  Role: <span className="font-semibold">{editingUser.role}</span> — Current cafe:{' '}
+                  <span className="font-semibold">{getCafeName(editingUser.cafe_id)}</span>
                 </p>
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-secondary-700 dark:text-gray-300 mb-2">
-                  Select Cafe
+                  Assign to cafe
                 </label>
                 <Select
-                  options={[
-                    { value: '', label: 'No Cafe (Unassign)' },
-                    ...cafes.map(c => ({ value: String(c.id), label: c.name }))
-                  ]}
+                  options={cafes.map(c => ({ value: String(c.id), label: c.name }))}
                   value={selectedCafeId === '' ? '' : String(selectedCafeId)}
                   onChange={setSelectedCafeId}
-                  placeholder="No Cafe (Unassign)"
+                  placeholder="Choose cafe (optional if only resetting password)"
                 />
+                <p className="text-xs text-secondary-500 dark:text-gray-400 mt-1">
+                  Pick a different cafe to move this user, or leave as-is and use reset password below only.
+                </p>
+              </div>
+
+              <div className="border-t border-accent-200 dark:border-gray-700 pt-4 space-y-3">
+                <p className="text-sm font-medium text-secondary-800 dark:text-gray-200">Reset password</p>
+                <div>
+                  <label className="block text-sm font-medium text-secondary-700 dark:text-gray-300 mb-2">
+                    New password
+                  </label>
+                  <input
+                    type="password"
+                    autoComplete="new-password"
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    className="input-field"
+                    placeholder="Leave blank to skip"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-secondary-700 dark:text-gray-300 mb-2">
+                    Confirm new password
+                  </label>
+                  <input
+                    type="password"
+                    autoComplete="new-password"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    className="input-field"
+                    placeholder="Leave blank to skip"
+                  />
+                </div>
+                <p className="text-xs text-secondary-500 dark:text-gray-400">
+                  At least 6 characters. Applies to admins, chefs, and reception only.
+                </p>
               </div>
 
               <div className="flex justify-end space-x-3 pt-4 border-t border-accent-200 dark:border-gray-700">
                 <button
+                  type="button"
                   onClick={() => {
                     setEditingUser(null);
                     setSelectedCafeId('');
+                    setNewPassword('');
+                    setConfirmPassword('');
                   }}
                   className="btn-secondary"
                 >
                   Cancel
                 </button>
                 <button
-                  onClick={() => handleAssignCafe(editingUser.id, selectedCafeId)}
+                  type="button"
+                  onClick={handleSaveUser}
                   className="px-4 py-2 bg-secondary-600 hover:bg-secondary-700 text-white rounded-lg transition-colors"
                 >
-                  Assign
+                  Save
                 </button>
               </div>
             </div>
+        )}
+      </Dialog>
+
+      <Dialog
+        open={!!superAdminPwdTarget}
+        onClose={() => {
+          setSuperAdminPwdTarget(null);
+          setSaNewPassword('');
+          setSaConfirmPassword('');
+          setSaActorPassword('');
+        }}
+        title="Reset Super Admin password"
+      >
+        {superAdminPwdTarget && (
+          <div className="space-y-4 pt-0">
+            <p className="text-sm text-secondary-600 dark:text-gray-400">
+              Account: <span className="font-semibold">{superAdminPwdTarget.username}</span> ({superAdminPwdTarget.email})
+            </p>
+            <p className="text-xs text-secondary-500 dark:text-gray-400">
+              Enter your own Super Admin password to authorize this change.
+            </p>
+            <div>
+              <label className="block text-sm font-medium text-secondary-700 dark:text-gray-300 mb-2">
+                Your current password <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="password"
+                autoComplete="current-password"
+                value={saActorPassword}
+                onChange={(e) => setSaActorPassword(e.target.value)}
+                className="input-field"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-secondary-700 dark:text-gray-300 mb-2">
+                New password for this account <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="password"
+                autoComplete="new-password"
+                value={saNewPassword}
+                onChange={(e) => setSaNewPassword(e.target.value)}
+                minLength={6}
+                className="input-field"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-secondary-700 dark:text-gray-300 mb-2">
+                Confirm new password <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="password"
+                autoComplete="new-password"
+                value={saConfirmPassword}
+                onChange={(e) => setSaConfirmPassword(e.target.value)}
+                minLength={6}
+                className="input-field"
+              />
+            </div>
+            <div className="flex justify-end space-x-3 pt-4 border-t border-accent-200 dark:border-gray-700">
+              <button
+                type="button"
+                onClick={() => {
+                  setSuperAdminPwdTarget(null);
+                  setSaNewPassword('');
+                  setSaConfirmPassword('');
+                  setSaActorPassword('');
+                }}
+                className="btn-secondary"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleSuperAdminPasswordSave}
+                className="px-4 py-2 bg-secondary-600 hover:bg-secondary-700 text-white rounded-lg transition-colors"
+              >
+                Update password
+              </button>
+            </div>
+          </div>
         )}
       </Dialog>
     </div>
