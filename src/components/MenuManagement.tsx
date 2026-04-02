@@ -454,11 +454,7 @@ const MenuManagement: React.FC<MenuManagementProps> = ({ menuItems, onUpdate, on
       const formData = new FormData();
       formData.append('file', file);
 
-      const response = await axios.post('/menu/import', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data'
-        }
-      });
+      const response = await axios.post('/menu/import', formData);
 
       toast.success(response.data.message);
       
@@ -473,7 +469,13 @@ const MenuManagement: React.FC<MenuManagementProps> = ({ menuItems, onUpdate, on
       window.location.reload();
     } catch (error) {
       console.error('Error importing menu:', error);
-      toast.error('Failed to import menu');
+      const data = error.response?.data;
+      const detail =
+        (typeof data?.error === 'string' && data.error) ||
+        (typeof data?.details === 'string' && data.details) ||
+        (Array.isArray(data?.errors) && data.errors.length > 0 && data.errors.slice(0, 3).join('; ')) ||
+        error.message;
+      toast.error(detail || 'Failed to import menu');
     } finally {
       setLoading(false);
       event.target.value = ''; // Reset file input
@@ -494,11 +496,7 @@ const MenuManagement: React.FC<MenuManagementProps> = ({ menuItems, onUpdate, on
       const formData = new FormData();
       formData.append('file', file);
 
-      const response = await axios.post('/menu/import-zip', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data'
-        }
-      });
+      const response = await axios.post('/menu/import-zip', formData);
 
       // Show detailed import results
       const { successCount, failureCount, imageStats, errors } = response.data;
