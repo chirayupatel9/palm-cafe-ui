@@ -426,13 +426,13 @@ const MenuManagement: React.FC<MenuManagementProps> = ({ menuItems, onUpdate, on
       const url = window.URL.createObjectURL(response.data);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `${cafeSettings.cafe_name || 'cafe'}-menu.xlsx`;
+      a.download = `${cafeSettings.cafe_name || 'cafe'}-menu-import-template.xlsx`;
       document.body.appendChild(a);
       a.click();
       window.URL.revokeObjectURL(url);
       document.body.removeChild(a);
-      
-      toast.success('Menu exported successfully');
+
+      toast.success('Downloaded import template (includes Import instructions sheet)', { duration: 4000 });
     } catch (error) {
       console.error('Error exporting menu:', error);
       toast.error('Failed to export menu');
@@ -796,10 +796,10 @@ const MenuManagement: React.FC<MenuManagementProps> = ({ menuItems, onUpdate, on
                 size="sm"
                 className="glass-button-secondary"
                 contentClassName="flex items-center gap-2"
-                title="Export menu to Excel (includes image filenames)"
+                title="Download Excel import template: instructions sheet, Menu Items (examples if menu is empty, or your current menu), and Categories reference"
               >
                 <Download className="h-4 w-4" />
-                Export Excel
+                Export template
               </GlassButton>
               <GlassButton
                 onClick={() => setShowAddForm(true)}
