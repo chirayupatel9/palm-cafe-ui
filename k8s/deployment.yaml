@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: palm-cafe-ui
+  namespace: palm-cafe
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: palm-cafe-ui
+  template:
+    metadata:
+      labels:
+        app: palm-cafe-ui
+    spec:
+      containers:
+        - name: ui
+          image: ghcr.io/owner/palm-cafe-ui:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 80
+          envFrom:
+            - configMapRef:
+                name: palm-cafe-ui-config
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            timeoutSeconds: 3
+            failureThreshold: 6
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 20
+            periodSeconds: 20
+            timeoutSeconds: 3
+            failureThreshold: 3
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 300m
+              memory: 256Mi

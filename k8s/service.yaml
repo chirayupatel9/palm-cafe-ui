@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: palm-cafe-ui
+  namespace: palm-cafe
+spec:
+  selector:
+    app: palm-cafe-ui
+  ports:
+    - name: http
+      port: 80
+      targetPort: 80

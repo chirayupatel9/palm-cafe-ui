@@ -1,4 +1,4 @@
-name: Deploy Frontend to Raspberry Pi
+name: Build and Deploy UI to Kubernetes
 
 on:
   push:
@@ -6,13 +6,55 @@ on:
 
 jobs:
   deploy:
-    runs-on: self-hosted
-    
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
     steps:
-    - name: Deploy Frontend
-      run: |
-        cd /home/chirayu/palm-cafe/palm-cafe-ui
-        git pull origin master
-        npm install
-        CI=false npm run build
-        sudo cp -r build/* /var/www/app.cafe.nevyaa.com/
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          build-args: |
+            REACT_APP_API_URL=${{ secrets.REACT_APP_API_URL }}
+          tags: |
+            ghcr.io/${{ github.repository_owner }}/palm-cafe-ui:latest
+            ghcr.io/${{ github.repository_owner }}/palm-cafe-ui:${{ github.sha }}
+
+      - name: Set up kubectl
+        uses: azure/setup-kubectl@v4
+        with:
+          version: latest
+
+      - name: Configure kubeconfig
+        shell: bash
+        run: |
+          mkdir -p ~/.kube
+          echo "${{ secrets.KUBE_CONFIG }}" | base64 -d > ~/.kube/config
+
+      - name: Deploy to Kubernetes
+        shell: bash
+        run: |
+          kubectl apply -f k8s/namespace.yaml
+          kubectl apply -f k8s/configmap.yaml
+          kubectl apply -f k8s/service.yaml
+          kubectl apply -f k8s/deployment.yaml
+          kubectl apply -f k8s/hpa.yaml
+          kubectl apply -f k8s/ingress.yaml
+          kubectl set image deployment/palm-cafe-ui ui=ghcr.io/${{ github.repository_owner }}/palm-cafe-ui:${{ github.sha }} -n palm-cafe
+          kubectl rollout status deployment/palm-cafe-ui -n palm-cafe --timeout=180s

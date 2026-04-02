@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: palm-cafe-ui-config
+  namespace: palm-cafe
+data:
+  APP_ENV: 'production'
