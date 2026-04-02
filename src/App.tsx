@@ -20,13 +20,16 @@ import DashboardRedirect from './components/DashboardRedirect';
 import OnboardingGuard from './components/OnboardingGuard';
 import { PillBase, type NavItem } from './components/ui/3d-adaptive-navigation-bar';
 import { GlassButton } from './components/ui/GlassButton';
+import type { MenuManagementProps } from './components/MenuManagement';
 
 const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
 const API_PATH = '/api';
 axios.defaults.baseURL = `${API_BASE_URL}${API_PATH}`;
 
 const OrderPage = lazy(() => import('./components/OrderPage'));
-const MenuManagement = lazy(() => import('./components/MenuManagement'));
+const MenuManagement = lazy(() => import('./components/MenuManagement')) as React.LazyExoticComponent<
+  React.ComponentType<MenuManagementProps>
+>;
 const InvoiceHistory = lazy(() => import('./components/InvoiceHistory'));
 const InventoryManagement = lazy(() => import('./components/InventoryManagement'));
 const KitchenOrders = lazy(() => import('./components/KitchenOrders'));
@@ -192,7 +195,15 @@ function MainApp() {
       case 'kitchen':
         return <KitchenOrders cart={cart} setCart={setCart} />;
       case 'menu':
-        return <MenuManagement menuItems={menuItems} onUpdate={updateMenuItem} onAdd={addMenuItem} onDelete={deleteMenuItem} />;
+        return (
+          <MenuManagement
+            menuItems={menuItems}
+            onUpdate={updateMenuItem}
+            onAdd={addMenuItem}
+            onDelete={deleteMenuItem}
+            onMenuRefresh={fetchMenuItems}
+          />
+        );
       case 'customers':
         return <CustomerManagement />;
       case 'cafe-settings': {
@@ -212,7 +223,7 @@ function MainApp() {
       default:
         return <OrderPage menuItems={menuItems} cart={cart} setCart={setCart} />;
     }
-  }, [currentPage, menuItems, cart, user?.role, cafeSettings?.admin_can_access_settings]);
+  }, [currentPage, menuItems, cart, user?.role, cafeSettings?.admin_can_access_settings, fetchMenuItems]);
 
   const pillNavItems: NavItem[] = useMemo(() => (
     navigationItems

@@ -13,14 +13,15 @@ import Dialog from './ui/Dialog';
 import Select from './ui/Select';
 import { GlassButton } from './ui/GlassButton';
 
-interface MenuManagementProps {
+export interface MenuManagementProps {
   menuItems: any[];
   onUpdate: (id: string | number, updatedItem: any) => void | Promise<void>;
   onAdd: (item: any) => void | Promise<void>;
   onDelete: (id: string | number) => void | Promise<void>;
+  onMenuRefresh?: () => void | Promise<void>;
 }
 
-const MenuManagement: React.FC<MenuManagementProps> = ({ menuItems, onUpdate, onAdd, onDelete }) => {
+const MenuManagement: React.FC<MenuManagementProps> = ({ menuItems, onUpdate, onAdd, onDelete, onMenuRefresh }) => {
   const { formatCurrency } = useCurrency();
   const { isDarkMode } = useDarkMode();
   const { cafeSettings } = useCafeSettings();
@@ -456,26 +457,39 @@ const MenuManagement: React.FC<MenuManagementProps> = ({ menuItems, onUpdate, on
 
       const response = await axios.post('/menu/import', formData);
 
-      toast.success(response.data.message);
-      
-      // Auto-generate categories from imported menu items
+      toast.success(response.data.message, { duration: 5000 });
+
+      const rowErrors = response.data?.errors;
+      if (Array.isArray(rowErrors) && rowErrors.length > 0) {
+        const preview = rowErrors.slice(0, 8).join('\n');
+        const more = rowErrors.length > 8 ? `\n… and ${rowErrors.length - 8} more (see browser console)` : '';
+        console.warn('Menu import row issues:', rowErrors);
+        toast.error(`Some rows had issues:\n${preview}${more}`, {
+          duration: 20000,
+          style: { whiteSpace: 'pre-line' }
+        });
+      }
+
       try {
         await axios.post('/categories/generate');
-      } catch (error) {
-        console.error('Error auto-generating categories:', error);
+      } catch (err) {
+        console.error('Error auto-generating categories:', err);
+        toast.error('Import saved but category sync failed. Try “Generate categories” manually.', { duration: 8000 });
       }
-      
-      // Refresh the menu items
-      window.location.reload();
-    } catch (error) {
+
+      await fetchCategories();
+      if (onMenuRefresh) {
+        await onMenuRefresh();
+      }
+    } catch (error: any) {
       console.error('Error importing menu:', error);
       const data = error.response?.data;
       const detail =
         (typeof data?.error === 'string' && data.error) ||
         (typeof data?.details === 'string' && data.details) ||
-        (Array.isArray(data?.errors) && data.errors.length > 0 && data.errors.slice(0, 3).join('; ')) ||
-        error.message;
-      toast.error(detail || 'Failed to import menu');
+        (Array.isArray(data?.errors) && data.errors.length > 0 && data.errors.slice(0, 5).join('; ')) ||
+        error?.message;
+      toast.error(detail || 'Failed to import menu', { duration: 12000 });
     } finally {
       setLoading(false);
       event.target.value = ''; // Reset file input
@@ -515,32 +529,39 @@ const MenuManagement: React.FC<MenuManagementProps> = ({ menuItems, onUpdate, on
         }
       }
       
-      toast.success(message, { duration: 5000 });
-      
+      toast.success(message, { duration: 6000 });
+
       if (errors && errors.length > 0) {
         console.warn('Import errors:', errors);
-        // Show errors in a toast or console
-        errors.slice(0, 5).forEach(error => {
-          toast.error(error, { duration: 3000 });
+        const preview = errors.slice(0, 8).join('\n');
+        const more = errors.length > 8 ? `\n… and ${errors.length - 8} more (see console)` : '';
+        toast.error(`Import issues:\n${preview}${more}`, {
+          duration: 20000,
+          style: { whiteSpace: 'pre-line' }
         });
-        if (errors.length > 5) {
-          toast.error(`... and ${errors.length - 5} more errors. Check console for details.`, { duration: 4000 });
-        }
       }
-      
-      // Auto-generate categories from imported menu items
+
       try {
         await axios.post('/categories/generate');
-      } catch (error) {
-        console.error('Error auto-generating categories:', error);
+      } catch (err) {
+        console.error('Error auto-generating categories:', err);
+        toast.error('ZIP import saved but category sync failed. Try “Generate categories” manually.', { duration: 8000 });
       }
-      
-      // Refresh the menu items
-      window.location.reload();
-    } catch (error) {
+
+      await fetchCategories();
+      if (onMenuRefresh) {
+        await onMenuRefresh();
+      }
+    } catch (error: any) {
       console.error('Error importing menu ZIP:', error);
-      const errorMessage = error.response?.data?.error || 'Failed to import menu ZIP';
-      toast.error(errorMessage);
+      const data = error.response?.data;
+      const errorMessage =
+        (typeof data?.error === 'string' && data.error) ||
+        (typeof data?.details === 'string' && data.details) ||
+        (Array.isArray(data?.errors) && data.errors.slice(0, 5).join('; ')) ||
+        error?.message ||
+        'Failed to import menu ZIP';
+      toast.error(errorMessage, { duration: 12000 });
     } finally {
       setLoading(false);
       event.target.value = ''; // Reset file input

@@ -72,7 +72,15 @@ const ChefApp: React.FC = () => {
       case 'kitchen':
         return <KitchenOrders cart={cart} setCart={setCart} />;
       case 'menu':
-        return <MenuManagement menuItems={menuItems} onUpdate={updateMenuItem} onAdd={addMenuItem} onDelete={deleteMenuItem} />;
+        return (
+          <MenuManagement
+            menuItems={menuItems}
+            onUpdate={updateMenuItem}
+            onAdd={addMenuItem}
+            onDelete={deleteMenuItem}
+            onMenuRefresh={fetchMenuItems}
+          />
+        );
       case 'inventory':
         return <InventoryManagement />;
       case 'history':
