@@ -28,12 +28,17 @@ interface SerialPort {
   close: () => Promise<void>;
 }
 
+export interface ThermalPrintOptions {
+  baudRate?: number;
+}
+
 class ThermalPrinterManager {
   private printers: PrinterDevice[] = [];
   private selectedPrinter: PrinterDevice | null = null;
 
   async detectPrinters(): Promise<PrinterDevice[]> {
     try {
+      this.printers = [];
       if (!navigator.usb) {
         console.warn('Web USB API not available');
         return [];
@@ -95,13 +100,24 @@ class ThermalPrinterManager {
     return [];
   }
 
+  encodeThermalPayload(content: string): Uint8Array {
+    const encoder = new TextEncoder();
+    const body = encoder.encode(content);
+    const init = new Uint8Array([0x1b, 0x40]);
+    const feed = new Uint8Array([0x0a, 0x0a, 0x0a]);
+    const out = new Uint8Array(init.length + body.length + feed.length);
+    out.set(init, 0);
+    out.set(body, init.length);
+    out.set(feed, init.length + body.length);
+    return out;
+  }
+
   async printToUSB(printer: PrinterDevice, content: string): Promise<PrintResult> {
     try {
       const device = printer.device;
       if (!device) throw new Error('No device');
 
-      const encoder = new TextEncoder();
-      const data = encoder.encode(content);
+      const data = this.encodeThermalPayload(content);
       await device.transferOut(1, data);
 
       return { success: true, message: 'Printed successfully' };
@@ -112,39 +128,124 @@ class ThermalPrinterManager {
     }
   }
 
+  escapeHtmlForPrint(text: string): string {
+    return String(text)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
+
+  /**
+   * Opens the system print dialog with plain receipt text.
+   * Uses a short delay and onafterprint so the document is laid out before print
+   * and the window is not closed while the preview is still blank (common Chrome issue).
+   */
   async printToSystem(_printer: PrinterDevice | null, content: string): Promise<PrintResult> {
     try {
-      const printWindow = window.open('', '_blank');
-      if (!printWindow) throw new Error('Could not open print window');
-      printWindow.document.write(`
+      const safeBody = this.escapeHtmlForPrint(content);
+      const html = `<!DOCTYPE html>
         <html>
           <head>
+            <meta charset="utf-8" />
             <title>Print Order</title>
             <style>
-              body {
-                font-family: 'Courier New', monospace;
+              html, body {
+                font-family: 'Courier New', Courier, monospace;
                 font-size: 12px;
-                line-height: 1.2;
+                line-height: 1.25;
                 margin: 0;
-                padding: 10px;
+                padding: 12px;
+                color: #000;
+                background: #fff;
                 white-space: pre-wrap;
               }
               @media print {
-                body { margin: 0; }
+                html, body { margin: 0; padding: 8px; }
               }
             </style>
           </head>
-          <body>${content}</body>
-        </html>
-      `);
+          <body>${safeBody}</body>
+        </html>`;
 
-      printWindow.document.close();
-      printWindow.focus();
+      const runPrint = (win: Window) => {
+        let done = false;
+        const safeClose = () => {
+          if (done) return;
+          done = true;
+          try {
+            win.close();
+          } catch {
+            /* ignore */
+          }
+        };
+        win.focus();
+        win.addEventListener(
+          'afterprint',
+          () => {
+            safeClose();
+          },
+          { once: true }
+        );
+        window.setTimeout(() => {
+          win.print();
+          window.setTimeout(() => {
+            if (!done && !win.closed) safeClose();
+          }, 120000);
+        }, 300);
+      };
 
-      setTimeout(() => {
-        printWindow.print();
-        printWindow.close();
-      }, 500);
+      const printWindow = window.open('', '_blank');
+      if (printWindow) {
+        printWindow.document.open();
+        printWindow.document.write(html);
+        printWindow.document.close();
+        runPrint(printWindow);
+        return { success: true, message: 'Print dialog opened' };
+      }
+
+      const iframe = document.createElement('iframe');
+      iframe.setAttribute('aria-hidden', 'true');
+      iframe.title = 'Print receipt';
+      iframe.style.position = 'fixed';
+      iframe.style.right = '0';
+      iframe.style.bottom = '0';
+      iframe.style.width = '0';
+      iframe.style.height = '0';
+      iframe.style.border = '0';
+      iframe.style.opacity = '0';
+      iframe.style.pointerEvents = 'none';
+      document.body.appendChild(iframe);
+
+      const doc = iframe.contentDocument;
+      const win = iframe.contentWindow;
+      if (!doc || !win) {
+        document.body.removeChild(iframe);
+        throw new Error('Could not create print frame');
+      }
+
+      doc.open();
+      doc.write(html);
+      doc.close();
+
+      const removeFrame = () => {
+        if (iframe.parentNode) iframe.parentNode.removeChild(iframe);
+      };
+
+      let frameRemoved = false;
+      const safeRemoveFrame = () => {
+        if (frameRemoved) return;
+        frameRemoved = true;
+        removeFrame();
+      };
+      win.addEventListener('afterprint', () => safeRemoveFrame(), { once: true });
+      win.focus();
+      window.setTimeout(() => {
+        win.print();
+        window.setTimeout(() => {
+          if (!frameRemoved) safeRemoveFrame();
+        }, 120000);
+      }, 300);
 
       return { success: true, message: 'Print dialog opened' };
     } catch (error) {
@@ -154,14 +255,18 @@ class ThermalPrinterManager {
     }
   }
 
-  async printToSerial(_printer: PrinterDevice | null, content: string): Promise<PrintResult> {
+  async printToSerial(
+    _printer: PrinterDevice | null,
+    content: string,
+    baudRate: number = 9600
+  ): Promise<PrintResult> {
     try {
       if (!navigator.serial) throw new Error('Serial API not available');
       const port = await navigator.serial.requestPort();
-      await port.open({ baudRate: 9600 });
+      const rate = Number.isFinite(baudRate) && baudRate > 0 ? baudRate : 9600;
+      await port.open({ baudRate: rate });
 
-      const encoder = new TextEncoder();
-      const data = encoder.encode(content);
+      const data = this.encodeThermalPayload(content);
       const writer = port.writable.getWriter();
       await writer.write(data);
       writer.releaseLock();
@@ -175,8 +280,13 @@ class ThermalPrinterManager {
     }
   }
 
-  async print(content: string, printerType: 'usb' | 'serial' | 'system' = 'system'): Promise<PrintResult> {
+  async print(
+    content: string,
+    printerType: 'usb' | 'serial' | 'system' = 'system',
+    options?: ThermalPrintOptions
+  ): Promise<PrintResult> {
     try {
+      const baud = options?.baudRate;
       switch (printerType) {
         case 'usb':
           if (this.selectedPrinter?.device) {
@@ -184,7 +294,7 @@ class ThermalPrinterManager {
           }
           break;
         case 'serial':
-          return await this.printToSerial(null, content);
+          return await this.printToSerial(null, content, baud);
         case 'system':
         default:
           return await this.printToSystem(null, content);

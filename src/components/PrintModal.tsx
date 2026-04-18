@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import { Printer, Usb, Wifi, Settings, CheckCircle, RefreshCw } from 'lucide-react';
 import Dialog from './ui/Dialog';
 import thermalPrinterManager from '../utils/thermalPrinter';
 import toast from 'react-hot-toast';
+import { useCafeSettings } from '../contexts/CafeSettingsContext';
 
 interface PrintModalProps {
   isOpen: boolean;
@@ -12,12 +14,25 @@ interface PrintModalProps {
 }
 
 const PrintModal: React.FC<PrintModalProps> = ({ isOpen, onClose, order, onPrintSuccess }) => {
+  const { cafeSettings } = useCafeSettings();
   const [printers, setPrinters] = useState<any[]>([]);
   const [selectedPrinter, setSelectedPrinter] = useState<any>(null);
   const [printerType, setPrinterType] = useState('system');
   const [isDetecting, setIsDetecting] = useState(false);
   const [isPrinting, setIsPrinting] = useState(false);
+  const [previewLoading, setPreviewLoading] = useState(false);
   const [printPreview, setPrintPreview] = useState('');
+
+  const orderId =
+    order?.id != null ? order.id : order?.order_id != null ? order.order_id : null;
+
+  useEffect(() => {
+    if (!isOpen) return;
+    const t = cafeSettings.default_printer_type;
+    if (t === 'usb' || t === 'serial' || t === 'system') {
+      setPrinterType(t);
+    }
+  }, [isOpen, cafeSettings.default_printer_type]);
 
   useEffect(() => {
     if (isOpen) {
@@ -56,40 +71,60 @@ const PrintModal: React.FC<PrintModalProps> = ({ isOpen, onClose, order, onPrint
   };
 
   const generatePrintPreview = async () => {
-    if (!order) return;
-    
+    if (orderId == null || orderId === '') {
+      setPrintPreview('');
+      return;
+    }
+
+    setPreviewLoading(true);
+    setPrintPreview('');
     try {
-      // Get print content from backend
-      const response = await fetch(`/api/orders/${order.id}/print`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        }
-      });
-      
-      if (response.ok) {
-        const content = await response.text();
-        setPrintPreview(content);
+      const response = await axios.post(
+        `/orders/${orderId}/print`,
+        {},
+        { responseType: 'text', transformResponse: [(data) => data] }
+      );
+      const text =
+        typeof response.data === 'string' ? response.data : String(response.data ?? '');
+      setPrintPreview(text);
+      if (!text.trim()) {
+        toast.error('Receipt is empty. Check the order and try again.');
       }
     } catch (error) {
       console.error('Error generating print preview:', error);
+      const ax = error as { response?: { data?: unknown }; message?: string };
+      const detail =
+        typeof ax.response?.data === 'string'
+          ? ax.response.data
+          : (ax.response?.data as { error?: string })?.error;
+      toast.error(detail || ax.message || 'Failed to load print preview');
+      setPrintPreview('');
+    } finally {
+      setPreviewLoading(false);
     }
   };
 
   const handlePrint = async () => {
     if (!order) return;
-    
+
+    if (!printPreview.trim()) {
+      toast.error('Nothing to print. Wait for the preview to load or refresh.');
+      return;
+    }
+
     setIsPrinting(true);
     try {
       let result;
       
+      const baudRate = Number(cafeSettings.printer_baud_rate) || 9600;
+
       if (printerType === 'usb' && selectedPrinter) {
         // Print to USB thermal printer
         thermalPrinterManager.setSelectedPrinter(selectedPrinter as any);
         result = await thermalPrinterManager.print(printPreview, 'usb');
       } else if (printerType === 'serial') {
-        // Print to serial thermal printer
-        result = await thermalPrinterManager.print(printPreview, 'serial');
+        // Print to serial thermal printer (baud from cafe settings)
+        result = await thermalPrinterManager.print(printPreview, 'serial', { baudRate });
       } else {
         // Print using system print dialog
         result = await thermalPrinterManager.print(printPreview, 'system');
@@ -104,7 +139,8 @@ const PrintModal: React.FC<PrintModalProps> = ({ isOpen, onClose, order, onPrint
       }
     } catch (error) {
       console.error('Printing error:', error);
-      toast.error('Printing failed: ' + error.message);
+      const msg = error instanceof Error ? error.message : 'Unknown error';
+      toast.error('Printing failed: ' + msg);
     } finally {
       setIsPrinting(false);
     }
@@ -153,7 +189,7 @@ const PrintModal: React.FC<PrintModalProps> = ({ isOpen, onClose, order, onPrint
                 <div className="space-y-2">
                   {printers.map((printer) => (
                     <div
-                      key={printer.id}
+                      key={`${printer.type}-${String(printer.id)}`}
                       onClick={() => handlePrinterSelect(printer)}
                       className={`p-3 rounded-lg border cursor-pointer transition-colors ${
                         selectedPrinter?.id === printer.id
@@ -186,9 +222,13 @@ const PrintModal: React.FC<PrintModalProps> = ({ isOpen, onClose, order, onPrint
                 {/* Manual Print Options */}
                 <div className="mt-4 space-y-2">
                   <button
-                    onClick={() => setPrinterType('system')}
+                    type="button"
+                    onClick={() => {
+                      setPrinterType('system');
+                      setSelectedPrinter(null);
+                    }}
                     className={`w-full p-3 rounded-lg border text-left transition-colors ${
-                      printerType === 'system' && !selectedPrinter
+                      printerType === 'system'
                         ? 'border-secondary-500 bg-secondary-50 dark:bg-secondary-900'
                         : 'border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500'
                     }`}
@@ -207,7 +247,11 @@ const PrintModal: React.FC<PrintModalProps> = ({ isOpen, onClose, order, onPrint
                   </button>
 
                   <button
-                    onClick={() => setPrinterType('serial')}
+                    type="button"
+                    onClick={() => {
+                      setPrinterType('serial');
+                      setSelectedPrinter(null);
+                    }}
                     className={`w-full p-3 rounded-lg border text-left transition-colors ${
                       printerType === 'serial'
                         ? 'border-secondary-500 bg-secondary-50 dark:bg-secondary-900'
@@ -232,14 +276,20 @@ const PrintModal: React.FC<PrintModalProps> = ({ isOpen, onClose, order, onPrint
               {/* Print Button */}
               <div className="pt-4">
                 <button
+                  type="button"
                   onClick={handlePrint}
-                  disabled={isPrinting}
+                  disabled={isPrinting || previewLoading || !printPreview.trim()}
                   className="w-full bg-secondary-600 hover:bg-secondary-700 disabled:bg-gray-400 text-white font-medium py-3 px-4 min-h-[44px] rounded-lg transition-colors flex items-center justify-center space-x-2"
                 >
                   {isPrinting ? (
                     <>
                       <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
                       <span>Printing...</span>
+                    </>
+                  ) : previewLoading ? (
+                    <>
+                      <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                      <span>Loading receipt...</span>
                     </>
                   ) : (
                     <>
@@ -261,7 +311,7 @@ const PrintModal: React.FC<PrintModalProps> = ({ isOpen, onClose, order, onPrint
               
               <div className="card card-sm">
                 <pre className="text-xs font-mono text-gray-800 dark:text-gray-200 whitespace-pre-wrap leading-tight">
-                  {printPreview || 'Loading preview...'}
+                  {previewLoading ? 'Loading preview...' : printPreview || 'No preview yet.'}
                 </pre>
               </div>
             </div>

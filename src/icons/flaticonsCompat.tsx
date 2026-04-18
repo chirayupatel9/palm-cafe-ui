@@ -114,6 +114,7 @@ export const Link2 = createAnimatedIcon(['FaLink']);
 export const Loader = createAnimatedIcon(['FaSpinner']);
 export const Loader2 = createAnimatedIcon(['FaSpinner']);
 export const Lock = createAnimatedIcon(['FaLock']);
+export const KeyRound = createAnimatedIcon(['FaKey']);
 export const LogIn = createAnimatedIcon(['FaSignInAlt']);
 export const LogOut = createAnimatedIcon(['FaSignOutAlt']);
 export const Mail = createAnimatedIcon(['FaEnvelope']);
