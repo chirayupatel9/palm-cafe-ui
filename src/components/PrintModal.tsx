@@ -35,11 +35,77 @@ const PrintModal: React.FC<PrintModalProps> = ({ isOpen, onClose, order, onPrint
   }, [isOpen, cafeSettings.default_printer_type]);
 
   useEffect(() => {
-    if (isOpen) {
-      detectPrinters();
-      generatePrintPreview();
+    if (!isOpen) {
+      return;
     }
-  }, [isOpen, order]);
+    void detectPrinters();
+  }, [isOpen]);
+
+  useEffect(() => {
+    if (!isOpen) {
+      return;
+    }
+    if (orderId == null || orderId === '') {
+      setPreviewLoading(false);
+      setPrintPreview('');
+      return;
+    }
+
+    const ac = new AbortController();
+    let cancelled = false;
+
+    setPreviewLoading(true);
+    setPrintPreview('');
+
+    axios
+      .get(`/orders/${encodeURIComponent(String(orderId))}/print`, {
+        responseType: 'text',
+        signal: ac.signal
+      })
+      .then((response) => {
+        if (cancelled) return;
+        const text =
+          typeof response.data === 'string' ? response.data : String(response.data ?? '');
+        setPrintPreview(text);
+        if (!text.trim()) {
+          toast.error('Receipt is empty. Check the order and try again.');
+        }
+      })
+      .catch((error: unknown) => {
+        if (cancelled) return;
+        if (axios.isAxiosError(error) && error.code === 'ERR_CANCELED') {
+          return;
+        }
+        console.error('Error generating print preview:', error);
+        let detail: string | undefined;
+        if (axios.isAxiosError(error) && error.response?.data != null) {
+          const d = error.response.data;
+          if (typeof d === 'string') {
+            try {
+              const parsed = JSON.parse(d) as { error?: string };
+              detail = parsed?.error;
+            } catch {
+              detail = d;
+            }
+          } else if (typeof d === 'object' && d && 'error' in d) {
+            detail = String((d as { error?: string }).error);
+          }
+        }
+        const msg = axios.isAxiosError(error) ? error.message : String(error);
+        toast.error(detail || msg || 'Failed to load print preview');
+        setPrintPreview('');
+      })
+      .finally(() => {
+        if (!cancelled) {
+          setPreviewLoading(false);
+        }
+      });
+
+    return () => {
+      cancelled = true;
+      ac.abort();
+    };
+  }, [isOpen, orderId]);
 
   const detectPrinters = async () => {
     setIsDetecting(true);
@@ -67,40 +133,6 @@ const PrintModal: React.FC<PrintModalProps> = ({ isOpen, onClose, order, onPrint
       toast.error('Failed to detect printers');
     } finally {
       setIsDetecting(false);
-    }
-  };
-
-  const generatePrintPreview = async () => {
-    if (orderId == null || orderId === '') {
-      setPrintPreview('');
-      return;
-    }
-
-    setPreviewLoading(true);
-    setPrintPreview('');
-    try {
-      const response = await axios.post(
-        `/orders/${orderId}/print`,
-        {},
-        { responseType: 'text', transformResponse: [(data) => data] }
-      );
-      const text =
-        typeof response.data === 'string' ? response.data : String(response.data ?? '');
-      setPrintPreview(text);
-      if (!text.trim()) {
-        toast.error('Receipt is empty. Check the order and try again.');
-      }
-    } catch (error) {
-      console.error('Error generating print preview:', error);
-      const ax = error as { response?: { data?: unknown }; message?: string };
-      const detail =
-        typeof ax.response?.data === 'string'
-          ? ax.response.data
-          : (ax.response?.data as { error?: string })?.error;
-      toast.error(detail || ax.message || 'Failed to load print preview');
-      setPrintPreview('');
-    } finally {
-      setPreviewLoading(false);
     }
   };
 
