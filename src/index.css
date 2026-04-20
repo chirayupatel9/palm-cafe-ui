@@ -1273,6 +1273,23 @@ textarea.glass-input {
 .select-dropdown-glass .select-option {
   color: var(--color-on-surface);
 }
+.select-dropdown-glass .select-option-tone-muted {
+  color: var(--color-on-surface-variant) !important;
+}
+.select-dropdown-glass .select-option-tone-primary {
+  color: var(--color-primary) !important;
+}
+.select-dropdown-glass .select-option-tone-danger {
+  color: var(--color-error) !important;
+}
+.select-dropdown-glass .select-option-tone-danger:hover,
+.select-dropdown-glass .select-option-tone-danger:focus-visible {
+  background: color-mix(in srgb, var(--color-error) 12%, rgba(255, 255, 255, 0.85)) !important;
+}
+.dark .select-dropdown-glass .select-option-tone-danger:hover,
+.dark .select-dropdown-glass .select-option-tone-danger:focus-visible {
+  background: color-mix(in srgb, var(--color-error) 16%, rgba(255, 255, 255, 0.18)) !important;
+}
 .select-dropdown-glass .select-option:hover {
   background: rgba(255, 255, 255, 0.85) !important;
   backdrop-filter: blur(12px);

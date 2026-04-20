@@ -3,6 +3,8 @@ import React, { useState, useRef, useEffect } from 'react';
 export interface SelectOption {
   value: string;
   label: string;
+  className?: string;
+  tone?: 'default' | 'muted' | 'primary' | 'danger';
 }
 
 export interface SelectProps {
@@ -92,6 +94,14 @@ const Select: React.FC<SelectProps> = ({
         >
           {options.map((opt) => {
             const isSelected = opt.value === value;
+            const toneClass =
+              opt.tone === 'danger'
+                ? 'select-option-tone-danger'
+                : opt.tone === 'primary'
+                  ? 'select-option-tone-primary'
+                  : opt.tone === 'muted'
+                    ? 'select-option-tone-muted'
+                    : '';
             return (
               <li
                 key={opt.value}
@@ -108,7 +118,9 @@ const Select: React.FC<SelectProps> = ({
                     setOpen(false);
                   }
                 }}
-                className={`select-option px-4 py-3 cursor-pointer transition-colors duration-150 text-sm font-medium rounded-lg mx-1.5 ${isSelected ? 'select-option-selected' : ''}`}
+                className={`select-option px-4 py-3 cursor-pointer transition-colors duration-150 text-sm font-medium rounded-lg mx-1.5 ${
+                  isSelected ? 'select-option-selected' : ''
+                } ${toneClass} ${opt.className || ''}`}
               >
                 {opt.label}
               </li>

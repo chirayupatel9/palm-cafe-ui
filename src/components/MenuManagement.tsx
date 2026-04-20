@@ -46,6 +46,10 @@ const MenuManagement: React.FC<MenuManagementProps> = ({ menuItems, onUpdate, on
   const [deleteConfirm, setDeleteConfirm] = useState(null);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [selectedItemIds, setSelectedItemIds] = useState<Set<string>>(() => new Set<string>());
+  const [bulkDeleteOpen, setBulkDeleteOpen] = useState(false);
+  const [isBulkDeleting, setIsBulkDeleting] = useState(false);
+  const [bulkAction, setBulkAction] = useState('');
 
   // Category management state
   const [categoryEditingId, setCategoryEditingId] = useState(null);
@@ -66,6 +70,20 @@ const MenuManagement: React.FC<MenuManagementProps> = ({ menuItems, onUpdate, on
   useEffect(() => {
     fetchCategories();
   }, []);
+
+  useEffect(() => {
+    if (activeTab !== 'menu-items') {
+      setSelectedItemIds(new Set<string>());
+      setBulkDeleteOpen(false);
+    }
+  }, [activeTab]);
+
+  useEffect(() => {
+    if (activeTab !== 'menu-items') return;
+    setSelectedItemIds(new Set<string>());
+    setBulkDeleteOpen(false);
+    setBulkAction('');
+  }, [activeTab, selectedCategory]);
 
   const fetchCategories = async () => {
     try {
@@ -293,6 +311,80 @@ const MenuManagement: React.FC<MenuManagementProps> = ({ menuItems, onUpdate, on
       toast.error('Failed to delete menu item. Please try again.');
     } finally {
       setIsDeleting(false);
+    }
+  };
+
+  const isItemSelected = (id) => selectedItemIds.has(String(id));
+
+  const toggleItemSelected = (id) => {
+    const key = String(id);
+    setSelectedItemIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(key)) next.delete(key);
+      else next.add(key);
+      return next;
+    });
+  };
+
+  const clearSelection = () => {
+    setSelectedItemIds(new Set<string>());
+  };
+
+  const selectMany = (ids) => {
+    setSelectedItemIds((prev) => {
+      const next = new Set(prev);
+      ids.forEach((id) => next.add(String(id)));
+      return next;
+    });
+  };
+
+  const selectOnly = (ids) => {
+    setSelectedItemIds(new Set<string>(ids.map((id) => String(id))));
+  };
+
+  const deselectMany = (ids) => {
+    setSelectedItemIds((prev) => {
+      const next = new Set(prev);
+      ids.forEach((id) => next.delete(String(id)));
+      return next;
+    });
+  };
+
+  const handleBulkDelete = async () => {
+    const ids = Array.from(selectedItemIds);
+    if (ids.length === 0) {
+      setBulkDeleteOpen(false);
+      return;
+    }
+
+    setIsBulkDeleting(true);
+    try {
+      const results = await Promise.allSettled(ids.map((id) => onDelete(id)));
+      const ok = results.filter((r) => r.status === 'fulfilled').length;
+      const fail = results.length - ok;
+
+      if (ok > 0) {
+        toast.success(`Deleted ${ok} item${ok !== 1 ? 's' : ''}`);
+      }
+      if (fail > 0) {
+        toast.error(`Failed to delete ${fail} item${fail !== 1 ? 's' : ''}`);
+      }
+
+      setBulkDeleteOpen(false);
+      clearSelection();
+
+      try {
+        await axios.post('/categories/generate');
+      } catch (error) {
+        console.error('Error auto-generating categories:', error);
+      }
+
+      await fetchCategories();
+      if (onMenuRefresh) {
+        await onMenuRefresh();
+      }
+    } finally {
+      setIsBulkDeleting(false);
     }
   };
 
@@ -661,7 +753,7 @@ const MenuManagement: React.FC<MenuManagementProps> = ({ menuItems, onUpdate, on
     : menuItems.filter(item => item.category_id === selectedCategory);
 
   // Group menu items by category for display
-  const groupedMenuItems = menuItems.reduce<Record<string, any[]>>((groups, item) => {
+  const groupedMenuItems = filteredMenuItems.reduce<Record<string, any[]>>((groups, item) => {
     const categoryName = item.category_name || 'Uncategorized';
     if (!groups[categoryName]) {
       groups[categoryName] = [];
@@ -669,6 +761,11 @@ const MenuManagement: React.FC<MenuManagementProps> = ({ menuItems, onUpdate, on
     groups[categoryName].push(item);
     return groups;
   }, {});
+
+  const allVisibleIds = Object.values(groupedMenuItems).flat().map((i) => String(i.id));
+  const visibleSelectedCount = allVisibleIds.filter((id) => selectedItemIds.has(id)).length;
+  const allVisibleSelected = allVisibleIds.length > 0 && visibleSelectedCount === allVisibleIds.length;
+  const someVisibleSelected = visibleSelectedCount > 0 && !allVisibleSelected;
 
   if (categoryLoading) {
     return (
@@ -815,18 +912,74 @@ const MenuManagement: React.FC<MenuManagementProps> = ({ menuItems, onUpdate, on
 
           {/* Category Filter – glass card (relative z-10 so dropdown opens above category cards) */}
           <div className="glass-card p-4 relative z-10">
-            <div className="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-4">
-              <label className="text-sm font-medium text-[var(--color-on-surface)]">Filter by Category:</label>
-              <Select
-                options={[
-                  { value: 'all', label: 'All Categories' },
-                  ...categories.map(c => ({ value: String(c.id), label: c.name }))
-                ]}
-                value={String(selectedCategory)}
-                onChange={setSelectedCategory}
-                className="sm:max-w-xs select-trigger-glass select-trigger-glass-hover rounded-full"
-                placeholder="All Categories"
-              />
+            <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3">
+              <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
+                <label className="text-sm font-medium text-[var(--color-on-surface)]">Filter by Category:</label>
+                <Select
+                  options={[
+                    { value: 'all', label: 'All Categories' },
+                    ...categories.map(c => ({ value: String(c.id), label: c.name }))
+                  ]}
+                  value={String(selectedCategory)}
+                  onChange={setSelectedCategory}
+                  className="sm:max-w-xs select-trigger-glass select-trigger-glass-hover rounded-full"
+                  placeholder="All Categories"
+                />
+              </div>
+
+              <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
+                <div className="text-sm text-[var(--color-on-surface-variant)]">
+                  {selectedItemIds.size > 0 ? (
+                    <>
+                      <span className="font-semibold text-[var(--color-on-surface)]">{selectedItemIds.size}</span> selected
+                    </>
+                  ) : (
+                    <>No selection</>
+                  )}
+                </div>
+
+                <div className="sm:min-w-[220px]">
+                  <Select
+                    options={[
+                      { value: 'select_all', label: 'Select all visible', tone: 'primary' },
+                      { value: 'clear', label: 'Clear selection', tone: 'muted' },
+                      { value: 'delete_selected', label: 'Delete selected…', tone: 'danger' },
+                      { value: 'delete_all', label: 'Delete all visible…', tone: 'danger' }
+                    ]}
+                    value={bulkAction}
+                    onChange={(value) => {
+                      setBulkAction(''); // reset immediately so same action can be chosen again
+                      if (value === 'select_all') {
+                        selectMany(allVisibleIds);
+                        return;
+                      }
+                      if (value === 'clear') {
+                        clearSelection();
+                        return;
+                      }
+                      if (value === 'delete_selected') {
+                        if (selectedItemIds.size === 0) {
+                          toast.error('No items selected');
+                          return;
+                        }
+                        setBulkDeleteOpen(true);
+                        return;
+                      }
+                      if (value === 'delete_all') {
+                        if (allVisibleIds.length === 0) {
+                          toast.error('No items to delete');
+                          return;
+                        }
+                        selectOnly(allVisibleIds);
+                        setBulkDeleteOpen(true);
+                      }
+                    }}
+                    className="select-trigger-glass select-trigger-glass-hover rounded-full"
+                    placeholder="Bulk actions"
+                    id="menu-bulk-actions"
+                  />
+                </div>
+              </div>
             </div>
           </div>
 
@@ -1043,22 +1196,47 @@ const MenuManagement: React.FC<MenuManagementProps> = ({ menuItems, onUpdate, on
             <EmptyMenu onAdd={() => setShowAddForm(true)} />
           ) : (
             Object.entries(groupedMenuItems).map(([categoryName, items], index) => {
+              const visibleIds = items.map((i) => String(i.id));
+              const visibleSelectedCount = visibleIds.filter((id) => selectedItemIds.has(id)).length;
+              const allVisibleSelected = visibleIds.length > 0 && visibleSelectedCount === visibleIds.length;
+              const someVisibleSelected = visibleSelectedCount > 0 && !allVisibleSelected;
               return (
                 <div key={categoryName} className="glass-card overflow-hidden rounded-2xl shadow-sm">
                   <div className="px-5 py-4 border-b border-white/20 bg-black/[0.04] dark:bg-white/[0.06] backdrop-blur-sm">
-                    <h3 className="flex items-center text-base font-semibold text-[var(--color-on-surface)]">
+                    <div className="flex items-center justify-between gap-3">
+                      <h3 className="flex items-center text-base font-semibold text-[var(--color-on-surface)] min-w-0">
                       <FolderOpen className="h-5 w-5 mr-2.5 text-[var(--color-primary)] opacity-90" />
                       {categoryName}
                       <span className="ml-2 text-sm font-normal text-[var(--color-on-surface-variant)]">
                         {items.length} item{items.length !== 1 ? 's' : ''}
                       </span>
-                    </h3>
+                      </h3>
+                      <div className="hidden lg:flex items-center gap-3">
+                        <label className="flex items-center gap-2 text-xs text-[var(--color-on-surface-variant)] select-none">
+                          <input
+                            type="checkbox"
+                            className="h-4 w-4 rounded border-[var(--color-outline)]/50"
+                            checked={allVisibleSelected}
+                            ref={(el) => {
+                              if (el) el.indeterminate = someVisibleSelected;
+                            }}
+                            onChange={(e) => {
+                              if (e.target.checked) selectMany(visibleIds);
+                              else deselectMany(visibleIds);
+                            }}
+                            aria-label={`Select all items in ${categoryName}`}
+                          />
+                          Select all
+                        </label>
+                      </div>
+                    </div>
                   </div>
 
                 {/* Desktop Table */}
                 <div className="hidden lg:block overflow-x-auto scrollbar-hide">
                   <table className="w-full table-fixed" style={{ tableLayout: 'fixed' }}>
                     <colgroup>
+                      <col style={{ width: '44px' }} />
                       <col style={{ width: '72px' }} />
                       <col style={{ width: '110px' }} />
                       <col style={{ width: '160px' }} />
@@ -1070,6 +1248,21 @@ const MenuManagement: React.FC<MenuManagementProps> = ({ menuItems, onUpdate, on
                     </colgroup>
                     <thead>
                       <tr className="text-left text-xs font-semibold uppercase tracking-wider bg-[var(--surface-table)]/60 text-[var(--color-on-surface)]">
+                        <th className="px-4 py-3.5 rounded-tl-lg">
+                          <input
+                            type="checkbox"
+                            className="h-4 w-4 rounded border-[var(--color-outline)]/50"
+                            checked={allVisibleSelected}
+                            ref={(el) => {
+                              if (el) el.indeterminate = someVisibleSelected;
+                            }}
+                            onChange={(e) => {
+                              if (e.target.checked) selectMany(visibleIds);
+                              else deselectMany(visibleIds);
+                            }}
+                            aria-label={`Select items in ${categoryName}`}
+                          />
+                        </th>
                         <th className="px-4 py-3.5 rounded-tl-lg">Image</th>
                         <th className="px-4 py-3.5">Category</th>
                         <th className="px-4 py-3.5">Item</th>
@@ -1089,6 +1282,15 @@ const MenuManagement: React.FC<MenuManagementProps> = ({ menuItems, onUpdate, on
                             : 'hover:bg-[var(--surface-table)]/50'
                           }`}
                         >
+                          <td className="px-4 py-3 align-middle">
+                            <input
+                              type="checkbox"
+                              className="h-4 w-4 rounded border-[var(--color-outline)]/50"
+                              checked={isItemSelected(item.id)}
+                              onChange={() => toggleItemSelected(item.id)}
+                              aria-label={`Select ${item.name}`}
+                            />
+                          </td>
                           <td className="px-4 py-3 align-middle">
                             <img
                               src={item.image_url ? getImageUrl(item.image_url) : getPlaceholderImage(item.category_name, item.name)}
@@ -1165,7 +1367,16 @@ const MenuManagement: React.FC<MenuManagementProps> = ({ menuItems, onUpdate, on
                             />
                             <div className="flex-1">
                               <div className="flex justify-between items-start mb-2">
-                                <h4 className="font-medium text-[var(--color-on-surface)]">{item.name}</h4>
+                                <div className="flex items-start gap-2 min-w-0">
+                                  <input
+                                    type="checkbox"
+                                    className="mt-0.5 h-4 w-4 rounded border-[var(--color-outline)]/50"
+                                    checked={isItemSelected(item.id)}
+                                    onChange={() => toggleItemSelected(item.id)}
+                                    aria-label={`Select ${item.name}`}
+                                  />
+                                  <h4 className="font-medium text-[var(--color-on-surface)] truncate">{item.name}</h4>
+                                </div>
                                 <div className="flex gap-1.5">
                                   <GlassButton
                                     onClick={() => handleEdit(item)}
@@ -1703,6 +1914,19 @@ const MenuManagement: React.FC<MenuManagementProps> = ({ menuItems, onUpdate, on
         cancelLabel="Cancel"
         variant="danger"
         isLoading={isDeleting}
+      />
+
+      {/* Bulk Delete Confirmation Modal */}
+      <ConfirmModal
+        isOpen={bulkDeleteOpen}
+        onClose={() => setBulkDeleteOpen(false)}
+        onConfirm={handleBulkDelete}
+        title="Delete selected items"
+        message={`Are you sure you want to delete ${selectedItemIds.size} selected item${selectedItemIds.size !== 1 ? 's' : ''}? This action cannot be undone.`}
+        confirmLabel="Delete selected"
+        cancelLabel="Cancel"
+        variant="danger"
+        isLoading={isBulkDeleting}
       />
     </div>
   );
