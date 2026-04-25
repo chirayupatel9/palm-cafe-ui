@@ -22,6 +22,7 @@ const KitchenOrders: React.FC<KitchenOrdersProps> = ({ cart, setCart }) => {
   const { isDarkMode } = useDarkMode();
   const { cafeSettings } = useCafeSettings();
   const { formatCurrency } = useCurrency();
+  const [taxSettings, setTaxSettings] = useState(null);
   
   // Use the custom orders hook with auto-refresh and WebSocket
   const { 
@@ -57,8 +58,19 @@ const KitchenOrders: React.FC<KitchenOrdersProps> = ({ cart, setCart }) => {
   useEffect(() => {
     if (isAuthenticated && !authLoading) {
       fetchMenuItems();
+      fetchTaxSettings();
     }
   }, [isAuthenticated, authLoading]);
+
+  const fetchTaxSettings = async () => {
+    try {
+      const response = await axios.get('/tax-settings');
+      setTaxSettings(response.data);
+    } catch (error) {
+      console.error('Error fetching tax settings:', error);
+      setTaxSettings(null);
+    }
+  };
 
   // Update displayed orders when orders or filters change
   useEffect(() => {
@@ -174,13 +186,14 @@ const KitchenOrders: React.FC<KitchenOrdersProps> = ({ cart, setCart }) => {
     try {
       // Calculate totals
       const totalAmount = editFormData.items.reduce((sum, item) => sum + (item.total || 0), 0);
-      const taxAmount = totalAmount * 0.085; // 8.5% tax
+      const resolvedTaxRate = taxSettings && taxSettings.include_tax ? (parseFloat(String(taxSettings.tax_rate)) || 0) : 0;
+      const taxAmount = (totalAmount * resolvedTaxRate) / 100;
       const finalAmount = totalAmount + taxAmount + (editFormData.extra_charge || 0);
 
       const orderData = {
         ...editFormData,
         total_amount: totalAmount,
-        tax_amount: taxAmount,
+        tax_amount: parseFloat(taxAmount.toFixed(2)),
         final_amount: finalAmount
       };
 
@@ -1283,9 +1296,15 @@ const KitchenOrders: React.FC<KitchenOrdersProps> = ({ cart, setCart }) => {
                             </span>
                           </div>
                           <div className="flex justify-between items-center">
-                            <span className="text-sm text-on-surface-variant">Tax (8.5%):</span>
+                            <span className="text-sm text-on-surface-variant">
+                              {(taxSettings && taxSettings.include_tax) ? `${taxSettings.tax_name || 'Tax'} (${parseFloat(String(taxSettings.tax_rate)) || 0}%):` : 'Tax (off):'}
+                            </span>
                             <span className="text-sm text-on-surface">
-                              ₹{((editFormData.items ? editFormData.items.reduce((sum, item) => sum + (item.total || 0), 0) : 0) * 0.085).toFixed(2)}
+                              ₹{(() => {
+                                const subtotal = editFormData.items ? editFormData.items.reduce((sum, item) => sum + (item.total || 0), 0) : 0;
+                                const rate = (taxSettings && taxSettings.include_tax) ? (parseFloat(String(taxSettings.tax_rate)) || 0) : 0;
+                                return ((subtotal * rate) / 100).toFixed(2);
+                              })()}
                             </span>
                           </div>
                           {editFormData.extra_charge > 0 && (
@@ -1299,7 +1318,12 @@ const KitchenOrders: React.FC<KitchenOrdersProps> = ({ cart, setCart }) => {
                           <div className="flex justify-between items-center border-t pt-2">
                             <span className="font-medium text-on-surface">Final Total:</span>
                             <span className="font-bold text-lg text-on-surface">
-                              ₹{((editFormData.items ? editFormData.items.reduce((sum, item) => sum + (item.total || 0), 0) : 0) * 1.085 + (editFormData.extra_charge || 0)).toFixed(2)}
+                              ₹{(() => {
+                                const subtotal = editFormData.items ? editFormData.items.reduce((sum, item) => sum + (item.total || 0), 0) : 0;
+                                const rate = (taxSettings && taxSettings.include_tax) ? (parseFloat(String(taxSettings.tax_rate)) || 0) : 0;
+                                const tax = (subtotal * rate) / 100;
+                                return (subtotal + tax + (editFormData.extra_charge || 0)).toFixed(2);
+                              })()}
                             </span>
                           </div>
                         </div>

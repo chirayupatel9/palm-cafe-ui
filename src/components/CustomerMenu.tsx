@@ -68,6 +68,7 @@ const CustomerMenu: React.FC<CustomerMenuProps> = ({
   const [taxAmount, setTaxAmount] = useState(0);
   const [taxRate, setTaxRate] = useState(0);
   const [showTaxInMenu, setShowTaxInMenu] = useState(true);
+  const [includeTaxInOrder, setIncludeTaxInOrder] = useState(true);
   const [orderStatus, setOrderStatus] = useState<string | null>(null);
   const [recentOrder, setRecentOrder] = useState<any>(null);
   const [pointsToRedeem, setPointsToRedeem] = useState(0);
@@ -334,19 +335,21 @@ const CustomerMenu: React.FC<CustomerMenuProps> = ({
       const settings = response.data;
       setShowTaxInMenu(settings.show_tax_in_menu);
       setTaxRate(settings.tax_rate || 0);
+      setIncludeTaxInOrder(settings.include_tax !== false);
     } catch (error) {
       console.error('Error fetching tax settings:', error);
       setShowTaxInMenu(false);
       setTaxRate(0);
+      setIncludeTaxInOrder(false);
     }
   };
 
   // Calculate tax amount when cart changes
   useEffect(() => {
     const subtotal = getSubtotal();
-    const calculatedTax = (subtotal * taxRate) / 100;
+    const calculatedTax = includeTaxInOrder ? (subtotal * taxRate) / 100 : 0;
     setTaxAmount(calculatedTax);
-  }, [cart, taxRate]);
+  }, [cart, taxRate, includeTaxInOrder]);
 
   // Calculate max redeemable points when cart changes
   useEffect(() => {
@@ -458,7 +461,7 @@ const CustomerMenu: React.FC<CustomerMenuProps> = ({
   const getTotal = () => {
     const subtotal = getSubtotal();
     const pointsDiscount = pointsToRedeem * 0.1; // 1 point = 0.1 INR
-    return subtotal + taxAmount + tipAmount - pointsDiscount;
+    return subtotal + (includeTaxInOrder ? taxAmount : 0) + tipAmount - pointsDiscount;
   };
 
   const MAX_ITEM_QUANTITY = 10;
