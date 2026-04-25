@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { Plus, Minus, Trash2, Receipt, ShoppingCart, FolderOpen, Star, ShoppingBag, BarChart3 } from 'lucide-react';
+import { Plus, Minus, Trash2, Receipt, ShoppingCart, FolderOpen, Star, ShoppingBag, BarChart3, Search } from 'lucide-react';
 import Dialog from './ui/Dialog';
 import Sheet from './ui/Sheet';
 import { GlassButton } from './ui/GlassButton';
@@ -40,6 +40,7 @@ const OrderPage: React.FC<OrderPageProps> = ({ menuItems, cart: externalCart, se
   const { isDarkMode } = useDarkMode();
   const { user } = useAuth();
   const [cart, setCart] = useState([]);
+  const [menuSearchQuery, setMenuSearchQuery] = useState('');
   const [customerName, setCustomerName] = useState('');
   const [customerPhone, setCustomerPhone] = useState('');
   const [customerEmail, setCustomerEmail] = useState('');
@@ -400,6 +401,21 @@ const OrderPage: React.FC<OrderPageProps> = ({ menuItems, cart: externalCart, se
 
   const subtotal = getSubtotal();
   const total = getTotal();
+  const normalizedMenuQuery = (menuSearchQuery || '').trim().toLowerCase();
+  const visibleGroupedMenuItems = normalizedMenuQuery
+    ? Object.fromEntries(
+        Object.entries(groupedMenuItems)
+          .map(([categoryName, items]) => {
+            const filtered = (items as any[]).filter((item: any) => {
+              const name = (item?.name || '').toString().toLowerCase();
+              const description = (item?.description || '').toString().toLowerCase();
+              return name.includes(normalizedMenuQuery) || description.includes(normalizedMenuQuery);
+            });
+            return [categoryName, filtered];
+          })
+          .filter(([, items]) => (items as any[]).length > 0)
+      )
+    : groupedMenuItems;
 
   return (
     <>
@@ -448,6 +464,40 @@ const OrderPage: React.FC<OrderPageProps> = ({ menuItems, cart: externalCart, se
           </div>
         </div>
 
+        {/* Menu search */}
+        <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+          <div className="relative w-full sm:max-w-md">
+            <input
+              type="text"
+              placeholder="Search menu items..."
+              value={menuSearchQuery}
+              onChange={(e) => setMenuSearchQuery(e.target.value)}
+              className="glass-input input-field pl-12 pr-10 w-full min-h-[44px] rounded-full"
+              aria-label="Search menu items"
+            />
+            <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+              <Search className="h-5 w-5 text-on-surface-variant" />
+            </div>
+            {menuSearchQuery && (
+              <button
+                type="button"
+                onClick={() => setMenuSearchQuery('')}
+                className="absolute inset-y-0 right-0 pr-3 flex items-center hover:text-on-surface"
+                aria-label="Clear menu search"
+              >
+                <svg className="h-5 w-5 text-on-surface-variant" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            )}
+          </div>
+          {normalizedMenuQuery && (
+            <div className="text-sm text-on-surface-variant">
+              Showing results for &quot;{menuSearchQuery.trim()}&quot;
+            </div>
+          )}
+        </div>
+
         {Object.keys(groupedMenuItems).length === 0 ? (
           <div className="text-center py-16">
             <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl mx-auto mb-4">
@@ -458,7 +508,15 @@ const OrderPage: React.FC<OrderPageProps> = ({ menuItems, cart: externalCart, se
           </div>
         ) : (
           <div className="space-y-12 sm:space-y-16">
-            {Object.entries(groupedMenuItems).map(([categoryName, items]) => {
+            {Object.keys(visibleGroupedMenuItems).length === 0 ? (
+              <div className="text-center py-16">
+                <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl mx-auto mb-4">
+                  <Search className="h-8 w-8 text-[var(--color-primary)] opacity-70" />
+                </div>
+                <h3 className="text-xl font-semibold mb-2 text-[var(--color-on-surface)]">No matching items</h3>
+                <p className="text-[var(--color-on-surface-variant)]">Try a different search term.</p>
+              </div>
+            ) : Object.entries(visibleGroupedMenuItems).map(([categoryName, items]) => {
               return (
                 <section
                   key={categoryName}
